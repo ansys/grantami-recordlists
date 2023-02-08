@@ -74,7 +74,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip poetry tox tox-gh-actions
       - name: Test with tox
-        run: tox -e ${{ matrix.python-version }}
+        run: tox
 #      - name: Upload coverage report
 #        uses: codecov/codecov-action@v3
 #        if: ${{ github.actor != 'dependabot[bot]' }}
