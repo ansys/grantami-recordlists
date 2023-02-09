@@ -45,6 +45,10 @@ jobs:
         os: [ubuntu-latest, windows-latest]
         python-version: ['3.7', '3.8', '3.9', '3.10']
     steps:
+      - name: Download dependencies
+        run: gh run download -R pyansys/grantami-serverapi-openapi -n "ansys-grantami-serverapi-openapi-wheel" -D .\deps
+        env:
+          GITHUB_TOKEN: ${{ secrets.LUDOVIC_PAT }}
       - uses: pyansys/actions/build-wheelhouse@v3
         with:
           library-name: ${{ env.LIBRARY_NAME }}
@@ -83,6 +87,10 @@ jobs:
     needs: [doc-style]
     steps:
       - uses: actions/checkout@v3
+      - name: Download dependencies
+        run: gh run download -R pyansys/grantami-serverapi-openapi -n "ansys-grantami-serverapi-openapi-wheel" -D .\deps
+        env:
+          GITHUB_TOKEN: ${{ secrets.LUDOVIC_PAT }}
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
@@ -128,6 +136,10 @@ jobs:
 #    needs: [tests, doc-deploy-stable]
     needs: [tests]
     steps:
+      - name: Download dependencies
+        run: gh run download -R pyansys/grantami-serverapi-openapi -n "ansys-grantami-serverapi-openapi-wheel" -D .\deps
+        env:
+          GITHUB_TOKEN: ${{ secrets.LUDOVIC_PAT }}
       - uses: pyansys/actions/build-library@v3
         with:
           library-name: ${{ env.LIBRARY_NAME }}
