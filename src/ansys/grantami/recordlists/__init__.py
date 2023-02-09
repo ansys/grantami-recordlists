@@ -1,8 +1,4 @@
-"""
-grantami.
-
-recordlists
-"""
+from ._connection import ServerApiFactory
 
 try:
     import importlib.metadata as importlib_metadata
