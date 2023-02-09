@@ -1,3 +1,4 @@
+"""Pythonic client for GRANTA MI ServerAPI RecordLists."""
 from ._connection import ServerApiFactory
 
 try:
