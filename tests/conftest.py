@@ -2,7 +2,7 @@ import json
 import pytest
 import requests_mock
 
-from ansys.grantami.recordlists import ServerApiFactory
+from ansys.grantami.recordlists import Connection
 
 from inputs.examples import examples_as_strings
 
@@ -22,7 +22,7 @@ def mocker():
 def mock_client(api_url, mocker):
     with mocker:
         mocker.get(requests_mock.ANY)
-        client = ServerApiFactory(api_url=api_url).with_anonymous().connect()
+        client = Connection(api_url=api_url).with_anonymous().connect()
     return client
 
 

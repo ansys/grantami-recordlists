@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 import requests
 from ansys.grantami.serverapi_openapi import api, models
@@ -6,10 +6,12 @@ from ansys.openapi.common import (
     ApiClient,
     SessionConfiguration,
     ApiClientFactory,
-    ApiConnectionException,
 )
 
 from ansys.grantami.recordlists.models import RecordListHeader, RecordListItem
+
+
+AUTH_PATH = "/swagger/v1/swagger.json"
 
 
 class RecordListApiClient(ApiClient):
@@ -60,18 +62,15 @@ class RecordListApiClient(ApiClient):
         return [RecordListItem.from_model(item) for item in items.items]
 
 
-class ServerApiFactory(ApiClientFactory):
+class Connection(ApiClientFactory):
     """
     Connects to a Granta MI ServerAPI instance.
     """
 
-    def _ApiClientFactory__test_connection(self):
-        test_path = "/swagger/v1/swagger.json"
-        resp = self._session.get(self._api_url + test_path)
-        if 200 <= resp.status_code < 300:
-            return True
-        else:
-            raise ApiConnectionException(resp.status_code, resp.reason, resp.text)
+    def __init__(self, api_url: str, session_configuration: Optional[SessionConfiguration] = None):
+        auth_url = api_url.strip("/") + AUTH_PATH
+        super().__init__(auth_url, session_configuration)
+        self._base_server_api_url = api_url
 
     def connect(self) -> RecordListApiClient:
         """
@@ -80,6 +79,11 @@ class ServerApiFactory(ApiClientFactory):
         Authentication must be configured for this method to succeed.
         """
         self._validate_builder()
-        client = RecordListApiClient(self._session, self._api_url, self._session_configuration)
+        client = RecordListApiClient(
+            self._session,
+            self._base_server_api_url,
+            self._session_configuration,
+        )
         client.setup_client(models)
+        # TODO: test connection
         return client
