@@ -1,8 +1,5 @@
-"""
-grantami.
-
-recordlists
-"""
+"""Pythonic client for GRANTA MI ServerAPI RecordLists."""
+from ._connection import Connection
 
 try:
     import importlib.metadata as importlib_metadata
