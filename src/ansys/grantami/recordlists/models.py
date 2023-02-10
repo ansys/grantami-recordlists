@@ -81,13 +81,38 @@ class RecordList:
         return self._awaiting_approval
 
     def read_items(self):
+        """
+        Fetches items included in the RecordList via a request to ServerAPI
+        """
         self._items = self._client.get_list_items(self._identifier)
 
     @property
-    def items(self):
+    def items(self) -> List["RecordListItem"]:
+        """
+        Items included in the RecordList. Fetched from ServerAPI if not yet exported.
+        """
         if self._items is None:
             self.read_items()
         return self._items
+
+    def add_items(self, items: List["RecordListItem"]):
+        """
+        Add items to the RecordList and refreshes all items.
+        Might be succesful even if the items are invalid references.
+        """
+        self._client.add_items_to_list(self._identifier, items)
+        self.read_items()
+
+    def remove_items(self, items: List["RecordListItem"]):
+        """
+        Remove items from the RecordList and refetches current items from ServerAPI.
+        Might be successful even the items are not initially in the RecordList.
+        """
+        # TODO: API will accept removal of items that are not in the list.
+        #  We could check here that items are in the list and raise an Exception if not, although it
+        #  would require getting the items first.
+        self._client.remove_items_from_list(self._identifier, items=items)
+        self.read_items()
 
     @classmethod
     def from_model(cls, client, model: models.GrantaServerApiListsDtoRecordListHeader):

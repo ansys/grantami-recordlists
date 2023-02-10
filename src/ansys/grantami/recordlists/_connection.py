@@ -63,6 +63,38 @@ class RecordListApiClient(ApiClient):
         items = self.list_item_api.api_v1_lists_list_list_identifier_items_get(identifier)
         return [RecordListItem.from_model(item) for item in items.items]
 
+    def add_items_to_list(self, identifier: str, items: List[RecordListItem]):
+        """
+        Perform a request against the Server API to add items to the Record List
+        specified by its UUID identifier.
+        """
+
+        if not items:
+            return
+
+        self.list_item_api.api_v1_lists_list_list_identifier_items_add_post(
+            identifier,
+            body=models.GrantaServerApiListsDtoRecordListItems(
+                items=[item.to_model() for item in items]
+            )
+        )
+
+    def remove_items_from_list(self, identifier: str, items: List[RecordListItem]):
+        """
+        Perform a request against the Server API to remove items from the Record List
+        specified by its UUID identifier.
+        """
+
+        if not items:
+            return
+
+        self.list_item_api.api_v1_lists_list_list_identifier_items_remove_post(
+            identifier,
+            body=models.GrantaServerApiListsDtoRecordListItems(
+                items=[item.to_model() for item in items]
+            )
+        )
+
 
 class Connection(ApiClientFactory):
     """
