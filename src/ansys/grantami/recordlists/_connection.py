@@ -50,8 +50,7 @@ class RecordListApiClient(ApiClient):
         """
 
         return RecordList.from_model(
-            self,
-            self.list_management_api.api_v1_lists_list_list_identifier_get(identifier)
+            self, self.list_management_api.api_v1_lists_list_list_identifier_get(identifier)
         )
 
     def get_list_items(self, identifier: str) -> List[RecordListItem]:
@@ -76,7 +75,7 @@ class RecordListApiClient(ApiClient):
             identifier,
             body=models.GrantaServerApiListsDtoRecordListItems(
                 items=[item.to_model() for item in items]
-            )
+            ),
         )
 
     def remove_items_from_list(self, identifier: str, items: List[RecordListItem]):
@@ -92,7 +91,7 @@ class RecordListApiClient(ApiClient):
             identifier,
             body=models.GrantaServerApiListsDtoRecordListItems(
                 items=[item.to_model() for item in items]
-            )
+            ),
         )
 
 

@@ -8,7 +8,6 @@ from ansys.grantami.recordlists.models import RecordList, RecordListItem
 
 
 class TestRecordList:
-
     @pytest.fixture
     def mock_client(self):
         return Mock(spec=RecordListApiClient)
@@ -29,13 +28,7 @@ class TestRecordList:
         assert mock_client.get_list_items.called_once_with("00000")
 
     items_variations = pytest.mark.parametrize(
-        "items",
-        [
-            [],
-            None,
-            ["1", 2],
-            [RecordListItem("db", "table", "record")]
-        ]
+        "items", [[], None, ["1", 2], [RecordListItem("db", "table", "record")]]
     )
 
     @items_variations
@@ -47,4 +40,3 @@ class TestRecordList:
     def test_remove_items(self, mock_client, record_list, items):
         record_list.add_items([])
         assert mock_client.add_items_to_list.called_once_with([])
-

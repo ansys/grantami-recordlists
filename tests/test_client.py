@@ -5,7 +5,7 @@ import pytest
 
 from ansys.grantami.recordlists._connection import RecordListApiClient
 from ansys.grantami.recordlists.models import RecordListItem
-from ansys.grantami.serverapi_openapi.api import ListManagementApi, ListItemApi, ListPermissionsApi
+from ansys.grantami.serverapi_openapi.api import ListManagementApi, ListItemApi
 from ansys.grantami.serverapi_openapi.models import (
     GrantaServerApiListsDtoRecordListHeader,
     GrantaServerApiListsDtoRecordListItems,
@@ -27,9 +27,7 @@ class TestClientMethod:
     @pytest.fixture
     def api_method(self, monkeypatch):
         mocked_method = Mock(return_value=self._return_value)
-        monkeypatch.setattr(
-            self._api, self._api_method, mocked_method
-        )
+        monkeypatch.setattr(self._api, self._api_method, mocked_method)
         return mocked_method
 
 
@@ -81,9 +79,7 @@ class TestAddItems(TestClientMethod):
     _api = ListItemApi
     _api_method = "api_v1_lists_list_list_identifier_items_add_post"
 
-    @pytest.mark.parametrize("items", [
-        None, [], set()
-    ])
+    @pytest.mark.parametrize("items", [None, [], set()])
     def test_add_no_items(self, client, api_method, items):
         identifier = "00000-0000a"
         response = client.add_items_to_list(identifier, items)
@@ -95,14 +91,14 @@ class TestAddItems(TestClientMethod):
         identifier = "00000-0000a"
         items = [RecordListItem("a", "b", "c")]
         expected_body = GrantaServerApiListsDtoRecordListItems(
-                items=[
-                    GrantaServerApiListsDtoListItem(
-                        database_guid="a",
-                        table_guid="b",
-                        record_history_guid="c",
-                    )
-                ]
-            )
+            items=[
+                GrantaServerApiListsDtoListItem(
+                    database_guid="a",
+                    table_guid="b",
+                    record_history_guid="c",
+                )
+            ]
+        )
 
         response = client.add_items_to_list(identifier, items)
 
@@ -115,9 +111,7 @@ class TestRemoveItems(TestClientMethod):
     _api = ListItemApi
     _api_method = "api_v1_lists_list_list_identifier_items_remove_post"
 
-    @pytest.mark.parametrize("items", [
-        None, [], set()
-    ])
+    @pytest.mark.parametrize("items", [None, [], set()])
     def test_remove_no_items(self, client, api_method, items):
         identifier = "00000-0000a"
         response = client.remove_items_from_list(identifier, items)
@@ -129,14 +123,14 @@ class TestRemoveItems(TestClientMethod):
         identifier = "00000-0000a"
         items = [RecordListItem("a", "b", "c")]
         expected_body = GrantaServerApiListsDtoRecordListItems(
-                items=[
-                    GrantaServerApiListsDtoListItem(
-                        database_guid="a",
-                        table_guid="b",
-                        record_history_guid="c",
-                    )
-                ]
-            )
+            items=[
+                GrantaServerApiListsDtoListItem(
+                    database_guid="a",
+                    table_guid="b",
+                    record_history_guid="c",
+                )
+            ]
+        )
 
         response = client.remove_items_from_list(identifier, items)
 

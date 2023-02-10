@@ -35,7 +35,7 @@ class RecordList:
         published: bool,
         awaiting_approval: bool,
         # internal_use=None,
-        items: Optional[List["RecordListItem"]] = None
+        items: Optional[List["RecordListItem"]] = None,
     ):
         self._client = client
         self._identifier: str = identifier
@@ -98,7 +98,7 @@ class RecordList:
     def add_items(self, items: List["RecordListItem"]):
         """
         Add items to the RecordList and refreshes all items.
-        Might be succesful even if the items are invalid references.
+        Might be successful even if the items are invalid references.
         """
         self._client.add_items_to_list(self._identifier, items)
         self.read_items()
