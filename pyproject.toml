@@ -25,6 +25,7 @@ packages = [
 [tool.poetry.dependencies]
 python = ">=3.7,<4.0"
 importlib-metadata = {version = "^6.0", python = "<3.8"}
+ansys-grantami-serverapi-openapi = {path = "deps/ansys_grantami_serverapi_openapi-0.1.0.dev11-py3-none-any.whl"}
 
 # Optional documentation dependencies
 [tool.poetry.group.doc]
@@ -42,6 +43,7 @@ optional = true
 [tool.poetry.group.tests.dependencies]
 pytest = "^7.1.2"
 pytest-cov = "^3.0.0"
+requests-mock = "^1.10.0"
 
 # Optional build requirements
 [tool.poetry.group.build]
