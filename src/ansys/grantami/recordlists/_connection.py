@@ -8,7 +8,7 @@ from ansys.openapi.common import (
     ApiClientFactory,
 )
 
-from ansys.grantami.recordlists.models import RecordListHeader, RecordListItem
+from ansys.grantami.recordlists.models import RecordList, RecordListItem
 
 
 AUTH_PATH = "/swagger/v1/swagger.json"
@@ -34,22 +34,23 @@ class RecordListApiClient(ApiClient):
         self.list_item_api = api.ListItemApi(self)
         self.list_permissions_api = api.ListPermissionsApi(self)
 
-    def get_all_lists(self) -> List[RecordListHeader]:
+    def get_all_lists(self) -> List[RecordList]:
         """
         Perform a request against the Server API to retrieve all defined Record Lists available for
         the user.
         """
 
-        return [RecordListHeader.from_model(l) for l in self.list_management_api.api_v1_lists_get()]
+        record_lists = self.list_management_api.api_v1_lists_get()
+        return [RecordList.from_model(self, record_list) for record_list in record_lists]
 
-    def get_list(self, identifier: str) -> RecordListHeader:
+    def get_list(self, identifier: str) -> RecordList:
         """
         Perform a request against the Server API to retrieve a Record List specified by its UUID
         identifier.
         """
 
-        return RecordListHeader.from_model(
-            self.list_management_api.api_v1_lists_list_list_identifier_get(identifier)
+        return RecordList.from_model(
+            self, self.list_management_api.api_v1_lists_list_list_identifier_get(identifier)
         )
 
     def get_list_items(self, identifier: str) -> List[RecordListItem]:
@@ -60,6 +61,38 @@ class RecordListApiClient(ApiClient):
 
         items = self.list_item_api.api_v1_lists_list_list_identifier_items_get(identifier)
         return [RecordListItem.from_model(item) for item in items.items]
+
+    def add_items_to_list(self, identifier: str, items: List[RecordListItem]):
+        """
+        Perform a request against the Server API to add items to the Record List
+        specified by its UUID identifier.
+        """
+
+        if not items:
+            return
+
+        self.list_item_api.api_v1_lists_list_list_identifier_items_add_post(
+            identifier,
+            body=models.GrantaServerApiListsDtoRecordListItems(
+                items=[item.to_model() for item in items]
+            ),
+        )
+
+    def remove_items_from_list(self, identifier: str, items: List[RecordListItem]):
+        """
+        Perform a request against the Server API to remove items from the Record List
+        specified by its UUID identifier.
+        """
+
+        if not items:
+            return
+
+        self.list_item_api.api_v1_lists_list_list_identifier_items_remove_post(
+            identifier,
+            body=models.GrantaServerApiListsDtoRecordListItems(
+                items=[item.to_model() for item in items]
+            ),
+        )
 
 
 class Connection(ApiClientFactory):
