@@ -136,3 +136,5 @@ class TestRemoveItems(TestClientMethod):
 
         assert response is None
         api_method.assert_called_once_with(identifier, body=expected_body)
+
+# TODO unit for create list when server-openapi gets updated to handle multiple responses.
