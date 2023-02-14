@@ -11,6 +11,18 @@ if TYPE_CHECKING:
     from ansys.grantami.recordlists._connection import RecordListApiClient
 
 
+def requires_existence(
+    fn,
+):
+    @wraps(fn)
+    def wrapped_property_getter(self: "RecordList"):
+        if not self.exists_on_server:
+            raise RuntimeError("RecordList must first be created.")  # TODO custom exception
+        return fn(self)
+
+    return wrapped_property_getter
+
+
 class RecordList:
     """
     Describes a RecordList as obtained from the API.
@@ -59,18 +71,6 @@ class RecordList:
     def exists_on_server(self) -> bool:
         """Whether the list exists on server or has been created in memory only."""
         return self._identifier is not None
-
-    @staticmethod
-    def requires_existence(
-        fn,
-    ):
-        @wraps(fn)
-        def wrapped_property_getter(self: "RecordList"):
-            if not self.exists_on_server:
-                raise RuntimeError("RecordList must first be created.")  # TODO custom exception
-            return fn(self)
-
-        return wrapped_property_getter
 
     # Read & Write properties
 
