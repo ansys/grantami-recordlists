@@ -49,9 +49,10 @@ class RecordListApiClient(ApiClient):
         identifier.
         """
 
-        return RecordList.from_model(
-            self, self.list_management_api.api_v1_lists_list_list_identifier_get(identifier)
-        )
+        return RecordList.from_model(self, self._get_list(identifier))
+
+    def _get_list(self, identifier: str) -> models.GrantaServerApiListsDtoRecordListHeader:
+        return self.list_management_api.api_v1_lists_list_list_identifier_get(identifier)
 
     def get_list_items(self, identifier: str) -> List[RecordListItem]:
         """
@@ -80,7 +81,7 @@ class RecordListApiClient(ApiClient):
 
     def remove_items_from_list(self, identifier: str, items: List[RecordListItem]):
         """
-        Perform a request against the Server API to remove items from the Record List
+        Perform a request against the Server API to remove items from the Record List.
         specified by its UUID identifier.
         """
 
@@ -93,6 +94,47 @@ class RecordListApiClient(ApiClient):
                 items=[item.to_model() for item in items]
             ),
         )
+
+    def create_list(
+        self,
+        name: str,
+        description: Optional[str] = None,
+        notes: Optional[str] = None,
+        items: Optional[List[RecordListItem]] = None,
+    ) -> RecordList:
+        """Create a new list and push it to Server API. The created RecordList is returned."""
+        identifier = self._create_list(name, description, notes, items)
+        return self.get_list(identifier)
+
+    def _create_list(
+        self,
+        name: str,
+        description: Optional[str] = None,
+        notes: Optional[str] = None,
+        items: Optional[List[RecordListItem]] = None,
+    ) -> str:
+        """Perform a request against the Server API to create a new Record List."""
+        if items is not None:
+            items = models.GrantaServerApiListsDtoRecordListItems(
+                items=[list_item.to_model() for list_item in items]
+            )
+
+        # TODO Workaround until Server API documents 201 response
+        response, status_code, _ = self.list_management_api.api_v1_lists_post_with_http_info(
+            _preload_content=False,
+            body=models.GrantaServerApiListsDtoRecordListCreate(
+                name=name,
+                description=description,
+                notes=notes,
+                items=items,
+            ),
+        )
+        if status_code == 201:
+            response = self.deserialize(response, "GrantaServerApiListsDtoRecordListResource")
+            response: models.GrantaServerApiListsDtoRecordListResource
+            return response.resource_uri.split("/")[-1]
+        else:
+            return None
 
 
 class Connection(ApiClientFactory):
