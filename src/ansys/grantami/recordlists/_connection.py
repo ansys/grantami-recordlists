@@ -102,7 +102,7 @@ class RecordListApiClient(ApiClient):
         notes: Optional[str] = None,
         items: Optional[List[RecordListItem]] = None,
     ) -> RecordList:
-        """Create a new list and immediately fetch its details from Server API."""
+        """Create a new list and push it to Server API. The created RecordList is returned."""
         identifier = self._create_list(name, description, notes, items)
         return self.get_list(identifier)
 
@@ -119,7 +119,7 @@ class RecordListApiClient(ApiClient):
                 items=[list_item.to_model() for list_item in items]
             )
 
-        # TODO Temporary workaround until release of openapi-common that handles multiple responses
+        # TODO Workaround until Server API documents 201 response
         response, status_code, _ = self.list_management_api.api_v1_lists_post_with_http_info(
             _preload_content=False,
             body=models.GrantaServerApiListsDtoRecordListCreate(

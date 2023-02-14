@@ -88,7 +88,7 @@ class RecordList:
         """
         if self.exists_on_server:
             # TODO support update
-            raise ValueError("Cannot set the value of property 'name'. Use [] instead.")
+            raise ValueError("Cannot set the value of property 'name'. Use <TODO> instead.")
         self._name = value
 
     @property
@@ -105,7 +105,7 @@ class RecordList:
         """
         if self.exists_on_server:
             # TODO support update
-            raise ValueError("Cannot set the value of property 'description'. Use [] instead.")
+            raise ValueError("Cannot set the value of property 'description'. Use <TODO> instead.")
         self._description = value
 
     @property
@@ -122,7 +122,7 @@ class RecordList:
         """
         if self.exists_on_server:
             # TODO support update
-            raise ValueError("Cannot set the value of property 'notes'. Use [] instead.")
+            raise ValueError("Cannot set the value of property 'notes'. Use <TODO> instead.")
         self._notes = value
 
     # Read-only properties
