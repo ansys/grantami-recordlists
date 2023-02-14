@@ -338,7 +338,6 @@ class RecordList:
             self.read_items()
 
 
-
 class RecordListItem:
     # TODO add record guid and version, validate input (require one guid)
 
