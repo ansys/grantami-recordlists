@@ -186,7 +186,7 @@ class RecordList:
     @requires_existence
     def published_user(self) -> Optional["User"]:
         """
-        Datetime at which the Record List was published.
+        User who published/withdrew the Record List.
         Read-only.
         """
         # TODO also represents last withdrawal date. Consider renaming
