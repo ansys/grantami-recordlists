@@ -84,7 +84,7 @@ class RecordList:
     @name.setter
     def name(self, value: str):
         """
-        Set the name of the Record List
+        Set the name of the Record List.
         """
         if self.exists_on_server:
             # TODO support update
@@ -101,7 +101,7 @@ class RecordList:
     @description.setter
     def description(self, value: str):
         """
-        Set the description of the Record List
+        Set the description of the Record List.
         """
         if self.exists_on_server:
             # TODO support update
@@ -118,7 +118,7 @@ class RecordList:
     @notes.setter
     def notes(self, value: str):
         """
-        Set the notes of the Record List
+        Set the notes of the Record List.
         """
         if self.exists_on_server:
             # TODO support update
@@ -235,7 +235,7 @@ class RecordList:
 
     def read_items(self):
         """
-        Fetches items included in the RecordList via a request to ServerAPI
+        Fetches items included in the RecordList via a request to ServerAPI.
         """
         self._items = self._client.get_list_items(self._identifier)
 
@@ -302,7 +302,7 @@ class RecordList:
         model: models.GrantaServerApiListsDtoRecordListHeader,
         items: models.GrantaServerApiListsDtoRecordListItems = None,
     ):
-        """Set private properties (read-only list properties)"""
+        """Set private properties (read-only list properties)."""
         self._identifier = model.identifier
         self._created_timestamp = model.created_timestamp
         self._created_user = User.from_model(model.created_user)
@@ -319,7 +319,9 @@ class RecordList:
             self._items = [RecordListItem.from_model(list_item) for list_item in items.items]
 
     def create(self):
-        """Multiple requests: create, get, get_items"""
+        """
+        Create the RecordList via Server API.
+        """
         if self.exists_on_server:
             raise RuntimeError(
                 "Cannot create a RecordList that already exists on server. See .copy() or .revise()"
@@ -398,7 +400,7 @@ class RecordListItem:
 
 class User:
     # TODO change name to something user-friendly that means User AND Group
-    """Read-only description of a Granta MI User or Group"""
+    """Read-only description of a Granta MI User or Group."""
 
     def __init__(self):
         self._identifier: Optional[str] = None

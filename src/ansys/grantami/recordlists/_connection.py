@@ -81,7 +81,7 @@ class RecordListApiClient(ApiClient):
 
     def remove_items_from_list(self, identifier: str, items: List[RecordListItem]):
         """
-        Perform a request against the Server API to remove items from the Record List
+        Perform a request against the Server API to remove items from the Record List.
         specified by its UUID identifier.
         """
 
