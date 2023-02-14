@@ -49,9 +49,7 @@ class RecordListApiClient(ApiClient):
         identifier.
         """
 
-        return RecordList.from_model(
-            self, self._get_list(identifier)
-        )
+        return RecordList.from_model(self, self._get_list(identifier))
 
     def _get_list(self, identifier: str) -> models.GrantaServerApiListsDtoRecordListHeader:
         return self.list_management_api.api_v1_lists_list_list_identifier_get(identifier)
@@ -104,9 +102,7 @@ class RecordListApiClient(ApiClient):
         notes: Optional[str] = None,
         items: Optional[List[RecordListItem]] = None,
     ) -> RecordList:
-        """
-
-        """
+        """Create a new list and immediately fetch its details from Server API."""
         identifier = self._create_list(name, description, notes, items)
         return self.get_list(identifier)
 
@@ -131,12 +127,10 @@ class RecordListApiClient(ApiClient):
                 description=description,
                 notes=notes,
                 items=items,
-            )
+            ),
         )
         if status_code == 201:
-            response = self.deserialize(
-                response, "GrantaServerApiListsDtoRecordListResource"
-            )
+            response = self.deserialize(response, "GrantaServerApiListsDtoRecordListResource")
             response: models.GrantaServerApiListsDtoRecordListResource
             return response.resource_uri.split("/")[-1]
         else:

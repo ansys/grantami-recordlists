@@ -15,6 +15,7 @@ class RecordList:
     """
     Describes a RecordList as obtained from the API.
     """
+
     # TODO Skipped, might be for internal use?
     #  - metadata
     #  - parent_record_list_identifier
@@ -52,7 +53,7 @@ class RecordList:
         self._notes: Optional[None] = notes
 
         # Other properties not directly extracted from auto-generated RecordListHeader model
-        self._items: Optional[List["RecordListItem"]] = items if items is not None else []
+        self._items: Optional[List["RecordListItem"]] = items
 
     @property
     def exists_on_server(self) -> bool:
@@ -60,7 +61,9 @@ class RecordList:
         return self._identifier is not None
 
     @staticmethod
-    def requires_existence(fn,):
+    def requires_existence(
+        fn,
+    ):
         @wraps(fn)
         def wrapped_property_getter(self: "RecordList"):
             if not self.exists_on_server:
@@ -254,6 +257,8 @@ class RecordList:
             self._client.add_items_to_list(self._identifier, items)
             self.read_items()
         else:
+            if self._items is None:
+                self._items = []
             self._items.extend(items)
 
     def remove_items(self, items: List["RecordListItem"]):
@@ -268,6 +273,8 @@ class RecordList:
             self._client.remove_items_from_list(self._identifier, items=items)
             self.read_items()
         else:
+            if self._items is None:
+                self._items = []
             for item in items:
                 self._items.remove(item)
 
@@ -393,6 +400,7 @@ class RecordListItem:
 class User:
     # TODO change name to something user-friendly that means User AND Group
     """Read-only description of a Granta MI User or Group"""
+
     def __init__(self):
         self._identifier: Optional[str] = None
         self._display_name: Optional[str] = None
@@ -411,7 +419,9 @@ class User:
         return self._name
 
     @classmethod
-    def from_model(cls, dto_user: Optional[models.GrantaServerApiListsDtoUserOrGroup]) -> Optional["User"]:
+    def from_model(
+        cls, dto_user: Optional[models.GrantaServerApiListsDtoUserOrGroup]
+    ) -> Optional["User"]:
         if dto_user is None:
             return None
 
