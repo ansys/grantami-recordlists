@@ -100,6 +100,7 @@ jobs:
       TEST_SERVER_URL: ${{ secrets.TEST_SERVER_URL }}
       TEST_SERVER_ADMIN_USER: ${{ secrets.TEST_SERVER_ADMIN_USER }}
       TEST_SERVER_ADMIN_PASS: ${{ secrets.TEST_SERVER_ADMIN_PASS }}
+      GITHUB_TOKEN: ${{ secrets.LUDOVIC_PAT }}
 
   doc-build:
     name: "Build documentation"
