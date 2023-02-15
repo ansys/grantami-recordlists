@@ -4,6 +4,9 @@ from ansys.grantami.recordlists import Connection
 from ansys.grantami.recordlists.models import RecordList, RecordListItem
 
 
+pytestmark = pytest.mark.integration
+
+
 @pytest.fixture
 def api_client():
     connection = Connection("http://localhost/mi_servicelayer/proxy/v1.svc").with_autologon()

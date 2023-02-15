@@ -67,3 +67,8 @@ source = ["ansys.grantami"]
 
 [tool.coverage.report]
 show_missing = true
+
+[tool.pytest.ini_options]
+markers = [
+    """integration: test requires a real database (deselect with '-m \"not integration\"')"""
+]
