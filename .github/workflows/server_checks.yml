@@ -17,7 +17,7 @@ on:
         required: true
       TEST_SERVER_ADMIN_PASS:
         required: true
-      GITHUB_TOKEN:
+      GH_PAT:
         required: true
   workflow_dispatch:
 
@@ -79,7 +79,7 @@ jobs:
       - name: Download dependencies
         run: gh run download -R pyansys/grantami-serverapi-openapi -n "ansys-grantami-serverapi-openapi-wheel" -D deps
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
 
       - name: Test with tox (integration tests only)
         run: tox -- -m "integration"
