@@ -84,7 +84,7 @@ jobs:
   stop_vm:
     name: Stop Azure VM
     runs-on: ubuntu-latest
-    needs: docs
+    needs: integration_tests
     if: always()
 
     steps:
