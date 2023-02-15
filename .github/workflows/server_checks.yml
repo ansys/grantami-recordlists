@@ -74,6 +74,11 @@ jobs:
       - name: Install dependencies
         run: pip install poetry 'tox<4' --disable-pip-version-check
 
+      - name: Download dependencies
+        run: gh run download -R pyansys/grantami-serverapi-openapi -n "ansys-grantami-serverapi-openapi-wheel" -D deps
+        env:
+          GITHUB_TOKEN: ${{ secrets.LUDOVIC_PAT }}
+          
       - name: Test with tox (integration tests only)
         run: tox -- -m "integration"
         env:
