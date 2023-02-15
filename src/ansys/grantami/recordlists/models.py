@@ -339,6 +339,31 @@ class RecordList:
         if self._items is not None:
             self.read_items()
 
+    def delete(self):
+        """
+        Sends a request to delete the RecordList on Server API. The current object will be updated
+        to reflect the new state.
+        """
+        if not self.exists_on_server:
+            raise RuntimeError("Cannot delete a RecordList that does not exist on server.")
+        self._client.delete_list(self.identifier)
+        self._delete_read_only_data()
+
+    def _delete_read_only_data(self):
+        """
+        Reset internal properties which are only available for a list that exists on server.
+        """
+        self._identifier = None
+        self._created_timestamp = None
+        self._created_user = None
+        self._last_modified_timestamp = None
+        self._last_modified_user = None
+        self._published_timestamp = None
+        self._published_user = None
+        self._is_revision = None
+        self._published = None
+        self._awaiting_approval = None
+        self._internal_use = None
 
 class RecordListItem:
     # TODO add record guid and version, validate input (require one guid)

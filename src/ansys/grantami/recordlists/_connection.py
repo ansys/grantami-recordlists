@@ -136,6 +136,9 @@ class RecordListApiClient(ApiClient):
         else:
             return None
 
+    def delete_list(self, identifier: str) -> None:
+        self.list_management_api.api_v1_lists_list_list_identifier_delete(identifier)
+
 
 class Connection(ApiClientFactory):
     """
