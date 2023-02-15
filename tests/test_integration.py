@@ -1,3 +1,4 @@
+import os
 import pytest
 
 from ansys.grantami.recordlists import Connection
@@ -7,9 +8,26 @@ from ansys.grantami.recordlists.models import RecordList, RecordListItem
 pytestmark = pytest.mark.integration
 
 
-@pytest.fixture
-def api_client():
-    connection = Connection("http://localhost/mi_servicelayer/proxy/v1.svc").with_autologon()
+@pytest.fixture(scope="session")
+def sl_url():
+    return os.getenv("TEST_SL_URL", "http://localhost/mi_servicelayer")
+
+
+@pytest.fixture(scope="session")
+def list_admin_username():
+    return os.getenv("TEST_LIST_ADMIN_USER")
+
+
+@pytest.fixture(scope="session")
+def list_admin_password():
+    return os.getenv("TEST_LIST_ADMIN_PASS")
+
+
+@pytest.fixture(scope="session")
+def api_client(sl_url, list_admin_username, list_admin_password):
+    connection = Connection(f"{sl_url}/proxy/v1.svc").with_credentials(
+        list_admin_username, list_admin_password
+    )
     return connection.connect()
 
 
@@ -18,7 +36,9 @@ TEST_LIST_NAME = "IntegrationTestList"
 
 @pytest.fixture
 def new_list_id(api_client):
-    return api_client._create_list(name=TEST_LIST_NAME)
+    list_id = api_client._create_list(name=TEST_LIST_NAME)
+    yield list_id
+    # TODO delete
 
 
 @pytest.fixture
@@ -35,7 +55,8 @@ def new_list_with_items(api_client, new_list_id):
     return new_list_id
 
 
-def test_getting_all_lists(api_client):
+def test_getting_all_lists(api_client, new_list_id):
+    # Using new_list_id fixture to ensure there is at least one list when this test is run
     all_lists = api_client.get_all_lists()
     assert isinstance(all_lists, list)
     assert all(isinstance(l, RecordList) for l in all_lists)
