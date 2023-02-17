@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import Dict, List, Optional
 
 import requests
 from ansys.grantami.serverapi_openapi import api, models
@@ -81,7 +81,7 @@ class RecordListApiClient(ApiClient):
 
     def remove_items_from_list(self, identifier: str, items: List[RecordListItem]):
         """
-        Perform a request against the Server API to remove items from the Record List.
+        Perform a request against the Server API to remove items from the Record List
         specified by its UUID identifier.
         """
 
@@ -137,7 +137,58 @@ class RecordListApiClient(ApiClient):
             return None
 
     def delete_list(self, identifier: str) -> None:
+        """
+        Perform a request against the Server API to delete a Record List specified by its UUID
+        identifier.
+        """
         self.list_management_api.api_v1_lists_list_list_identifier_delete(identifier)
+
+    def update_list(
+        self,
+        identifier: str,
+        **kwargs: Dict[str, Optional[str]],
+    ) -> None:
+        """
+        Perform a request against the Server API to update a Record List specified by its UUID
+        identifier, with the properties provided.
+        # TODO document kwargs
+        """
+        _nullable = ["notes", "description"]
+        _non_nullable = ["name"]
+        _all_properties = _non_nullable + _nullable
+
+        if not kwargs:
+            raise ValueError(
+                f"Update must include at least one property to update. "
+                f"Supported properties are {_all_properties}"
+            )
+
+        unexpected_args = [key for key in kwargs.keys() if key not in _all_properties]
+        if unexpected_args:
+            raise ValueError(
+                f"Properties {unexpected_args} are not supported for update. Supported properties"
+                f" are {_all_properties}"
+            )
+
+        unexpected_none_args = [
+            name for name, value in kwargs.items() if name not in _nullable and value is None
+        ]
+        if unexpected_none_args:
+            raise ValueError(
+                f"Properties {unexpected_none_args} cannot be None. "
+                f"The following properties are nullable {_nullable}"
+            )
+
+        body = []
+        for name, value in kwargs.items():
+            operation = models.MicrosoftAspNetCoreJsonPatchOperationsOperation(
+                value=value,
+                path=f"/{name}",
+                op="replace",
+            )
+            body.append(operation)
+
+        self.list_management_api.api_v1_lists_list_list_identifier_patch(identifier, body=body)
 
 
 class Connection(ApiClientFactory):
