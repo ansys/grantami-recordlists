@@ -130,8 +130,32 @@ class TestRecordList:
     # TODO test deletion of list with items
 
     @pytest.mark.parametrize("prop_name", ["name", "notes", "description"])
-    def test_updating_list_property(self, mock_client, existing_list, prop_name):
+    def test_updating_list_property_individually(self, mock_client, existing_list, prop_name):
         new_value = f"New value for {prop_name}"
+        _return_value = Mock(**{prop_name: new_value})
+        setattr(_return_value, prop_name, new_value)
+        attrs = {"_update_list.return_value": _return_value}
+        mock_client.configure_mock(**attrs)
+
         setattr(existing_list, prop_name, new_value)
-        mock_client.update_list.assert_called_once_with(self._mock_id, **{prop_name: new_value})
+
+        mock_client._update_list.assert_called_once_with(self._mock_id, **{prop_name: new_value})
         assert getattr(existing_list, prop_name) == new_value
+
+    def test_bulk_updating_list_properties(self, mock_client, existing_list):
+        updated_name = "NewName"
+        updated_description = "NewDescription"
+        updated_notes = "NewNotes"
+
+        mock_return = Mock(description=updated_description, notes=updated_notes)
+        mock_return.name = updated_name  # name is an arg on Mock so it must be set separately
+        mock_client._update_list = Mock(return_value=mock_return)
+
+        existing_list.update(updated_name, updated_description, updated_notes)
+
+        mock_client._update_list.assert_called_once_with(
+            self._mock_id, updated_name, updated_description, updated_notes
+        )
+        assert existing_list.name == updated_name
+        assert existing_list.description == updated_description
+        assert existing_list.notes == updated_notes

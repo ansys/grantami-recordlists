@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional
+from typing import List, Optional
 
 import requests
 from ansys.grantami.serverapi_openapi import api, models
@@ -9,6 +9,7 @@ from ansys.openapi.common import (
 )
 
 from ansys.grantami.recordlists.models import RecordList, RecordListItem
+from ansys.grantami.recordlists._utils import _ArgNotProvided
 
 
 AUTH_PATH = "/swagger/v1/swagger.json"
@@ -146,49 +147,53 @@ class RecordListApiClient(ApiClient):
     def update_list(
         self,
         identifier: str,
-        **kwargs: Dict[str, Optional[str]],
+        name: str = _ArgNotProvided,
+        description: Optional[str] = _ArgNotProvided,
+        notes: Optional[str] = _ArgNotProvided,
     ) -> None:
+        self._update_list(identifier, name, description, notes)
+
+    def _update_list(
+        self,
+        identifier: str,
+        name: str = _ArgNotProvided,
+        description: Optional[str] = _ArgNotProvided,
+        notes: Optional[str] = _ArgNotProvided,
+    ) -> models.GrantaServerApiListsDtoRecordListHeader:
         """
         Perform a request against the Server API to update a Record List specified by its UUID
         identifier, with the properties provided.
-        # TODO document kwargs
         """
-        _nullable = ["notes", "description"]
-        _non_nullable = ["name"]
-        _all_properties = _non_nullable + _nullable
-
-        if not kwargs:
+        if name == _ArgNotProvided and description == _ArgNotProvided and notes == _ArgNotProvided:
             raise ValueError(
                 f"Update must include at least one property to update. "
-                f"Supported properties are {_all_properties}"
+                f"Supported properties are 'name', 'description', and 'notes'."
             )
 
-        unexpected_args = [key for key in kwargs.keys() if key not in _all_properties]
-        if unexpected_args:
-            raise ValueError(
-                f"Properties {unexpected_args} are not supported for update. Supported properties"
-                f" are {_all_properties}"
-            )
-
-        unexpected_none_args = [
-            name for name, value in kwargs.items() if name not in _nullable and value is None
-        ]
-        if unexpected_none_args:
-            raise ValueError(
-                f"Properties {unexpected_none_args} cannot be None. "
-                f"The following properties are nullable {_nullable}"
-            )
+        if name is None:
+            raise ValueError(f"If provided, argument 'name' cannot be None.")
 
         body = []
-        for name, value in kwargs.items():
-            operation = models.MicrosoftAspNetCoreJsonPatchOperationsOperation(
-                value=value,
-                path=f"/{name}",
-                op="replace",
-            )
-            body.append(operation)
+        if name != _ArgNotProvided:
+            body.append(self._create_patch_operation(name, "name"))
+        if description != _ArgNotProvided:
+            body.append(self._create_patch_operation(description, "description"))
+        if notes != _ArgNotProvided:
+            body.append(self._create_patch_operation(notes, "notes"))
 
-        self.list_management_api.api_v1_lists_list_list_identifier_patch(identifier, body=body)
+        return self.list_management_api.api_v1_lists_list_list_identifier_patch(
+            identifier, body=body
+        )
+
+    @staticmethod
+    def _create_patch_operation(
+        value: Optional[str], name: str, op="replace"
+    ) -> models.MicrosoftAspNetCoreJsonPatchOperationsOperation:
+        return models.MicrosoftAspNetCoreJsonPatchOperationsOperation(
+            value=value,
+            path=f"/{name}",
+            op=op,
+        )
 
 
 class Connection(ApiClientFactory):
