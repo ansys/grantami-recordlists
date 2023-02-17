@@ -323,6 +323,7 @@ class RecordList:
             awaiting_approval=None,
             internal_use=None,
         )
+        self._items = None
 
     @classmethod
     def from_model(

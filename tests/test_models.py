@@ -121,3 +121,10 @@ class TestRecordList:
     def test_delete_existing_list(self, mock_client, existing_list):
         existing_list.delete()
         mock_client.delete_list.assert_called_once_with(self._mock_id)
+
+        # Check internal state has been updated
+        assert existing_list.exists_on_server is False
+        assert existing_list._identifier is None
+        assert existing_list._created_timestamp is None
+
+    # TODO test deletion of list with items
