@@ -87,8 +87,7 @@ class RecordList:
         Set the name of the Record List.
         """
         if self.exists_on_server:
-            # TODO support update
-            raise ValueError("Cannot set the value of property 'name'. Use <TODO> instead.")
+            self._client.update_list(self._identifier, name=value)
         self._name = value
 
     @property
@@ -104,8 +103,7 @@ class RecordList:
         Set the description of the Record List.
         """
         if self.exists_on_server:
-            # TODO support update
-            raise ValueError("Cannot set the value of property 'description'. Use <TODO> instead.")
+            self._client.update_list(self._identifier, description=value)
         self._description = value
 
     @property
@@ -113,7 +111,7 @@ class RecordList:
         """
         Notes about the Record List.
         """
-        return self._description
+        return self._notes
 
     @notes.setter
     def notes(self, value: str):
@@ -121,8 +119,7 @@ class RecordList:
         Set the notes of the Record List.
         """
         if self.exists_on_server:
-            # TODO support update
-            raise ValueError("Cannot set the value of property 'notes'. Use <TODO> instead.")
+            self._client.update_list(self._identifier, notes=value)
         self._notes = value
 
     # Read-only properties

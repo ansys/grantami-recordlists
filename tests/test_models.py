@@ -128,3 +128,10 @@ class TestRecordList:
         assert existing_list._created_timestamp is None
 
     # TODO test deletion of list with items
+
+    @pytest.mark.parametrize("prop_name", ["name", "notes", "description"])
+    def test_updating_list_property(self, mock_client, existing_list, prop_name):
+        new_value = f"New value for {prop_name}"
+        setattr(existing_list, prop_name, new_value)
+        mock_client.update_list.assert_called_once_with(self._mock_id, **{prop_name: new_value})
+        assert getattr(existing_list, prop_name) == new_value
