@@ -237,6 +237,8 @@ class RecordList:
         """
         Fetches items included in the RecordList via a request to ServerAPI.
         """
+        if not self.exists_on_server:
+            raise RuntimeError("Cannot read items for a RecordList that does not exist on server.")
         self._items = self._client.get_list_items(self._identifier)
 
     @property
@@ -253,6 +255,7 @@ class RecordList:
         Add items to the RecordList and refreshes all items.
         Might be successful even if the items are invalid references.
         """
+        # TODO items validation
         if self.exists_on_server:
             self._client.add_items_to_list(self._identifier, items)
             self.read_items()
@@ -277,46 +280,6 @@ class RecordList:
                 self._items = []
             for item in items:
                 self._items.remove(item)
-
-    @classmethod
-    def from_model(
-        cls,
-        client: "RecordListApiClient",
-        model: models.GrantaServerApiListsDtoRecordListHeader,
-        items: models.GrantaServerApiListsDtoRecordListItems = None,
-    ):
-        """
-        Instantiate from a model defined in the auto-generated client code.
-        """
-        instance = cls(
-            client,
-            model.name,
-            model.description,
-            model.notes,
-        )
-        instance._from_model(model, items)
-        return instance
-
-    def _from_model(
-        self,
-        model: models.GrantaServerApiListsDtoRecordListHeader,
-        items: models.GrantaServerApiListsDtoRecordListItems = None,
-    ):
-        """Set private properties (read-only list properties)."""
-        self._identifier = model.identifier
-        self._created_timestamp = model.created_timestamp
-        self._created_user = User.from_model(model.created_user)
-        self._last_modified_timestamp = model.last_modified_timestamp
-        self._last_modified_user = User.from_model(model.last_modified_user)
-        self._published_timestamp = model.published_timestamp
-        self._published_user = User.from_model(model.published_user)
-        self._is_revision = model.is_revision
-        self._published = model.published
-        self._awaiting_approval = model.awaiting_approval
-        self._internal_use = model.internal_use
-
-        if items is not None:
-            self._items = [RecordListItem.from_model(list_item) for list_item in items.items]
 
     def create(self):
         """
@@ -347,23 +310,87 @@ class RecordList:
         if not self.exists_on_server:
             raise RuntimeError("Cannot delete a RecordList that does not exist on server.")
         self._client.delete_list(self.identifier)
-        self._delete_read_only_data()
+        self._set_internal_state(
+            identifier=None,
+            created_timestamp=None,
+            created_user=None,
+            last_modified_timestamp=None,
+            last_modified_user=None,
+            published_timestamp=None,
+            published_user=None,
+            is_revision=None,
+            published=None,
+            awaiting_approval=None,
+            internal_use=None,
+        )
 
-    def _delete_read_only_data(self):
+    @classmethod
+    def from_model(
+        cls,
+        client: "RecordListApiClient",
+        model: models.GrantaServerApiListsDtoRecordListHeader,
+        items: models.GrantaServerApiListsDtoRecordListItems = None,
+    ):
         """
-        Reset internal properties which are only available for a list that exists on server.
+        Instantiate from a model defined in the auto-generated client code.
         """
-        self._identifier = None
-        self._created_timestamp = None
-        self._created_user = None
-        self._last_modified_timestamp = None
-        self._last_modified_user = None
-        self._published_timestamp = None
-        self._published_user = None
-        self._is_revision = None
-        self._published = None
-        self._awaiting_approval = None
-        self._internal_use = None
+        instance = cls(
+            client,
+            model.name,
+            model.description,
+            model.notes,
+        )
+        instance._from_model(model, items)
+        return instance
+
+    def _from_model(
+        self,
+        model: models.GrantaServerApiListsDtoRecordListHeader,
+        items: models.GrantaServerApiListsDtoRecordListItems = None,
+    ):
+        self._set_internal_state(
+            identifier=model.identifier,
+            created_timestamp=model.created_timestamp,
+            created_user=User.from_model(model.created_user),
+            last_modified_timestamp=model.last_modified_timestamp,
+            last_modified_user=User.from_model(model.last_modified_user),
+            published_timestamp=model.published_timestamp,
+            published_user=User.from_model(model.published_user),
+            is_revision=model.is_revision,
+            published=model.published,
+            awaiting_approval=model.awaiting_approval,
+            internal_use=model.internal_use,
+        )
+
+        if items is not None:
+            self._items = [RecordListItem.from_model(list_item) for list_item in items.items]
+
+    def _set_internal_state(
+        self,
+        identifier: Optional[str],
+        created_timestamp: Optional[datetime],
+        created_user: Optional["User"],
+        published: Optional[bool],
+        is_revision: Optional[bool],
+        awaiting_approval: Optional[bool],
+        internal_use: Optional[bool],
+        last_modified_timestamp: Optional[datetime],
+        last_modified_user: Optional["User"],
+        published_timestamp: Optional[datetime],
+        published_user: Optional[datetime],
+    ):
+        self._identifier = identifier
+        self._created_timestamp = created_timestamp
+        self._created_user = created_user
+        self._published = published
+        self._is_revision = is_revision
+        self._awaiting_approval = awaiting_approval
+        self._internal_use = internal_use
+        self._last_modified_timestamp = last_modified_timestamp
+        self._last_modified_user = last_modified_user
+        self._published_timestamp = published_timestamp
+        self._published_user = published_user
+
 
 class RecordListItem:
     # TODO add record guid and version, validate input (require one guid)
