@@ -27,7 +27,7 @@ def requires_existence(
 
 class RecordList:
     """
-    Describes a RecordList as obtained from the API.
+    Describes a Granta MI RecordList.
     """
 
     # TODO Skipped, might be for internal use?
@@ -413,6 +413,11 @@ class RecordList:
 
 class RecordListItem:
     # TODO add record guid and version, validate input (require one guid)
+    """
+    Describes an item of a :class:`RecordList`, i.e. a record in a Granta MI database.
+
+    An item does not necessarily represent a record that exists on the server.
+    """
 
     def __init__(
         self,
@@ -428,6 +433,7 @@ class RecordListItem:
 
     @property
     def database_guid(self) -> str:
+        """GUID of the database."""
         return self._database_guid
 
     @database_guid.setter
@@ -436,6 +442,7 @@ class RecordListItem:
 
     @property
     def table_guid(self) -> str:
+        """GUID of the table"""
         return self._table_guid
 
     @table_guid.setter
@@ -444,6 +451,7 @@ class RecordListItem:
 
     @property
     def record_history_guid(self) -> str:
+        """Record History GUID of the Record"""
         return self._record_history_guid
 
     @record_history_guid.setter
@@ -480,14 +488,17 @@ class User:
 
     @property
     def identifier(self) -> str:
+        """Read-only identifier of the user or group"""
         return self._identifier
 
     @property
     def display_name(self) -> str:
+        """Read-only display name of the user or group"""
         return self._display_name
 
     @property
     def name(self) -> str:
+        """Read-only name of the user or group"""
         return self._name
 
     @classmethod
