@@ -89,8 +89,7 @@ class RecordList:
         Set the name of the Record List.
         """
         if self.exists_on_server:
-            updated_model = self._client._update_list(self._identifier, name=value)
-            self._name = updated_model.name
+            self.update(name=value)
         else:
             self._name = value
 
@@ -107,8 +106,7 @@ class RecordList:
         Set the description of the Record List.
         """
         if self.exists_on_server:
-            updated_model = self._client._update_list(self._identifier, description=value)
-            self._description = updated_model.description
+            self.update(description=value)
         else:
             self._description = value
 
@@ -125,8 +123,7 @@ class RecordList:
         Set the notes of the Record List.
         """
         if self.exists_on_server:
-            updated_model = self._client._update_list(self._identifier, notes=value)
-            self._notes = updated_model.notes
+            self.update(notes=value)
         else:
             self._notes = value
 
@@ -344,6 +341,7 @@ class RecordList:
         self._name = updated_model.name
         self._notes = updated_model.notes
         self._description = updated_model.description
+        self._from_model(updated_model)
 
     @classmethod
     def from_model(

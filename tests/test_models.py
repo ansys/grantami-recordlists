@@ -5,6 +5,7 @@ import pytest
 
 from ansys.grantami.recordlists._connection import RecordListApiClient
 from ansys.grantami.recordlists.models import RecordList, RecordListItem, User
+from ansys.grantami.recordlists._utils import _ArgNotProvided
 
 
 class TestRecordList:
@@ -139,7 +140,13 @@ class TestRecordList:
 
         setattr(existing_list, prop_name, new_value)
 
-        mock_client._update_list.assert_called_once_with(self._mock_id, **{prop_name: new_value})
+        expected_args = {
+            "name": _ArgNotProvided,
+            "description": _ArgNotProvided,
+            "notes": _ArgNotProvided,
+        }
+        expected_args.update({prop_name: new_value})
+        mock_client._update_list.assert_called_once_with(self._mock_id, *expected_args.values())
         assert getattr(existing_list, prop_name) == new_value
 
     def test_bulk_updating_list_properties(self, mock_client, existing_list):
