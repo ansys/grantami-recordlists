@@ -139,3 +139,14 @@ class TestRemoveItems(TestClientMethod):
 
 
 # TODO unit for create list when server-openapi gets updated to handle multiple responses.
+
+
+class TestDeleteList(TestClientMethod):
+    _return_value = None
+    _api = ListManagementApi
+    _api_method = "api_v1_lists_list_list_identifier_delete"
+
+    def test_delete_list(self, client, api_method):
+        identifier = "00000-0000a"
+        client.delete_list(identifier)
+        api_method.assert_called_once_with(identifier)
