@@ -1,4 +1,4 @@
-Pygrantami recordlists
+Granta MI RecordLists
 ======================
 |pyansys| |python| |pypi| |GH-CI| |codecov| |MIT| |black|
 
@@ -7,19 +7,19 @@ Pygrantami recordlists
    :alt: PyAnsys
 
 .. |python| image:: https://img.shields.io/pypi/pyversions/pygrantami-recordlists?logo=pypi
-   :target: https://pypi.org/project/pygrantami-recordlists/
+   :target: https://pypi.org/project/grantami-recordlists/
    :alt: Python
 
 .. |pypi| image:: https://img.shields.io/pypi/v/pygrantami-recordlists.svg?logo=python&logoColor=white
-   :target: https://pypi.org/project/pygrantami-recordlists
+   :target: https://pypi.org/project/grantami-recordlists
    :alt: PyPI
 
 .. |codecov| image:: https://codecov.io/gh/pyansys/pygrantami-recordlists/branch/main/graph/badge.svg
-   :target: https://codecov.io/gh/pyansys/pygrantami-recordlists
+   :target: https://codecov.io/gh/pyansys/grantami-recordlists
    :alt: Codecov
 
 .. |GH-CI| image:: https://github.com/pyansys/pygrantami-recordlists/actions/workflows/ci_cd.yml/badge.svg
-   :target: https://github.com/pyansys/pygrantami-recordlists/actions/workflows/ci_cd.yml
+   :target: https://github.com/pyansys/grantami-recordlists/actions/workflows/ci_cd.yml
    :alt: GH-CI
 
 .. |MIT| image:: https://img.shields.io/badge/License-MIT-yellow.svg
@@ -42,7 +42,7 @@ At least two installation modes are provided: user and developer.
 For users
 ^^^^^^^^^
 
-In order to install Pygrantami recordlists, make sure you
+In order to install Granta MI RecordLists, make sure you
 have the latest version of `pip`_. To do so, run:
 
 .. code:: bash
@@ -58,7 +58,7 @@ Then, you can simply execute:
 For developers
 ^^^^^^^^^^^^^^
 
-Installing Pygrantami recordlists in developer mode allows
+Installing Granta MI RecordLists in developer mode allows
 you to modify the source and enhance it.
 
 Before contributing to the project, please refer to the `PyAnsys Developer's guide`_. You will 
