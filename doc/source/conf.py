@@ -1,18 +1,20 @@
 """Sphinx documentation configuration file."""
 from datetime import datetime
 
-from ansys_sphinx_theme import pyansys_logo_black as logo
+from ansys_sphinx_theme import pyansys_logo_black, ansys_favicon
+from ansys.grantami.recordlists import __version__
 
 # Project information
 project = "ansys-grantami-recordlists"
-copyright = f"(c) {datetime.now().year} ANSYS, Inc. All rights reserved"
+project_copyright = f"(c) {datetime.now().year} ANSYS, Inc. All rights reserved"
 author = "ANSYS, Inc."
-release = version = "0.1.dev0"
+release = version = __version__
 
 # Select desired logo, theme, and declare the html title
-html_logo = logo
+html_logo = pyansys_logo_black
 html_theme = "ansys_sphinx_theme"
-html_short_title = html_title = "pygrantami-recordlists"
+html_short_title = html_title = "Granta MI RecordLists"
+html_favicon = ansys_favicon
 
 # specify the location of your github repo
 html_theme_options = {
@@ -28,6 +30,7 @@ html_theme_options = {
 extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.autosummary",
+    "sphinx.ext.autosectionlabel",
     "numpydoc",
     "sphinx.ext.intersphinx",
     "sphinx_copybutton",
@@ -36,6 +39,7 @@ extensions = [
 # Intersphinx mapping
 intersphinx_mapping = {
     "python": ("https://docs.python.org/dev", None),
+    "openapi-common": ("https://openapi.docs.pyansys.com", None),
     # kept here as an example
     # "scipy": ("https://docs.scipy.org/doc/scipy/reference", None),
     # "numpy": ("https://numpy.org/devdocs", None),
@@ -79,3 +83,6 @@ source_suffix = ".rst"
 
 # The master toctree document.
 master_doc = "index"
+
+# Generate section labels up to four levels deep
+autosectionlabel_maxdepth = 4
