@@ -125,3 +125,19 @@ def test_delete_list(api_client, new_list_id, list_name):
     with pytest.raises(ApiException) as exc:
         my_list = api_client.get_list(new_list_id)
     assert exc.value.status_code == 404
+
+
+def test_update_list(api_client, new_list_id):
+    api_client.update_list(new_list_id, name="NEWUPDATEDNAME")
+    record_list = api_client.get_list(new_list_id)
+    assert record_list.name == "NEWUPDATEDNAME"
+
+
+def test_update_list_nullable_property(api_client, new_list_id):
+    api_client.update_list(new_list_id, notes="Some notes")
+    record_list = api_client.get_list(new_list_id)
+    assert record_list.notes == "Some notes"
+
+    api_client.update_list(new_list_id, notes=None)
+    record_list = api_client.get_list(new_list_id)
+    assert record_list.notes is None

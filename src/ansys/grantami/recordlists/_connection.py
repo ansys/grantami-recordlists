@@ -9,6 +9,7 @@ from ansys.openapi.common import (
 )
 
 from ansys.grantami.recordlists.models import RecordList, RecordListItem
+from ansys.grantami.recordlists._utils import _ArgNotProvided
 
 
 AUTH_PATH = "/swagger/v1/swagger.json"
@@ -81,7 +82,7 @@ class RecordListApiClient(ApiClient):
 
     def remove_items_from_list(self, identifier: str, items: List[RecordListItem]):
         """
-        Perform a request against the Server API to remove items from the Record List.
+        Perform a request against the Server API to remove items from the Record List
         specified by its UUID identifier.
         """
 
@@ -137,7 +138,62 @@ class RecordListApiClient(ApiClient):
             return None
 
     def delete_list(self, identifier: str) -> None:
+        """
+        Perform a request against the Server API to delete a Record List specified by its UUID
+        identifier.
+        """
         self.list_management_api.api_v1_lists_list_list_identifier_delete(identifier)
+
+    def update_list(
+        self,
+        identifier: str,
+        name: str = _ArgNotProvided,
+        description: Optional[str] = _ArgNotProvided,
+        notes: Optional[str] = _ArgNotProvided,
+    ) -> None:
+        self._update_list(identifier, name, description, notes)
+
+    def _update_list(
+        self,
+        identifier: str,
+        name: str = _ArgNotProvided,
+        description: Optional[str] = _ArgNotProvided,
+        notes: Optional[str] = _ArgNotProvided,
+    ) -> models.GrantaServerApiListsDtoRecordListHeader:
+        """
+        Perform a request against the Server API to update a Record List specified by its UUID
+        identifier, with the properties provided.
+        """
+        if name == _ArgNotProvided and description == _ArgNotProvided and notes == _ArgNotProvided:
+            raise ValueError(
+                f"Update must include at least one property to update. "
+                f"Supported properties are 'name', 'description', and 'notes'."
+            )
+
+        if name is None:
+            raise ValueError(f"If provided, argument 'name' cannot be None.")
+
+        body = []
+        if name != _ArgNotProvided:
+            body.append(self._create_patch_operation(name, "name"))
+        if description != _ArgNotProvided:
+            body.append(self._create_patch_operation(description, "description"))
+        if notes != _ArgNotProvided:
+            body.append(self._create_patch_operation(notes, "notes"))
+
+        return self.list_management_api.api_v1_lists_list_list_identifier_patch(
+            identifier, body=body
+        )
+
+    @staticmethod
+    def _create_patch_operation(
+        value: Optional[str], name: str, op="replace"
+    ) -> models.MicrosoftAspNetCoreJsonPatchOperationsOperation:
+        return models.MicrosoftAspNetCoreJsonPatchOperationsOperation(
+            value=value,
+            path=f"/{name}",
+            op=op,
+        )
 
 
 class Connection(ApiClientFactory):

@@ -1,3 +1,4 @@
+import uuid
 from typing import Type, Any
 from unittest.mock import Mock
 
@@ -10,6 +11,7 @@ from ansys.grantami.serverapi_openapi.models import (
     GrantaServerApiListsDtoRecordListHeader,
     GrantaServerApiListsDtoRecordListItems,
     GrantaServerApiListsDtoListItem,
+    MicrosoftAspNetCoreJsonPatchOperationsOperation,
 )
 
 
@@ -23,6 +25,7 @@ class TestClientMethod:
     _return_value: Any
     _api: Type
     _api_method: str
+    _mock_uuid = str(uuid.uuid4())
 
     @pytest.fixture
     def api_method(self, monkeypatch):
@@ -150,3 +153,31 @@ class TestDeleteList(TestClientMethod):
         identifier = "00000-0000a"
         client.delete_list(identifier)
         api_method.assert_called_once_with(identifier)
+
+
+class TestUpdate(TestClientMethod):
+    _return_value = None
+    _api = ListManagementApi
+    _api_method = "api_v1_lists_list_list_identifier_patch"
+
+    def test_update_list_no_args(self, client, api_method):
+        with pytest.raises(ValueError, match="at least one property"):
+            client.update_list(self._mock_uuid)
+        api_method.assert_not_called()
+
+    def test_update_list_single_non_nullable_args(self, client, api_method):
+        with pytest.raises(ValueError):
+            client.update_list(self._mock_uuid, name=None)
+        api_method.assert_not_called()
+
+    @pytest.mark.parametrize("prop_name", ["notes", "description"])
+    def test_update_list_single_nullable_args(self, client, api_method, prop_name):
+        client.update_list(self._mock_uuid, **{prop_name: None})
+        expected_body = [
+            MicrosoftAspNetCoreJsonPatchOperationsOperation(
+                value=None,
+                path=f"/{prop_name}",
+                op="replace",
+            )
+        ]
+        api_method.assert_called_once_with(self._mock_uuid, body=expected_body)

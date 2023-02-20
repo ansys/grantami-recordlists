@@ -7,6 +7,8 @@ from typing import List, Optional, TYPE_CHECKING
 
 from ansys.grantami.serverapi_openapi import models
 
+from ansys.grantami.recordlists._utils import _ArgNotProvided
+
 if TYPE_CHECKING:
     from ansys.grantami.recordlists._connection import RecordListApiClient
 
@@ -87,9 +89,9 @@ class RecordList:
         Set the name of the Record List.
         """
         if self.exists_on_server:
-            # TODO support update
-            raise ValueError("Cannot set the value of property 'name'. Use <TODO> instead.")
-        self._name = value
+            self.update(name=value)
+        else:
+            self._name = value
 
     @property
     def description(self) -> str:
@@ -104,16 +106,16 @@ class RecordList:
         Set the description of the Record List.
         """
         if self.exists_on_server:
-            # TODO support update
-            raise ValueError("Cannot set the value of property 'description'. Use <TODO> instead.")
-        self._description = value
+            self.update(description=value)
+        else:
+            self._description = value
 
     @property
     def notes(self) -> str:
         """
         Notes about the Record List.
         """
-        return self._description
+        return self._notes
 
     @notes.setter
     def notes(self, value: str):
@@ -121,9 +123,9 @@ class RecordList:
         Set the notes of the Record List.
         """
         if self.exists_on_server:
-            # TODO support update
-            raise ValueError("Cannot set the value of property 'notes'. Use <TODO> instead.")
-        self._notes = value
+            self.update(notes=value)
+        else:
+            self._notes = value
 
     # Read-only properties
 
@@ -324,6 +326,22 @@ class RecordList:
             internal_use=None,
         )
         self._items = None
+
+    def update(
+        self,
+        name: str = _ArgNotProvided,
+        description: Optional[str] = _ArgNotProvided,
+        notes: Optional[str] = _ArgNotProvided,
+    ) -> None:
+        """
+        Sends a request to update the RecordList on Server API. The current object will be updated
+        to reflect the new state.
+        """
+        updated_model = self._client._update_list(self._identifier, name, description, notes)
+        self._name = updated_model.name
+        self._notes = updated_model.notes
+        self._description = updated_model.description
+        self._from_model(updated_model)
 
     @classmethod
     def from_model(
