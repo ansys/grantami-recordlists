@@ -36,6 +36,9 @@ extensions = [
     "sphinx_copybutton",
 ]
 
+# sphinx
+add_module_names = False
+
 # Intersphinx mapping
 intersphinx_mapping = {
     "python": ("https://docs.python.org/dev", None),

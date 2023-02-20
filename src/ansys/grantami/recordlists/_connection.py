@@ -20,7 +20,7 @@ class RecordListApiClient(ApiClient):
     Communicates with Granta MI.
 
     This class is instantiated by the
-    :class:`ansys.grantami.recordlists.ServerApiFactory` class and should not be instantiated
+    :class:`~ansys.grantami.recordlists.Connection` class and should not be instantiated
     directly.
     """
 
