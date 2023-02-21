@@ -5,7 +5,7 @@
 SPHINXOPTS    = -j auto
 SPHINXBUILD   = poetry run sphinx-build
 SOURCEDIR     = source
-BUILDDIR      = _build
+BUILDDIR      = build
 
 # Put it first so that "make" without argument is like "make help".
 help:
