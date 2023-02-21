@@ -82,7 +82,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GH_PAT }}
 
       - name: Test with tox (integration tests only)
-        run: tox -- -m "integration"
+        run: tox -e py39 -- -m "integration"
         env:
           TEST_SL_URL: ${{secrets.TEST_SERVER_URL}}
           TEST_LIST_ADMIN_USER: ${{secrets.TEST_SERVER_ADMIN_USER}}
