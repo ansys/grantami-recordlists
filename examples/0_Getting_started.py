@@ -13,7 +13,7 @@
 #     name: python3
 # ---
 
-# # Getting started
+# # Basic usage example
 # ## Connect to Granta MI
 
 # + tags=[]
