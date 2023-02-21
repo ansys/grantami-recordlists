@@ -1,9 +1,7 @@
-..
-   Just reuse the root readme to avoid duplicating the documentation.
-   Provide any documentation specific to your online documentation
-   here.
+Granta MI RecordLists
+======================
 
-.. include:: ../../README.rst
+.. include:: ../../_README.rst
 
 
 .. toctree::

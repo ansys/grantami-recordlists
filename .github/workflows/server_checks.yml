@@ -126,40 +126,8 @@ jobs:
           TEST_PASS: ${{secrets.TEST_SERVER_ADMIN_PASS}}
           BUILD_EXAMPLES: 1
 
-#      - name: Build PDF Documentation
-#        run: make -C doc latexpdf
-#
-#      - name: Build json documentation
-#        run: |
-#          # Export the documentation files to JSON files.
-#          poetry run sphinx-build -M json doc/source doc-json -j auto -w build_errors.txt -N;
-#        env:
-#          TEST_SL_URL: ${{secrets.TEST_SERVER_URL}}
-#          TEST_USER: ${{secrets.TEST_SERVER_ADMIN_USER}}
-#          TEST_PASS: ${{secrets.TEST_SERVER_ADMIN_PASS}}
-#          BUILD_EXAMPLES: 1
-#
-#      - name: Flatten the generated nested files into a single directory
-#        run: |
-#          echo Flattening a nested directory
-#          mkdir doc-flatten-json;
-#          echo Move all the JSON file to the flatten directory.
-#          find . -name "*.fjson" -exec mv "{}" --backup=numbered ./doc-flatten-json \;
-#          echo Make sure all the file has .json extensions instead of the .fjson
-#          for file in doc-flatten-json/*.fjson ; do mv -- "$file" "${file%.fjson}.json" ; done;
-#      - name: zip the flattened JSON directory
-#        run: |
-#          zip -r grantami-recordlists-doc-flatten-json.zip doc-flatten-json;
-#          mkdir grantami-recordlists-doc-flatten-json;
-#          mv grantami-recordlists-doc-flatten-json.zip grantami-recordlists-doc-flatten-json;
-#          echo "Clean up build directories after the process is completed."
-#          rm -rf doc-json doc-flatten-json;
-#      - name: Upload json Documentation
-#        uses: actions/upload-artifact@v3
-#        with:
-#          name: grantami-recordlists-doc-flatten-json.zip
-#          path: grantami-recordlists-doc-flatten-json
-#          retention-days: 7
+      - name: Build PDF Documentation
+        run: make -C doc latexpdf
 
       - name: Upload HTML Documentation
         uses: actions/upload-artifact@v3
@@ -168,12 +136,12 @@ jobs:
           path: doc/build/html
           retention-days: 7
 
-#      - name: Upload PDF Documentation
-#        uses: actions/upload-artifact@v3
-#        with:
-#          name: Documentation-pdf
-#          path: doc/build/latex/*.pdf
-#          retention-days: 7
+      - name: Upload PDF Documentation
+        uses: actions/upload-artifact@v3
+        with:
+          name: Documentation-pdf
+          path: doc/build/latex/*.pdf
+          retention-days: 7
 
   stop_vm:
     name: Stop Azure VM
