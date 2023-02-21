@@ -9,7 +9,7 @@ from inputs.examples import examples_as_strings
 
 @pytest.fixture(scope="session")
 def api_url():
-    return "http://localhost/mi_servicelayer/proxy/v1.svc"
+    return "http://localhost/mi_servicelayer"
 
 
 @pytest.fixture()
@@ -22,7 +22,7 @@ def mocker():
 def mock_client(api_url, mocker):
     with mocker:
         mocker.get(requests_mock.ANY)
-        client = Connection(api_url=api_url).with_anonymous().connect()
+        client = Connection(servicelayer_url=api_url).with_anonymous().connect()
     return client
 
 
