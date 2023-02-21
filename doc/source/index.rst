@@ -1,7 +1,5 @@
-Granta MI RecordLists
-======================
 
-.. include:: ../../_README.rst
+.. include:: ../../README.rst
 
 
 .. toctree::
