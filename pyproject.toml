@@ -38,6 +38,7 @@ ansys-sphinx-theme = "^0.8.2"
 sphinx-copybutton = "^0.5.0"
 jupytext = "^1.14.4"
 nbsphinx = "^0.8.12"
+ipykernel = "~6.16.0" # required by nbsphinx to run notebooks. Last minor version compatible with Python 3.7
 
 # Optional testing dependencies
 [tool.poetry.group.tests]
