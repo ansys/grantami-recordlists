@@ -19,9 +19,6 @@ on:
         required: true
       GH_PAT:
         required: true
-    inputs:
-      library-name:
-        required: true
   workflow_dispatch:
 
 concurrency:
@@ -130,14 +127,14 @@ jobs:
       - name: Upload HTML Documentation
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ inputs.library-name }}-Documentation-html
+          name: ansys-grantami-recordlists-Documentation-html
           path: doc/build/html
           retention-days: 7
 
       - name: Upload PDF Documentation
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ inputs.library-name }}-Documentation-pdf
+          name: ansys-grantami-recordlists-Documentation-pdf
           path: doc/build/latex/*.pdf
           retention-days: 7
 
