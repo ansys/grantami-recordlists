@@ -1,5 +1,8 @@
 on:
   workflow_call:
+    inputs:
+      LIBRARY_NAME:
+        required: true
     secrets:
       AZURE_APP_ID:
         required: true
@@ -132,14 +135,14 @@ jobs:
       - name: Upload HTML Documentation
         uses: actions/upload-artifact@v3
         with:
-          name: Documentation-html
+          name: ${{ inputs.LIBRARY_NAME }}-Documentation-html
           path: doc/build/html
           retention-days: 7
 
       - name: Upload PDF Documentation
         uses: actions/upload-artifact@v3
         with:
-          name: Documentation-pdf
+          name: ${{ inputs.LIBRARY_NAME }}-Documentation-pdf
           path: doc/build/latex/*.pdf
           retention-days: 7
 

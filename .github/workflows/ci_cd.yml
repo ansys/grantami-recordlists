@@ -120,7 +120,6 @@ jobs:
       - name: Install system dependencies
         run: |
           sudo apt update
-          sudo apt install libkrb5-dev
           sudo apt install pandoc
 
       - name: Install dependencies
@@ -132,7 +131,7 @@ jobs:
       - name: Upload HTML Documentation
         uses: actions/upload-artifact@v3
         with:
-          name: Documentation-html-no-examples
+          name: ${{ env.LIBRARY_NAME }}-Documentation-html-no-examples
           path: .tox/doc_out/
           retention-days: 7
 
