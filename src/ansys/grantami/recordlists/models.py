@@ -2,79 +2,55 @@
 Models
 """
 from datetime import datetime
-from functools import wraps
-from typing import List, Optional, TYPE_CHECKING
+from typing import Optional
 
 from ansys.grantami.serverapi_openapi import models
 
-from ansys.grantami.recordlists._utils import _ArgNotProvided
-
-if TYPE_CHECKING:
-    from ansys.grantami.recordlists._connection import RecordListApiClient
-
-
-def requires_existence(
-    fn,
-):
-    @wraps(fn)
-    def wrapped_property_getter(self: "RecordList"):
-        if not self.exists_on_server:
-            raise RuntimeError("RecordList must first be created.")  # TODO custom exception
-        return fn(self)
-
-    return wrapped_property_getter
-
 
 class RecordList:
-    """
-    Describes a RecordList as obtained from the API.
-    """
-
     # TODO Skipped, might be for internal use?
     #  - metadata
     #  - parent_record_list_identifier
 
+    """
+    Describes a RecordList as obtained from the API. Read-only.
+    """
+
     def __init__(
         self,
-        client: "RecordListApiClient",
+        identifier: str,
         name: str,
+        created_timestamp: datetime,
+        created_user: "User",
+        published: bool,
+        is_revision: bool,
+        awaiting_approval: bool,
+        internal_use: bool,
         description: Optional[str] = None,
         notes: Optional[str] = None,
-        items: Optional[List["RecordListItem"]] = None,
+        # TODO is set at creation, so not optional?
+        last_modified_timestamp: Optional[datetime] = None,
+        # TODO is set at creation, so not optional?
+        last_modified_user: Optional["User"] = None,
+        published_timestamp: Optional[datetime] = None,
+        published_user: Optional[datetime] = None,
     ):
-        self._client = client
 
-        # Read-only
-        # Should not be None if list has been retrieved from server
-        self._identifier: Optional[str] = None
-        self._created_timestamp: Optional[datetime] = None
-        self._created_user: Optional[User] = None
-        self._published: Optional[bool] = None
-        self._is_revision: Optional[bool] = None
-        self._awaiting_approval: Optional[bool] = None
-        self._internal_use: Optional[bool] = None
-        self._last_modified_timestamp: Optional[datetime] = None
-        self._last_modified_user: Optional[User] = None
-        # Can be None even if list has been retrieved from server
-        self._published_timestamp: Optional[datetime] = None
-        self._published_user: Optional[datetime] = None
-
-        # Read/Write
-        # Mandatory
+        self._identifier: str = identifier
         self._name: str = name
-        # Optional
-        self._description: Optional[None] = description
-        self._notes: Optional[None] = notes
+        self._created_timestamp: datetime = created_timestamp
+        self._created_user: User = created_user
+        self._published: bool = published
+        self._is_revision: bool = is_revision
+        self._awaiting_approval: bool = awaiting_approval
+        self._internal_use: bool = internal_use
 
-        # Other properties not directly extracted from auto-generated RecordListHeader model
-        self._items: Optional[List["RecordListItem"]] = items
-
-    @property
-    def exists_on_server(self) -> bool:
-        """Whether the list exists on server or has been created in memory only."""
-        return self._identifier is not None
-
-    # Read & Write properties
+        self._description: Optional[str] = description
+        self._notes: Optional[str] = notes
+        self._last_modified_timestamp: Optional[datetime] = last_modified_timestamp
+        self._last_modified_user: Optional[User] = last_modified_user
+        self._published_timestamp: Optional[datetime] = published_timestamp
+        self._published_user: Optional[datetime] = published_user
 
     @property
     def name(self) -> str:
@@ -83,32 +59,12 @@ class RecordList:
         """
         return self._name
 
-    @name.setter
-    def name(self, value: str):
-        """
-        Set the name of the Record List.
-        """
-        if self.exists_on_server:
-            self.update(name=value)
-        else:
-            self._name = value
-
     @property
     def description(self) -> str:
         """
         Description of the Record List.
         """
         return self._description
-
-    @description.setter
-    def description(self, value: str):
-        """
-        Set the description of the Record List.
-        """
-        if self.exists_on_server:
-            self.update(description=value)
-        else:
-            self._description = value
 
     @property
     def notes(self) -> str:
@@ -117,20 +73,7 @@ class RecordList:
         """
         return self._notes
 
-    @notes.setter
-    def notes(self, value: str):
-        """
-        Set the notes of the Record List.
-        """
-        if self.exists_on_server:
-            self.update(notes=value)
-        else:
-            self._notes = value
-
-    # Read-only properties
-
     @property
-    @requires_existence
     def identifier(self) -> str:
         """
         Identifier of the Record List.
@@ -139,7 +82,6 @@ class RecordList:
         return self._identifier
 
     @property
-    @requires_existence
     def created_timestamp(self) -> datetime:
         """
         Datetime at which the Record List was created.
@@ -148,7 +90,6 @@ class RecordList:
         return self._created_timestamp
 
     @property
-    @requires_existence
     def created_user(self) -> "User":
         """
         User who created the Record List.
@@ -157,7 +98,6 @@ class RecordList:
         return self._created_user
 
     @property
-    @requires_existence
     def last_modified_timestamp(self) -> datetime:
         """
         Datetime at which the Record List was last modified.
@@ -166,7 +106,6 @@ class RecordList:
         return self._last_modified_timestamp
 
     @property
-    @requires_existence
     def last_modified_user(self) -> "User":
         """
         User who last modified the Record List.
@@ -175,7 +114,6 @@ class RecordList:
         return self._last_modified_user
 
     @property
-    @requires_existence
     def published_timestamp(self) -> Optional[datetime]:
         """
         Datetime at which the Record List was published.
@@ -185,7 +123,6 @@ class RecordList:
         return self._published_timestamp
 
     @property
-    @requires_existence
     def published_user(self) -> Optional["User"]:
         """
         User who published/withdrew the Record List.
@@ -195,7 +132,6 @@ class RecordList:
         return self._published_user
 
     @property
-    @requires_existence
     def published(self) -> bool:
         """
         Whether the Record List has been published or not.
@@ -204,7 +140,6 @@ class RecordList:
         return self._published
 
     @property
-    @requires_existence
     def is_revision(self) -> bool:
         """
         Whether the Record List is a revision.
@@ -213,7 +148,6 @@ class RecordList:
         return self._is_revision
 
     @property
-    @requires_existence
     def awaiting_approval(self) -> bool:
         """
         Whether the Record List is awaiting approval to be published or withdrawn.
@@ -222,7 +156,6 @@ class RecordList:
         return self._awaiting_approval
 
     @property
-    @requires_existence
     def internal_use(self) -> bool:
         """
         Whether the Record List is for internal use only.
@@ -233,182 +166,31 @@ class RecordList:
         #  Consider not exposing the property and filtering out all internal lists?
         return self._internal_use
 
-    # Item management
-
-    def read_items(self):
-        """
-        Fetches items included in the RecordList via a request to ServerAPI.
-        """
-        if not self.exists_on_server:
-            raise RuntimeError("Cannot read items for a RecordList that does not exist on server.")
-        self._items = self._client.get_list_items(self._identifier)
-
-    @property
-    def items(self) -> List["RecordListItem"]:
-        """
-        Items included in the RecordList. Fetched from ServerAPI if not yet exported.
-        """
-        if self._items is None:
-            self.read_items()
-        return self._items
-
-    def add_items(self, items: List["RecordListItem"]):
-        """
-        Add items to the RecordList and refreshes all items.
-        Might be successful even if the items are invalid references.
-        """
-        # TODO items validation
-        if self.exists_on_server:
-            self._client.add_items_to_list(self._identifier, items)
-            self.read_items()
-        else:
-            if self._items is None:
-                self._items = []
-            self._items.extend(items)
-
-    def remove_items(self, items: List["RecordListItem"]):
-        """
-        Remove items from the RecordList and refetches current items from ServerAPI.
-        Might be successful even the items are not initially in the RecordList.
-        """
-        # TODO: API will accept removal of items that are not in the list.
-        #  We could check here that items are in the list and raise an Exception if not, although it
-        #  would require getting the items first.
-        if self.exists_on_server:
-            self._client.remove_items_from_list(self._identifier, items=items)
-            self.read_items()
-        else:
-            if self._items is None:
-                self._items = []
-            for item in items:
-                self._items.remove(item)
-
-    def create(self):
-        """
-        Create the RecordList via Server API.
-        """
-        if self.exists_on_server:
-            raise RuntimeError(
-                "Cannot create a RecordList that already exists on server. See .copy() or .revise()"
-                " to create a copy or private copy of the list."
-            )
-        created_id = self._client._create_list(
-            name=self._name,
-            description=self._description,
-            notes=self._notes,
-            items=self._items,
-        )
-        details = self._client._get_list(created_id)
-        self._from_model(details)
-
-        if self._items is not None:
-            self.read_items()
-
-    def delete(self):
-        """
-        Sends a request to delete the RecordList on Server API. The current object will be updated
-        to reflect the new state.
-        """
-        if not self.exists_on_server:
-            raise RuntimeError("Cannot delete a RecordList that does not exist on server.")
-        self._client.delete_list(self.identifier)
-        self._set_internal_state(
-            identifier=None,
-            created_timestamp=None,
-            created_user=None,
-            last_modified_timestamp=None,
-            last_modified_user=None,
-            published_timestamp=None,
-            published_user=None,
-            is_revision=None,
-            published=None,
-            awaiting_approval=None,
-            internal_use=None,
-        )
-        self._items = None
-
-    def update(
-        self,
-        name: str = _ArgNotProvided,
-        description: Optional[str] = _ArgNotProvided,
-        notes: Optional[str] = _ArgNotProvided,
-    ) -> None:
-        """
-        Sends a request to update the RecordList on Server API. The current object will be updated
-        to reflect the new state.
-        """
-        updated_model = self._client._update_list(self._identifier, name, description, notes)
-        self._name = updated_model.name
-        self._notes = updated_model.notes
-        self._description = updated_model.description
-        self._from_model(updated_model)
-
     @classmethod
     def from_model(
         cls,
-        client: "RecordListApiClient",
         model: models.GrantaServerApiListsDtoRecordListHeader,
-        items: models.GrantaServerApiListsDtoRecordListItems = None,
     ):
         """
         Instantiate from a model defined in the auto-generated client code.
         """
         instance = cls(
-            client,
-            model.name,
-            model.description,
-            model.notes,
-        )
-        instance._from_model(model, items)
-        return instance
-
-    def _from_model(
-        self,
-        model: models.GrantaServerApiListsDtoRecordListHeader,
-        items: models.GrantaServerApiListsDtoRecordListItems = None,
-    ):
-        self._set_internal_state(
+            name=model.name,
             identifier=model.identifier,
+            description=model.description,
+            notes=model.notes,
             created_timestamp=model.created_timestamp,
             created_user=User.from_model(model.created_user),
-            last_modified_timestamp=model.last_modified_timestamp,
-            last_modified_user=User.from_model(model.last_modified_user),
-            published_timestamp=model.published_timestamp,
-            published_user=User.from_model(model.published_user),
             is_revision=model.is_revision,
             published=model.published,
             awaiting_approval=model.awaiting_approval,
             internal_use=model.internal_use,
+            last_modified_timestamp=model.last_modified_timestamp,
+            last_modified_user=User.from_model(model.last_modified_user),
+            published_timestamp=model.published_timestamp,
+            published_user=User.from_model(model.published_user),
         )
-
-        if items is not None:
-            self._items = [RecordListItem.from_model(list_item) for list_item in items.items]
-
-    def _set_internal_state(
-        self,
-        identifier: Optional[str],
-        created_timestamp: Optional[datetime],
-        created_user: Optional["User"],
-        published: Optional[bool],
-        is_revision: Optional[bool],
-        awaiting_approval: Optional[bool],
-        internal_use: Optional[bool],
-        last_modified_timestamp: Optional[datetime],
-        last_modified_user: Optional["User"],
-        published_timestamp: Optional[datetime],
-        published_user: Optional[datetime],
-    ):
-        self._identifier = identifier
-        self._created_timestamp = created_timestamp
-        self._created_user = created_user
-        self._published = published
-        self._is_revision = is_revision
-        self._awaiting_approval = awaiting_approval
-        self._internal_use = internal_use
-        self._last_modified_timestamp = last_modified_timestamp
-        self._last_modified_user = last_modified_user
-        self._published_timestamp = published_timestamp
-        self._published_user = published_user
+        return instance
 
 
 class RecordListItem:
