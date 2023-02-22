@@ -88,48 +88,27 @@ class TestRecordList:
 
     @patch("ansys.grantami.recordlists.models.User")
     def test_dto_mapping(self, mock_user_class):
+        # Ignoring sub-mapping, just checking that fields are correctly mapped. User.from_model is
+        # tested separately
         mock_user_class.from_model = lambda x: x
+        # Using mock to generate unique values for each property
+        mock_dto = Mock(spec=GrantaServerApiListsDtoRecordListHeader)
+        record_list = RecordList.from_model(mock_dto)
 
-        is_revision = False
-        published = False
-        awaiting_approval = False
-        internal_use = False
-
-        dto = GrantaServerApiListsDtoRecordListHeader(
-            name=self._list_name,
-            identifier=self._mock_id,
-            metadata=None,
-            parent_record_list_identifier=None,
-            created_timestamp=self._created_timestamp,
-            created_user="CreatedUser",
-            last_modified_timestamp=self._last_modified_timestamp,
-            last_modified_user="LastModifiedUser",
-            published_timestamp=self._published_timestamp,
-            published_user="PublishedUser",
-            is_revision=is_revision,
-            description=self._description,
-            notes=self._notes,
-            published=published,
-            awaiting_approval=awaiting_approval,
-            internal_use=internal_use,
-        )
-
-        record_list = RecordList.from_model(dto)
-
-        assert record_list.name == self._list_name
-        assert record_list.identifier == self._mock_id
-        assert record_list.notes == self._notes
-        assert record_list.description == self._description
-        assert record_list.created_timestamp == self._created_timestamp
-        assert record_list.created_user == "CreatedUser"
-        assert record_list.last_modified_timestamp == self._last_modified_timestamp
-        assert record_list.last_modified_user == "LastModifiedUser"
-        assert record_list.published_timestamp == self._published_timestamp
-        assert record_list.published_user == "PublishedUser"
-        assert record_list.published is published
-        assert record_list.is_revision is is_revision
-        assert record_list.awaiting_approval is awaiting_approval
-        assert record_list.internal_use is internal_use
+        assert record_list.name == mock_dto.name
+        assert record_list.identifier == mock_dto.identifier
+        assert record_list.notes == mock_dto.notes
+        assert record_list.description == mock_dto.description
+        assert record_list.created_timestamp == mock_dto.created_timestamp
+        assert record_list.created_user == mock_dto.created_user
+        assert record_list.last_modified_timestamp == mock_dto.last_modified_timestamp
+        assert record_list.last_modified_user == mock_dto.last_modified_user
+        assert record_list.published_timestamp == mock_dto.published_timestamp
+        assert record_list.published_user == mock_dto.published_user
+        assert record_list.published is mock_dto.published
+        assert record_list.is_revision is mock_dto.is_revision
+        assert record_list.awaiting_approval is mock_dto.awaiting_approval
+        assert record_list.internal_use is mock_dto.internal_use
 
 
 def test_user_dto_mapping():
