@@ -101,7 +101,10 @@ class RecordListApiClient(ApiClient):
         notes: Optional[str] = None,
         items: Optional[List[RecordListItem]] = None,
     ) -> str:
-        """Create a new list and push it to Server API. The created RecordList is returned."""
+        """
+        Create a new list and push it to Server API. The identifier of the created RecordList is
+        returned.
+        """
         if items is not None:
             items = models.GrantaServerApiListsDtoRecordListItems(
                 items=[list_item.to_model() for list_item in items]
@@ -139,8 +142,8 @@ class RecordListApiClient(ApiClient):
         notes: Optional[str] = _ArgNotProvided,
     ) -> RecordList:
         """
-        Perform a request against the Server API to update a Record List specified by its UUID
-        identifier, with the properties provided.
+        Perform a request against the Server API to update a RecordList specified by its UUID
+        identifier with the properties provided, and returns the updated RecordList.
         """
         if name == _ArgNotProvided and description == _ArgNotProvided and notes == _ArgNotProvided:
             raise ValueError(
