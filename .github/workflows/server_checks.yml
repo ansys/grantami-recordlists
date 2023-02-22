@@ -72,10 +72,6 @@ jobs:
         with:
           python-version: '3.9'
 
-      - name: Install kerberos headers (ubuntu only)
-        if: ${{ matrix.os == 'ubuntu-latest' }}
-        run: sudo apt install libkrb5-dev
-
       - name: Install dependencies
         run: pip install poetry 'tox<4' --disable-pip-version-check
 
@@ -107,7 +103,6 @@ jobs:
       - name: Install system dependencies
         run: |
           sudo apt update
-          sudo apt install libkrb5-dev
           sudo apt install pandoc
           sudo apt install texlive-latex-extra latexmk texlive-xetex fonts-freefont-otf xindy
 
