@@ -1,11 +1,15 @@
-from unittest.mock import Mock
-from datetime import datetime
+import uuid
+from unittest.mock import Mock, patch
+from datetime import datetime, timedelta
 
 import pytest
 
-from ansys.grantami.recordlists._connection import RecordListApiClient
 from ansys.grantami.recordlists.models import RecordList, RecordListItem, User
-from ansys.grantami.recordlists._utils import _ArgNotProvided
+from ansys.grantami.serverapi_openapi.models import (
+    GrantaServerApiListsDtoRecordListHeader,
+    GrantaServerApiListsDtoUserOrGroup,
+    GrantaServerApiListsDtoListItem,
+)
 
 
 class TestRecordList:
@@ -13,156 +17,151 @@ class TestRecordList:
     _mock_id = "889dcaef-1ef4-4b92-8ff9-46f08d936f39"
     _mock_user = Mock(spec=User)
 
-    @pytest.fixture
-    def mock_client(self):
-        return Mock(spec=RecordListApiClient)
+    _notes = "TestNotes"
+    _description = "TestDescription"
+    _last_modified_timestamp = datetime.now() - timedelta(days=1)
+    _created_timestamp = datetime.now() - timedelta(days=2)
+    _published_timestamp = datetime.now()
 
-    @pytest.fixture
-    def new_list(self, mock_client):
-        return RecordList(
-            mock_client,
-            name=self._list_name,
-        )
-
-    @pytest.fixture
-    def existing_list(self, mock_client):
-        record_list = RecordList(
-            mock_client,
-            name=self._list_name,
-        )
-        now = datetime.now()
-        record_list._set_internal_state(
-            identifier=self._mock_id,
-            created_timestamp=now,
-            created_user=self._mock_user,
-            published=False,
-            is_revision=False,
-            awaiting_approval=False,
-            internal_use=False,
-            last_modified_timestamp=now,
-            last_modified_user=self._mock_user,
-            published_timestamp=now,
-            published_user=self._mock_user,
-        )
-        return record_list
-
-    def test_read_items(self, mock_client, new_list):
-        with pytest.raises(RuntimeError):
-            new_list.read_items()
-        mock_client.get_list_items.assert_not_called()
-
-    def test_read_items_existing_list(self, mock_client, existing_list):
-        existing_list.read_items()
-        mock_client.get_list_items.assert_called_once_with(self._mock_id)
-
-    items_variations = pytest.mark.parametrize(
-        "items", [[], ["1", 2], [RecordListItem("db", "table", "record")]]
+    _data = dict(
+        name=_list_name,
+        identifier=_mock_id,
+        created_timestamp=_created_timestamp,
+        created_user=_mock_user,
+        published=False,
+        is_revision=False,
+        awaiting_approval=False,
+        internal_use=False,
+        notes=_notes,
+        description=_description,
+        last_modified_timestamp=_last_modified_timestamp,
+        last_modified_user=_mock_user,
+        published_timestamp=_published_timestamp,
+        published_user=_mock_user,
     )
 
-    @items_variations
-    def test_add_items_new_list(self, mock_client, new_list, items):
-        new_list.add_items(items)
-        mock_client.add_items_to_list.assert_not_called()
+    @pytest.fixture
+    def record_list(self):
+        record_list = RecordList(**self._data)
+        return record_list
 
-    @items_variations
-    def test_add_items_existing_list(self, mock_client, existing_list, items):
-        existing_list.add_items(items)
-        mock_client.add_items_to_list.assert_called_once_with(self._mock_id, items)
+    @pytest.mark.parametrize("attr_name", list(_data.keys()))
+    def test_record_list_is_read_only(self, record_list, attr_name):
+        with pytest.raises(AttributeError, match="can't set attribute"):
+            setattr(record_list, attr_name, "new_value")
 
-    # TODO test removing items not already in items
-    def test_remove_items_new_list(self, mock_client, new_list):
-        items = [RecordListItem("db", "table", "record")]
-        new_list._items = items
-        new_list.remove_items(items)
-        mock_client.add_items_to_list.assert_not_called()
-        assert new_list.items == []
+    _required_fields = [
+        "name",
+        "identifier",
+        "created_timestamp",
+        "created_user",
+        "published",
+        "is_revision",
+        "awaiting_approval",
+        "internal_use",
+    ]
 
-    # TODO test removing items on existing list
+    @pytest.mark.parametrize("attr_name", _required_fields)
+    def test_required_properties(self, attr_name):
+        record_list_data = dict(**self._data)
+        del record_list_data[attr_name]
 
-    def test_create_minimal_list(self, mock_client, new_list):
-        mock_client._create_list = Mock(return_value=self._mock_id)
+        with pytest.raises(TypeError, match="missing 1 required positional argument"):
+            RecordList(**record_list_data)
 
-        new_list.create()
+    _optional_fields = [
+        "notes",
+        "description",
+        "last_modified_timestamp",
+        "last_modified_user",
+        "published_timestamp",
+        "published_user",
+    ]
 
-        mock_client._create_list.assert_called_once_with(
+    @pytest.mark.parametrize("attr_name", _optional_fields)
+    def test_optional_parameters(self, attr_name):
+        record_list_data = dict(**self._data)
+        del record_list_data[attr_name]
+
+        record_list = RecordList(**record_list_data)
+        assert getattr(record_list, attr_name) is None
+
+    @patch("ansys.grantami.recordlists.models.User")
+    def test_dto_mapping(self, mock_user_class):
+        mock_user_class.from_model = lambda x: x
+
+        is_revision = False
+        published = False
+        awaiting_approval = False
+        internal_use = False
+
+        dto = GrantaServerApiListsDtoRecordListHeader(
             name=self._list_name,
-            notes=None,
-            description=None,
-            items=None,
-        )
-        mock_client._get_list.assert_called_once_with(self._mock_id)
-        mock_client.get_list_items.assert_not_called()
-
-    def test_create_list_with_items_and_data(self, mock_client, new_list):
-        mock_client._create_list = Mock(return_value=self._mock_id)
-        items = [RecordListItem("db", "table", "record")]
-        list_notes = "Notes"
-        list_description = "Description"
-
-        new_list.add_items(items)
-        new_list.description = list_description
-        new_list.notes = list_notes
-        new_list.create()
-
-        mock_client._create_list.assert_called_once_with(
-            name=self._list_name,
-            notes=list_notes,
-            description=list_description,
-            items=items,
+            identifier=self._mock_id,
+            metadata=None,
+            parent_record_list_identifier=None,
+            created_timestamp=self._created_timestamp,
+            created_user="CreatedUser",
+            last_modified_timestamp=self._last_modified_timestamp,
+            last_modified_user="LastModifiedUser",
+            published_timestamp=self._published_timestamp,
+            published_user="PublishedUser",
+            is_revision=is_revision,
+            description=self._description,
+            notes=self._notes,
+            published=published,
+            awaiting_approval=awaiting_approval,
+            internal_use=internal_use,
         )
 
-        mock_client._get_list.assert_called_once_with(self._mock_id)
-        mock_client.get_list_items.assert_called_once()
+        record_list = RecordList.from_model(dto)
 
-    def test_delete_new_list(self, mock_client, new_list):
-        with pytest.raises(RuntimeError):
-            new_list.delete()
-        mock_client.delete_list.assert_not_called()
+        assert record_list.name == self._list_name
+        assert record_list.identifier == self._mock_id
+        assert record_list.notes == self._notes
+        assert record_list.description == self._description
+        assert record_list.created_timestamp == self._created_timestamp
+        assert record_list.created_user == "CreatedUser"
+        assert record_list.last_modified_timestamp == self._last_modified_timestamp
+        assert record_list.last_modified_user == "LastModifiedUser"
+        assert record_list.published_timestamp == self._published_timestamp
+        assert record_list.published_user == "PublishedUser"
+        assert record_list.published is published
+        assert record_list.is_revision is is_revision
+        assert record_list.awaiting_approval is awaiting_approval
+        assert record_list.internal_use is internal_use
 
-    def test_delete_existing_list(self, mock_client, existing_list):
-        existing_list.delete()
-        mock_client.delete_list.assert_called_once_with(self._mock_id)
 
-        # Check internal state has been updated
-        assert existing_list.exists_on_server is False
-        assert existing_list._identifier is None
-        assert existing_list._created_timestamp is None
+def test_user_dto_mapping():
+    user_id = uuid.uuid4()
+    username = "domain\\username"
+    display_name = "domain\\displayname"
+    dto_user = GrantaServerApiListsDtoUserOrGroup(user_id, display_name, username)
 
-    # TODO test deletion of list with items
+    user = User.from_model(dto_user)
 
-    @pytest.mark.parametrize("prop_name", ["name", "notes", "description"])
-    def test_updating_list_property_individually(self, mock_client, existing_list, prop_name):
-        new_value = f"New value for {prop_name}"
-        _return_value = Mock(**{prop_name: new_value})
-        setattr(_return_value, prop_name, new_value)
-        attrs = {"_update_list.return_value": _return_value}
-        mock_client.configure_mock(**attrs)
+    assert user.identifier == user_id
+    assert user.name == username
+    assert user.display_name == display_name
 
-        setattr(existing_list, prop_name, new_value)
 
-        expected_args = {
-            "name": _ArgNotProvided,
-            "description": _ArgNotProvided,
-            "notes": _ArgNotProvided,
-        }
-        expected_args.update({prop_name: new_value})
-        mock_client._update_list.assert_called_once_with(self._mock_id, *expected_args.values())
-        assert getattr(existing_list, prop_name) == new_value
+def test_record_list_item_dto_mapping():
+    db_guid = uuid.uuid4()
+    table_guid = uuid.uuid4()
+    record_history_guid = uuid.uuid4()
+    record_version = 1
+    record_guid = uuid.uuid4()
 
-    def test_bulk_updating_list_properties(self, mock_client, existing_list):
-        updated_name = "NewName"
-        updated_description = "NewDescription"
-        updated_notes = "NewNotes"
+    dto_item = GrantaServerApiListsDtoListItem(
+        database_guid=db_guid,
+        table_guid=table_guid,
+        record_history_guid=record_history_guid,
+        record_version=record_version,
+        record_guid=record_guid,
+    )
 
-        mock_return = Mock(description=updated_description, notes=updated_notes)
-        mock_return.name = updated_name  # name is an arg on Mock so it must be set separately
-        mock_client._update_list = Mock(return_value=mock_return)
+    item = RecordListItem.from_model(dto_item)
 
-        existing_list.update(updated_name, updated_description, updated_notes)
-
-        mock_client._update_list.assert_called_once_with(
-            self._mock_id, updated_name, updated_description, updated_notes
-        )
-        assert existing_list.name == updated_name
-        assert existing_list.description == updated_description
-        assert existing_list.notes == updated_notes
+    assert item.database_guid == db_guid
+    assert item.table_guid == table_guid
+    assert item.record_history_guid == record_history_guid
