@@ -211,7 +211,7 @@ class RecordListItem:
 
     An item does not necessarily represent a record that exists on the server.
     """
-    
+
     def __init__(
         self,
         database_guid: str,
