@@ -156,7 +156,7 @@ class TestDeleteList(TestClientMethod):
 
 
 class TestUpdate(TestClientMethod):
-    _return_value = None
+    _return_value = Mock(spec=GrantaServerApiListsDtoRecordListHeader)
     _api = ListManagementApi
     _api_method = "api_v1_lists_list_list_identifier_patch"
 

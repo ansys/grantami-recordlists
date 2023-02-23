@@ -9,7 +9,7 @@ from ansys.openapi.common import (
 )
 
 from ansys.grantami.recordlists.models import RecordList, RecordListItem
-from ansys.grantami.recordlists._utils import _ArgNotProvided
+from ansys.grantami.recordlists._utils import _ArgNotProvided, extract_identifier
 
 
 AUTH_PATH = "/swagger/v1/swagger.json"
@@ -42,7 +42,7 @@ class RecordListApiClient(ApiClient):
         """
 
         record_lists = self.list_management_api.api_v1_lists_get()
-        return [RecordList.from_model(self, record_list) for record_list in record_lists]
+        return [RecordList.from_model(record_list) for record_list in record_lists]
 
     def get_list(self, identifier: str) -> RecordList:
         """
@@ -50,10 +50,8 @@ class RecordListApiClient(ApiClient):
         identifier.
         """
 
-        return RecordList.from_model(self, self._get_list(identifier))
-
-    def _get_list(self, identifier: str) -> models.GrantaServerApiListsDtoRecordListHeader:
-        return self.list_management_api.api_v1_lists_list_list_identifier_get(identifier)
+        record_list = self.list_management_api.api_v1_lists_list_list_identifier_get(identifier)
+        return RecordList.from_model(record_list)
 
     def get_list_items(self, identifier: str) -> List[RecordListItem]:
         """
@@ -102,19 +100,11 @@ class RecordListApiClient(ApiClient):
         description: Optional[str] = None,
         notes: Optional[str] = None,
         items: Optional[List[RecordListItem]] = None,
-    ) -> RecordList:
-        """Create a new list and push it to Server API. The created RecordList is returned."""
-        identifier = self._create_list(name, description, notes, items)
-        return self.get_list(identifier)
-
-    def _create_list(
-        self,
-        name: str,
-        description: Optional[str] = None,
-        notes: Optional[str] = None,
-        items: Optional[List[RecordListItem]] = None,
     ) -> str:
-        """Perform a request against the Server API to create a new Record List."""
+        """
+        Create a new list and push it to Server API. The identifier of the created RecordList is
+        returned.
+        """
         if items is not None:
             items = models.GrantaServerApiListsDtoRecordListItems(
                 items=[list_item.to_model() for list_item in items]
@@ -133,7 +123,7 @@ class RecordListApiClient(ApiClient):
         if status_code == 201:
             response = self.deserialize(response, "GrantaServerApiListsDtoRecordListResource")
             response: models.GrantaServerApiListsDtoRecordListResource
-            return response.resource_uri.split("/")[-1]
+            return extract_identifier(response)
         else:
             return None
 
@@ -150,19 +140,10 @@ class RecordListApiClient(ApiClient):
         name: str = _ArgNotProvided,
         description: Optional[str] = _ArgNotProvided,
         notes: Optional[str] = _ArgNotProvided,
-    ) -> None:
-        self._update_list(identifier, name, description, notes)
-
-    def _update_list(
-        self,
-        identifier: str,
-        name: str = _ArgNotProvided,
-        description: Optional[str] = _ArgNotProvided,
-        notes: Optional[str] = _ArgNotProvided,
-    ) -> models.GrantaServerApiListsDtoRecordListHeader:
+    ) -> RecordList:
         """
-        Perform a request against the Server API to update a Record List specified by its UUID
-        identifier, with the properties provided.
+        Perform a request against the Server API to update a RecordList specified by its UUID
+        identifier with the properties provided, and returns the updated RecordList.
         """
         if name == _ArgNotProvided and description == _ArgNotProvided and notes == _ArgNotProvided:
             raise ValueError(
@@ -181,9 +162,10 @@ class RecordListApiClient(ApiClient):
         if notes != _ArgNotProvided:
             body.append(self._create_patch_operation(notes, "notes"))
 
-        return self.list_management_api.api_v1_lists_list_list_identifier_patch(
+        updated_resource = self.list_management_api.api_v1_lists_list_list_identifier_patch(
             identifier, body=body
         )
+        return RecordList.from_model(updated_resource)
 
     @staticmethod
     def _create_patch_operation(
