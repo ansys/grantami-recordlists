@@ -33,9 +33,7 @@ def api_client(sl_url, list_admin_username, list_admin_password, list_name):
     Server API.
     On teardown, deletes all lists named using the fixture `list_name`.
     """
-    connection = Connection(f"{sl_url}/proxy/v1.svc").with_credentials(
-        list_admin_username, list_admin_password
-    )
+    connection = Connection(sl_url).with_credentials(list_admin_username, list_admin_password)
     client = connection.connect()
     yield client
 

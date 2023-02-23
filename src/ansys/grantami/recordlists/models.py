@@ -206,6 +206,12 @@ class RecordList:
 
 
 class RecordListItem:
+    """
+    Describes an item of a :class:`RecordList`, i.e. a record in a Granta MI database.
+
+    An item does not necessarily represent a record that exists on the server.
+    """
+
     def __init__(
         self,
         database_guid: str,
@@ -221,14 +227,17 @@ class RecordListItem:
 
     @property
     def database_guid(self) -> str:
+        """GUID of the database."""
         return self._database_guid
 
     @property
     def table_guid(self) -> str:
+        """GUID of the table"""
         return self._table_guid
 
     @property
     def record_history_guid(self) -> str:
+        """Record History GUID of the Record"""
         return self._record_history_guid
 
     @property
@@ -291,14 +300,17 @@ class User:
 
     @property
     def identifier(self) -> str:
+        """Read-only identifier of the user or group"""
         return self._identifier
 
     @property
     def display_name(self) -> str:
+        """Read-only display name of the user or group"""
         return self._display_name
 
     @property
     def name(self) -> str:
+        """Read-only name of the user or group"""
         return self._name
 
     @classmethod

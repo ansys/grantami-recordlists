@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
 
 env:
-  MAIN_PYTHON_VERSION: '3.7'
+  MAIN_PYTHON_VERSION: '3.8'
   DOCUMENTATION_CNAME: 'grantami.docs.pyansys.com'
   LIBRARY_NAME: 'ansys-grantami-recordlists'
   LIBRARY_NAMESPACE: 'ansys.grantami.recordlists'
@@ -44,7 +44,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest]
-        python-version: ['3.7', '3.8', '3.9', '3.10']
+        python-version: ['3.8', '3.9', '3.10']
     steps:
       - uses: actions/checkout@v3
       - name: Download dependencies
@@ -68,7 +68,7 @@ jobs:
     strategy:
       matrix:
        os: [ubuntu-latest, windows-latest]
-       python-version: ['3.7', '3.8', '3.9', '3.10']
+       python-version: ['3.8', '3.9', '3.10']
       fail-fast: false
     steps:
       - uses: actions/checkout@v3
@@ -116,6 +116,12 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: ${{ env.MAIN_PYTHON_VERSION }}
+
+      - name: Install system dependencies
+        run: |
+          sudo apt update
+          sudo apt install pandoc
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip poetry tox
@@ -125,7 +131,7 @@ jobs:
       - name: Upload HTML Documentation
         uses: actions/upload-artifact@v3
         with:
-          name: Documentation-html
+          name: ${{ env.LIBRARY_NAME }}-Documentation-html-no-examples
           path: .tox/doc_out/
           retention-days: 7
 
