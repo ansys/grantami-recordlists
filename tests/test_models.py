@@ -187,6 +187,7 @@ class TestItemEquality:
             (RecordListItem(DB1, T1, RHG1), RecordListItem(DB1, table_guid_2, RHG1), False),
             (RecordListItem(DB1, T1, RHG1), RecordListItem(db_guid_2, T1, RHG1), False),
             (RecordListItem(DB1, T1, RHG1), RecordListItem(DB1, T1, RHG1, None), True),
+            (RecordListItem(DB1, T1, RHG1, RV1), RecordListItem(DB1, T1, RHG1, RV1), True),
             (RecordListItem(DB1, T1, RHG1, RV1), RecordListItem(DB1, T1, RHG1, None), False),
             (
                 RecordListItem(DB1, T1, RHG1, RV1),
