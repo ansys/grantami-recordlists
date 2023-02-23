@@ -10,7 +10,6 @@ from ansys.grantami.serverapi_openapi import models
 class RecordList:
     # TODO Skipped, might be for internal use?
     #  - metadata
-    #  - parent_record_list_identifier
 
     """
     Describes a RecordList as obtained from the API. Read-only.
@@ -34,6 +33,7 @@ class RecordList:
         last_modified_user: Optional["User"] = None,
         published_timestamp: Optional[datetime] = None,
         published_user: Optional[datetime] = None,
+        parent_record_list_identifier: Optional[str] = None,
     ):
 
         self._identifier: str = identifier
@@ -51,6 +51,8 @@ class RecordList:
         self._last_modified_user: Optional[User] = last_modified_user
         self._published_timestamp: Optional[datetime] = published_timestamp
         self._published_user: Optional[datetime] = published_user
+
+        self._parent_record_list_identifier: Optional[str] = parent_record_list_identifier
 
     @property
     def name(self) -> str:
@@ -166,6 +168,15 @@ class RecordList:
         #  Consider not exposing the property and filtering out all internal lists?
         return self._internal_use
 
+    @property
+    def parent_record_list_identifier(self) -> str:
+        """
+        Identifier of the parent record list. Is populated if the record list is a revision of
+        another record list.
+        Read-only.
+        """
+        return self._parent_record_list_identifier
+
     @classmethod
     def from_model(
         cls,
@@ -189,6 +200,7 @@ class RecordList:
             last_modified_user=User.from_model(model.last_modified_user),
             published_timestamp=model.published_timestamp,
             published_user=User.from_model(model.published_user),
+            parent_record_list_identifier=model.parent_record_list_identifier,
         )
         return instance
 

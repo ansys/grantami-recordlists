@@ -38,6 +38,7 @@ class TestRecordList:
         last_modified_user=_mock_user,
         published_timestamp=_published_timestamp,
         published_user=_mock_user,
+        parent_record_list_identifier=None,
     )
 
     @pytest.fixture
@@ -76,6 +77,7 @@ class TestRecordList:
         "last_modified_user",
         "published_timestamp",
         "published_user",
+        "parent_record_list_identifier",
     ]
 
     @pytest.mark.parametrize("attr_name", _optional_fields)
@@ -95,20 +97,21 @@ class TestRecordList:
         mock_dto = Mock(spec=GrantaServerApiListsDtoRecordListHeader)
         record_list = RecordList.from_model(mock_dto)
 
-        assert record_list.name == mock_dto.name
-        assert record_list.identifier == mock_dto.identifier
-        assert record_list.notes == mock_dto.notes
-        assert record_list.description == mock_dto.description
-        assert record_list.created_timestamp == mock_dto.created_timestamp
-        assert record_list.created_user == mock_dto.created_user
-        assert record_list.last_modified_timestamp == mock_dto.last_modified_timestamp
-        assert record_list.last_modified_user == mock_dto.last_modified_user
-        assert record_list.published_timestamp == mock_dto.published_timestamp
-        assert record_list.published_user == mock_dto.published_user
+        assert record_list.name is mock_dto.name
+        assert record_list.identifier is mock_dto.identifier
+        assert record_list.notes is mock_dto.notes
+        assert record_list.description is mock_dto.description
+        assert record_list.created_timestamp is mock_dto.created_timestamp
+        assert record_list.created_user is mock_dto.created_user
+        assert record_list.last_modified_timestamp is mock_dto.last_modified_timestamp
+        assert record_list.last_modified_user is mock_dto.last_modified_user
+        assert record_list.published_timestamp is mock_dto.published_timestamp
+        assert record_list.published_user is mock_dto.published_user
         assert record_list.published is mock_dto.published
         assert record_list.is_revision is mock_dto.is_revision
         assert record_list.awaiting_approval is mock_dto.awaiting_approval
         assert record_list.internal_use is mock_dto.internal_use
+        assert record_list.parent_record_list_identifier is mock_dto.parent_record_list_identifier
 
 
 def test_user_dto_mapping():
