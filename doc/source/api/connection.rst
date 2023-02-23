@@ -12,7 +12,7 @@ Connection builder
     .. automethod:: with_oidc
     .. automethod:: with_anonymous
 
-RecordLists client
+Record lists client
 ~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: ansys.grantami.recordlists._connection.RecordListApiClient

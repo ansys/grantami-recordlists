@@ -5,7 +5,7 @@ The API for Granta MI RecordLists comprises the following key areas:
 
 - :ref:`Granta MI connection` describes how to connect to Granta MI Server API and provides details about the operations
   available on the client.
-- :ref:`RecordList` describes the properties of a RecordList as well as high-level operations it supports.
+- :ref:`Models` describes resources handled by the client.
 
 Table of contents
 ~~~~~~~~~~~~~~~~~~
@@ -13,7 +13,4 @@ Table of contents
    :maxdepth: 2
 
    connection
-   models/recordlist
-   models/items
-   models/user
-
+   models
