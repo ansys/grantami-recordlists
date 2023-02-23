@@ -39,15 +39,13 @@ def admin_client(sl_url, list_admin_username, list_admin_password, list_name):
     Server API.
     On teardown, deletes all lists named using the fixture `list_name`.
     """
-    connection = Connection(f"{sl_url}/proxy/v1.svc").with_credentials(
-        list_admin_username, list_admin_password
-    )
+    connection = Connection(sl_url).with_credentials(list_admin_username, list_admin_password)
     client = connection.connect()
     yield client
 
     all_lists = client.get_all_lists()
     for record_list in all_lists:
-        if record_list.name == list_name:
+        if list_name in record_list.name:
             client.delete_list(record_list.identifier)
 
 
@@ -58,7 +56,7 @@ def basic_client(sl_url, list_username_no_permissions, list_password_no_permissi
     Server API.
 
     """
-    connection = Connection(f"{sl_url}/proxy/v1.svc").with_credentials(
+    connection = Connection(sl_url).with_credentials(
         list_username_no_permissions, list_password_no_permissions
     )
     client = connection.connect()
@@ -66,7 +64,7 @@ def basic_client(sl_url, list_username_no_permissions, list_password_no_permissi
 
     all_lists = client.get_all_lists()
     for record_list in all_lists:
-        if record_list.name == list_name:
+        if list_name in record_list.name:
             client.delete_list(record_list.identifier)
 
 

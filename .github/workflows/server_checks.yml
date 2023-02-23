@@ -73,10 +73,6 @@ jobs:
         with:
           python-version: '3.9'
 
-      - name: Install kerberos headers (ubuntu only)
-        if: ${{ matrix.os == 'ubuntu-latest' }}
-        run: sudo apt install libkrb5-dev
-
       - name: Install dependencies
         run: pip install poetry 'tox<4' --disable-pip-version-check
 
@@ -86,7 +82,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GH_PAT }}
 
       - name: Test with tox (integration tests only)
-        run: tox -- -m "integration"
+        run: tox -e py39 -- -m "integration"
         env:
           TEST_SL_URL: ${{secrets.TEST_SERVER_URL}}
           TEST_LIST_ADMIN_USER: ${{secrets.TEST_SERVER_ADMIN_USER}}
@@ -94,10 +90,64 @@ jobs:
           TEST_LIST_USER: ${{secrets.TEST_SERVER_USER}}
           TEST_LIST_PASS: ${{secrets.TEST_SERVER_PASS}}
 
+  docs:
+    name: Build documentation
+    runs-on: ubuntu-latest
+    needs: integration_tests
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install system dependencies
+        run: |
+          sudo apt update
+          sudo apt install pandoc
+          sudo apt install texlive-latex-extra latexmk texlive-xetex fonts-freefont-otf xindy
+
+      - name: Download dependencies
+        run: gh run download -R pyansys/grantami-serverapi-openapi -n "ansys-grantami-serverapi-openapi-wheel" -D deps
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
+
+      - name: Install library
+        run: |
+          pip install poetry --disable-pip-version-check
+          poetry install --with doc
+
+      - name: Build HTML Documentation
+        run: poetry run -- make -C doc html SPHINXOPTS="-W"
+        env:
+          TEST_SL_URL: ${{secrets.TEST_SERVER_URL}}
+          TEST_USER: ${{secrets.TEST_SERVER_ADMIN_USER}}
+          TEST_PASS: ${{secrets.TEST_SERVER_ADMIN_PASS}}
+          BUILD_EXAMPLES: 1
+
+      - name: Build PDF Documentation
+        run: poetry run -- make -C doc latexpdf
+
+      - name: Upload HTML Documentation
+        uses: actions/upload-artifact@v3
+        with:
+          name: ansys-grantami-recordlists-Documentation-html
+          path: doc/build/html
+          retention-days: 7
+
+      - name: Upload PDF Documentation
+        uses: actions/upload-artifact@v3
+        with:
+          name: ansys-grantami-recordlists-Documentation-pdf
+          path: doc/build/latex/*.pdf
+          retention-days: 7
+
   stop_vm:
     name: Stop Azure VM
     runs-on: ubuntu-latest
-    needs: integration_tests
+    needs: docs
     if: always()
 
     steps:

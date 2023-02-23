@@ -11,8 +11,8 @@ from ansys.openapi.common import (
 from ansys.grantami.recordlists.models import RecordList, RecordListItem
 from ansys.grantami.recordlists._utils import _ArgNotProvided, extract_identifier
 
-
-AUTH_PATH = "/swagger/v1/swagger.json"
+PROXY_PATH = "/proxy/v1.svc"
+AUTH_PATH = "/Health/v2.svc"
 
 
 class RecordListApiClient(ApiClient):
@@ -20,7 +20,7 @@ class RecordListApiClient(ApiClient):
     Communicates with Granta MI.
 
     This class is instantiated by the
-    :class:`ansys.grantami.recordlists.ServerApiFactory` class and should not be instantiated
+    :class:`~ansys.grantami.recordlists.Connection` class and should not be instantiated
     directly.
     """
 
@@ -273,10 +273,12 @@ class Connection(ApiClientFactory):
     Connects to a Granta MI ServerAPI instance.
     """
 
-    def __init__(self, api_url: str, session_configuration: Optional[SessionConfiguration] = None):
-        auth_url = api_url.strip("/") + AUTH_PATH
+    def __init__(
+        self, servicelayer_url: str, session_configuration: Optional[SessionConfiguration] = None
+    ):
+        auth_url = servicelayer_url.strip("/") + AUTH_PATH
         super().__init__(auth_url, session_configuration)
-        self._base_server_api_url = api_url
+        self._base_service_layer_url = servicelayer_url
 
     def connect(self) -> RecordListApiClient:
         """
@@ -287,7 +289,7 @@ class Connection(ApiClientFactory):
         self._validate_builder()
         client = RecordListApiClient(
             self._session,
-            self._base_server_api_url,
+            self._base_service_layer_url + PROXY_PATH,
             self._session_configuration,
         )
         client.setup_client(models)

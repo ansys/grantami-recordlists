@@ -1,18 +1,26 @@
 """Sphinx documentation configuration file."""
+import os
+import shutil
 from datetime import datetime
+from pathlib import Path
 
-from ansys_sphinx_theme import pyansys_logo_black as logo
+import jupytext
+from ansys_sphinx_theme import pyansys_logo_black, ansys_favicon
+
+from ansys.grantami.recordlists import __version__
+
 
 # Project information
 project = "ansys-grantami-recordlists"
-copyright = f"(c) {datetime.now().year} ANSYS, Inc. All rights reserved"
+project_copyright = f"(c) {datetime.now().year} ANSYS, Inc. All rights reserved"
 author = "ANSYS, Inc."
-release = version = "0.1.dev0"
+release = version = __version__
 
 # Select desired logo, theme, and declare the html title
-html_logo = logo
+html_logo = pyansys_logo_black
 html_theme = "ansys_sphinx_theme"
-html_short_title = html_title = "pygrantami-recordlists"
+html_short_title = html_title = "Granta MI RecordLists"
+html_favicon = ansys_favicon
 
 # specify the location of your github repo
 html_theme_options = {
@@ -31,11 +39,21 @@ extensions = [
     "numpydoc",
     "sphinx.ext.intersphinx",
     "sphinx_copybutton",
+    "nbsphinx",
 ]
+
+# sphinx
+add_module_names = False
+
+# sphinx.ext.autodoc
+autodoc_typehints = "both"
+autodoc_typehints_description_target = "documented"
+autodoc_member_order = "bysource"
 
 # Intersphinx mapping
 intersphinx_mapping = {
     "python": ("https://docs.python.org/dev", None),
+    "openapi-common": ("https://openapi.docs.pyansys.com", None),
     # kept here as an example
     # "scipy": ("https://docs.scipy.org/doc/scipy/reference", None),
     # "numpy": ("https://numpy.org/devdocs", None),
@@ -79,3 +97,69 @@ source_suffix = ".rst"
 
 # The master toctree document.
 master_doc = "index"
+
+# Generate section labels up to four levels deep
+autosectionlabel_maxdepth = 4
+
+
+# -- Example Script functions -------------------------------------------------
+
+# Define some important paths and check were are where we expect to be
+cwd = Path(os.getcwd())
+assert cwd.name == "source"
+EXAMPLES_DIR_NAME = "examples"
+DUMMY_EXAMPLES_DIR_NAME = "examples-dummy"
+
+examples_output_dir = Path(EXAMPLES_DIR_NAME).absolute()
+examples_source_dir = Path("../../" + EXAMPLES_DIR_NAME).absolute()
+dummy_examples_source_dir = Path("../../" + DUMMY_EXAMPLES_DIR_NAME).absolute() / Path(
+    EXAMPLES_DIR_NAME
+)
+EXAMPLE_FLAG = os.getenv("BUILD_EXAMPLES")
+
+# If we are building examples, use the included ipython-profile
+if EXAMPLE_FLAG:
+    ipython_dir = Path("../../.ipython").absolute()
+    os.environ["IPYTHONDIR"] = str(ipython_dir)
+
+
+def _copy_examples_and_convert_to_notebooks(source_dir, output_dir):
+    for root, dirs, files in os.walk(source_dir):
+        root_path = Path(root)
+        index = root_path.parts.index(EXAMPLES_DIR_NAME) + 1  # Path elements below examples
+        root_output_path = output_dir.joinpath(*root_path.parts[index:])
+        root_output_path.mkdir(
+            parents=False, exist_ok=False
+        )  # Create new folders in corresponding output location
+        for file in files:
+            file_source_path = root_path / Path(file)
+            file_output_path = root_output_path / Path(file)
+            shutil.copy(file_source_path, file_output_path)  # Copy everything
+            if file_source_path.suffix == ".py":  # Also convert python scripts to jupyter notebooks
+                ntbk = jupytext.read(file_source_path)
+                jupytext.write(ntbk, file_output_path.with_suffix(".ipynb"))
+
+
+# If we already have a source/examples directory then don't do anything.
+# If we don't have an examples folder, we must first create it
+# We don't delete the examples after every build because this triggers nbsphinx to re-run them,
+# which is very expensive
+if not examples_output_dir.is_dir():
+    # Only include examples if the environment variable is set to something truthy
+    if EXAMPLE_FLAG:
+        print("'BUILD_EXAMPLES' environment variable is set, including examples in docs build.")
+        _copy_examples_and_convert_to_notebooks(examples_source_dir, examples_output_dir)
+
+    # If we are skipping examples in the docs, create a placeholder index.rst file to avoid sphinx
+    # errors.
+    else:
+        print("'BUILD_EXAMPLES' environment variable is not set, using standalone examples.")
+        _copy_examples_and_convert_to_notebooks(dummy_examples_source_dir, examples_output_dir)
+
+
+nbsphinx_prolog = """
+Download this example as a :download:`Jupyter notebook </{{ env.docname }}.ipynb>` or a
+:download:`Python script </{{ env.docname }}.py>`.
+
+----
+"""
