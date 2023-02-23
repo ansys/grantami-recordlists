@@ -56,12 +56,12 @@ def test_update_list_nullable_property(admin_client, new_list_id):
     assert record_list.notes is None
 
 
-def test_copy_list(api_client, new_list_id):
-    list_copy_identifier = api_client.copy_list(new_list_id)
+def test_copy_list(admin_client, new_list_id):
+    list_copy_identifier = admin_client.copy_list(new_list_id)
     assert list_copy_identifier != new_list_id
 
-    original_list = api_client.get_list(new_list_id)
-    copied_list = api_client.get_list(list_copy_identifier)
+    original_list = admin_client.get_list(new_list_id)
+    copied_list = admin_client.get_list(list_copy_identifier)
 
     # Copied list name is original list name + " copy_{timestamp}"
     assert original_list.name in copied_list.name
@@ -69,9 +69,9 @@ def test_copy_list(api_client, new_list_id):
     assert copied_list.notes == original_list.notes
 
 
-def test_revise_unpublished_list(api_client, new_list_id):
+def test_revise_unpublished_list(admin_client, new_list_id):
     with pytest.raises(ApiException) as exc:
-        api_client.revise_list(new_list_id)
+        admin_client.revise_list(new_list_id)
 
     assert exc.value.status_code == 403
 
