@@ -10,7 +10,6 @@ from ansys.grantami.serverapi_openapi import models
 class RecordList:
     # TODO Skipped, might be for internal use?
     #  - metadata
-    #  - parent_record_list_identifier
 
     """
     Describes a RecordList as obtained from the API. Read-only.
@@ -34,6 +33,7 @@ class RecordList:
         last_modified_user: Optional["User"] = None,
         published_timestamp: Optional[datetime] = None,
         published_user: Optional[datetime] = None,
+        parent_record_list_identifier: Optional[str] = None,
     ):
 
         self._identifier: str = identifier
@@ -51,6 +51,8 @@ class RecordList:
         self._last_modified_user: Optional[User] = last_modified_user
         self._published_timestamp: Optional[datetime] = published_timestamp
         self._published_user: Optional[datetime] = published_user
+
+        self._parent_record_list_identifier: Optional[str] = parent_record_list_identifier
 
     @property
     def name(self) -> str:
@@ -166,6 +168,15 @@ class RecordList:
         #  Consider not exposing the property and filtering out all internal lists?
         return self._internal_use
 
+    @property
+    def parent_record_list_identifier(self) -> str:
+        """
+        Identifier of the parent record list. Is populated if the record list is a revision of
+        another record list.
+        Read-only.
+        """
+        return self._parent_record_list_identifier
+
     @classmethod
     def from_model(
         cls,
@@ -189,65 +200,83 @@ class RecordList:
             last_modified_user=User.from_model(model.last_modified_user),
             published_timestamp=model.published_timestamp,
             published_user=User.from_model(model.published_user),
+            parent_record_list_identifier=model.parent_record_list_identifier,
         )
         return instance
 
 
 class RecordListItem:
-    # TODO add record guid and version, validate input (require one guid)
-
     def __init__(
         self,
         database_guid: str,
         table_guid: str,
         record_history_guid: str,
+        record_version: Optional[int] = None,
     ):
         self._database_guid: str = database_guid
         self._table_guid: str = table_guid
         self._record_history_guid: str = record_history_guid
-        # self._record_guid = None
-        # self._record_version = None
+        self._record_version: Optional[int] = record_version
+        self._record_guid: Optional[str] = None
 
     @property
     def database_guid(self) -> str:
         return self._database_guid
 
-    @database_guid.setter
-    def database_guid(self, value: str):
-        self._database_guid = value
-
     @property
     def table_guid(self) -> str:
         return self._table_guid
-
-    @table_guid.setter
-    def table_guid(self, value: str):
-        self._table_guid = value
 
     @property
     def record_history_guid(self) -> str:
         return self._record_history_guid
 
-    @record_history_guid.setter
-    def record_history_guid(self, value: str):
-        self._record_history_guid = value
+    @property
+    def record_version(self) -> Optional[int]:
+        """Record version number"""
+        return self._record_version
+
+    @property
+    def record_guid(self) -> Optional[str]:
+        """
+        Record GUID.
+
+        Only populated if the :class:`RecordListItem` has been obtained via an API request and
+        represents a record in a version-controlled table.
+        """
+        return self._record_guid
+
+    def __eq__(self, other: "RecordListItem"):
+        return (
+            self.database_guid == other.database_guid
+            and self.table_guid == other.table_guid
+            and self.record_history_guid == other.record_history_guid
+            and self.record_version == other.record_version
+        )
 
     @classmethod
     def from_model(cls, model: models.GrantaServerApiListsDtoListItem):
-        return cls(
+        """
+        Instantiate from a model defined in the auto-generated client code.
+        """
+        instance = cls(
             database_guid=model.database_guid,
             table_guid=model.table_guid,
             record_history_guid=model.record_history_guid,
+            record_version=model.record_version,
         )
+        instance._record_guid = model.record_guid
+        return instance
 
     def to_model(self) -> models.GrantaServerApiListsDtoListItem:
         """
-        Instantiate from a model defined in the auto-generated client code.
+        Generate the DTO for use with the auto-generated client code.
         """
         return models.GrantaServerApiListsDtoListItem(
             database_guid=self.database_guid,
             table_guid=self.table_guid,
             record_history_guid=self.record_history_guid,
+            record_version=self.record_version,
         )
 
 
