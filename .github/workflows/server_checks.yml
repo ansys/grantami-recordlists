@@ -17,6 +17,10 @@ on:
         required: true
       TEST_SERVER_ADMIN_PASS:
         required: true
+      TEST_SERVER_USER:
+        required: true
+      TEST_SERVER_PASS:
+        required: true
       GH_PAT:
         required: true
   workflow_dispatch:
@@ -87,6 +91,8 @@ jobs:
           TEST_SL_URL: ${{secrets.TEST_SERVER_URL}}
           TEST_LIST_ADMIN_USER: ${{secrets.TEST_SERVER_ADMIN_USER}}
           TEST_LIST_ADMIN_PASS: ${{secrets.TEST_SERVER_ADMIN_PASS}}
+          TEST_LIST_USER: ${{secrets.TEST_SERVER_USER}}
+          TEST_LIST_PASS: ${{secrets.TEST_SERVER_PASS}}
 
   stop_vm:
     name: Stop Azure VM
