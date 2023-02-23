@@ -23,8 +23,7 @@ packages = [
 ]
 
 [tool.poetry.dependencies]
-python = ">=3.7,<4.0"
-importlib-metadata = {version = "^4.0", python = "<3.8"}
+python = ">=3.8,<4.0"
 ansys-grantami-serverapi-openapi = {path = "deps/ansys_grantami_serverapi_openapi-0.1.0.dev12-py3-none-any.whl"}
 
 # Optional documentation dependencies
@@ -38,7 +37,7 @@ ansys-sphinx-theme = "^0.8.2"
 sphinx-copybutton = "^0.5.0"
 jupytext = "^1.14.4"
 nbsphinx = "^0.8.12"
-ipykernel = "~6.16.0" # required by nbsphinx to run notebooks. Last minor version compatible with Python 3.7
+ipykernel = "^6.21.2" # required by nbsphinx to run notebooks.
 
 # Optional testing dependencies
 [tool.poetry.group.tests]
