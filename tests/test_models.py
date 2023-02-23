@@ -90,8 +90,7 @@ class TestRecordList:
 
     @patch("ansys.grantami.recordlists.models.User")
     def test_dto_mapping(self, mock_user_class):
-        # Ignoring sub-mapping, just checking that fields are correctly mapped. User.from_model is
-        # tested separately
+        # Overriding User.from_model method to a no-op. It is tested separately
         mock_user_class.from_model = lambda x: x
         # Using mock to generate unique values for each property
         mock_dto = Mock(spec=GrantaServerApiListsDtoRecordListHeader)
