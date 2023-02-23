@@ -205,7 +205,8 @@ class RecordListApiClient(ApiClient):
 
         The list must be published and awaiting approval. Withdrawing the list updates
         the "published" status to False and resets the awaiting approval status.
-        # TODO who has still access to the list? Original author? What about subscribers?
+        # TODO who has still access to the list? Original author?
+        All existing subscriptions will be lost on withdrawal.
         """
         self.list_management_api.api_v1_lists_list_list_identifier_unpublish_post(identifier)
 
