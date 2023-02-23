@@ -167,6 +167,53 @@ class RecordListApiClient(ApiClient):
         )
         return RecordList.from_model(updated_resource)
 
+    def copy_list(self, identifier: str) -> str:
+        """
+        Perform a request against the Server API to copy a Record List specified by its UUID
+        identifier.
+        """
+        # TODO remove temp workaround when API documents operation return type
+        (
+            response,
+            status_code,
+            _,
+        ) = self.list_management_api.api_v1_lists_list_list_identifier_copy_post_with_http_info(
+            identifier,
+            _preload_content=False,
+        )
+        if status_code == 201:
+            response = self.deserialize(response, "GrantaServerApiListsDtoRecordListResource")
+            response: models.GrantaServerApiListsDtoRecordListResource
+            return extract_identifier(response)
+        else:
+            return None
+
+    def revise_list(self, identifier: str) -> str:
+        """
+        Perform a request against the Server API to revise a Record List specified by its UUID
+        identifier.
+
+        # TODO: revising requires a published list, otherwise 403 forbidden
+        # TODO Explain what revising a list is about
+        """
+        # TODO remove temp workaround when API documents operation return type
+        (
+            response,
+            status_code,
+            _,
+        ) = self.list_management_api.api_v1_lists_list_list_identifier_revise_post_with_http_info(
+            identifier, _preload_content=False
+        )
+        if status_code == 201:
+            response = self.deserialize(response, "GrantaServerApiListsDtoRecordListResource")
+            response: models.GrantaServerApiListsDtoRecordListResource
+            return extract_identifier(response)
+        else:
+            # TODO returning None isn't helpful at all. Consider raising an Exception instead with
+            #  the content of the response, should it include any information about what happened
+            #  server-side (same for all three methods using this workaround)
+            return None
+
     @staticmethod
     def _create_patch_operation(
         value: Optional[str], name: str, op="replace"

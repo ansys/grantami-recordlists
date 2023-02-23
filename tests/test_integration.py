@@ -39,7 +39,8 @@ def api_client(sl_url, list_admin_username, list_admin_password, list_name):
 
     all_lists = client.get_all_lists()
     for record_list in all_lists:
-        if record_list.name == list_name:
+        #  Check for included rather than equal to account for copied lists
+        if list_name in record_list.name:
             client.delete_list(record_list.identifier)
 
 
@@ -128,3 +129,29 @@ def test_update_list_nullable_property(api_client, new_list_id):
     api_client.update_list(new_list_id, notes=None)
     record_list = api_client.get_list(new_list_id)
     assert record_list.notes is None
+
+
+def test_copy_list(api_client, new_list_id):
+    list_copy_identifier = api_client.copy_list(new_list_id)
+    assert list_copy_identifier != new_list_id
+
+    original_list = api_client.get_list(new_list_id)
+    copied_list = api_client.get_list(list_copy_identifier)
+
+    # Copied list name is original list name + " copy_{timestamp}"
+    assert original_list.name in copied_list.name
+    assert copied_list.description == original_list.description
+    assert copied_list.notes == original_list.notes
+
+
+def test_revise_unpublished_list(api_client, new_list_id):
+    # TODO review Exception
+    with pytest.raises(ApiException) as exc:
+        api_client.revise_list(new_list_id)
+
+    assert exc.value.status_code == 403
+
+
+@pytest.mark.skip(reason="No functionality to publish list yet")
+def test_revise_published_list(api_client, new_list_id):
+    raise NotImplementedError
