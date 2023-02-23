@@ -130,3 +130,137 @@ def test_update_list_nullable_property(api_client, new_list_id):
     api_client.update_list(new_list_id, notes=None)
     record_list = api_client.get_list(new_list_id)
     assert record_list.notes is None
+
+
+class TestLifeCycle:
+    _not_awaiting_approval_error = "The list is not currently awaiting approval."
+    _already_awaiting_approval_error = "The list is already awaiting approval."
+
+
+class TestLifeCycleNewList(TestLifeCycle):
+    """
+    Test workflow methods for RecordList with awaiting_approval = False, published = False
+    """
+
+    def test_cannot_publish(self, api_client, new_list_id):
+        with pytest.raises(ApiException, match=self._not_awaiting_approval_error) as e:
+            api_client.publish(new_list_id)
+        assert e.value.status_code == 400
+
+    def test_cannot_withdraw(self, api_client, new_list_id):
+        with pytest.raises(ApiException, match=self._not_awaiting_approval_error) as e:
+            api_client.unpublish(new_list_id)
+        assert e.value.status_code == 400
+
+    def test_cannot_reset(self, api_client, new_list_id):
+        with pytest.raises(ApiException, match=self._not_awaiting_approval_error) as e:
+            api_client.reset_approval_request(new_list_id)
+        assert e.value.status_code == 400
+
+    def test_can_request_approval(self, api_client, new_list_id):
+        api_client.request_approval(new_list_id)
+        list_details = api_client.get_list(new_list_id)
+        assert list_details.awaiting_approval is True
+
+
+class TestLifeCycleAwaitingApprovalAndNotPublished(TestLifeCycle):
+    """
+    Test workflow methods for RecordList with awaiting_approval = True, published = False
+    """
+
+    @pytest.fixture(autouse=True)
+    def request_approval_for_list(self, api_client, new_list_id):
+        api_client.request_approval(new_list_id)
+
+    def test_can_publish(self, api_client, new_list_id):
+        api_client.publish(new_list_id)
+        list_details = api_client.get_list(new_list_id)
+        assert list_details.awaiting_approval is False
+        assert list_details.published is True
+        assert list_details.published_timestamp is not None
+        assert list_details.published_user is not None
+
+    def test_cannot_withdraw(self, api_client, new_list_id):
+        with pytest.raises(ApiException, match="not currently published") as e:
+            api_client.unpublish(new_list_id)
+        assert e.value.status_code == 400
+
+    def test_can_reset(self, api_client, new_list_id):
+        api_client.reset_approval_request(new_list_id)
+        list_details = api_client.get_list(new_list_id)
+        assert list_details.awaiting_approval is False
+
+    def test_cannot_request_approval(self, api_client, new_list_id):
+        with pytest.raises(ApiException, match=self._already_awaiting_approval_error) as e:
+            api_client.request_approval(new_list_id)
+        assert e.value.status_code == 400
+
+
+class TestLifeCyclePublishedAndNotAwaitingApproval(TestLifeCycle):
+    """
+    Test workflow methods for RecordList with awaiting_approval = False, published = True
+    """
+
+    @pytest.fixture(autouse=True)
+    def publish_list(self, api_client, new_list_id):
+        api_client.request_approval(new_list_id)
+        api_client.publish(new_list_id)
+
+    def test_cannot_publish(self, api_client, new_list_id):
+        with pytest.raises(ApiException, match=self._not_awaiting_approval_error) as e:
+            api_client.publish(new_list_id)
+        assert e.value.status_code == 400
+
+    def test_cannot_withdraw(self, api_client, new_list_id):
+        with pytest.raises(ApiException, match=self._not_awaiting_approval_error) as e:
+            api_client.unpublish(new_list_id)
+        assert e.value.status_code == 400
+
+    def test_cannot_reset(self, api_client, new_list_id):
+        with pytest.raises(ApiException, match=self._not_awaiting_approval_error) as e:
+            api_client.reset_approval_request(new_list_id)
+        assert e.value.status_code == 400
+
+    def test_cannot_request_approval(self, api_client, new_list_id):
+        api_client.request_approval(new_list_id)
+        list_details = api_client.get_list(new_list_id)
+        assert list_details.awaiting_approval is True
+        assert list_details.published is True
+
+
+class TestLifeCyclePublishedAndAwaitingApproval(TestLifeCycle):
+    """
+    Test workflow methods for RecordList with awaiting_approval = True, published = True
+    """
+
+    @pytest.fixture(autouse=True)
+    def publish_and_request_approval_for_list(self, api_client, new_list_id):
+        # TODO refactor if we allow creating lists with predefined statuses
+        api_client.request_approval(new_list_id)
+        api_client.publish(new_list_id)
+        api_client.request_approval(new_list_id)
+
+    def test_cannot_publish(self, api_client, new_list_id):
+        with pytest.raises(ApiException, match="already published") as e:
+            api_client.publish(new_list_id)
+        assert e.value.status_code == 400
+
+    def test_can_withdraw(self, api_client, new_list_id):
+        api_client.unpublish(new_list_id)
+        list_details = api_client.get_list(new_list_id)
+        assert list_details.published is False
+        assert list_details.awaiting_approval is False
+
+    def test_can_reset(self, api_client, new_list_id):
+        api_client.reset_approval_request(new_list_id)
+        list_details = api_client.get_list(new_list_id)
+        assert list_details.awaiting_approval is False
+        assert list_details.published is True
+
+    def test_cannot_request_approval(self, api_client, new_list_id):
+        with pytest.raises(ApiException, match=self._already_awaiting_approval_error) as e:
+            api_client.request_approval(new_list_id)
+        assert e.value.status_code == 400
+
+
+# TODO test lifecylce methods on revision
