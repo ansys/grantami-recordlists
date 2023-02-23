@@ -1,15 +1,15 @@
 Models
 =======
 
-RecordList
-~~~~~~~~~~~
+Record list
+~~~~~~~~~~~~
 
 .. autoclass:: ansys.grantami.recordlists.RecordList
    :members:
    :exclude-members: from_model
 
-RecordListItem
-~~~~~~~~~~~~~~~~
+Record list item
+~~~~~~~~~~~~~~~~~
 
 .. autoclass:: ansys.grantami.recordlists.models.RecordListItem
    :members:
