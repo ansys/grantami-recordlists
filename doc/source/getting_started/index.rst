@@ -16,7 +16,7 @@ this code:
     pip install ansys-grantami-recordlists
 
 
-Alternatively, to install the latest from `ansys-grantami-recordlists GitHub <https://github.com/pyansys/grantami-recordlists>`_,
+Alternatively, to install the latest from ``ansys-grantami-recordlists`` `GitHub <https://github.com/pyansys/grantami-recordlists>`_,
 use this code:
 
 .. code::
