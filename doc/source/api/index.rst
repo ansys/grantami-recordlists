@@ -1,3 +1,5 @@
+.. _ref_grantami_recordlists_api_reference:
+
 API reference
 =============
 

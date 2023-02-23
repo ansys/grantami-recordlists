@@ -41,7 +41,7 @@ is hosted at `Granta MI RecordLists Documentation <https://grantami.docs.pyansys
 View examples
 -------------
 Examples are included in the documentation to give you more context around
-the core capabilities described in :ref:`API Reference`.
+the core capabilities described in :ref:`ref_grantami_recordlists_api_reference`.
 Additional examples are welcomed, especially if they cover a key use case of the
 package that has not yet been covered.
 
