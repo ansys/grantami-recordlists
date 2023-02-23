@@ -76,11 +76,6 @@ def test_revise_unpublished_list(api_client, new_list_id):
     assert exc.value.status_code == 403
 
 
-@pytest.mark.skip(reason="No functionality to publish list yet")
-def test_revise_published_list(api_client, new_list_id):
-    raise NotImplementedError
-
-
 @pytest.mark.parametrize(
     ["create_client_name", "read_client_name"],
     [
@@ -195,6 +190,30 @@ class TestLifeCyclePublishedAndNotAwaitingApproval(TestLifeCycle):
         assert list_details.published is True
 
 
+class TestRevisionLifeCycle(TestLifeCyclePublishedAndNotAwaitingApproval):
+    # Inherits the auto-use fixture to publish the list
+
+    def test_revise_published_list(self, admin_client, new_list_id):
+        revision_id = admin_client.revise_list(new_list_id)
+        list_details = admin_client.get_list(revision_id)
+        assert list_details.published is False
+        assert list_details.awaiting_approval is False
+        assert list_details.parent_record_list_identifier == new_list_id
+
+        updated_note = "Notes added to list revision"
+        _ = admin_client.update_list(revision_id, notes=updated_note)
+
+        admin_client.request_approval(revision_id)
+        admin_client.publish(revision_id)
+
+        with pytest.raises(ApiException) as e:
+            revision_list_details = admin_client.get_list(revision_id)
+        e.value.status_code == 404
+
+        original_list_details = admin_client.get_list(new_list_id)
+        assert original_list_details.notes == updated_note
+
+
 class TestLifeCyclePublishedAndAwaitingApproval(TestLifeCycle):
     """
     Test workflow methods for RecordList with awaiting_approval = True, published = True
@@ -231,4 +250,3 @@ class TestLifeCyclePublishedAndAwaitingApproval(TestLifeCycle):
 
 
 # TODO test published list cannot be updated (properties or items)
-# TODO test lifecylce methods on revision
