@@ -3,21 +3,25 @@ from typing import Type, Any
 from unittest.mock import Mock
 
 import pytest
+import requests
 
 from ansys.grantami.recordlists._connection import RecordListApiClient
 from ansys.grantami.recordlists.models import RecordListItem
 from ansys.grantami.serverapi_openapi.api import ListManagementApi, ListItemApi
+from ansys.grantami.serverapi_openapi import models
 from ansys.grantami.serverapi_openapi.models import (
     GrantaServerApiListsDtoRecordListHeader,
     GrantaServerApiListsDtoRecordListItems,
     GrantaServerApiListsDtoListItem,
     MicrosoftAspNetCoreJsonPatchOperationsOperation,
+    GrantaServerApiListsDtoRecordListCreate,
 )
 
 
 @pytest.fixture
 def client():
     client = RecordListApiClient(Mock(), Mock(), Mock())
+    client.setup_client(models)
     return client
 
 
@@ -141,7 +145,7 @@ class TestRemoveItems(TestClientMethod):
         api_method.assert_called_once_with(identifier, body=expected_body)
 
 
-# TODO unit for create list when server-openapi gets updated to handle multiple responses.
+# TODO unit test for create list when server-openapi documents its 201 response.
 
 
 class TestDeleteList(TestClientMethod):
@@ -181,3 +185,67 @@ class TestUpdate(TestClientMethod):
             )
         ]
         api_method.assert_called_once_with(self._mock_uuid, body=expected_body)
+
+
+@pytest.fixture
+def mock_id():
+    return str(uuid.uuid4())
+
+
+@pytest.fixture
+def mock_api_method(request, monkeypatch, mock_id):
+    method_name = getattr(request, "param", {}).get("method_name")
+    mock = Mock(
+        spec=requests.Response,
+        status_code=201,
+    )
+    mock.json = Mock(
+        return_value={
+            "resourceUri": f"http://my_server_name/mi_servicelayer/proxy/v1.svc"
+            f"/api/v1/lists/list/{mock_id}"
+        }
+    )
+
+    mocked_method = Mock(return_value=(mock, 201, {}))
+    monkeypatch.setattr(ListManagementApi, method_name, mocked_method)
+    return mocked_method
+
+
+@pytest.mark.parametrize(
+    "mock_api_method", [{"method_name": "api_v1_lists_post_with_http_info"}], indirect=True
+)
+def test_create_list(client, mock_api_method, mock_id):
+    list_name = "ListName"
+
+    returned_identifier = client.create_list(list_name)
+
+    expected_body = GrantaServerApiListsDtoRecordListCreate(name=list_name)
+    mock_api_method.assert_called_once_with(_preload_content=False, body=expected_body)
+    assert returned_identifier == mock_id
+
+
+@pytest.mark.parametrize(
+    "mock_api_method",
+    [{"method_name": "api_v1_lists_list_list_identifier_copy_post_with_http_info"}],
+    indirect=True,
+)
+def test_copy_list(client, mock_api_method, mock_id):
+    existing_list_identifier = str(uuid.uuid4())
+
+    returned_identifier = client.copy_list(existing_list_identifier)
+    mock_api_method.assert_called_once_with(existing_list_identifier, _preload_content=False)
+    assert returned_identifier == mock_id
+
+
+@pytest.mark.parametrize(
+    "mock_api_method",
+    [{"method_name": "api_v1_lists_list_list_identifier_revise_post_with_http_info"}],
+    indirect=True,
+)
+def test_revise_list(client, mock_api_method, mock_id):
+    existing_list_identifier = str(uuid.uuid4())
+
+    returned_identifier = client.revise_list(existing_list_identifier)
+
+    mock_api_method.assert_called_once_with(existing_list_identifier, _preload_content=False)
+    assert returned_identifier == mock_id
