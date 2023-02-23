@@ -126,7 +126,7 @@ def test_user_dto_mapping():
     assert user.display_name == display_name
 
 
-def test_record_list_item_dto_mapping():
+def test_record_list_item_from_dto_mapping():
     db_guid = uuid.uuid4()
     table_guid = uuid.uuid4()
     record_history_guid = uuid.uuid4()
@@ -146,3 +146,55 @@ def test_record_list_item_dto_mapping():
     assert item.database_guid == db_guid
     assert item.table_guid == table_guid
     assert item.record_history_guid == record_history_guid
+    assert item.record_version == record_version
+    assert item.record_guid == record_guid
+
+
+def test_record_list_item_to_dto_mapping():
+    item = RecordListItem(
+        database_guid=str(uuid.uuid4()),
+        table_guid=str(uuid.uuid4()),
+        record_history_guid=str(uuid.uuid4()),
+        record_version=2,
+    )
+    item._record_guid = str(uuid.uuid4())
+
+    dto = item.to_model()
+    assert dto.database_guid == item.database_guid
+    assert dto.table_guid == item.table_guid
+    assert dto.record_history_guid == item.record_history_guid
+    assert dto.record_version == item.record_version
+    assert dto.record_guid is None
+
+
+class TestItemEquality:
+    DB1 = str(uuid.uuid4())
+    T1 = str(uuid.uuid4())
+    RHG1 = str(uuid.uuid4())
+    RV1 = 1
+
+    # Voluntary inconsistent naming scheme to highlight differences in test matrix
+    db_guid_2 = str(uuid.uuid4())
+    table_guid_2 = str(uuid.uuid4())
+    record_hguid_2 = str(uuid.uuid4())
+    record_version_2 = 2
+
+    @pytest.mark.parametrize(
+        ["item_a", "item_b", "expected_equal"],
+        [
+            (RecordListItem(DB1, T1, RHG1), RecordListItem(DB1, T1, RHG1), True),
+            (RecordListItem(DB1, T1, RHG1), RecordListItem(DB1, T1, record_hguid_2), False),
+            (RecordListItem(DB1, T1, RHG1), RecordListItem(DB1, table_guid_2, RHG1), False),
+            (RecordListItem(DB1, T1, RHG1), RecordListItem(db_guid_2, T1, RHG1), False),
+            (RecordListItem(DB1, T1, RHG1), RecordListItem(DB1, T1, RHG1, None), True),
+            (RecordListItem(DB1, T1, RHG1, RV1), RecordListItem(DB1, T1, RHG1, RV1), True),
+            (RecordListItem(DB1, T1, RHG1, RV1), RecordListItem(DB1, T1, RHG1, None), False),
+            (
+                RecordListItem(DB1, T1, RHG1, RV1),
+                RecordListItem(DB1, T1, RHG1, record_version_2),
+                False,
+            ),
+        ],
+    )
+    def test_item_equality(self, item_a, item_b, expected_equal):
+        assert (item_a == item_b) is expected_equal
