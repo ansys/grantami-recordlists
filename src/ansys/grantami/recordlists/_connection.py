@@ -331,7 +331,7 @@ class RecordListApiClient(ApiClient):
         The list must be awaiting approval and not published already. Publishing the list updates
         the status to "published" and resets the awaiting approval status.
         Published lists can be viewed by all users and cannot be modified. To modify a published
-        list, use :meth:`Record.revise_list`.
+        list, use :meth:`.revise_list`.
 
         Parameters
         ----------
@@ -347,7 +347,6 @@ class RecordListApiClient(ApiClient):
         Performs an HTTP request against the Server API.
         The list must be published and awaiting approval. Withdrawing the list updates
         the "published" status to False and resets the awaiting approval status.
-        # TODO who has still access to the list? Original author?
         All existing subscriptions will be lost on withdrawal.
 
         Parameters
