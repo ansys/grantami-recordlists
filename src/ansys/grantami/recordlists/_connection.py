@@ -1,15 +1,11 @@
 from typing import List, Optional
 
-import requests
 from ansys.grantami.serverapi_openapi import api, models
-from ansys.openapi.common import (
-    ApiClient,
-    SessionConfiguration,
-    ApiClientFactory,
-)
+from ansys.openapi.common import ApiClient, ApiClientFactory, SessionConfiguration
+import requests
 
-from ansys.grantami.recordlists.models import RecordList, RecordListItem
 from ansys.grantami.recordlists._utils import _ArgNotProvided, extract_identifier
+from ansys.grantami.recordlists.models import RecordList, RecordListItem
 
 PROXY_PATH = "/proxy/v1.svc"
 AUTH_PATH = "/Health/v2.svc"

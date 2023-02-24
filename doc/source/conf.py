@@ -1,14 +1,13 @@
 """Sphinx documentation configuration file."""
-import os
-import shutil
 from datetime import datetime
+import os
 from pathlib import Path
+import shutil
 
+from ansys_sphinx_theme import ansys_favicon, pyansys_logo_black
 import jupytext
-from ansys_sphinx_theme import pyansys_logo_black, ansys_favicon
 
 from ansys.grantami.recordlists import __version__
-
 
 # Project information
 project = "ansys-grantami-recordlists"

@@ -1,22 +1,22 @@
-import uuid
-from typing import Type, Any
+from typing import Any, Type
 from unittest.mock import Mock
+import uuid
 
+from ansys.grantami.serverapi_openapi import models
+from ansys.grantami.serverapi_openapi.api import ListItemApi, ListManagementApi
+from ansys.grantami.serverapi_openapi.models import (
+    GrantaServerApiListsDtoListItem,
+    GrantaServerApiListsDtoRecordListCreate,
+    GrantaServerApiListsDtoRecordListHeader,
+    GrantaServerApiListsDtoRecordListItems,
+    GrantaServerApiListsDtoRecordListResource,
+    MicrosoftAspNetCoreJsonPatchOperationsOperation,
+)
 import pytest
 import requests
 
 from ansys.grantami.recordlists._connection import RecordListApiClient
 from ansys.grantami.recordlists.models import RecordListItem
-from ansys.grantami.serverapi_openapi.api import ListManagementApi, ListItemApi
-from ansys.grantami.serverapi_openapi import models
-from ansys.grantami.serverapi_openapi.models import (
-    GrantaServerApiListsDtoRecordListHeader,
-    GrantaServerApiListsDtoRecordListItems,
-    GrantaServerApiListsDtoListItem,
-    MicrosoftAspNetCoreJsonPatchOperationsOperation,
-    GrantaServerApiListsDtoRecordListResource,
-    GrantaServerApiListsDtoRecordListCreate,
-)
 
 
 @pytest.fixture

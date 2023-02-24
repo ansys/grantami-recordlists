@@ -1,6 +1,5 @@
-import pytest
-
 from ansys.openapi.common import ApiException
+import pytest
 
 pytestmark = pytest.mark.integration
 

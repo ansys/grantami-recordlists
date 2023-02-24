@@ -1,9 +1,9 @@
 import json
+
 import pytest
 import requests_mock
 
 from ansys.grantami.recordlists import Connection
-
 from inputs.examples import examples_as_strings
 
 

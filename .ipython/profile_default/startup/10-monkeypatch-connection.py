@@ -1,4 +1,5 @@
 import os
+
 from ansys.grantami.recordlists import Connection
 from ansys.grantami.recordlists._connection import RecordListApiClient
 

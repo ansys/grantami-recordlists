@@ -1,15 +1,15 @@
-import uuid
-from unittest.mock import Mock, patch
 from datetime import datetime, timedelta
+from unittest.mock import Mock, patch
+import uuid
 
+from ansys.grantami.serverapi_openapi.models import (
+    GrantaServerApiListsDtoListItem,
+    GrantaServerApiListsDtoRecordListHeader,
+    GrantaServerApiListsDtoUserOrGroup,
+)
 import pytest
 
 from ansys.grantami.recordlists.models import RecordList, RecordListItem, User
-from ansys.grantami.serverapi_openapi.models import (
-    GrantaServerApiListsDtoRecordListHeader,
-    GrantaServerApiListsDtoUserOrGroup,
-    GrantaServerApiListsDtoListItem,
-)
 
 
 class TestRecordList:
