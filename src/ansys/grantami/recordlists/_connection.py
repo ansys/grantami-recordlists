@@ -224,6 +224,49 @@ class RecordListApiClient(ApiClient):
             op=op,
         )
 
+    def request_approval(self, identifier: str) -> None:
+        """
+        Perform a request against the Server API to request approval for a RecordList specified
+        by its UUID identifier.
+
+        Requesting approval updates the status of an existing list to "awaiting approval".
+        """
+        self.list_management_api.api_v1_lists_list_list_identifier_request_approval_post(identifier)
+
+    def publish(self, identifier: str) -> None:
+        """
+        Perform a request against the Server API to publish a RecordList specified
+        by its UUID identifier.
+
+        The list must be awaiting approval and not published already. Publishing the list updates
+        the status to "published" and resets the awaiting approval status.
+        Published lists can be viewed by all users and cannot be modified. To modify a published
+        list, use :meth:`Record.revise_list`.
+        """
+        self.list_management_api.api_v1_lists_list_list_identifier_publish_post(identifier)
+
+    def unpublish(self, identifier: str) -> None:
+        """
+        Perform a request against the Server API to unpublish/withdraw a RecordList specified
+        by its UUID identifier.
+
+        The list must be published and awaiting approval. Withdrawing the list updates
+        the "published" status to False and resets the awaiting approval status.
+        # TODO who has still access to the list? Original author?
+        All existing subscriptions will be lost on withdrawal.
+        """
+        self.list_management_api.api_v1_lists_list_list_identifier_unpublish_post(identifier)
+
+    def reset_approval_request(self, identifier: str) -> None:
+        """
+        Perform a request against the Server API to cancel a request for approval for a RecordList
+        specified by its UUID identifier.
+
+        The list must be awaiting approval. Cancelling the approval request resets the awaiting
+        approval status to False.
+        """
+        self.list_management_api.api_v1_lists_list_list_identifier_reset_post(identifier)
+
 
 class Connection(ApiClientFactory):
     """

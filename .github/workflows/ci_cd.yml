@@ -100,6 +100,8 @@ jobs:
       TEST_SERVER_URL: ${{ secrets.TEST_SERVER_URL }}
       TEST_SERVER_ADMIN_USER: ${{ secrets.TEST_SERVER_ADMIN_USER }}
       TEST_SERVER_ADMIN_PASS: ${{ secrets.TEST_SERVER_ADMIN_PASS }}
+      TEST_SERVER_USER: ${{ secrets.TEST_SERVER_USER }}
+      TEST_SERVER_PASS: ${{ secrets.TEST_SERVER_PASS }}
       GH_PAT: ${{ secrets.LUDOVIC_PAT }}
 
   doc-build:

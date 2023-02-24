@@ -14,6 +14,7 @@ from ansys.grantami.serverapi_openapi.models import (
     GrantaServerApiListsDtoRecordListItems,
     GrantaServerApiListsDtoListItem,
     MicrosoftAspNetCoreJsonPatchOperationsOperation,
+    GrantaServerApiListsDtoRecordListResource,
     GrantaServerApiListsDtoRecordListCreate,
 )
 
@@ -185,6 +186,50 @@ class TestUpdate(TestClientMethod):
             )
         ]
         api_method.assert_called_once_with(self._mock_uuid, body=expected_body)
+
+
+class TestPublishList(TestClientMethod):
+    _return_value = Mock(spec=GrantaServerApiListsDtoRecordListResource, resource_uri=uuid.uuid4())
+    _api = ListManagementApi
+    _api_method = "api_v1_lists_list_list_identifier_publish_post"
+
+    def test_publish_list(self, client, api_method):
+        identifier = "00000-0000a"
+        client.publish(identifier)
+        api_method.assert_called_once_with(identifier)
+
+
+class TestUnpublishList(TestClientMethod):
+    _return_value = Mock(spec=GrantaServerApiListsDtoRecordListResource, resource_uri=uuid.uuid4())
+    _api = ListManagementApi
+    _api_method = "api_v1_lists_list_list_identifier_unpublish_post"
+
+    def test_unpublish_list(self, client, api_method):
+        identifier = "00000-0000a"
+        client.unpublish(identifier)
+        api_method.assert_called_once_with(identifier)
+
+
+class TestResetApprovalList(TestClientMethod):
+    _return_value = Mock(spec=GrantaServerApiListsDtoRecordListResource, resource_uri=uuid.uuid4())
+    _api = ListManagementApi
+    _api_method = "api_v1_lists_list_list_identifier_reset_post"
+
+    def test_reset_approval(self, client, api_method):
+        identifier = "00000-0000a"
+        client.reset_approval_request(identifier)
+        api_method.assert_called_once_with(identifier)
+
+
+class TestRequestApprovalList(TestClientMethod):
+    _return_value = Mock(spec=GrantaServerApiListsDtoRecordListResource, resource_uri=uuid.uuid4())
+    _api = ListManagementApi
+    _api_method = "api_v1_lists_list_list_identifier_request_approval_post"
+
+    def test_request_approval(self, client, api_method):
+        identifier = "00000-0000a"
+        client.request_approval(identifier)
+        api_method.assert_called_once_with(identifier)
 
 
 @pytest.fixture
