@@ -45,6 +45,11 @@ class RecordListApiClient(ApiClient):
         Get the details of a record list.
 
         Performs an HTTP request against the Server API.
+
+        Parameters
+        ----------
+        identifier :
+            Unique identifier of the record list.
         """
         record_list = self.list_management_api.api_v1_lists_list_list_identifier_get(identifier)
         return RecordList._from_model(record_list)
@@ -54,6 +59,11 @@ class RecordListApiClient(ApiClient):
         Get all items included in a record list.
 
         Performs an HTTP request against the Server API.
+
+        Parameters
+        ----------
+        identifier :
+            Unique identifier of the record list.
         """
         items = self.list_item_api.api_v1_lists_list_list_identifier_items_get(identifier)
         return [RecordListItem._from_model(item) for item in items.items]
@@ -65,6 +75,13 @@ class RecordListApiClient(ApiClient):
         Performs an HTTP request against the Server API.
         Items are not validated against existing records on the server or existing items in the
         list.
+
+        Parameters
+        ----------
+        identifier :
+            Unique identifier of the record list.
+        items:
+            List of items to add to the record list.
         """
         if not items:
             return
@@ -82,6 +99,13 @@ class RecordListApiClient(ApiClient):
 
         Performs an HTTP request against the Server API.
         Attempting to remove items that are not in the list will not result in an error.
+
+        Parameters
+        ----------
+        identifier :
+            Unique identifier of the record list.
+        items:
+            List of items to remove from the record list.
         """
         if not items:
             return
@@ -104,6 +128,22 @@ class RecordListApiClient(ApiClient):
         Create a new record list with the provided arguments.
 
         Performs an HTTP request against the Server API.
+
+        Parameters
+        ----------
+        name :
+            Name of the record list.
+        description :
+            Description of the record list.
+        notes :
+            Notes of the record list.
+        items :
+            List of items to add to the record list.
+
+        Returns
+        -------
+        str
+            Unique identifier of the created record list.
         """
         if items is not None:
             items = models.GrantaServerApiListsDtoRecordListItems(
@@ -132,6 +172,11 @@ class RecordListApiClient(ApiClient):
         Delete a record list.
 
         Performs an HTTP request against the Server API.
+
+        Parameters
+        ----------
+        identifier :
+            Unique identifier of the record list.
         """
         self.list_management_api.api_v1_lists_list_list_identifier_delete(identifier)
 
@@ -146,6 +191,22 @@ class RecordListApiClient(ApiClient):
         Update a record list with the provided arguments.
 
         Performs an HTTP request against the Server API.
+
+        Parameters
+        ----------
+        identifier :
+            Unique identifier of the record list.
+        name :
+            New value for the name of the record list.
+        description :
+            New value for the description of the record list.
+        notes :
+            New value for the notes of the record list.
+
+        Returns
+        -------
+        RecordList
+            Updated representation of the record list.
         """
         if name == _ArgNotProvided and description == _ArgNotProvided and notes == _ArgNotProvided:
             raise ValueError(
@@ -174,6 +235,16 @@ class RecordListApiClient(ApiClient):
         Create a copy of a record list.
 
         Performs an HTTP request against the Server API.
+
+        Parameters
+        ----------
+        identifier :
+            Unique identifier of the record list.
+
+        Returns
+        -------
+        str
+            Unique identifier of the created record list.
         """
         # TODO remove temp workaround when API documents operation return type
         (
@@ -199,6 +270,16 @@ class RecordListApiClient(ApiClient):
         Revising a list allows a user to create a personal copy of a published list and to modify
         its items or details. When the 'in-revision' list is published, it overwrites the original
         list.
+
+        Parameters
+        ----------
+        identifier :
+            Unique identifier of the record list.
+
+        Returns
+        -------
+        str
+            Unique identifier of the created personal record list.
         """
         # TODO remove temp workaround when API documents operation return type
         (
@@ -234,6 +315,11 @@ class RecordListApiClient(ApiClient):
 
         Performs an HTTP request against the Server API.
         Requesting approval updates the ``awaiting approval`` status of the record list to `True`.
+
+        Parameters
+        ----------
+        identifier :
+            Unique identifier of the record list.
         """
         self.list_management_api.api_v1_lists_list_list_identifier_request_approval_post(identifier)
 
@@ -246,6 +332,11 @@ class RecordListApiClient(ApiClient):
         the status to "published" and resets the awaiting approval status.
         Published lists can be viewed by all users and cannot be modified. To modify a published
         list, use :meth:`Record.revise_list`.
+
+        Parameters
+        ----------
+        identifier :
+            Unique identifier of the record list.
         """
         self.list_management_api.api_v1_lists_list_list_identifier_publish_post(identifier)
 
@@ -258,6 +349,11 @@ class RecordListApiClient(ApiClient):
         the "published" status to False and resets the awaiting approval status.
         # TODO who has still access to the list? Original author?
         All existing subscriptions will be lost on withdrawal.
+
+        Parameters
+        ----------
+        identifier :
+            Unique identifier of the record list.
         """
         self.list_management_api.api_v1_lists_list_list_identifier_unpublish_post(identifier)
 
@@ -268,6 +364,11 @@ class RecordListApiClient(ApiClient):
         Performs an HTTP request against the Server API.
         The list must be awaiting approval. Cancelling the approval request resets the awaiting
         approval status to False.
+
+        Parameters
+        ----------
+        identifier :
+            Unique identifier of the record list.
         """
         self.list_management_api.api_v1_lists_list_list_identifier_reset_post(identifier)
 
