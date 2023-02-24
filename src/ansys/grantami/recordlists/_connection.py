@@ -11,8 +11,8 @@ from ansys.openapi.common import (
 from ansys.grantami.recordlists.models import RecordList, RecordListItem
 from ansys.grantami.recordlists._utils import _ArgNotProvided, extract_identifier
 
-
-AUTH_PATH = "/swagger/v1/swagger.json"
+PROXY_PATH = "/proxy/v1.svc"
+AUTH_PATH = "/Health/v2.svc"
 
 
 class RecordListApiClient(ApiClient):
@@ -20,7 +20,7 @@ class RecordListApiClient(ApiClient):
     Communicates with Granta MI.
 
     This class is instantiated by the
-    :class:`ansys.grantami.recordlists.ServerApiFactory` class and should not be instantiated
+    :class:`~ansys.grantami.recordlists.Connection` class and should not be instantiated
     directly.
     """
 
@@ -224,16 +224,61 @@ class RecordListApiClient(ApiClient):
             op=op,
         )
 
+    def request_approval(self, identifier: str) -> None:
+        """
+        Perform a request against the Server API to request approval for a RecordList specified
+        by its UUID identifier.
+
+        Requesting approval updates the status of an existing list to "awaiting approval".
+        """
+        self.list_management_api.api_v1_lists_list_list_identifier_request_approval_post(identifier)
+
+    def publish(self, identifier: str) -> None:
+        """
+        Perform a request against the Server API to publish a RecordList specified
+        by its UUID identifier.
+
+        The list must be awaiting approval and not published already. Publishing the list updates
+        the status to "published" and resets the awaiting approval status.
+        Published lists can be viewed by all users and cannot be modified. To modify a published
+        list, use :meth:`Record.revise_list`.
+        """
+        self.list_management_api.api_v1_lists_list_list_identifier_publish_post(identifier)
+
+    def unpublish(self, identifier: str) -> None:
+        """
+        Perform a request against the Server API to unpublish/withdraw a RecordList specified
+        by its UUID identifier.
+
+        The list must be published and awaiting approval. Withdrawing the list updates
+        the "published" status to False and resets the awaiting approval status.
+        # TODO who has still access to the list? Original author?
+        All existing subscriptions will be lost on withdrawal.
+        """
+        self.list_management_api.api_v1_lists_list_list_identifier_unpublish_post(identifier)
+
+    def reset_approval_request(self, identifier: str) -> None:
+        """
+        Perform a request against the Server API to cancel a request for approval for a RecordList
+        specified by its UUID identifier.
+
+        The list must be awaiting approval. Cancelling the approval request resets the awaiting
+        approval status to False.
+        """
+        self.list_management_api.api_v1_lists_list_list_identifier_reset_post(identifier)
+
 
 class Connection(ApiClientFactory):
     """
     Connects to a Granta MI ServerAPI instance.
     """
 
-    def __init__(self, api_url: str, session_configuration: Optional[SessionConfiguration] = None):
-        auth_url = api_url.strip("/") + AUTH_PATH
+    def __init__(
+        self, servicelayer_url: str, session_configuration: Optional[SessionConfiguration] = None
+    ):
+        auth_url = servicelayer_url.strip("/") + AUTH_PATH
         super().__init__(auth_url, session_configuration)
-        self._base_server_api_url = api_url
+        self._base_service_layer_url = servicelayer_url
 
     def connect(self) -> RecordListApiClient:
         """
@@ -244,7 +289,7 @@ class Connection(ApiClientFactory):
         self._validate_builder()
         client = RecordListApiClient(
             self._session,
-            self._base_server_api_url,
+            self._base_service_layer_url + PROXY_PATH,
             self._session_configuration,
         )
         client.setup_client(models)

@@ -1,6 +1,18 @@
-..
-   Just reuse the root readme to avoid duplicating the documentation.
-   Provide any documentation specific to your online documentation
-   here.
+.. only:: latexpdf
 
-.. include:: ../../README.rst
+   .. include:: ../../README.rst
+      :start-after: after-badges
+
+.. only:: html
+
+   .. include:: ../../README.rst
+
+
+.. toctree::
+   :hidden:
+   :maxdepth: 3
+
+   getting_started/index
+   api/index
+   examples/index
+   contributing
