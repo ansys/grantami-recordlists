@@ -21,7 +21,7 @@ from ansys.grantami.recordlists.models import RecordListItem
 
 @pytest.fixture
 def client():
-    client = RecordListApiClient(Mock(), Mock(), Mock())
+    client = RecordListApiClient(Mock(), "http://server_name/mi_servicelayer", Mock())
     client.setup_client(models)
     return client
 
