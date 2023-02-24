@@ -74,3 +74,6 @@ show_missing = true
 markers = [
     """integration: test requires a real database (deselect with '-m \"not integration\"')"""
 ]
+
+[tool.pydocstyle]
+convention = "numpy"

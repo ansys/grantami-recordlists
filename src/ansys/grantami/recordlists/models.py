@@ -1,6 +1,4 @@
-"""
-Models
-"""
+"""Models."""
 from datetime import datetime
 from typing import Optional
 
@@ -10,10 +8,7 @@ from ansys.grantami.serverapi_openapi import models
 class RecordList:
     # TODO Skipped, might be for internal use?
     #  - metadata
-
-    """
-    Describes a RecordList as obtained from the API. Read-only.
-    """
+    """Describes a RecordList as obtained from the API. Read-only."""
 
     def __init__(
         self,
@@ -57,111 +52,91 @@ class RecordList:
     @property
     def name(self) -> str:
         """
-        Name of the Record List.
+        Name of the Record List. Read-only.
+
+        Can be updated via
+        :meth:`~ansys.grantami.recordlists._connection.RecordListApiClient.update_list`.
         """
         return self._name
 
     @property
     def description(self) -> str:
         """
-        Description of the Record List.
+        Description of the Record List. Read-only.
+
+        Can be updated via
+        :meth:`~ansys.grantami.recordlists._connection.RecordListApiClient.update_list`.
         """
         return self._description
 
     @property
     def notes(self) -> str:
         """
-        Notes about the Record List.
+        Notes about the Record List. Read-only.
+
+        Can be updated via
+        :meth:`~ansys.grantami.recordlists._connection.RecordListApiClient.update_list`.
         """
         return self._notes
 
     @property
     def identifier(self) -> str:
-        """
-        Identifier of the Record List.
-        Read-only.
-        """
+        """Identifier of the Record List. Read-only."""
         return self._identifier
 
     @property
     def created_timestamp(self) -> datetime:
-        """
-        Datetime at which the Record List was created.
-        Read-only.
-        """
+        """Datetime at which the Record List was created. Read-only."""
         return self._created_timestamp
 
     @property
     def created_user(self) -> "User":
-        """
-        User who created the Record List.
-        Read-only.
-        """
+        """User who created the Record List. Read-only."""
         return self._created_user
 
     @property
     def last_modified_timestamp(self) -> datetime:
-        """
-        Datetime at which the Record List was last modified.
-        Read-only.
-        """
+        """Datetime at which the Record List was last modified. Read-only."""
         return self._last_modified_timestamp
 
     @property
     def last_modified_user(self) -> "User":
-        """
-        User who last modified the Record List.
-        Read-only.
-        """
+        """User who last modified the Record List. Read-only."""
         return self._last_modified_user
 
     @property
     def published_timestamp(self) -> Optional[datetime]:
-        """
-        Datetime at which the Record List was published.
-        Read-only.
-        """
+        """Datetime at which the Record List was published. Read-only."""
         # TODO also represents last withdrawal date. Consider renaming
         return self._published_timestamp
 
     @property
     def published_user(self) -> Optional["User"]:
-        """
-        User who published/withdrew the Record List.
-        Read-only.
-        """
+        """User who published/withdrew the Record List. Read-only."""
         # TODO also represents last withdrawal date. Consider renaming
         return self._published_user
 
     @property
     def published(self) -> bool:
-        """
-        Whether the Record List has been published or not.
-        Read-only.
-        """
+        """Whether the Record List has been published or not. Read-only."""
         return self._published
 
     @property
     def is_revision(self) -> bool:
-        """
-        Whether the Record List is a revision.
-        Read-only.
-        """
+        """Whether the Record List is a revision. Read-only."""
         return self._is_revision
 
     @property
     def awaiting_approval(self) -> bool:
-        """
-        Whether the Record List is awaiting approval to be published or withdrawn.
-        Read-only.
-        """
+        """Whether the Record List is awaiting approval to be published or withdrawn. Read-only."""
         return self._awaiting_approval
 
     @property
     def internal_use(self) -> bool:
         """
-        Whether the Record List is for internal use only.
-        Read-only.
+        Whether the Record List is for internal use only. Read-only.
+
+        Lists flagged as for internal use are periodically deleted from the system.
         """
         # TODO internal_use flags that the list has been created by another MI application. Internal
         #  lists are periodically deleted.
@@ -171,35 +146,33 @@ class RecordList:
     @property
     def parent_record_list_identifier(self) -> str:
         """
-        Identifier of the parent record list. Is populated if the record list is a revision of
-        another record list.
-        Read-only.
+        Identifier of the parent record list. Read-only.
+
+        Is populated if the record list is a revision of another record list.
         """
         return self._parent_record_list_identifier
 
     @classmethod
-    def from_model(
+    def _from_model(
         cls,
         model: models.GrantaServerApiListsDtoRecordListHeader,
     ):
-        """
-        Instantiate from a model defined in the auto-generated client code.
-        """
+        """Instantiate from a model defined in the auto-generated client code."""
         instance = cls(
             name=model.name,
             identifier=model.identifier,
             description=model.description,
             notes=model.notes,
             created_timestamp=model.created_timestamp,
-            created_user=User.from_model(model.created_user),
+            created_user=User._from_model(model.created_user),
             is_revision=model.is_revision,
             published=model.published,
             awaiting_approval=model.awaiting_approval,
             internal_use=model.internal_use,
             last_modified_timestamp=model.last_modified_timestamp,
-            last_modified_user=User.from_model(model.last_modified_user),
+            last_modified_user=User._from_model(model.last_modified_user),
             published_timestamp=model.published_timestamp,
-            published_user=User.from_model(model.published_user),
+            published_user=User._from_model(model.published_user),
             parent_record_list_identifier=model.parent_record_list_identifier,
         )
         return instance
@@ -232,17 +205,17 @@ class RecordListItem:
 
     @property
     def table_guid(self) -> str:
-        """GUID of the table"""
+        """GUID of the table."""
         return self._table_guid
 
     @property
     def record_history_guid(self) -> str:
-        """Record History GUID of the Record"""
+        """Record History GUID."""
         return self._record_history_guid
 
     @property
     def record_version(self) -> Optional[int]:
-        """Record version number"""
+        """Record version number."""
         return self._record_version
 
     @property
@@ -256,6 +229,7 @@ class RecordListItem:
         return self._record_guid
 
     def __eq__(self, other: "RecordListItem"):
+        """Evaluate equality by checking equality of GUIDs and record version."""
         return (
             self.database_guid == other.database_guid
             and self.table_guid == other.table_guid
@@ -264,10 +238,8 @@ class RecordListItem:
         )
 
     @classmethod
-    def from_model(cls, model: models.GrantaServerApiListsDtoListItem):
-        """
-        Instantiate from a model defined in the auto-generated client code.
-        """
+    def _from_model(cls, model: models.GrantaServerApiListsDtoListItem):
+        """Instantiate from a model defined in the auto-generated client code."""
         instance = cls(
             database_guid=model.database_guid,
             table_guid=model.table_guid,
@@ -277,10 +249,8 @@ class RecordListItem:
         instance._record_guid = model.record_guid
         return instance
 
-    def to_model(self) -> models.GrantaServerApiListsDtoListItem:
-        """
-        Generate the DTO for use with the auto-generated client code.
-        """
+    def _to_model(self) -> models.GrantaServerApiListsDtoListItem:
+        """Generate the DTO for use with the auto-generated client code."""
         return models.GrantaServerApiListsDtoListItem(
             database_guid=self.database_guid,
             table_guid=self.table_guid,
@@ -300,23 +270,24 @@ class User:
 
     @property
     def identifier(self) -> str:
-        """Read-only identifier of the user or group"""
+        """Read-only identifier of the user or group."""
         return self._identifier
 
     @property
     def display_name(self) -> str:
-        """Read-only display name of the user or group"""
+        """Read-only display name of the user or group."""
         return self._display_name
 
     @property
     def name(self) -> str:
-        """Read-only name of the user or group"""
+        """Read-only name of the user or group."""
         return self._name
 
     @classmethod
-    def from_model(
+    def _from_model(
         cls, dto_user: Optional[models.GrantaServerApiListsDtoUserOrGroup]
     ) -> Optional["User"]:
+        """Instantiate from a model defined in the auto-generated client code."""
         if dto_user is None:
             return None
 

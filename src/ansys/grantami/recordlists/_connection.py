@@ -33,60 +33,63 @@ class RecordListApiClient(ApiClient):
 
     def get_all_lists(self) -> List[RecordList]:
         """
-        Perform a request against the Server API to retrieve all defined Record Lists available for
-        the user.
-        """
+        Get the details of all record lists available for the current user.
 
+        Performs an HTTP request against the Server API.
+        """
         record_lists = self.list_management_api.api_v1_lists_get()
-        return [RecordList.from_model(record_list) for record_list in record_lists]
+        return [RecordList._from_model(record_list) for record_list in record_lists]
 
     def get_list(self, identifier: str) -> RecordList:
         """
-        Perform a request against the Server API to retrieve a Record List specified by its UUID
-        identifier.
-        """
+        Get the details of a record list.
 
+        Performs an HTTP request against the Server API.
+        """
         record_list = self.list_management_api.api_v1_lists_list_list_identifier_get(identifier)
-        return RecordList.from_model(record_list)
+        return RecordList._from_model(record_list)
 
     def get_list_items(self, identifier: str) -> List[RecordListItem]:
         """
-        Perform a request against the Server API to retrieve all items included in a Record List
-        specified by its UUID identifier.
-        """
+        Get all items included in a record list.
 
+        Performs an HTTP request against the Server API.
+        """
         items = self.list_item_api.api_v1_lists_list_list_identifier_items_get(identifier)
-        return [RecordListItem.from_model(item) for item in items.items]
+        return [RecordListItem._from_model(item) for item in items.items]
 
     def add_items_to_list(self, identifier: str, items: List[RecordListItem]):
         """
-        Perform a request against the Server API to add items to the Record List
-        specified by its UUID identifier.
-        """
+        Add items to a record list.
 
+        Performs an HTTP request against the Server API.
+        Items are not validated against existing records on the server or existing items in the
+        list.
+        """
         if not items:
             return
 
         self.list_item_api.api_v1_lists_list_list_identifier_items_add_post(
             identifier,
             body=models.GrantaServerApiListsDtoRecordListItems(
-                items=[item.to_model() for item in items]
+                items=[item._to_model() for item in items]
             ),
         )
 
     def remove_items_from_list(self, identifier: str, items: List[RecordListItem]):
         """
-        Perform a request against the Server API to remove items from the Record List
-        specified by its UUID identifier.
-        """
+        Remove items from a record list.
 
+        Performs an HTTP request against the Server API.
+        Attempting to remove items that are not in the list will not result in an error.
+        """
         if not items:
             return
 
         self.list_item_api.api_v1_lists_list_list_identifier_items_remove_post(
             identifier,
             body=models.GrantaServerApiListsDtoRecordListItems(
-                items=[item.to_model() for item in items]
+                items=[item._to_model() for item in items]
             ),
         )
 
@@ -98,12 +101,13 @@ class RecordListApiClient(ApiClient):
         items: Optional[List[RecordListItem]] = None,
     ) -> str:
         """
-        Create a new list and push it to Server API. The identifier of the created RecordList is
-        returned.
+        Create a new record list with the provided arguments.
+
+        Performs an HTTP request against the Server API.
         """
         if items is not None:
             items = models.GrantaServerApiListsDtoRecordListItems(
-                items=[list_item.to_model() for list_item in items]
+                items=[list_item._to_model() for list_item in items]
             )
 
         # TODO Workaround until Server API documents 201 response
@@ -125,8 +129,9 @@ class RecordListApiClient(ApiClient):
 
     def delete_list(self, identifier: str) -> None:
         """
-        Perform a request against the Server API to delete a Record List specified by its UUID
-        identifier.
+        Delete a record list.
+
+        Performs an HTTP request against the Server API.
         """
         self.list_management_api.api_v1_lists_list_list_identifier_delete(identifier)
 
@@ -138,8 +143,9 @@ class RecordListApiClient(ApiClient):
         notes: Optional[str] = _ArgNotProvided,
     ) -> RecordList:
         """
-        Perform a request against the Server API to update a RecordList specified by its UUID
-        identifier with the properties provided, and returns the updated RecordList.
+        Update a record list with the provided arguments.
+
+        Performs an HTTP request against the Server API.
         """
         if name == _ArgNotProvided and description == _ArgNotProvided and notes == _ArgNotProvided:
             raise ValueError(
@@ -161,12 +167,13 @@ class RecordListApiClient(ApiClient):
         updated_resource = self.list_management_api.api_v1_lists_list_list_identifier_patch(
             identifier, body=body
         )
-        return RecordList.from_model(updated_resource)
+        return RecordList._from_model(updated_resource)
 
     def copy_list(self, identifier: str) -> str:
         """
-        Perform a request against the Server API to copy a Record List specified by its UUID
-        identifier.
+        Create a copy of a record list.
+
+        Performs an HTTP request against the Server API.
         """
         # TODO remove temp workaround when API documents operation return type
         (
@@ -186,11 +193,12 @@ class RecordListApiClient(ApiClient):
 
     def revise_list(self, identifier: str) -> str:
         """
-        Perform a request against the Server API to revise a Record List specified by its UUID
-        identifier.
+        Revise a record list.
 
-        # TODO: revising requires a published list, otherwise 403 forbidden
-        # TODO Explain what revising a list is about
+        Performs an HTTP request against the Server API.
+        Revising a list allows a user to create a personal copy of a published list and to modify
+        its items or details. When the 'in-revision' list is published, it overwrites the original
+        list.
         """
         # TODO remove temp workaround when API documents operation return type
         (
@@ -222,18 +230,18 @@ class RecordListApiClient(ApiClient):
 
     def request_approval(self, identifier: str) -> None:
         """
-        Perform a request against the Server API to request approval for a RecordList specified
-        by its UUID identifier.
+        Request approval for a record list.
 
-        Requesting approval updates the status of an existing list to "awaiting approval".
+        Performs an HTTP request against the Server API.
+        Requesting approval updates the ``awaiting approval`` status of the record list to `True`.
         """
         self.list_management_api.api_v1_lists_list_list_identifier_request_approval_post(identifier)
 
     def publish(self, identifier: str) -> None:
         """
-        Perform a request against the Server API to publish a RecordList specified
-        by its UUID identifier.
+        Publish a record list.
 
+        Performs an HTTP request against the Server API.
         The list must be awaiting approval and not published already. Publishing the list updates
         the status to "published" and resets the awaiting approval status.
         Published lists can be viewed by all users and cannot be modified. To modify a published
@@ -243,9 +251,9 @@ class RecordListApiClient(ApiClient):
 
     def unpublish(self, identifier: str) -> None:
         """
-        Perform a request against the Server API to unpublish/withdraw a RecordList specified
-        by its UUID identifier.
+        Withdraw a record list.
 
+        Performs an HTTP request against the Server API.
         The list must be published and awaiting approval. Withdrawing the list updates
         the "published" status to False and resets the awaiting approval status.
         # TODO who has still access to the list? Original author?
@@ -255,9 +263,9 @@ class RecordListApiClient(ApiClient):
 
     def reset_approval_request(self, identifier: str) -> None:
         """
-        Perform a request against the Server API to cancel a request for approval for a RecordList
-        specified by its UUID identifier.
+        Cancel a pending request for approval on a record list.
 
+        Performs an HTTP request against the Server API.
         The list must be awaiting approval. Cancelling the approval request resets the awaiting
         approval status to False.
         """
@@ -265,9 +273,7 @@ class RecordListApiClient(ApiClient):
 
 
 class Connection(ApiClientFactory):
-    """
-    Connects to a Granta MI ServerAPI instance.
-    """
+    """Connects to a Granta MI ServerAPI instance."""
 
     def __init__(
         self, servicelayer_url: str, session_configuration: Optional[SessionConfiguration] = None
