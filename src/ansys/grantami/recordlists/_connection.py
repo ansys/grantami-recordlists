@@ -16,20 +16,26 @@ class RecordListApiClient(ApiClient):
     Communicates with Granta MI.
 
     This class is instantiated by the
-    :class:`~ansys.grantami.recordlists.Connection` class and should not be instantiated
+    :class:`Connection` class and should not be instantiated
     directly.
     """
 
     def __init__(
         self,
         session: requests.Session,
-        api_url: str,
+        service_layer_url: str,
         configuration: SessionConfiguration,
     ):
+        self._service_layer_url = service_layer_url
+        api_url = service_layer_url + PROXY_PATH
         super().__init__(session, api_url, configuration)
         self.list_management_api = api.ListManagementApi(self)
         self.list_item_api = api.ListItemApi(self)
         self.list_permissions_api = api.ListPermissionsApi(self)
+
+    def __repr__(self) -> str:
+        """Printable representation of the object."""
+        return f"<{self.__class__.__name__} url: {self._service_layer_url}>"
 
     def get_all_lists(self) -> List[RecordList]:
         """
@@ -373,7 +379,50 @@ class RecordListApiClient(ApiClient):
 
 
 class Connection(ApiClientFactory):
-    """Connects to a Granta MI ServerAPI instance."""
+    """
+    Connects to a Granta MI ServerAPI instance.
+
+    This is a subclass of the :class:`ansys.openapi.common.ApiClientFactory` class. All methods in
+    this class are documented as returning :class:`~ansys.openapi.common.ApiClientFactory` class
+    instances of the :class:`ansys.grantami.recordlists.Connection` class instead.
+
+    Parameters
+    ----------
+    servicelayer_url : str
+       Base URL of the Granta MI Service Layer application.
+    session_configuration : :class:`~ansys.openapi.common.SessionConfiguration`, optional
+       Additional configuration settings for the requests session. The default is ``None``, in which
+        case the :class:`~ansys.openapi.common.SessionConfiguration` class with default parameters
+        is used.
+
+    Notes
+    -----
+    For advanced usage, including configuring session-specific properties and timeouts, see the
+    :external+openapi-common:doc:`ansys-openapi-common API reference <api/index>`. Specifically, see
+    the documentation for the :class:`~ansys.openapi.common.ApiClientFactory` base class and the
+    :class:`~ansys.openapi.common.SessionConfiguration` class
+
+
+    1. Create the connection builder object and specify the server to connect to.
+    2. Specify the authentication method to use for the connection and provide credentials if
+       required.
+    3. Connect to the server, which returns the client object.
+
+    The examples show this process for different authentication methods.
+
+    Examples
+    --------
+    >>> client = Connection("http://my_mi_server/mi_servicelayer").with_autologon().connect()
+    >>> client
+    <RecordListApiClient: url=http://my_mi_server/mi_servicelayer>
+    >>> client = (
+    ...     Connection("http://my_mi_server/mi_servicelayer")
+    ...     .with_credentials(username="my_username", password="my_password")
+    ...     .connect()
+    ... )
+    >>> client
+    <RecordListApiClient: url: http://my_mi_server/mi_servicelayer>
+    """
 
     def __init__(
         self, servicelayer_url: str, session_configuration: Optional[SessionConfiguration] = None
@@ -384,14 +433,20 @@ class Connection(ApiClientFactory):
 
     def connect(self) -> RecordListApiClient:
         """
-        Finalize the RecordList client and return it for use.
+        Finalize the :class:`RecordListApiClient` client and return it for use.
 
         Authentication must be configured for this method to succeed.
+
+        Returns
+        -------
+        RecordListApiClient
+            Client object that can be used to connect to Granta MI and interact with the record
+            list API.
         """
         self._validate_builder()
         client = RecordListApiClient(
             self._session,
-            self._base_service_layer_url + PROXY_PATH,
+            self._base_service_layer_url,
             self._session_configuration,
         )
         client.setup_client(models)
