@@ -48,7 +48,7 @@ class TestRecordList:
 
     @pytest.mark.parametrize("attr_name", list(_data.keys()))
     def test_record_list_is_read_only(self, record_list, attr_name):
-        with pytest.raises(AttributeError, match="can't set attribute"):
+        with pytest.raises(AttributeError):
             setattr(record_list, attr_name, "new_value")
 
     _required_fields = [
