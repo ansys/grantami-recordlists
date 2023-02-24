@@ -44,7 +44,7 @@ jobs:
       - name: Start VM with Azure CLI
         id: azure_cli
         uses: azure/CLI@v1
-        if:   ${{ !(inputs.skip_vm_management == 'true')}}
+        if:   ${{ !(inputs.skip_vm_management)}}
         with:
           azcliversion: 2.32.0
           inlineScript: |
@@ -153,7 +153,7 @@ jobs:
     name: Stop Azure VM
     runs-on: ubuntu-latest
     needs: docs
-    if:   ${{ always() && !(inputs.skip_vm_management == 'true')}}
+    if:   ${{ always() && !(inputs.skip_vm_management)}}
     steps:
       - name: Stop Azure VM
         uses: azure/CLI@v1
