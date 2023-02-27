@@ -392,8 +392,8 @@ class Connection(ApiClientFactory):
        Base URL of the Granta MI Service Layer application.
     session_configuration : :class:`~ansys.openapi.common.SessionConfiguration`, optional
        Additional configuration settings for the requests session. The default is ``None``, in which
-        case the :class:`~ansys.openapi.common.SessionConfiguration` class with default parameters
-        is used.
+       case the :class:`~ansys.openapi.common.SessionConfiguration` class with default parameters
+       is used.
 
     Notes
     -----
@@ -433,7 +433,7 @@ class Connection(ApiClientFactory):
 
     def connect(self) -> RecordListApiClient:
         """
-        Finalize the :class:`RecordListApiClient` client and return it for use.
+        Finalize the :class:`.RecordListApiClient` client and return it for use.
 
         Authentication must be configured for this method to succeed.
 

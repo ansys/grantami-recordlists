@@ -47,8 +47,6 @@ add_module_names = False
 
 # sphinx.ext.autodoc
 autodoc_typehints = "description"
-autodoc_typehints_description_target = "documented"
-autodoc_typehints_format = "short"
 autodoc_member_order = "bysource"
 
 # Intersphinx mapping
