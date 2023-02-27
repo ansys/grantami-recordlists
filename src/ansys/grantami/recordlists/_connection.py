@@ -1,11 +1,11 @@
 from typing import List, Optional
 
-from ansys.grantami.serverapi_openapi import api, models
-from ansys.openapi.common import ApiClient, ApiClientFactory, SessionConfiguration
-import requests
+from ansys.grantami.serverapi_openapi import api, models  # type: ignore
+from ansys.openapi.common import ApiClient, ApiClientFactory, SessionConfiguration  # type: ignore
+import requests  # type: ignore
 
-from ansys.grantami.recordlists._utils import _ArgNotProvided, extract_identifier
-from ansys.grantami.recordlists.models import RecordList, RecordListItem
+from ._utils import _ArgNotProvided, extract_identifier
+from .models import RecordList, RecordListItem
 
 PROXY_PATH = "/proxy/v1.svc"
 AUTH_PATH = "/Health/v2.svc"
@@ -166,12 +166,13 @@ class RecordListApiClient(ApiClient):
                 items=items,
             ),
         )
-        if status_code == 201:
-            response = self.deserialize(response, "GrantaServerApiListsDtoRecordListResource")
-            response: models.GrantaServerApiListsDtoRecordListResource
-            return extract_identifier(response)
-        else:
-            return None
+        if status_code != 201:
+            raise NotImplementedError("Expected response with status code 201")
+
+        data: models.GrantaServerApiListsDtoRecordListResource = self.deserialize(
+            response, "GrantaServerApiListsDtoRecordListResource"
+        )  # type: ignore
+        return extract_identifier(data)
 
     def delete_list(self, identifier: str) -> None:
         """
@@ -189,9 +190,9 @@ class RecordListApiClient(ApiClient):
     def update_list(
         self,
         identifier: str,
-        name: str = _ArgNotProvided,
-        description: Optional[str] = _ArgNotProvided,
-        notes: Optional[str] = _ArgNotProvided,
+        name: str = _ArgNotProvided,  # type: ignore
+        description: Optional[str] = _ArgNotProvided,  # type: ignore
+        notes: Optional[str] = _ArgNotProvided,  # type: ignore
     ) -> RecordList:
         """
         Update a record list with the provided arguments.
@@ -261,12 +262,13 @@ class RecordListApiClient(ApiClient):
             identifier,
             _preload_content=False,
         )
-        if status_code == 201:
-            response = self.deserialize(response, "GrantaServerApiListsDtoRecordListResource")
-            response: models.GrantaServerApiListsDtoRecordListResource
-            return extract_identifier(response)
-        else:
-            return None
+        if status_code != 201:
+            raise NotImplementedError("Expected response with status code 201")
+
+        data: models.GrantaServerApiListsDtoRecordListResource = self.deserialize(
+            response, "GrantaServerApiListsDtoRecordListResource"
+        )  # type: ignore
+        return extract_identifier(data)
 
     def revise_list(self, identifier: str) -> str:
         """
@@ -295,15 +297,13 @@ class RecordListApiClient(ApiClient):
         ) = self.list_management_api.api_v1_lists_list_list_identifier_revise_post_with_http_info(
             identifier, _preload_content=False
         )
-        if status_code == 201:
-            response = self.deserialize(response, "GrantaServerApiListsDtoRecordListResource")
-            response: models.GrantaServerApiListsDtoRecordListResource
-            return extract_identifier(response)
-        else:
-            # TODO returning None isn't helpful at all. Consider raising an Exception instead with
-            #  the content of the response, should it include any information about what happened
-            #  server-side (same for all three methods using this workaround)
-            return None
+        if status_code != 201:
+            raise NotImplementedError("Expected response with status code 201")
+
+        data: models.GrantaServerApiListsDtoRecordListResource = self.deserialize(
+            response, "GrantaServerApiListsDtoRecordListResource"
+        )  # type: ignore
+        return extract_identifier(data)
 
     @staticmethod
     def _create_patch_operation(
