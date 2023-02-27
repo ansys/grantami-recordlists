@@ -156,7 +156,7 @@ class RecordList:
     def _from_model(
         cls,
         model: models.GrantaServerApiListsDtoRecordListHeader,
-    ):
+    ) -> "RecordList":
         """Instantiate from a model defined in the auto-generated client code."""
         instance = cls(
             name=model.name,
@@ -228,8 +228,10 @@ class RecordListItem:
         """
         return self._record_guid
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
         """Evaluate equality by checking equality of GUIDs and record version."""
+        if not isinstance(other, RecordListItem):
+            return False
         return (
             self.database_guid == other.database_guid
             and self.table_guid == other.table_guid
@@ -238,7 +240,7 @@ class RecordListItem:
         )
 
     @classmethod
-    def _from_model(cls, model: models.GrantaServerApiListsDtoListItem):
+    def _from_model(cls, model: models.GrantaServerApiListsDtoListItem) -> "RecordListItem":
         """Instantiate from a model defined in the auto-generated client code."""
         instance = cls(
             database_guid=model.database_guid,
@@ -263,7 +265,7 @@ class User:
     # TODO change name to something user-friendly that means User AND Group
     """Read-only description of a Granta MI User or Group."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self._identifier: Optional[str] = None
         self._display_name: Optional[str] = None
         self._name: Optional[str] = None
@@ -286,7 +288,7 @@ class User:
     @classmethod
     def _from_model(cls, dto_user: models.GrantaServerApiListsDtoUserOrGroup) -> "User":
         """Instantiate from a model defined in the auto-generated client code."""
-        user = User()
+        user: User = User()
         user._identifier = dto_user.identifier
         user._display_name = dto_user.display_name
         user._name = dto_user.name
