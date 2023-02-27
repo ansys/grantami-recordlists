@@ -1,15 +1,15 @@
-import uuid
-from unittest.mock import Mock, patch
 from datetime import datetime, timedelta
+from unittest.mock import Mock, patch
+import uuid
 
+from ansys.grantami.serverapi_openapi.models import (
+    GrantaServerApiListsDtoListItem,
+    GrantaServerApiListsDtoRecordListHeader,
+    GrantaServerApiListsDtoUserOrGroup,
+)
 import pytest
 
 from ansys.grantami.recordlists.models import RecordList, RecordListItem, User
-from ansys.grantami.serverapi_openapi.models import (
-    GrantaServerApiListsDtoRecordListHeader,
-    GrantaServerApiListsDtoUserOrGroup,
-    GrantaServerApiListsDtoListItem,
-)
 
 
 class TestRecordList:
@@ -91,10 +91,10 @@ class TestRecordList:
     @patch("ansys.grantami.recordlists.models.User")
     def test_dto_mapping(self, mock_user_class):
         # Overriding User.from_model method to a no-op. It is tested separately
-        mock_user_class.from_model = lambda x: x
+        mock_user_class._from_model = lambda x: x
         # Using mock to generate unique values for each property
         mock_dto = Mock(spec=GrantaServerApiListsDtoRecordListHeader)
-        record_list = RecordList.from_model(mock_dto)
+        record_list = RecordList._from_model(mock_dto)
 
         assert record_list.name is mock_dto.name
         assert record_list.identifier is mock_dto.identifier
@@ -119,7 +119,7 @@ def test_user_dto_mapping():
     display_name = "domain\\displayname"
     dto_user = GrantaServerApiListsDtoUserOrGroup(user_id, display_name, username)
 
-    user = User.from_model(dto_user)
+    user = User._from_model(dto_user)
 
     assert user.identifier == user_id
     assert user.name == username
@@ -141,7 +141,7 @@ def test_record_list_item_from_dto_mapping():
         record_guid=record_guid,
     )
 
-    item = RecordListItem.from_model(dto_item)
+    item = RecordListItem._from_model(dto_item)
 
     assert item.database_guid == db_guid
     assert item.table_guid == table_guid
@@ -159,7 +159,7 @@ def test_record_list_item_to_dto_mapping():
     )
     item._record_guid = str(uuid.uuid4())
 
-    dto = item.to_model()
+    dto = item._to_model()
     assert dto.database_guid == item.database_guid
     assert dto.table_guid == item.table_guid
     assert dto.record_history_guid == item.record_history_guid

@@ -1,14 +1,13 @@
 """Sphinx documentation configuration file."""
-import os
-import shutil
 from datetime import datetime
+import os
 from pathlib import Path
+import shutil
 
+from ansys_sphinx_theme import ansys_favicon, pyansys_logo_black
 import jupytext
-from ansys_sphinx_theme import pyansys_logo_black, ansys_favicon
 
 from ansys.grantami.recordlists import __version__
-
 
 # Project information
 project = "ansys-grantami-recordlists"
@@ -35,7 +34,8 @@ html_theme_options = {
 # Sphinx extensions
 extensions = [
     "sphinx.ext.autodoc",
-    "sphinx.ext.autosummary",
+    "sphinx.ext.autodoc.typehints",
+    "sphinx.ext.napoleon",
     "numpydoc",
     "sphinx.ext.intersphinx",
     "sphinx_copybutton",
@@ -46,14 +46,14 @@ extensions = [
 add_module_names = False
 
 # sphinx.ext.autodoc
-autodoc_typehints = "both"
-autodoc_typehints_description_target = "documented"
+autodoc_typehints = "description"
 autodoc_member_order = "bysource"
 
 # Intersphinx mapping
 intersphinx_mapping = {
     "python": ("https://docs.python.org/dev", None),
     "openapi-common": ("https://openapi.docs.pyansys.com", None),
+    "requests": ("https://requests.readthedocs.io/en/latest/", None),
     # kept here as an example
     # "scipy": ("https://docs.scipy.org/doc/scipy/reference", None),
     # "numpy": ("https://numpy.org/devdocs", None),

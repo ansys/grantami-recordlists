@@ -1,15 +1,11 @@
 from typing import List, Optional
 
-import requests
 from ansys.grantami.serverapi_openapi import api, models
-from ansys.openapi.common import (
-    ApiClient,
-    SessionConfiguration,
-    ApiClientFactory,
-)
+from ansys.openapi.common import ApiClient, ApiClientFactory, SessionConfiguration
+import requests
 
-from ansys.grantami.recordlists.models import RecordList, RecordListItem
 from ansys.grantami.recordlists._utils import _ArgNotProvided, extract_identifier
+from ansys.grantami.recordlists.models import RecordList, RecordListItem
 
 PROXY_PATH = "/proxy/v1.svc"
 AUTH_PATH = "/Health/v2.svc"
@@ -20,77 +16,110 @@ class RecordListApiClient(ApiClient):
     Communicates with Granta MI.
 
     This class is instantiated by the
-    :class:`~ansys.grantami.recordlists.Connection` class and should not be instantiated
+    :class:`Connection` class and should not be instantiated
     directly.
     """
 
     def __init__(
         self,
         session: requests.Session,
-        api_url: str,
+        service_layer_url: str,
         configuration: SessionConfiguration,
     ):
+        self._service_layer_url = service_layer_url
+        api_url = service_layer_url + PROXY_PATH
         super().__init__(session, api_url, configuration)
         self.list_management_api = api.ListManagementApi(self)
         self.list_item_api = api.ListItemApi(self)
         self.list_permissions_api = api.ListPermissionsApi(self)
 
+    def __repr__(self) -> str:
+        """Printable representation of the object."""
+        return f"<{self.__class__.__name__} url: {self._service_layer_url}>"
+
     def get_all_lists(self) -> List[RecordList]:
         """
-        Perform a request against the Server API to retrieve all defined Record Lists available for
-        the user.
-        """
+        Get the details of all record lists available for the current user.
 
+        Performs an HTTP request against the Server API.
+        """
         record_lists = self.list_management_api.api_v1_lists_get()
-        return [RecordList.from_model(record_list) for record_list in record_lists]
+        return [RecordList._from_model(record_list) for record_list in record_lists]
 
     def get_list(self, identifier: str) -> RecordList:
         """
-        Perform a request against the Server API to retrieve a Record List specified by its UUID
-        identifier.
-        """
+        Get the details of a record list.
 
+        Performs an HTTP request against the Server API.
+
+        Parameters
+        ----------
+        identifier :
+            Unique identifier of the record list.
+        """
         record_list = self.list_management_api.api_v1_lists_list_list_identifier_get(identifier)
-        return RecordList.from_model(record_list)
+        return RecordList._from_model(record_list)
 
     def get_list_items(self, identifier: str) -> List[RecordListItem]:
         """
-        Perform a request against the Server API to retrieve all items included in a Record List
-        specified by its UUID identifier.
-        """
+        Get all items included in a record list.
 
+        Performs an HTTP request against the Server API.
+
+        Parameters
+        ----------
+        identifier :
+            Unique identifier of the record list.
+        """
         items = self.list_item_api.api_v1_lists_list_list_identifier_items_get(identifier)
-        return [RecordListItem.from_model(item) for item in items.items]
+        return [RecordListItem._from_model(item) for item in items.items]
 
     def add_items_to_list(self, identifier: str, items: List[RecordListItem]):
         """
-        Perform a request against the Server API to add items to the Record List
-        specified by its UUID identifier.
-        """
+        Add items to a record list.
 
+        Performs an HTTP request against the Server API.
+        Items are not validated against existing records on the server or existing items in the
+        list.
+
+        Parameters
+        ----------
+        identifier :
+            Unique identifier of the record list.
+        items:
+            List of items to add to the record list.
+        """
         if not items:
             return
 
         self.list_item_api.api_v1_lists_list_list_identifier_items_add_post(
             identifier,
             body=models.GrantaServerApiListsDtoRecordListItems(
-                items=[item.to_model() for item in items]
+                items=[item._to_model() for item in items]
             ),
         )
 
     def remove_items_from_list(self, identifier: str, items: List[RecordListItem]):
         """
-        Perform a request against the Server API to remove items from the Record List
-        specified by its UUID identifier.
-        """
+        Remove items from a record list.
 
+        Performs an HTTP request against the Server API.
+        Attempting to remove items that are not in the list will not result in an error.
+
+        Parameters
+        ----------
+        identifier :
+            Unique identifier of the record list.
+        items:
+            List of items to remove from the record list.
+        """
         if not items:
             return
 
         self.list_item_api.api_v1_lists_list_list_identifier_items_remove_post(
             identifier,
             body=models.GrantaServerApiListsDtoRecordListItems(
-                items=[item.to_model() for item in items]
+                items=[item._to_model() for item in items]
             ),
         )
 
@@ -102,12 +131,29 @@ class RecordListApiClient(ApiClient):
         items: Optional[List[RecordListItem]] = None,
     ) -> str:
         """
-        Create a new list and push it to Server API. The identifier of the created RecordList is
-        returned.
+        Create a new record list with the provided arguments.
+
+        Performs an HTTP request against the Server API.
+
+        Parameters
+        ----------
+        name :
+            Name of the record list.
+        description :
+            Description of the record list.
+        notes :
+            Notes of the record list.
+        items :
+            List of items to add to the record list.
+
+        Returns
+        -------
+        str
+            Unique identifier of the created record list.
         """
         if items is not None:
             items = models.GrantaServerApiListsDtoRecordListItems(
-                items=[list_item.to_model() for list_item in items]
+                items=[list_item._to_model() for list_item in items]
             )
 
         # TODO Workaround until Server API documents 201 response
@@ -129,8 +175,14 @@ class RecordListApiClient(ApiClient):
 
     def delete_list(self, identifier: str) -> None:
         """
-        Perform a request against the Server API to delete a Record List specified by its UUID
-        identifier.
+        Delete a record list.
+
+        Performs an HTTP request against the Server API.
+
+        Parameters
+        ----------
+        identifier :
+            Unique identifier of the record list.
         """
         self.list_management_api.api_v1_lists_list_list_identifier_delete(identifier)
 
@@ -142,8 +194,25 @@ class RecordListApiClient(ApiClient):
         notes: Optional[str] = _ArgNotProvided,
     ) -> RecordList:
         """
-        Perform a request against the Server API to update a RecordList specified by its UUID
-        identifier with the properties provided, and returns the updated RecordList.
+        Update a record list with the provided arguments.
+
+        Performs an HTTP request against the Server API.
+
+        Parameters
+        ----------
+        identifier :
+            Unique identifier of the record list.
+        name :
+            New value for the name of the record list.
+        description :
+            New value for the description of the record list.
+        notes :
+            New value for the notes of the record list.
+
+        Returns
+        -------
+        RecordList
+            Updated representation of the record list.
         """
         if name == _ArgNotProvided and description == _ArgNotProvided and notes == _ArgNotProvided:
             raise ValueError(
@@ -165,12 +234,23 @@ class RecordListApiClient(ApiClient):
         updated_resource = self.list_management_api.api_v1_lists_list_list_identifier_patch(
             identifier, body=body
         )
-        return RecordList.from_model(updated_resource)
+        return RecordList._from_model(updated_resource)
 
     def copy_list(self, identifier: str) -> str:
         """
-        Perform a request against the Server API to copy a Record List specified by its UUID
-        identifier.
+        Create a copy of a record list.
+
+        Performs an HTTP request against the Server API.
+
+        Parameters
+        ----------
+        identifier :
+            Unique identifier of the record list.
+
+        Returns
+        -------
+        str
+            Unique identifier of the created record list.
         """
         # TODO remove temp workaround when API documents operation return type
         (
@@ -190,11 +270,22 @@ class RecordListApiClient(ApiClient):
 
     def revise_list(self, identifier: str) -> str:
         """
-        Perform a request against the Server API to revise a Record List specified by its UUID
-        identifier.
+        Revise a record list.
 
-        # TODO: revising requires a published list, otherwise 403 forbidden
-        # TODO Explain what revising a list is about
+        Performs an HTTP request against the Server API.
+        Revising a list allows a user to create a personal copy of a published list and to modify
+        its items or details. When the 'in-revision' list is published, it overwrites the original
+        list.
+
+        Parameters
+        ----------
+        identifier :
+            Unique identifier of the record list.
+
+        Returns
+        -------
+        str
+            Unique identifier of the created personal record list.
         """
         # TODO remove temp workaround when API documents operation return type
         (
@@ -226,44 +317,63 @@ class RecordListApiClient(ApiClient):
 
     def request_approval(self, identifier: str) -> None:
         """
-        Perform a request against the Server API to request approval for a RecordList specified
-        by its UUID identifier.
+        Request approval for a record list.
 
-        Requesting approval updates the status of an existing list to "awaiting approval".
+        Performs an HTTP request against the Server API.
+        Requesting approval updates the ``awaiting approval`` status of the record list to `True`.
+
+        Parameters
+        ----------
+        identifier :
+            Unique identifier of the record list.
         """
         self.list_management_api.api_v1_lists_list_list_identifier_request_approval_post(identifier)
 
     def publish(self, identifier: str) -> None:
         """
-        Perform a request against the Server API to publish a RecordList specified
-        by its UUID identifier.
+        Publish a record list.
 
+        Performs an HTTP request against the Server API.
         The list must be awaiting approval and not published already. Publishing the list updates
         the status to "published" and resets the awaiting approval status.
         Published lists can be viewed by all users and cannot be modified. To modify a published
-        list, use :meth:`Record.revise_list`.
+        list, use :meth:`.revise_list`.
+
+        Parameters
+        ----------
+        identifier :
+            Unique identifier of the record list.
         """
         self.list_management_api.api_v1_lists_list_list_identifier_publish_post(identifier)
 
     def unpublish(self, identifier: str) -> None:
         """
-        Perform a request against the Server API to unpublish/withdraw a RecordList specified
-        by its UUID identifier.
+        Withdraw a record list.
 
+        Performs an HTTP request against the Server API.
         The list must be published and awaiting approval. Withdrawing the list updates
         the "published" status to False and resets the awaiting approval status.
-        # TODO who has still access to the list? Original author?
         All existing subscriptions will be lost on withdrawal.
+
+        Parameters
+        ----------
+        identifier :
+            Unique identifier of the record list.
         """
         self.list_management_api.api_v1_lists_list_list_identifier_unpublish_post(identifier)
 
     def reset_approval_request(self, identifier: str) -> None:
         """
-        Perform a request against the Server API to cancel a request for approval for a RecordList
-        specified by its UUID identifier.
+        Cancel a pending request for approval on a record list.
 
+        Performs an HTTP request against the Server API.
         The list must be awaiting approval. Cancelling the approval request resets the awaiting
         approval status to False.
+
+        Parameters
+        ----------
+        identifier :
+            Unique identifier of the record list.
         """
         self.list_management_api.api_v1_lists_list_list_identifier_reset_post(identifier)
 
@@ -271,6 +381,47 @@ class RecordListApiClient(ApiClient):
 class Connection(ApiClientFactory):
     """
     Connects to a Granta MI ServerAPI instance.
+
+    This is a subclass of the :class:`ansys.openapi.common.ApiClientFactory` class. All methods in
+    this class are documented as returning :class:`~ansys.openapi.common.ApiClientFactory` class
+    instances of the :class:`ansys.grantami.recordlists.Connection` class instead.
+
+    Parameters
+    ----------
+    servicelayer_url : str
+       Base URL of the Granta MI Service Layer application.
+    session_configuration : :class:`~ansys.openapi.common.SessionConfiguration`, optional
+       Additional configuration settings for the requests session. The default is ``None``, in which
+       case the :class:`~ansys.openapi.common.SessionConfiguration` class with default parameters
+       is used.
+
+    Notes
+    -----
+    For advanced usage, including configuring session-specific properties and timeouts, see the
+    :external+openapi-common:doc:`ansys-openapi-common API reference <api/index>`. Specifically, see
+    the documentation for the :class:`~ansys.openapi.common.ApiClientFactory` base class and the
+    :class:`~ansys.openapi.common.SessionConfiguration` class
+
+
+    1. Create the connection builder object and specify the server to connect to.
+    2. Specify the authentication method to use for the connection and provide credentials if
+       required.
+    3. Connect to the server, which returns the client object.
+
+    The examples show this process for different authentication methods.
+
+    Examples
+    --------
+    >>> client = Connection("http://my_mi_server/mi_servicelayer").with_autologon().connect()
+    >>> client
+    <RecordListApiClient: url=http://my_mi_server/mi_servicelayer>
+    >>> client = (
+    ...     Connection("http://my_mi_server/mi_servicelayer")
+    ...     .with_credentials(username="my_username", password="my_password")
+    ...     .connect()
+    ... )
+    >>> client
+    <RecordListApiClient: url: http://my_mi_server/mi_servicelayer>
     """
 
     def __init__(
@@ -282,14 +433,20 @@ class Connection(ApiClientFactory):
 
     def connect(self) -> RecordListApiClient:
         """
-        Finalize the RecordList client and return it for use.
+        Finalize the :class:`.RecordListApiClient` client and return it for use.
 
         Authentication must be configured for this method to succeed.
+
+        Returns
+        -------
+        RecordListApiClient
+            Client object that can be used to connect to Granta MI and interact with the record
+            list API.
         """
         self._validate_builder()
         client = RecordListApiClient(
             self._session,
-            self._base_service_layer_url + PROXY_PATH,
+            self._base_service_layer_url,
             self._session_configuration,
         )
         client.setup_client(models)

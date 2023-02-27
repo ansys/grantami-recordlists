@@ -1,10 +1,11 @@
+from functools import wraps
+import json
+import logging
+import os
+import time
+
 import requests
 from requests.auth import HTTPBasicAuth
-import os
-import json
-import time
-from functools import wraps
-import logging
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger()

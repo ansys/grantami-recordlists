@@ -1,6 +1,6 @@
+from ansys.openapi.common import ApiException
 import pytest
 
-from ansys.openapi.common import ApiException
 from ansys.grantami.recordlists.models import RecordList, RecordListItem
 
 pytestmark = pytest.mark.integration
