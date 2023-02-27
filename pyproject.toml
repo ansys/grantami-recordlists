@@ -77,9 +77,3 @@ markers = [
 
 [tool.pydocstyle]
 convention = "numpy"
-
-[tool.mypy]
-python_version = 3.7
-
-[[tool.mypy.overrides]]
-ignore_missing_imports = true
