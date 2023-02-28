@@ -2,9 +2,7 @@ from typing import List
 
 from ansys.grantami.serverapi_openapi import models  # type: ignore
 
-
-class _ArgNotProvided:
-    pass
+_ArgNotProvided = "_ArgNotProvided"
 
 
 def extract_identifier(response: models.GrantaServerApiListsDtoRecordListResource) -> str:

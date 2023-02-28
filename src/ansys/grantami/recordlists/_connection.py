@@ -1,8 +1,12 @@
-from typing import List, Optional
+from typing import List, Optional, Union, cast
 
-from ansys.grantami.serverapi_openapi import api, models  # type: ignore
-from ansys.openapi.common import ApiClient, ApiClientFactory, SessionConfiguration  # type: ignore
-import requests  # type: ignore
+from ansys.grantami.serverapi_openapi import api, models  # type: ignore[import]
+from ansys.openapi.common import (  # type: ignore[import]
+    ApiClient,
+    ApiClientFactory,
+    SessionConfiguration,
+)
+import requests  # type: ignore[import]
 
 from ._utils import _ArgNotProvided, extract_identifier
 from .models import RecordList, RecordListItem
@@ -11,7 +15,7 @@ PROXY_PATH = "/proxy/v1.svc"
 AUTH_PATH = "/Health/v2.svc"
 
 
-class RecordListApiClient(ApiClient):  # type: ignore
+class RecordListApiClient(ApiClient):  # type: ignore[misc]
     """
     Communicates with Granta MI.
 
@@ -169,9 +173,10 @@ class RecordListApiClient(ApiClient):  # type: ignore
         if status_code != 201:
             raise NotImplementedError("Expected response with status code 201")
 
-        data = self.deserialize(
-            response, "GrantaServerApiListsDtoRecordListResource"
-        )  # type: models.GrantaServerApiListsDtoRecordListResource
+        data = cast(
+            models.GrantaServerApiListsDtoRecordListResource,
+            self.deserialize(response, "GrantaServerApiListsDtoRecordListResource"),
+        )
         return extract_identifier(data)
 
     def delete_list(self, identifier: str) -> None:
@@ -190,9 +195,10 @@ class RecordListApiClient(ApiClient):  # type: ignore
     def update_list(
         self,
         identifier: str,
-        name: str = _ArgNotProvided,  # type: ignore
-        description: Optional[str] = _ArgNotProvided,  # type: ignore
-        notes: Optional[str] = _ArgNotProvided,  # type: ignore
+        *,
+        name: str = _ArgNotProvided,
+        description: Union[str, None] = _ArgNotProvided,
+        notes: Union[str, None] = _ArgNotProvided,
     ) -> RecordList:
         """
         Update a record list with the provided arguments.
@@ -201,13 +207,13 @@ class RecordListApiClient(ApiClient):  # type: ignore
 
         Parameters
         ----------
-        identifier :
+        identifier : str
             Unique identifier of the record list.
-        name :
+        name : str, optional
             New value for the name of the record list.
-        description :
+        description : Union[str, None], optional
             New value for the description of the record list.
-        notes :
+        notes : Optional[str], optional
             New value for the notes of the record list.
 
         Returns
@@ -215,11 +221,7 @@ class RecordListApiClient(ApiClient):  # type: ignore
         RecordList
             Updated representation of the record list.
         """
-        if (
-            name == _ArgNotProvided  # type: ignore
-            and description == _ArgNotProvided  # type: ignore
-            and notes == _ArgNotProvided  # type: ignore
-        ):
+        if name == _ArgNotProvided and description == _ArgNotProvided and notes == _ArgNotProvided:
             raise ValueError(
                 f"Update must include at least one property to update. "
                 f"Supported properties are 'name', 'description', and 'notes'."
@@ -229,11 +231,11 @@ class RecordListApiClient(ApiClient):  # type: ignore
             raise ValueError(f"If provided, argument 'name' cannot be None.")
 
         body = []
-        if name != _ArgNotProvided:  # type: ignore
+        if name != _ArgNotProvided:
             body.append(self._create_patch_operation(name, "name"))
-        if description != _ArgNotProvided:  # type: ignore
+        if description != _ArgNotProvided:
             body.append(self._create_patch_operation(description, "description"))
-        if notes != _ArgNotProvided:  # type: ignore
+        if notes != _ArgNotProvided:
             body.append(self._create_patch_operation(notes, "notes"))
 
         updated_resource = self.list_management_api.api_v1_lists_list_list_identifier_patch(
@@ -269,9 +271,10 @@ class RecordListApiClient(ApiClient):  # type: ignore
         if status_code != 201:
             raise NotImplementedError("Expected response with status code 201")
 
-        data = self.deserialize(
-            response, "GrantaServerApiListsDtoRecordListResource"
-        )  # type: models.GrantaServerApiListsDtoRecordListResource
+        data = cast(
+            models.GrantaServerApiListsDtoRecordListResource,
+            self.deserialize(response, "GrantaServerApiListsDtoRecordListResource"),
+        )
         return extract_identifier(data)
 
     def revise_list(self, identifier: str) -> str:
@@ -304,9 +307,10 @@ class RecordListApiClient(ApiClient):  # type: ignore
         if status_code != 201:
             raise NotImplementedError("Expected response with status code 201")
 
-        data = self.deserialize(
-            response, "GrantaServerApiListsDtoRecordListResource"
-        )  # type: models.GrantaServerApiListsDtoRecordListResource
+        data = cast(
+            models.GrantaServerApiListsDtoRecordListResource,
+            self.deserialize(response, "GrantaServerApiListsDtoRecordListResource"),
+        )
         return extract_identifier(data)
 
     @staticmethod
@@ -382,7 +386,7 @@ class RecordListApiClient(ApiClient):  # type: ignore
         self.list_management_api.api_v1_lists_list_list_identifier_reset_post(identifier)
 
 
-class Connection(ApiClientFactory):  # type: ignore
+class Connection(ApiClientFactory):  # type: ignore[misc]
     """
     Connects to a Granta MI ServerAPI instance.
 
