@@ -1,17 +1,21 @@
-from typing import List, Optional
+from typing import List, Optional, Union, cast
 
-from ansys.grantami.serverapi_openapi import api, models
-from ansys.openapi.common import ApiClient, ApiClientFactory, SessionConfiguration
-import requests
+from ansys.grantami.serverapi_openapi import api, models  # type: ignore[import]
+from ansys.openapi.common import (  # type: ignore[import]
+    ApiClient,
+    ApiClientFactory,
+    SessionConfiguration,
+)
+import requests  # type: ignore[import]
 
-from ansys.grantami.recordlists._utils import _ArgNotProvided, extract_identifier
-from ansys.grantami.recordlists.models import RecordList, RecordListItem
+from ._utils import _ArgNotProvided, extract_identifier
+from .models import RecordList, RecordListItem
 
 PROXY_PATH = "/proxy/v1.svc"
 AUTH_PATH = "/Health/v2.svc"
 
 
-class RecordListApiClient(ApiClient):
+class RecordListApiClient(ApiClient):  # type: ignore[misc]
     """
     Communicates with Granta MI.
 
@@ -74,7 +78,7 @@ class RecordListApiClient(ApiClient):
         items = self.list_item_api.api_v1_lists_list_list_identifier_items_get(identifier)
         return [RecordListItem._from_model(item) for item in items.items]
 
-    def add_items_to_list(self, identifier: str, items: List[RecordListItem]):
+    def add_items_to_list(self, identifier: str, items: List[RecordListItem]) -> None:
         """
         Add items to a record list.
 
@@ -99,7 +103,7 @@ class RecordListApiClient(ApiClient):
             ),
         )
 
-    def remove_items_from_list(self, identifier: str, items: List[RecordListItem]):
+    def remove_items_from_list(self, identifier: str, items: List[RecordListItem]) -> None:
         """
         Remove items from a record list.
 
@@ -166,12 +170,14 @@ class RecordListApiClient(ApiClient):
                 items=items,
             ),
         )
-        if status_code == 201:
-            response = self.deserialize(response, "GrantaServerApiListsDtoRecordListResource")
-            response: models.GrantaServerApiListsDtoRecordListResource
-            return extract_identifier(response)
-        else:
-            return None
+        if status_code != 201:
+            raise NotImplementedError("Expected response with status code 201")
+
+        data = cast(
+            models.GrantaServerApiListsDtoRecordListResource,
+            self.deserialize(response, "GrantaServerApiListsDtoRecordListResource"),
+        )
+        return extract_identifier(data)
 
     def delete_list(self, identifier: str) -> None:
         """
@@ -189,9 +195,10 @@ class RecordListApiClient(ApiClient):
     def update_list(
         self,
         identifier: str,
+        *,
         name: str = _ArgNotProvided,
-        description: Optional[str] = _ArgNotProvided,
-        notes: Optional[str] = _ArgNotProvided,
+        description: Union[str, None] = _ArgNotProvided,
+        notes: Union[str, None] = _ArgNotProvided,
     ) -> RecordList:
         """
         Update a record list with the provided arguments.
@@ -200,13 +207,13 @@ class RecordListApiClient(ApiClient):
 
         Parameters
         ----------
-        identifier :
+        identifier : str
             Unique identifier of the record list.
-        name :
+        name : str, optional
             New value for the name of the record list.
-        description :
+        description : Union[str, None], optional
             New value for the description of the record list.
-        notes :
+        notes : Optional[str], optional
             New value for the notes of the record list.
 
         Returns
@@ -261,12 +268,14 @@ class RecordListApiClient(ApiClient):
             identifier,
             _preload_content=False,
         )
-        if status_code == 201:
-            response = self.deserialize(response, "GrantaServerApiListsDtoRecordListResource")
-            response: models.GrantaServerApiListsDtoRecordListResource
-            return extract_identifier(response)
-        else:
-            return None
+        if status_code != 201:
+            raise NotImplementedError("Expected response with status code 201")
+
+        data = cast(
+            models.GrantaServerApiListsDtoRecordListResource,
+            self.deserialize(response, "GrantaServerApiListsDtoRecordListResource"),
+        )
+        return extract_identifier(data)
 
     def revise_list(self, identifier: str) -> str:
         """
@@ -295,19 +304,18 @@ class RecordListApiClient(ApiClient):
         ) = self.list_management_api.api_v1_lists_list_list_identifier_revise_post_with_http_info(
             identifier, _preload_content=False
         )
-        if status_code == 201:
-            response = self.deserialize(response, "GrantaServerApiListsDtoRecordListResource")
-            response: models.GrantaServerApiListsDtoRecordListResource
-            return extract_identifier(response)
-        else:
-            # TODO returning None isn't helpful at all. Consider raising an Exception instead with
-            #  the content of the response, should it include any information about what happened
-            #  server-side (same for all three methods using this workaround)
-            return None
+        if status_code != 201:
+            raise NotImplementedError("Expected response with status code 201")
+
+        data = cast(
+            models.GrantaServerApiListsDtoRecordListResource,
+            self.deserialize(response, "GrantaServerApiListsDtoRecordListResource"),
+        )
+        return extract_identifier(data)
 
     @staticmethod
     def _create_patch_operation(
-        value: Optional[str], name: str, op="replace"
+        value: Optional[str], name: str, op: str = "replace"
     ) -> models.MicrosoftAspNetCoreJsonPatchOperationsOperation:
         return models.MicrosoftAspNetCoreJsonPatchOperationsOperation(
             value=value,
@@ -378,7 +386,7 @@ class RecordListApiClient(ApiClient):
         self.list_management_api.api_v1_lists_list_list_identifier_reset_post(identifier)
 
 
-class Connection(ApiClientFactory):
+class Connection(ApiClientFactory):  # type: ignore[misc]
     """
     Connects to a Granta MI ServerAPI instance.
 

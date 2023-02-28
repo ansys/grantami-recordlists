@@ -198,3 +198,7 @@ class TestItemEquality:
     )
     def test_item_equality(self, item_a, item_b, expected_equal):
         assert (item_a == item_b) is expected_equal
+
+    def test_item_equality_with_other_type(self):
+        item = RecordListItem(self.DB1, self.T1, self.RHG1)
+        assert (item == 2) is False
