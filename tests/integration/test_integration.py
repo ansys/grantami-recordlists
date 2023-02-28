@@ -1,7 +1,9 @@
+import uuid
+
 from ansys.openapi.common import ApiException
 import pytest
 
-from ansys.grantami.recordlists.models import RecordList, RecordListItem
+from ansys.grantami.recordlists.models import RecordList, RecordListItem, SearchCriterion, UserRole
 
 pytestmark = pytest.mark.integration
 
@@ -250,3 +252,125 @@ class TestLifeCyclePublishedAndAwaitingApproval(TestLifeCycle):
 
 
 # TODO test published list cannot be updated (properties or items)
+
+
+class TestSearch:
+    """Exercises some search criteria."""
+
+    _name_suffix_A = "_ListA"
+    _name_suffix_B = "_ListB"
+    _name_suffix_C = "_ListC"
+
+    @pytest.fixture(scope="class")
+    def list_a(self, admin_client, list_name):
+        """A personal list with a known name."""
+        list_id = admin_client.create_list(list_name + self._name_suffix_A)
+        yield list_id
+        admin_client.delete_list(list_id)
+
+    @pytest.fixture(scope="class")
+    def list_b(self, admin_client, list_name):
+        """A published list with a known name."""
+        list_id = admin_client.create_list(list_name + self._name_suffix_B)
+        admin_client.request_approval(list_id)
+        admin_client.publish(list_id)
+        yield list_id
+        admin_client.delete_list(list_id)
+
+    @pytest.fixture(scope="class")
+    def list_c(self, admin_client, list_name, list_b, example_item):
+        """A revision of list B with a known name and items."""
+        list_id = admin_client.revise_list(list_b)
+        admin_client.update_list(list_id, name=list_name + self._name_suffix_C)
+        admin_client.add_items_to_list(list_id, [example_item])
+        yield list_id
+        admin_client.delete_list(list_id)
+
+    @pytest.fixture(scope="class", autouse=True)
+    def multiple_lists(self, list_a, list_b, list_c):
+        yield list_a, list_b, list_c
+
+    def test_search_list_name_match_all(self, admin_client, list_name):
+        # All tests include name_contains=list_name to filter results to lists created in this test
+        #  session.
+        criteria = SearchCriterion(name_contains=list_name)
+        results = admin_client.search(criteria)
+        assert len(results) >= 3
+
+    def test_search_list_name_match_one(self, admin_client, list_a):
+        criteria = SearchCriterion(name_contains=self._name_suffix_A)
+        results = admin_client.search(criteria)
+        assert len(results) == 1
+        assert results[0].identifier == list_a
+
+    def test_search_not_published_or_awaiting(self, admin_client, list_a):
+        criteria = SearchCriterion(
+            name_contains=self._name_suffix_A,
+            is_published=False,
+            is_awaiting_approval=False,
+            is_revision=False,
+            is_internal_use=False,
+        )
+        results = admin_client.search(criteria)
+        assert len(results) == 1
+        assert results[0].identifier == list_a
+
+    def test_search_published(self, admin_client, list_name, list_b):
+        criteria = SearchCriterion(name_contains=list_name, is_published=True)
+        results = admin_client.search(criteria)
+        assert len(results) == 1
+        assert results[0].identifier == list_b
+
+    def test_search_revision(self, admin_client, list_name, list_c):
+        criteria = SearchCriterion(name_contains=list_name, is_revision=True)
+        results = admin_client.search(criteria)
+        assert len(results) == 1
+        assert results[0].identifier == list_c
+
+    def test_search_by_database(self, admin_client, list_name, example_item, list_c):
+        criteria = SearchCriterion(
+            name_contains=list_name,
+            contains_records_in_databases=[example_item.database_guid],
+        )
+        results = admin_client.search(criteria)
+        assert len(results) == 1
+        assert results[0].identifier == list_c
+
+    def test_search_by_multiple_databases(self, admin_client, list_name, example_item, list_c):
+        # List of databases = Is in one OR the other
+        criteria = SearchCriterion(
+            name_contains=list_name,
+            contains_records_in_databases=[example_item.database_guid, str(uuid.uuid4())],
+        )
+        results = admin_client.search(criteria)
+        assert len(results) == 1
+        assert results[0].identifier == list_c
+
+    def test_search_by_table(self, admin_client, list_name, example_item, list_c):
+        criteria = SearchCriterion(
+            name_contains=list_name,
+            contains_records_in_tables=[example_item.table_guid],
+        )
+        results = admin_client.search(criteria)
+        assert len(results) == 1
+        assert results[0].identifier == list_c
+
+    def test_search_by_record(self, admin_client, list_name, example_item, list_c):
+        criteria = SearchCriterion(
+            name_contains=list_name,
+            contains_records=[example_item.record_history_guid],
+        )
+        results = admin_client.search(criteria)
+        assert len(results) == 1
+        assert results[0].identifier == list_c
+
+    def test_search_role_is_none(self, admin_client, list_name):
+        criteria = SearchCriterion(user_role=UserRole.NONE)
+        results = admin_client.search(criteria)
+        assert len(results) == 0
+        # TODO: Perhaps not worth keeping None as a value. Check what it's meant to be.
+
+    def test_search_role_is_owner(self, admin_client, list_name):
+        criteria = SearchCriterion(name_contains=list_name, user_role=UserRole.OWNER)
+        results = admin_client.search(criteria)
+        assert len(results) >= 3

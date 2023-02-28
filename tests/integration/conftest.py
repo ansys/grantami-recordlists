@@ -92,14 +92,18 @@ def new_list_id(admin_client, request, list_name):
         admin_client.delete_list(list_id)
 
 
+@pytest.fixture(scope="session")
+def example_item():
+    # GUIDs need only have the correct format for record lists test to pass.
+    return RecordListItem(
+        "e595fe23-b450-4d18-8c08-4a0f378ef095",
+        "81dff531-0254-4fbe-9621-174b10aaee3d",
+        "3bc2b82f-0199-4f3b-a7af-8d520250b180",
+    )
+
+
 @pytest.fixture
-def new_list_with_items(admin_client, new_list_id):
-    items = [
-        RecordListItem(
-            "e595fe23-b450-4d18-8c08-4a0f378ef095",
-            "81dff531-0254-4fbe-9621-174b10aaee3d",
-            "3bc2b82f-0199-4f3b-a7af-8d520250b180",
-        )
-    ]
+def new_list_with_items(admin_client, new_list_id, example_item):
+    items = [example_item]
     admin_client.add_items_to_list(new_list_id, items)
     return new_list_id
