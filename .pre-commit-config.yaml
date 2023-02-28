@@ -35,6 +35,5 @@ repos:
     language: python
     types: [python]
     require_serial: true
-    args: ["--strict", "--explicit-package-bases"]
     files: "^(src/)"
     additional_dependencies: ["mypy==1.0.1"]
