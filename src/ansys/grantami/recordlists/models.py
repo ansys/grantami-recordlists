@@ -1,6 +1,8 @@
 """Models."""
+from dataclasses import dataclass
 from datetime import datetime
-from typing import Optional
+from enum import Enum
+from typing import List, Optional
 
 from ansys.grantami.serverapi_openapi import models  # type: ignore
 
@@ -293,3 +295,116 @@ class User:
         user._display_name = dto_user.display_name
         user._name = dto_user.name
         return user
+
+
+#
+# class BooleanCriterion:
+#     def _to_model(self) -> models.GrantaServerApiListsDtoListBooleanCriterion:
+#         return None
+
+
+@dataclass
+class SearchCriterion:
+    # TODO docstring with strong examples
+    """
+    Search criterion to use in a search operation :meth:`~._connection.RecordListApiClient.search`.
+
+    The properties in the this class represent an AND search - only lists that match all of the
+    non-null properties will be returned.
+
+    Attributes
+    ----------
+    name_contains : str, optional
+        Limits results to lists whose name contains the provided string.
+    user_role : :class:`UserRole`, optional
+        Limits results to lists on which the user has the specified role.
+    is_published : bool, optional
+        Set to ``True`` to include only record lists that are published.
+        Set to ``False`` to include only record lists that are not published.
+        Default value ``None`` will include both.
+    is_awaiting_approval : bool, optional
+        Set to ``True`` to include only record lists that are awaiting approval.
+        Set to ``False`` to include only record lists that are not awaiting approval.
+        Default value ``None`` will include both.
+    is_internal_use : bool, optional
+        Set to ``True`` to include only internal record lists.
+        Set to ``False`` to include only non-internal record lists.
+        Default value ``None`` will include both.
+    is_revision : bool, optional
+        Set to ``True`` to include only record lists that are revisions of other lists.
+        Set to ``False`` to include only record lists that are not revisions.
+        Default value ``None`` will include both.
+    contains_records_in_databases : list of str, optional
+        Limits results to lists containing records in any of the databases specified by their GUIDs.
+    contains_records_in_integration_schemas : list of str, optional
+        Limits results to lists containing records in any of the integration schemas specified by
+        their GUIDs.
+    contains_records_in_tables : list of str, optional
+        Limits results to lists containing records in any of the tables specified by their GUIDs.
+    contains_records : list of str, optional
+        Limits results to lists containing records specified by their GUIDs.
+    user_can_add_or_remove_items : bool, optional
+        Limits results to lists where the current user can add or remove items.
+
+    Examples
+    --------
+    To filter record lists based on their name and status:
+
+    >>> criterion = SearchCriterion(
+    ...     name_contains="Approved materials",
+    ...     is_published=True,
+    ... )
+
+    To filter record lists based on whether they include items from specific databases:
+
+    >>> criterion = SearchCriterion(
+    ...     contains_records_in_databases=["9f6182ee-1f49-4ba9-9bd7-d4c0a392e94e"],
+    ... )
+
+    To filter record lists based on whether they include items from specific tables:
+
+    >>> criterion = SearchCriterion(
+    ...     contains_records_in_tables=["9f6182ee-1f49-4ba9-9bd7-d4c0a392e94e"],
+    ... )
+    """
+
+    name_contains: Optional[str] = None
+    user_role: Optional["UserRole"] = None
+    is_published: Optional[bool] = None
+    is_awaiting_approval: Optional[bool] = None
+    is_internal_use: Optional[bool] = None
+    is_revision: Optional[bool] = None
+    contains_records_in_databases: Optional[List[str]] = None
+    contains_records_in_integration_schemas: Optional[List[str]] = None
+    contains_records_in_tables: Optional[List[str]] = None
+    contains_records: Optional[List[str]] = None
+    user_can_add_or_remove_items: Optional[bool] = None
+
+    def _to_model(self) -> models.GrantaServerApiListsDtoRecordListSearchCriterion:
+        """Generate the DTO for use with the auto-generated client code."""
+        return models.GrantaServerApiListsDtoRecordListSearchCriterion(
+            name_contains=self.name_contains,
+            user_role=self.user_role,
+            is_published=self.is_published,
+            is_awaiting_approval=self.is_awaiting_approval,
+            is_internal_use=self.is_internal_use,
+            is_revision=self.is_revision,
+            contains_records_in_databases=self.contains_records_in_databases,
+            contains_records_in_integration_schemas=self.contains_records_in_integration_schemas,
+            contains_records_in_tables=self.contains_records_in_tables,
+            contains_records=self.contains_records,
+            user_can_add_or_remove_items=self.user_can_add_or_remove_items,
+        )
+
+
+class UserRole(str, Enum):
+    """Roles a user can have on a record list."""
+
+    NONE = (
+        models.GrantaServerApiListsDtoUserRole.NONE
+    )  # TODO: = Search for lists once has no permissions on?
+    OWNER = models.GrantaServerApiListsDtoUserRole.OWNER
+    SUBSCRIBER = models.GrantaServerApiListsDtoUserRole.SUBSCRIBER
+    CURATOR = models.GrantaServerApiListsDtoUserRole.CURATOR
+    ADMINISTRATOR = models.GrantaServerApiListsDtoUserRole.ADMINISTRATOR
+    PUBLISHER = models.GrantaServerApiListsDtoUserRole.PUBLISHER

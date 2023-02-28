@@ -23,3 +23,18 @@ User
 .. autoclass:: ansys.grantami.recordlists.models.User
    :members:
    :exclude-members: from_model
+
+
+SearchCriterion
+~~~~~~~~~~~~~~~~~
+
+.. autoclass:: ansys.grantami.recordlists.models.SearchCriterion
+   :members:
+   :exclude-members: to_model
+
+UserRole
+~~~~~~~~~~~~~~~~~
+
+.. autoclass:: ansys.grantami.recordlists.models.UserRole
+   :members:
+   :undoc-members:
