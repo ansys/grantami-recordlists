@@ -40,9 +40,6 @@ html_theme_options = {
 
 # Sphinx extensions
 extensions = [
-    "sphinx.ext.autodoc",
-    "sphinx.ext.autodoc.typehints",
-    "sphinx.ext.napoleon",
     "numpydoc",
     "sphinx.ext.intersphinx",
     "sphinx_copybutton",
@@ -53,7 +50,8 @@ extensions = [
 add_module_names = False
 
 # sphinx.ext.autodoc
-autodoc_typehints = "description"
+autodoc_typehints = "description"  # Remove typehints from signatures in docs
+autodoc_typehints_description_target = "documented"
 autodoc_member_order = "bysource"
 
 # Intersphinx mapping
@@ -73,6 +71,7 @@ intersphinx_mapping = {
 # numpydoc configuration
 numpydoc_show_class_members = False
 numpydoc_xref_param_type = True
+numpydoc_xref_ignore = {"of", "optional"}
 
 # Consider enabling numpydoc validation. See:
 # https://numpydoc.readthedocs.io/en/latest/validation.html#

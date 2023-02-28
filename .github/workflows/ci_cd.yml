@@ -99,7 +99,7 @@ jobs:
         run: tox -- -m "not integration"
 
   server_checks:
-    name: "Server checks: Integration tests and full docs"
+    name: "Server checks"
     needs: [tests]
     if: ${{ !startsWith( github.event.pull_request.head.ref, 'dependabot/') }}
     uses: ./.github/workflows/server_checks.yml

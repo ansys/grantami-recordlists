@@ -46,6 +46,11 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
         Get the details of all record lists available for the current user.
 
         Performs an HTTP request against the Server API.
+
+        Returns
+        -------
+        list of :class:`.RecordList`
+            List of available record lists.
         """
         record_lists = self.list_management_api.api_v1_lists_get()
         return [RecordList._from_model(record_list) for record_list in record_lists]
@@ -58,8 +63,12 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
 
         Parameters
         ----------
-        identifier :
+        identifier : str
             Unique identifier of the record list.
+
+        Returns
+        -------
+        :class:`.RecordList`
         """
         record_list = self.list_management_api.api_v1_lists_list_list_identifier_get(identifier)
         return RecordList._from_model(record_list)
@@ -72,8 +81,13 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
 
         Parameters
         ----------
-        identifier :
+        identifier : str
             Unique identifier of the record list.
+
+        Returns
+        -------
+        list of :class:`.RecordListItem`
+            List of items included in the record list.
         """
         items = self.list_item_api.api_v1_lists_list_list_identifier_items_get(identifier)
         return [RecordListItem._from_model(item) for item in items.items]
@@ -88,9 +102,9 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
 
         Parameters
         ----------
-        identifier :
+        identifier : str
             Unique identifier of the record list.
-        items:
+        items : list of :class:`.RecordListItem`
             List of items to add to the record list.
         """
         if not items:
@@ -112,9 +126,9 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
 
         Parameters
         ----------
-        identifier :
+        identifier : str
             Unique identifier of the record list.
-        items:
+        items : list of :class:`.RecordListItem`
             List of items to remove from the record list.
         """
         if not items:
@@ -141,13 +155,13 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
 
         Parameters
         ----------
-        name :
+        name : str
             Name of the record list.
-        description :
+        description : str or None
             Description of the record list.
-        notes :
+        notes : str or None
             Notes of the record list.
-        items :
+        items : list of :class:`.RecordListItem` or None
             List of items to add to the record list.
 
         Returns
@@ -187,7 +201,7 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
 
         Parameters
         ----------
-        identifier :
+        identifier : str
             Unique identifier of the record list.
         """
         self.list_management_api.api_v1_lists_list_list_identifier_delete(identifier)
@@ -211,14 +225,15 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
             Unique identifier of the record list.
         name : str, optional
             New value for the name of the record list.
-        description : Union[str, None], optional
-            New value for the description of the record list.
-        notes : Optional[str], optional
-            New value for the notes of the record list.
+        description : str or None, optional
+            New value for the description of the record list. Set to None to delete an existing
+            value.
+        notes : str or None, optional
+            New value for the notes of the record list. Set to None to delete an existing value.
 
         Returns
         -------
-        RecordList
+        :class:`.RecordList`
             Updated representation of the record list.
         """
         if name == _ArgNotProvided and description == _ArgNotProvided and notes == _ArgNotProvided:
@@ -251,7 +266,7 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
 
         Parameters
         ----------
-        identifier :
+        identifier : str
             Unique identifier of the record list.
 
         Returns
@@ -288,7 +303,7 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
 
         Parameters
         ----------
-        identifier :
+        identifier : str
             Unique identifier of the record list.
 
         Returns
@@ -332,7 +347,7 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
 
         Parameters
         ----------
-        identifier :
+        identifier : str
             Unique identifier of the record list.
         """
         self.list_management_api.api_v1_lists_list_list_identifier_request_approval_post(identifier)
@@ -349,7 +364,7 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
 
         Parameters
         ----------
-        identifier :
+        identifier : str
             Unique identifier of the record list.
         """
         self.list_management_api.api_v1_lists_list_list_identifier_publish_post(identifier)
@@ -365,7 +380,7 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
 
         Parameters
         ----------
-        identifier :
+        identifier : str
             Unique identifier of the record list.
         """
         self.list_management_api.api_v1_lists_list_list_identifier_unpublish_post(identifier)
@@ -380,7 +395,7 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
 
         Parameters
         ----------
-        identifier :
+        identifier : str
             Unique identifier of the record list.
         """
         self.list_management_api.api_v1_lists_list_list_identifier_reset_post(identifier)
@@ -447,7 +462,7 @@ class Connection(ApiClientFactory):  # type: ignore[misc]
 
         Returns
         -------
-        RecordListApiClient
+        :class:`.RecordListApiClient`
             Client object that can be used to connect to Granta MI and interact with the record
             list API.
         """
