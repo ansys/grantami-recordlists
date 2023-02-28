@@ -125,7 +125,7 @@ jobs:
           poetry install --with doc
 
       - name: Build HTML Documentation
-        run: poetry run -- make -C doc html SPHINXOPTS="-W"
+        run: poetry run -- make -C doc html SPHINXOPTS="-n -W --keep-going"
         env:
           TEST_SL_URL: ${{secrets.TEST_SERVER_URL}}
           TEST_USER: ${{secrets.TEST_SERVER_ADMIN_USER}}
