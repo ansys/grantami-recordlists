@@ -47,11 +47,19 @@ jobs:
         python-version: ['3.8', '3.9', '3.10', '3.11']
     steps:
       - uses: actions/checkout@v3
+      - name: Get Bot Application Token
+        id: get_workflow_token
+        uses: peter-murray/workflow-application-token-action@v1
+        with:
+          application_id: ${{ secrets.BOT_APPLICATION_ID }}
+          application_private_key: ${{ secrets.BOT_APPLICATION_PRIVATE_KEY }}
+
       - name: Download dependencies
         run: |
           gh run download -R pyansys/grantami-serverapi-openapi -n "ansys-grantami-serverapi-openapi-wheel" -D deps
         env:
-          GITHUB_TOKEN: ${{ secrets.LUDOVIC_PAT }}
+          GITHUB_TOKEN: ${{ steps.get_workflow_token.outputs.token }}
+
       - uses: pyansys/actions/build-wheelhouse@v3
         with:
           library-name: ${{ env.LIBRARY_NAME }}
@@ -72,10 +80,16 @@ jobs:
       fail-fast: false
     steps:
       - uses: actions/checkout@v3
+      - name: Get Bot Application Token
+        id: get_workflow_token
+        uses: peter-murray/workflow-application-token-action@v1
+        with:
+          application_id: ${{ secrets.BOT_APPLICATION_ID }}
+          application_private_key: ${{ secrets.BOT_APPLICATION_PRIVATE_KEY }}
       - name: Download dependencies
         run: gh run download -R pyansys/grantami-serverapi-openapi -n "ansys-grantami-serverapi-openapi-wheel" -D deps
         env:
-          GITHUB_TOKEN: ${{ secrets.LUDOVIC_PAT }}
+          GITHUB_TOKEN: ${{ steps.get_workflow_token.outputs.token }}
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
         with:
@@ -112,10 +126,16 @@ jobs:
     needs: [doc-style]
     steps:
       - uses: actions/checkout@v3
+      - name: Get Bot Application Token
+        id: get_workflow_token
+        uses: peter-murray/workflow-application-token-action@v1
+        with:
+          application_id: ${{ secrets.BOT_APPLICATION_ID }}
+          application_private_key: ${{ secrets.BOT_APPLICATION_PRIVATE_KEY }}
       - name: Download dependencies
         run: gh run download -R pyansys/grantami-serverapi-openapi -n "ansys-grantami-serverapi-openapi-wheel" -D deps
         env:
-          GITHUB_TOKEN: ${{ secrets.LUDOVIC_PAT }}
+          GITHUB_TOKEN: ${{ steps.get_workflow_token.outputs.token }}
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
@@ -168,10 +188,16 @@ jobs:
     needs: [tests]
     steps:
       - uses: actions/checkout@v3
+      - name: Get Bot Application Token
+        id: get_workflow_token
+        uses: peter-murray/workflow-application-token-action@v1
+        with:
+          application_id: ${{ secrets.BOT_APPLICATION_ID }}
+          application_private_key: ${{ secrets.BOT_APPLICATION_PRIVATE_KEY }}
       - name: Download dependencies
         run: gh run download -R pyansys/grantami-serverapi-openapi -n "ansys-grantami-serverapi-openapi-wheel" -D grantami-recordlists/grantami-recordlists/deps
         env:
-          GITHUB_TOKEN: ${{ secrets.LUDOVIC_PAT }}
+          GITHUB_TOKEN: ${{ steps.get_workflow_token.outputs.token }}
       - uses: pyansys/actions/build-library@v3
         with:
           library-name: ${{ env.LIBRARY_NAME }}
