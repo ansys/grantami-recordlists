@@ -4,7 +4,7 @@ import os
 from pathlib import Path
 import shutil
 
-from ansys_sphinx_theme import ansys_favicon, pyansys_logo_black
+from ansys_sphinx_theme import ansys_favicon, get_version_match, pyansys_logo_black
 import jupytext
 
 from ansys.grantami.recordlists import __version__
@@ -21,6 +21,9 @@ html_theme = "ansys_sphinx_theme"
 html_short_title = html_title = "Granta MI RecordLists"
 html_favicon = ansys_favicon
 
+cname = os.getenv("DOCUMENTATION_CNAME", "<DEFAULT_CNAME>")
+"""The canonical name of the webpage hosting the documentation."""
+
 # specify the location of your github repo
 html_theme_options = {
     "github_url": "https://github.com/pyansys/grantami-recordlists",
@@ -29,6 +32,10 @@ html_theme_options = {
     "additional_breadcrumbs": [
         ("PyAnsys", "https://docs.pyansys.com/"),
     ],
+    "switcher": {
+        "json_url": f"https://{cname}/versions.json",
+        "version_match": get_version_match(__version__),
+    },
 }
 
 # Sphinx extensions
