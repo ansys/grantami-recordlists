@@ -71,6 +71,7 @@ intersphinx_mapping = {
 # numpydoc configuration
 numpydoc_show_class_members = False
 numpydoc_xref_param_type = True
+numpydoc_xref_ignore = {"of", "optional"}
 
 # Consider enabling numpydoc validation. See:
 # https://numpydoc.readthedocs.io/en/latest/validation.html#
