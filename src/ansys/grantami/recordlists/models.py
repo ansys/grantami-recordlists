@@ -2,7 +2,7 @@
 from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
-from typing import List, Optional
+from typing import List, Optional, Protocol
 
 from ansys.grantami.serverapi_openapi import models  # type: ignore
 
@@ -297,15 +297,15 @@ class User:
         return user
 
 
-#
-# class BooleanCriterion:
-#     def _to_model(self) -> models.GrantaServerApiListsDtoListBooleanCriterion:
-#         return None
+class Criterion(Protocol):
+    """Describes the protocol to implement for valid search criterion."""
+
+    def _to_model(self) -> models.GrantaServerApiListsDtoListCriterion:
+        ...
 
 
 @dataclass
-class SearchCriterion:
-    # TODO docstring with strong examples
+class SearchCriterion(Criterion):
     """
     Search criterion to use in a search operation :meth:`~._connection.RecordListApiClient.search`.
 
@@ -394,6 +394,58 @@ class SearchCriterion:
             contains_records_in_tables=self.contains_records_in_tables,
             contains_records=self.contains_records,
             user_can_add_or_remove_items=self.user_can_add_or_remove_items,
+        )
+
+
+class BooleanCriterion(Criterion):
+    """
+    Search criterion to use in a search operation :meth:`~._connection.RecordListApiClient.search`.
+
+    Allow aggregation of multiple criteria defined as :class:`SearchCriterion` or
+    :class:`BooleanCriterion`
+
+    Examples
+    --------
+    Search record lists and obtain the union of multiple criteria:
+
+    >>> criterion = BooleanCriterion(
+    ...     match_any=[
+    ...         SearchCriterion(name_contains="Approved materials"),
+    ...         SearchCriterion(is_published=True),
+    ...     ]
+    ... )
+
+    Search record lists and obtain the intersection of multiple criteria:
+
+    >>> criterion = BooleanCriterion(
+    ...     match_all=[
+    ...         SearchCriterion(name_contains="Approved materials"),
+    ...         SearchCriterion(is_published=True),
+    ...     ]
+    ... )
+
+    """
+
+    # TODO Using both match_any and match_all ignores criteria in match_any (PUD-561)
+    # TODO setters?
+
+    def __init__(
+        self,
+        match_any: Optional[List[Criterion]] = None,
+        match_all: Optional[List[Criterion]] = None,
+    ) -> None:
+        self._match_any: Optional[List[Criterion]] = match_any
+        self._match_all: Optional[List[Criterion]] = match_all
+
+    def _to_model(self) -> models.GrantaServerApiListsDtoListBooleanCriterion:
+        """Generate the DTO for use with the auto-generated client code."""
+        return models.GrantaServerApiListsDtoListBooleanCriterion(
+            match_any=[criteria._to_model() for criteria in self._match_any]
+            if self._match_any is not None
+            else None,
+            match_all=[criteria._to_model() for criteria in self._match_all]
+            if self._match_all is not None
+            else None,
         )
 
 

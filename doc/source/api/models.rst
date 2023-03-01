@@ -8,21 +8,19 @@ Record list
 
 .. autoclass:: ansys.grantami.recordlists.RecordList
    :members:
-   :exclude-members: from_model
+
 
 Record list item
 ~~~~~~~~~~~~~~~~~
 
 .. autoclass:: ansys.grantami.recordlists.models.RecordListItem
    :members:
-   :exclude-members: from_model, to_model
 
 
 User
 ~~~~~
 .. autoclass:: ansys.grantami.recordlists.models.User
    :members:
-   :exclude-members: from_model
 
 
 SearchCriterion
@@ -30,7 +28,14 @@ SearchCriterion
 
 .. autoclass:: ansys.grantami.recordlists.models.SearchCriterion
    :members:
-   :exclude-members: to_model
+
+
+BooleanCriterion
+~~~~~~~~~~~~~~~~~
+
+.. autoclass:: ansys.grantami.recordlists.models.BooleanCriterion
+   :members:
+
 
 UserRole
 ~~~~~~~~~~~~~~~~~
