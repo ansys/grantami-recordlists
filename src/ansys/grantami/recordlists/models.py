@@ -454,7 +454,7 @@ class UserRole(str, Enum):
 
     NONE = (
         models.GrantaServerApiListsDtoUserRole.NONE
-    )  # TODO: = Search for lists once has no permissions on?
+    )  # TODO: = Search for lists one has no permissions on?
     OWNER = models.GrantaServerApiListsDtoUserRole.OWNER
     SUBSCRIBER = models.GrantaServerApiListsDtoUserRole.SUBSCRIBER
     CURATOR = models.GrantaServerApiListsDtoUserRole.CURATOR

@@ -294,3 +294,45 @@ def test_revise_list(client, mock_api_method, mock_id):
 
     mock_api_method.assert_called_once_with(existing_list_identifier, _preload_content=False)
     assert returned_identifier == mock_id
+
+
+class TestSearch:
+    @pytest.fixture
+    def search_result_id(self):
+        return str(uuid.uuid4())
+
+    @pytest.fixture
+    def mock_search_post(self, monkeypatch, search_result_id):
+        response = models.GrantaServerApiListsDtoRecordListResource(
+            resource_uri=f"http://my_server_name/mi_servicelayer/proxy/v1.svc"
+            f"/api/v1/lists/search/results/{search_result_id}"
+        )
+        mocked_method = Mock(return_value=response)
+        monkeypatch.setattr(ListManagementApi, "api_v1_lists_search_post", mocked_method)
+        return mocked_method
+
+    @pytest.fixture
+    def mock_search_result_get(self, monkeypatch, mock_id):
+        response = [Mock(spec=models.GrantaServerApiListsDtoRecordListSearchResult)]
+        mocked_method = Mock(return_value=response)
+        monkeypatch.setattr(
+            ListManagementApi,
+            "api_v1_lists_search_results_result_resource_identifier_get",
+            mocked_method,
+        )
+        return mocked_method
+
+    def test_search(self, client, mock_search_post, mock_search_result_get, search_result_id):
+        criterion_dto = Mock()
+        to_model_method = Mock(return_value=criterion_dto)
+        criterion = Mock()
+        criterion.attach_mock(to_model_method, "_to_model")
+
+        results = client.search(criterion)
+
+        to_model_method.assert_called_once()
+        expected_body = models.GrantaServerApiListsDtoRecordListSearchRequest(
+            search_criterion=criterion_dto
+        )
+        mock_search_post.assert_called_once_with(body=expected_body)
+        mock_search_result_get.assert_called_once_with(search_result_id)

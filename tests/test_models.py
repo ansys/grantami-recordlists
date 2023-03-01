@@ -3,13 +3,23 @@ from unittest.mock import Mock, patch
 import uuid
 
 from ansys.grantami.serverapi_openapi.models import (
+    GrantaServerApiListsDtoListBooleanCriterion,
     GrantaServerApiListsDtoListItem,
     GrantaServerApiListsDtoRecordListHeader,
+    GrantaServerApiListsDtoRecordListSearchCriterion,
     GrantaServerApiListsDtoUserOrGroup,
+    GrantaServerApiListsDtoUserRole,
 )
 import pytest
 
-from ansys.grantami.recordlists.models import RecordList, RecordListItem, User
+from ansys.grantami.recordlists.models import (
+    BooleanCriterion,
+    RecordList,
+    RecordListItem,
+    SearchCriterion,
+    User,
+    UserRole,
+)
 
 
 class TestRecordList:
@@ -202,3 +212,70 @@ class TestItemEquality:
     def test_item_equality_with_other_type(self):
         item = RecordListItem(self.DB1, self.T1, self.RHG1)
         assert (item == 2) is False
+
+
+class TestSearchCriterion:
+    def test_search_criterion_dto_mapping(self):
+        # Check one to one mapping between idiomatic class and DTO using ids of mock attributes
+        criterion = Mock(spec=SearchCriterion)
+
+        dto = SearchCriterion._to_model(criterion)
+
+        assert isinstance(dto, GrantaServerApiListsDtoRecordListSearchCriterion)
+        assert dto.name_contains is criterion.name_contains
+        assert dto.user_role is criterion.user_role
+        assert dto.is_published is criterion.is_published
+        assert dto.is_awaiting_approval is criterion.is_awaiting_approval
+        assert dto.is_internal_use is criterion.is_internal_use
+        assert dto.is_revision is criterion.is_revision
+        assert dto.contains_records_in_databases is criterion.contains_records_in_databases
+        assert (
+            dto.contains_records_in_integration_schemas
+            is criterion.contains_records_in_integration_schemas
+        )
+        assert dto.contains_records_in_tables is criterion.contains_records_in_tables
+        assert dto.contains_records is criterion.contains_records
+        assert dto.user_can_add_or_remove_items is criterion.user_can_add_or_remove_items
+
+    def test_simple_boolean_criterion_dto_mapping(self):
+        crit_a_dto = Mock()
+        crit_a = Mock(spec=SearchCriterion)
+        crit_a.attach_mock(Mock(return_value=crit_a_dto), "_to_model")
+        crit_b_dto = Mock()
+        crit_b = Mock(spec=SearchCriterion)
+        crit_b.attach_mock(Mock(return_value=crit_b_dto), "_to_model")
+
+        criterion = BooleanCriterion(match_any=[crit_a], match_all=[crit_a, crit_b])
+
+        dto = BooleanCriterion._to_model(criterion)
+
+        assert dto.match_any == [crit_a_dto]
+        assert dto.match_all == [crit_a_dto, crit_b_dto]
+
+    def test_nested_boolean_criterion_dto_mapping(self):
+        criterion = BooleanCriterion(
+            match_any=[
+                BooleanCriterion(
+                    match_all=[
+                        SearchCriterion(
+                            name_contains="A",
+                            user_role=UserRole.OWNER,
+                        )
+                    ],
+                ),
+            ]
+        )
+
+        criterion_dto = criterion._to_model()
+
+        assert isinstance(criterion_dto, GrantaServerApiListsDtoListBooleanCriterion)
+        assert criterion_dto.match_all is None
+        assert len(criterion_dto.match_any) == 1
+        nested_boolean_criterion = criterion_dto.match_any[0]
+        assert isinstance(nested_boolean_criterion, GrantaServerApiListsDtoListBooleanCriterion)
+        assert nested_boolean_criterion.match_any is None
+        assert len(nested_boolean_criterion.match_all) == 1
+        leaf_criterion = nested_boolean_criterion.match_all[0]
+        assert isinstance(leaf_criterion, GrantaServerApiListsDtoRecordListSearchCriterion)
+        assert leaf_criterion.name_contains == "A"
+        assert leaf_criterion.user_role == GrantaServerApiListsDtoUserRole.OWNER
