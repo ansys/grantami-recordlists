@@ -179,6 +179,10 @@ class RecordList:
         )
         return instance
 
+    def __repr__(self) -> str:
+        """Printable representation of the object."""
+        return f"<{self.__class__.__name__} name: {self._name}>"
+
 
 class RecordListItem:
     """
