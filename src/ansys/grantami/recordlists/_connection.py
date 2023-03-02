@@ -85,23 +85,15 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
         ----------
         criterion : :class:`.SearchCriterion`
             Unique identifier of the record list.
-        include_items : bool
-            Whether to include record list items in the return.
 
         Returns
         -------
         list of :class:`.RecordList`
             List of record lists matching the provided criterion.
         """
-        # TODO how to handle including items in return?
-        # search_options = models.GrantaServerApiListsDtoResponseOptions(
-        #     include_record_list_items=include_items,
-        #     # TODO other options
-        # )
         search_resource = self.list_management_api.api_v1_lists_search_post(
             body=models.GrantaServerApiListsDtoRecordListSearchRequest(
                 search_criterion=criterion._to_model(),
-                # response_options=search_options,
             )
         )
 
