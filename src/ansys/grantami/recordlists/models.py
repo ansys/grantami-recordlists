@@ -1,8 +1,7 @@
 """Models."""
-from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
-from typing import List, Optional, Protocol
+from typing import List, Optional, Union
 
 from ansys.grantami.serverapi_openapi import models  # type: ignore
 
@@ -301,54 +300,12 @@ class User:
         return user
 
 
-class Criterion(Protocol):
-    """Describes the protocol to implement for valid search criterion."""
-
-    def _to_model(self) -> models.GrantaServerApiListsDtoListCriterion:
-        ...
-
-
-@dataclass
-class SearchCriterion(Criterion):
+class SearchCriterion:
     """
-    Search criterion to use in a search operation :meth:`~._connection.RecordListApiClient.search`.
+    Search criterion to use in a :meth:`~._connection.RecordListApiClient.search` operation.
 
-    The properties in the this class represent an AND search - only lists that match all of the
+    The properties in this class represent an AND search - only lists that match all the
     non-null properties will be returned.
-
-    Attributes
-    ----------
-    name_contains : str, optional
-        Limits results to lists whose name contains the provided string.
-    user_role : :class:`UserRole`, optional
-        Limits results to lists on which the user has the specified role.
-    is_published : bool, optional
-        Set to ``True`` to include only record lists that are published.
-        Set to ``False`` to include only record lists that are not published.
-        Default value ``None`` will include both.
-    is_awaiting_approval : bool, optional
-        Set to ``True`` to include only record lists that are awaiting approval.
-        Set to ``False`` to include only record lists that are not awaiting approval.
-        Default value ``None`` will include both.
-    is_internal_use : bool, optional
-        Set to ``True`` to include only internal record lists.
-        Set to ``False`` to include only non-internal record lists.
-        Default value ``None`` will include both.
-    is_revision : bool, optional
-        Set to ``True`` to include only record lists that are revisions of other lists.
-        Set to ``False`` to include only record lists that are not revisions.
-        Default value ``None`` will include both.
-    contains_records_in_databases : list of str, optional
-        Limits results to lists containing records in any of the databases specified by their GUIDs.
-    contains_records_in_integration_schemas : list of str, optional
-        Limits results to lists containing records in any of the integration schemas specified by
-        their GUIDs.
-    contains_records_in_tables : list of str, optional
-        Limits results to lists containing records in any of the tables specified by their GUIDs.
-    contains_records : list of str, optional
-        Limits results to lists containing records specified by their GUIDs.
-    user_can_add_or_remove_items : bool, optional
-        Limits results to lists where the current user can add or remove items.
 
     Examples
     --------
@@ -372,17 +329,156 @@ class SearchCriterion(Criterion):
     ... )
     """
 
-    name_contains: Optional[str] = None
-    user_role: Optional["UserRole"] = None
-    is_published: Optional[bool] = None
-    is_awaiting_approval: Optional[bool] = None
-    is_internal_use: Optional[bool] = None
-    is_revision: Optional[bool] = None
-    contains_records_in_databases: Optional[List[str]] = None
-    contains_records_in_integration_schemas: Optional[List[str]] = None
-    contains_records_in_tables: Optional[List[str]] = None
-    contains_records: Optional[List[str]] = None
-    user_can_add_or_remove_items: Optional[bool] = None
+    def __init__(
+        self,
+        name_contains: Optional[str] = None,
+        user_role: Optional["UserRole"] = None,
+        is_published: Optional[bool] = None,
+        is_awaiting_approval: Optional[bool] = None,
+        is_internal_use: Optional[bool] = None,
+        is_revision: Optional[bool] = None,
+        contains_records_in_databases: Optional[List[str]] = None,
+        contains_records_in_integration_schemas: Optional[List[str]] = None,
+        contains_records_in_tables: Optional[List[str]] = None,
+        contains_records: Optional[List[str]] = None,
+        user_can_add_or_remove_items: Optional[bool] = None,
+    ):
+        self._name_contains: Optional[str] = name_contains
+        self._user_role: Optional[UserRole] = user_role
+        self._is_published: Optional[bool] = is_published
+        self._is_awaiting_approval: Optional[bool] = is_awaiting_approval
+        self._is_internal_use: Optional[bool] = is_internal_use
+        self._is_revision: Optional[bool] = is_revision
+        self._contains_records_in_databases: Optional[List[str]] = contains_records_in_databases
+        self._contains_records_in_integration_schemas: Optional[
+            List[str]
+        ] = contains_records_in_integration_schemas
+        self._contains_records_in_tables: Optional[List[str]] = contains_records_in_tables
+        self._contains_records: Optional[List[str]] = contains_records
+        self._user_can_add_or_remove_items: Optional[bool] = user_can_add_or_remove_items
+
+    @property
+    def name_contains(self) -> Optional[str]:
+        """Limits results to lists whose name contains the provided string."""
+        return self._name_contains
+
+    @name_contains.setter
+    def name_contains(self, value: Optional[str]) -> None:
+        self._name_contains = value
+
+    @property
+    def user_role(self) -> Optional["UserRole"]:
+        """Limits results to lists on which the user has the specified role."""
+        return self._user_role
+
+    @user_role.setter
+    def user_role(self, value: Optional["UserRole"]) -> None:
+        self._user_role = value
+
+    @property
+    def is_published(self) -> Optional[bool]:
+        """
+        Limits results to lists with a specific publication status.
+
+        Set to ``True`` to include only record lists that are published.
+        Set to ``False`` to include only record lists that are not published.
+        Default value ``None`` will include both.
+        """
+        return self._is_published
+
+    @is_published.setter
+    def is_published(self, value: Optional[bool]) -> None:
+        self._is_published = value
+
+    @property
+    def is_awaiting_approval(self) -> Optional[bool]:
+        """
+        Limits results to lists with a specific approval status.
+
+        Set to ``True`` to include only record lists that are awaiting approval.
+        Set to ``False`` to include only record lists that are not awaiting approval.
+        Default value ``None`` will include both.
+        """
+        return self._is_awaiting_approval
+
+    @is_awaiting_approval.setter
+    def is_awaiting_approval(self, value: Optional[bool]) -> None:
+        self._is_awaiting_approval = value
+
+    @property
+    def is_internal_use(self) -> Optional[bool]:
+        """
+        Limits results to lists which are internal.
+
+        Set to ``True`` to include only internal record lists.
+        Set to ``False`` to include only non-internal record lists.
+        Default value ``None`` will include both.
+        """
+        return self._is_internal_use
+
+    @is_internal_use.setter
+    def is_internal_use(self, value: Optional[bool]) -> None:
+        self._is_internal_use = value
+
+    @property
+    def is_revision(self) -> Optional[bool]:
+        """
+        Limits results to lists which are revisions.
+
+        Set to ``True`` to include only record lists that are revisions of another list.
+        Set to ``False`` to include only record lists that are not revisions.
+        Default value ``None`` will include both.
+        """
+        return self._is_revision
+
+    @is_revision.setter
+    def is_revision(self, value: Optional[bool]) -> None:
+        self._is_revision = value
+
+    @property
+    def contains_records_in_databases(self) -> Optional[List[str]]:
+        """Limits results to lists containing records in the specified databases."""
+        return self._contains_records_in_databases
+
+    @contains_records_in_databases.setter
+    def contains_records_in_databases(self, value: Optional[List[str]]) -> None:
+        self._contains_records_in_databases = value
+
+    @property
+    def contains_records_in_integration_schemas(self) -> Optional[List[str]]:
+        """Limits results to lists containing records in the specified integration schemas."""
+        return self._contains_records_in_integration_schemas
+
+    @contains_records_in_integration_schemas.setter
+    def contains_records_in_integration_schemas(self, value: Optional[List[str]]) -> None:
+        self._contains_records_in_integration_schemas = value
+
+    @property
+    def contains_records_in_tables(self) -> Optional[List[str]]:
+        """Limits results to lists containing records in the specified tables specified."""
+        return self._contains_records_in_tables
+
+    @contains_records_in_tables.setter
+    def contains_records_in_tables(self, value: Optional[List[str]]) -> None:
+        self._contains_records_in_tables = value
+
+    @property
+    def contains_records(self) -> Optional[List[str]]:
+        """Limits results to lists containing records specified by their GUIDs."""
+        return self._contains_records
+
+    @contains_records.setter
+    def contains_records(self, value: Optional[List[str]]) -> None:
+        self._contains_records = value
+
+    @property
+    def user_can_add_or_remove_items(self) -> Optional[bool]:
+        """Limits results to lists where the current user can add or remove items."""
+        return self._user_can_add_or_remove_items
+
+    @user_can_add_or_remove_items.setter
+    def user_can_add_or_remove_items(self, value: Optional[bool]) -> None:
+        self._user_can_add_or_remove_items = value
 
     def _to_model(self) -> models.GrantaServerApiListsDtoRecordListSearchCriterion:
         """Generate the DTO for use with the auto-generated client code."""
@@ -401,12 +497,12 @@ class SearchCriterion(Criterion):
         )
 
 
-class BooleanCriterion(Criterion):
+class BooleanCriterion:
     """
     Search criterion to use in a search operation :meth:`~._connection.RecordListApiClient.search`.
 
     Allow aggregation of multiple criteria defined as :class:`SearchCriterion` or
-    :class:`BooleanCriterion`
+    :class:`BooleanCriterion`.
 
     Examples
     --------
@@ -431,30 +527,66 @@ class BooleanCriterion(Criterion):
     """
 
     # TODO Using both match_any and match_all ignores criteria in match_any (PUD-561)
-    # TODO setters?
 
     def __init__(
         self,
-        match_any: Optional[List[Criterion]] = None,
-        match_all: Optional[List[Criterion]] = None,
+        match_any: Optional[List[Union["BooleanCriterion", "SearchCriterion"]]] = None,
+        match_all: Optional[List[Union["BooleanCriterion", "SearchCriterion"]]] = None,
+    ):
+        self._match_any = match_any
+        self._match_all = match_all
+
+    @property
+    def match_any(self) -> Optional[List[Union["BooleanCriterion", "SearchCriterion"]]]:
+        """
+        Limits results to lists which satisfy one or more provided criteria.
+
+        Returns
+        -------
+        list of :class:`BooleanCriterion` | :class:`SearchCriterion`, or None
+        """
+        return self._match_any
+
+    @match_any.setter
+    def match_any(
+        self, value: Optional[List[Union["BooleanCriterion", "SearchCriterion"]]]
     ) -> None:
-        self._match_any: Optional[List[Criterion]] = match_any
-        self._match_all: Optional[List[Criterion]] = match_all
+        self._match_any = value
+
+    @property
+    def match_all(self) -> Optional[List[Union["BooleanCriterion", "SearchCriterion"]]]:
+        """
+        Limits results to lists which satisfy all provided criteria.
+
+        Returns
+        -------
+        list of :class:`BooleanCriterion` | :class:`SearchCriterion`, or None
+        """
+        return self._match_all
+
+    @match_all.setter
+    def match_all(
+        self, value: Optional[List[Union["BooleanCriterion", "SearchCriterion"]]]
+    ) -> None:
+        self._match_all = value
 
     def _to_model(self) -> models.GrantaServerApiListsDtoListBooleanCriterion:
         """Generate the DTO for use with the auto-generated client code."""
         return models.GrantaServerApiListsDtoListBooleanCriterion(
-            match_any=[criteria._to_model() for criteria in self._match_any]
-            if self._match_any is not None
+            match_any=[criteria._to_model() for criteria in self.match_any]
+            if self.match_any is not None
             else None,
-            match_all=[criteria._to_model() for criteria in self._match_all]
-            if self._match_all is not None
+            match_all=[criteria._to_model() for criteria in self.match_all]
+            if self.match_all is not None
             else None,
         )
 
 
 class UserRole(str, Enum):
-    """Roles a user can have on a record list."""
+    """Roles a user can have on a record list.
+
+    Can be used in :attr:`SearchCriterion.user_role`.
+    """
 
     NONE = (
         models.GrantaServerApiListsDtoUserRole.NONE

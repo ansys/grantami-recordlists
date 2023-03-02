@@ -9,7 +9,7 @@ from ansys.openapi.common import (  # type: ignore[import]
 import requests  # type: ignore[import]
 
 from ._utils import _ArgNotProvided, extract_identifier
-from .models import Criterion, RecordList, RecordListItem
+from .models import BooleanCriterion, RecordList, RecordListItem, SearchCriterion
 
 PROXY_PATH = "/proxy/v1.svc"
 AUTH_PATH = "/Health/v2.svc"
@@ -73,7 +73,9 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
         record_list = self.list_management_api.api_v1_lists_list_list_identifier_get(identifier)
         return RecordList._from_model(record_list)
 
-    def search(self, criterion: Criterion, include_items: bool = False) -> List[RecordList]:
+    def search(
+        self, criterion: Union[BooleanCriterion, SearchCriterion], include_items: bool = False
+    ) -> List[RecordList]:
         """
         Search for record lists matching the provided :class:`.SearchCriterion`.
 
