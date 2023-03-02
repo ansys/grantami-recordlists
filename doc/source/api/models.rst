@@ -23,22 +23,16 @@ User
    :members:
 
 
-SearchCriterion
-~~~~~~~~~~~~~~~~~
+Search criteria
+~~~~~~~~~~~~~~~
 
 .. autoclass:: ansys.grantami.recordlists.models.SearchCriterion
    :members:
 
 
-BooleanCriterion
-~~~~~~~~~~~~~~~~~
-
 .. autoclass:: ansys.grantami.recordlists.models.BooleanCriterion
    :members:
 
-
-UserRole
-~~~~~~~~~~~~~~~~~
 
 .. autoclass:: ansys.grantami.recordlists.models.UserRole
    :members:
