@@ -14,6 +14,12 @@
 # ---
 
 # # Searching
+# This notebook demonstrates how to search for record lists, using ``SearchCriterion`` and
+# ``BooleanCriterion``.
+
+# .. note:: Running this notebook requires permissions to request publication, publish and revise a
+# list.
+
 # ## Connect to Granta MI
 
 # + tags=[]
@@ -32,9 +38,11 @@ client = connection.connect()
 # ## Create some lists to search on
 
 # + tags=[]
-identifier_a = client.create_list(name="Example list A")
+identifier_a = client.create_list(name="Approved materials - Metals")
+client.request_approval(identifier_a)
+client.publish(identifier_a)
 
-identifier_b = client.create_list(name="Example list B")
+identifier_b = client.create_list(name="Approved materials - Ceramics")
 client.add_items_to_list(
     identifier_b,
     items=[
@@ -49,13 +57,14 @@ client.request_approval(identifier_b)
 client.publish(identifier_b)
 
 identifier_c = client.revise_list(identifier_b)
+identifier_d = client.create_list(name="My personal list")
 # -
 
-# ## Search for the created list by name
+# ## Search for a list by name
 
 # + tags=[]
-results = client.search(SearchCriterion(name_contains="Example list B"))
-print(results)
+results = client.search(SearchCriterion(name_contains="Approved materials - Ceramics"))
+results
 # -
 
 # ## Search for 'personal' record lists.
@@ -69,10 +78,10 @@ criterion = SearchCriterion(
     is_revision=False,
     is_awaiting_approval=False,
     is_internal_use=False,
+    user_role=UserRole.OWNER,
 )
 results = client.search(criterion)
-
-print(results)
+results
 # -
 
 # ## Search for record lists based on their items.
@@ -81,32 +90,41 @@ print(results)
 # + tags=[]
 criterion = SearchCriterion(contains_records=["c61e8f3a-d7e1-4b7f-8232-b2495eae6c15"])
 results = client.search(criterion)
-
-print(results)
+results
 # -
 
 
 # ## Complex criterion
-# Using ``BooleanCriterion``, we can build more complex queries. Here we search for lists where...
-#  TODO Find an interesting complex criteria.
+# Using ``BooleanCriterion``, we can build complex queries. Here we search for published lists
+# following the naming convention "Approved materials - {Material family}" and specifically,
+# metals and ceramics.
 
 # + tags=[]
 criterion = BooleanCriterion(
-    match_any=[
+    match_all=[
         SearchCriterion(
-            is_awaiting_approval=True,
-            user_role=UserRole.PUBLISHER,
+            name_contains="Approved materials",
+            is_published=True,
+        ),
+        BooleanCriterion(
+            match_any=[
+                SearchCriterion(
+                    name_contains="Metals",
+                ),
+                SearchCriterion(
+                    name_contains="Ceramics",
+                ),
+            ]
         ),
     ]
 )
-
 results = client.search(criterion)
-
-print(len(results))
+results
 # -
 
-# + tags=['hidden']
+# + nbsphinx="hidden"
 client.delete_list(identifier_a)
 client.delete_list(identifier_b)
 client.delete_list(identifier_c)
+client.delete_list(identifier_d)
 # -
