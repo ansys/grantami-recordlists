@@ -85,12 +85,14 @@ results
 # -
 
 # ## Search for record lists based on their items.
-# We can easily search for record lists that include a specific item
+# We can search for record lists that include a specific item. Setting ``include_items`` to ``True``
+# will populate ``items`` on the results.
 
 # + tags=[]
 criterion = SearchCriterion(contains_records=["c61e8f3a-d7e1-4b7f-8232-b2495eae6c15"])
-results = client.search(criterion)
-results
+results = client.search(criterion, include_items=True)
+print(results)
+print(results[0].items)
 # -
 
 

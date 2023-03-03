@@ -620,6 +620,10 @@ class SearchResult:
         """
         return self._items
 
+    def __repr__(self) -> str:
+        """Printable representation of the object."""
+        return f"<{self.__class__.__name__} name: {self.list_details.name}>"
+
     @classmethod
     def _from_model(
         cls,
