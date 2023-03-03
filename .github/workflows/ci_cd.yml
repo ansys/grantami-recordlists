@@ -55,7 +55,8 @@ jobs:
 
       - name: Download dependencies
         run: |
-          gh run download -R pyansys/grantami-serverapi-openapi -n "ansys-grantami-serverapi-openapi-wheel" -D deps
+          $run_id = gh run list -R pyansys/grantami-serverapi-openapi -w "Build and Test Client Library" --json=databaseId,conclusion --jq 'map(select(.conclusion==\"success\")) | .[0].databaseId' 
+          gh run download -R pyansys/grantami-serverapi-openapi -n "ansys-grantami-serverapi-openapi-wheel" $run_id -D deps
         env:
           GITHUB_TOKEN: ${{ steps.get_workflow_token.outputs.token }}
 
@@ -85,7 +86,9 @@ jobs:
           application_id: ${{ secrets.BOT_APPLICATION_ID }}
           application_private_key: ${{ secrets.BOT_APPLICATION_PRIVATE_KEY }}
       - name: Download dependencies
-        run: gh run download -R pyansys/grantami-serverapi-openapi -n "ansys-grantami-serverapi-openapi-wheel" -D deps
+        run: |
+          $run_id = gh run list -R pyansys/grantami-serverapi-openapi -w "Build and Test Client Library" --json=databaseId,conclusion --jq 'map(select(.conclusion==\"success\")) | .[0].databaseId' 
+          gh run download -R pyansys/grantami-serverapi-openapi -n "ansys-grantami-serverapi-openapi-wheel" $run_id -D deps
         env:
           GITHUB_TOKEN: ${{ steps.get_workflow_token.outputs.token }}
       - name: Set up Python ${{ matrix.python-version }}
@@ -121,7 +124,9 @@ jobs:
           application_id: ${{ secrets.BOT_APPLICATION_ID }}
           application_private_key: ${{ secrets.BOT_APPLICATION_PRIVATE_KEY }}
       - name: Download dependencies
-        run: gh run download -R pyansys/grantami-serverapi-openapi -n "ansys-grantami-serverapi-openapi-wheel" -D deps
+        run: |
+          $run_id = gh run list -R pyansys/grantami-serverapi-openapi -w "Build and Test Client Library" --json=databaseId,conclusion --jq 'map(select(.conclusion==\"success\")) | .[0].databaseId' 
+          gh run download -R pyansys/grantami-serverapi-openapi -n "ansys-grantami-serverapi-openapi-wheel" $run_id -D deps
         env:
           GITHUB_TOKEN: ${{ steps.get_workflow_token.outputs.token }}
       - name: Set up Python
@@ -182,7 +187,9 @@ jobs:
           application_id: ${{ secrets.BOT_APPLICATION_ID }}
           application_private_key: ${{ secrets.BOT_APPLICATION_PRIVATE_KEY }}
       - name: Download dependencies
-        run: gh run download -R pyansys/grantami-serverapi-openapi -n "ansys-grantami-serverapi-openapi-wheel" -D grantami-recordlists/grantami-recordlists/deps
+        run: |
+          $run_id = gh run list -R pyansys/grantami-serverapi-openapi -w "Build and Test Client Library" --json=databaseId,conclusion --jq 'map(select(.conclusion==\"success\")) | .[0].databaseId' 
+          gh run download -R pyansys/grantami-serverapi-openapi -n "ansys-grantami-serverapi-openapi-wheel" $run_id -D grantami-recordlists/grantami-recordlists/deps
         env:
           GITHUB_TOKEN: ${{ steps.get_workflow_token.outputs.token }}
       - uses: pyansys/actions/build-library@v3
