@@ -596,3 +596,54 @@ class UserRole(str, Enum):
     CURATOR = models.GrantaServerApiListsDtoUserRole.CURATOR
     ADMINISTRATOR = models.GrantaServerApiListsDtoUserRole.ADMINISTRATOR
     PUBLISHER = models.GrantaServerApiListsDtoUserRole.PUBLISHER
+
+
+class SearchResult:
+    """Describes the result of a search."""
+
+    def __init__(self, list_details: RecordList, items: Optional[List[RecordListItem]]):
+        self._list_details = list_details
+        self._items = items
+
+    @property
+    def list_details(self) -> RecordList:
+        """Details of the record list associated with the search result."""
+        return self._list_details
+
+    @property
+    def items(self) -> Optional[List[RecordListItem]]:
+        """
+        Items of the record list associated with the search result.
+
+        Will be ``None`` unless ``include_items`` has been specified in
+        :meth:`~._connection.RecordListApiClient.search`
+        """
+        return self._items
+
+    @classmethod
+    def _from_model(
+        cls,
+        model: models.GrantaServerApiListsDtoRecordListSearchResult,
+        includes_items: bool,
+    ) -> "SearchResult":
+        """
+        Instantiate from a model defined in the auto-generated client code.
+
+        Parameters
+        ----------
+        model:
+            DTO object to parse
+        includes_items: bool
+            Whether the DTO object includes items.
+        """
+        # Set items to None if they have not been requested to allow distinction between list
+        # without items and list whose items have not been requested. On the DTO object, both are
+        # represented by an empty list.
+        items = None
+        if includes_items:
+            items = [RecordListItem._from_model(item) for item in model.items]
+
+        return cls(
+            list_details=RecordList._from_model(model.header),
+            items=items,
+        )

@@ -16,7 +16,7 @@ import pytest
 import requests
 
 from ansys.grantami.recordlists._connection import RecordListApiClient
-from ansys.grantami.recordlists.models import RecordListItem
+from ansys.grantami.recordlists.models import RecordListItem, SearchResult
 
 
 @pytest.fixture
@@ -313,7 +313,9 @@ class TestSearch:
 
     @pytest.fixture
     def mock_search_result_get(self, monkeypatch, mock_id):
-        response = [Mock(spec=models.GrantaServerApiListsDtoRecordListSearchResult)]
+        mock_search_result = Mock(spec=models.GrantaServerApiListsDtoRecordListSearchResult)
+        mock_search_result.items = [Mock(spec=models.GrantaServerApiListsDtoListItem)]
+        response = [mock_search_result]
         mocked_method = Mock(return_value=response)
         monkeypatch.setattr(
             ListManagementApi,
@@ -322,17 +324,35 @@ class TestSearch:
         )
         return mocked_method
 
-    def test_search(self, client, mock_search_post, mock_search_result_get, search_result_id):
+    @pytest.mark.parametrize("include_items", [True, False])
+    def test_search(
+        self,
+        client,
+        mock_search_post,
+        mock_search_result_get,
+        search_result_id,
+        monkeypatch,
+        include_items,
+    ):
         criterion_dto = Mock()
         to_model_method = Mock(return_value=criterion_dto)
         criterion = Mock()
         criterion.attach_mock(to_model_method, "_to_model")
 
-        results = client.search(criterion)
+        mock_from_model = Mock()
+        monkeypatch.setattr(SearchResult, "_from_model", mock_from_model)
+
+        results = client.search(criterion, include_items=include_items)
 
         to_model_method.assert_called_once()
         expected_body = models.GrantaServerApiListsDtoRecordListSearchRequest(
-            search_criterion=criterion_dto
+            search_criterion=criterion_dto,
+            response_options=models.GrantaServerApiListsDtoResponseOptions(
+                include_record_list_items=include_items,
+            ),
         )
         mock_search_post.assert_called_once_with(body=expected_body)
         mock_search_result_get.assert_called_once_with(search_result_id)
+        mock_from_model.assert_called_once_with(
+            mock_search_result_get._mock_return_value[0], include_items
+        )
