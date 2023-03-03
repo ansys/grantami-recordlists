@@ -299,7 +299,7 @@ class TestSearchResult:
         record_list_from_model_mock = Mock()
         monkeypatch.setattr(RecordList, "_from_model", record_list_from_model_mock)
 
-        search_result = SearchResult._from_model(search_result_dto, include_items)
+        search_result = SearchResult._from_model(search_result_dto, include_items, False, False)
 
         record_list_from_model_mock.assert_called_once_with(header_mock)
         if include_items:

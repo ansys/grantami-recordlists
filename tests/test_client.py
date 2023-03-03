@@ -349,10 +349,15 @@ class TestSearch:
             search_criterion=criterion_dto,
             response_options=models.GrantaServerApiListsDtoResponseOptions(
                 include_record_list_items=include_items,
+                include_user_permissions=False,
+                include_user_actions=False,
             ),
         )
         mock_search_post.assert_called_once_with(body=expected_body)
         mock_search_result_get.assert_called_once_with(search_result_id)
         mock_from_model.assert_called_once_with(
-            mock_search_result_get._mock_return_value[0], include_items
+            mock_search_result_get._mock_return_value[0],
+            include_items,
+            False,
+            False,
         )

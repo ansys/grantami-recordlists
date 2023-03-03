@@ -44,3 +44,9 @@ Search results
 
 .. autoclass:: ansys.grantami.recordlists.models.SearchResult
    :members:
+
+.. autoclass:: ansys.grantami.recordlists.models.UserActions
+   :members:
+
+.. autoclass:: ansys.grantami.recordlists.models.UserPermissions
+   :members:

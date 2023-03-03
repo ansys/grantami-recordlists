@@ -1,7 +1,7 @@
 """Models."""
 from datetime import datetime
 from enum import Enum
-from typing import List, Optional, Union
+from typing import Dict, List, Optional, TypedDict, Union
 
 from ansys.grantami.serverapi_openapi import models  # type: ignore
 
@@ -601,9 +601,17 @@ class UserRole(str, Enum):
 class SearchResult:
     """Describes the result of a search."""
 
-    def __init__(self, list_details: RecordList, items: Optional[List[RecordListItem]]):
+    def __init__(
+        self,
+        list_details: RecordList,
+        items: Optional[List[RecordListItem]],
+        actions: Optional["UserActions"],
+        permissions: Optional["UserPermissions"],
+    ):
         self._list_details = list_details
         self._items = items
+        self._actions = actions
+        self._permissions = permissions
 
     @property
     def list_details(self) -> RecordList:
@@ -620,11 +628,37 @@ class SearchResult:
         """
         return self._items
 
+    @property
+    def actions(self) -> Optional["UserActions"]:
+        """
+        Actions the user can perform on the record list associated with the search result.
+
+        Will be ``None`` unless ``include_actions`` has been specified in
+        :meth:`~._connection.RecordListApiClient.search`
+        """
+        return self._actions
+
+    @property
+    def permissions(self) -> Optional["UserPermissions"]:
+        """
+        Permissions of the user on the record list associated with the search result.
+
+        Will be ``None`` unless ``include_permissions`` has been specified in
+        :meth:`~._connection.RecordListApiClient.search`
+        """
+        return self._permissions
+
+    def __repr__(self) -> str:
+        """Printable representation of the object."""
+        return f"<{self.__class__.__name__} name: {self.list_details.name}>"
+
     @classmethod
     def _from_model(
         cls,
         model: models.GrantaServerApiListsDtoRecordListSearchResult,
         includes_items: bool,
+        includes_permissions: bool,
+        includes_actions: bool,
     ) -> "SearchResult":
         """
         Instantiate from a model defined in the auto-generated client code.
@@ -635,6 +669,10 @@ class SearchResult:
             DTO object to parse
         includes_items: bool
             Whether the DTO object includes items.
+        includes_permissions: bool
+            Whether the DTO object includes permissions.
+        includes_actions: bool
+            Whether the DTO object includes actions.
         """
         # Set items to None if they have not been requested to allow distinction between list
         # without items and list whose items have not been requested. On the DTO object, both are
@@ -643,7 +681,230 @@ class SearchResult:
         if includes_items:
             items = [RecordListItem._from_model(item) for item in model.items]
 
+        metadata = model.header.metadata
+        permissions = None
+        if includes_permissions:
+            permissions = UserPermissions._from_metadata(metadata)
+        actions = None
+        if includes_actions:
+            actions = UserActions._from_metadata(metadata)
+
         return cls(
             list_details=RecordList._from_model(model.header),
             items=items,
+            actions=actions,
+            permissions=permissions,
+        )
+
+
+class MetadataDict(TypedDict):
+    """Expected record list metadata format."""
+
+    actions: Dict[str, bool]
+    permissions: Dict[str, bool]
+
+
+class UserPermissions:
+    """Describes permissions of the current user on a record list."""
+
+    def __init__(
+        self,
+        is_owner: bool,
+        is_subscriber: bool,
+        is_curator: bool,
+        is_administrator: bool,
+        is_publisher: bool,
+    ):
+        self._is_owner: bool = is_owner
+        self._is_subscriber: bool = is_subscriber
+        self._is_curator: bool = is_curator
+        self._is_administrator: bool = is_administrator
+        self._is_publisher: bool = is_publisher
+
+    @property
+    def is_owner(self) -> bool:
+        """Whether the user is the owner of the list."""
+        return self._is_owner
+
+    @property
+    def is_subscriber(self) -> bool:
+        """Whether the user is subscribed to the list."""
+        return self._is_owner
+
+    @property
+    def is_curator(self) -> bool:
+        """Whether the user has curating permissions on the list."""
+        return self._is_owner
+
+    @property
+    def is_administrator(self) -> bool:
+        """Whether the user has administrating permissions on the list."""
+        return self._is_owner
+
+    @property
+    def is_publisher(self) -> bool:
+        """Whether the user has publishing permissions on the list."""
+        return self._is_owner
+
+    @classmethod
+    def _from_metadata(cls, metadata: MetadataDict) -> "UserPermissions":
+        """Instantiate from a metadata dictionary obtained in a search operation."""
+        permissions = metadata["permissions"]
+        return cls(
+            is_owner=permissions["isOwner"],
+            is_subscriber=permissions["isSubscriber"],
+            is_curator=permissions["isCurator"],
+            is_administrator=permissions["isAdministrator"],
+            is_publisher=permissions["isPublisher"],
+        )
+
+
+class UserActions:
+    """Describes actions the current user can perform on a record list."""
+
+    def __init__(
+        self,
+        can_update: bool,
+        can_copy: bool,
+        can_delete: bool,
+        can_read_items: bool,
+        can_add_items: bool,
+        can_remove_items: bool,
+        can_subscribe: bool,
+        can_unsubscribe: bool,
+        can_request_publish: bool,
+        can_cancel_request_publish: bool,
+        can_approve_request_publish: bool,
+        can_reject_request_publish: bool,
+        can_request_withdraw: bool,
+        can_cancel_request_withdraw: bool,
+        can_approve_request_withdraw: bool,
+        can_reject_request_withdraw: bool,
+        can_revise: bool,
+    ):
+        self._can_update: bool = can_update
+        self._can_copy: bool = can_copy
+        self._can_delete: bool = can_delete
+        self._can_read_items: bool = can_read_items
+        self._can_add_items: bool = can_add_items
+        self._can_remove_items: bool = can_remove_items
+        self._can_subscribe: bool = can_subscribe
+        self._can_unsubscribe: bool = can_unsubscribe
+        self._can_request_publish: bool = can_request_publish
+        self._can_cancel_request_publish: bool = can_cancel_request_publish
+        self._can_approve_request_publish: bool = can_approve_request_publish
+        self._can_reject_request_publish: bool = can_reject_request_publish
+        self._can_request_withdraw: bool = can_request_withdraw
+        self._can_cancel_request_withdraw: bool = can_cancel_request_withdraw
+        self._can_approve_request_withdraw: bool = can_approve_request_withdraw
+        self._can_reject_request_withdraw: bool = can_reject_request_withdraw
+        self._can_revise: bool = can_revise
+
+    @property
+    def can_update(self) -> bool:
+        """Whether the user can update the record list."""
+        return self._can_update
+
+    @property
+    def can_copy(self) -> bool:
+        """Whether the user can copy the record list."""
+        return self._can_copy
+
+    @property
+    def can_delete(self) -> bool:
+        """Whether the user can delete the record list."""
+        return self._can_delete
+
+    @property
+    def can_read_items(self) -> bool:
+        """Whether the user can read the items of the record list."""
+        return self._can_read_items
+
+    @property
+    def can_add_items(self) -> bool:
+        """Whether the user can add items to the record list."""
+        return self._can_add_items
+
+    @property
+    def can_remove_items(self) -> bool:
+        """Whether the user can remove items from the record list."""
+        return self._can_remove_items
+
+    @property
+    def can_subscribe(self) -> bool:
+        """Whether the user can subscribe to the record list."""
+        return self._can_subscribe
+
+    @property
+    def can_unsubscribe(self) -> bool:
+        """Whether the user can unsubscribe from the record list."""
+        return self._can_unsubscribe
+
+    @property
+    def can_request_publish(self) -> bool:
+        """Whether the user can request to publish the record list."""
+        return self._can_request_publish
+
+    @property
+    def can_cancel_request_publish(self) -> bool:
+        """Whether the user can cancel a request to publish the record list."""
+        return self._can_cancel_request_publish
+
+    @property
+    def can_approve_request_publish(self) -> bool:
+        """Whether the user can approve a request to publish the record list."""
+        return self._can_approve_request_publish
+
+    @property
+    def can_reject_request_publish(self) -> bool:
+        """Whether the user can reject a request to publish the record list."""
+        return self._can_reject_request_publish
+
+    @property
+    def can_request_withdraw(self) -> bool:
+        """Whether the user can request to withdraw the record list."""
+        return self._can_request_withdraw
+
+    @property
+    def can_cancel_request_withdraw(self) -> bool:
+        """Whether the user can cancel a request to withdraw the record list."""
+        return self._can_cancel_request_withdraw
+
+    @property
+    def can_approve_request_withdraw(self) -> bool:
+        """Whether the user can approve a request to withdraw the record list."""
+        return self._can_approve_request_withdraw
+
+    @property
+    def can_reject_request_withdraw(self) -> bool:
+        """Whether the user can reject a request to withdraw the record list."""
+        return self._can_reject_request_withdraw
+
+    @property
+    def can_revise(self) -> bool:
+        """Whether the user can revise the record list."""
+        return self._can_copy
+
+    @classmethod
+    def _from_metadata(cls, metadata: MetadataDict) -> "UserActions":
+        """Instantiate from a metadata dictionary obtained in a search operation."""
+        permissions = metadata["permissions"]
+        return cls(
+            can_update=permissions["canUpdate"],
+            can_copy=permissions["canCopy"],
+            can_delete=permissions["canDelete"],
+            can_read_items=permissions["canReadItems"],
+            can_add_items=permissions["canAddItems"],
+            can_remove_items=permissions["canRemoveItems"],
+            can_subscribe=permissions["canSubscribe"],
+            can_unsubscribe=permissions["canUnsubscribe"],
+            can_request_publish=permissions["canRequestPublish"],
+            can_cancel_request_publish=permissions["canCancelRequestPublish"],
+            can_approve_request_publish=permissions["canApproveRequestPublish"],
+            can_reject_request_publish=permissions["canRejectRequestPublish"],
+            can_request_withdraw=permissions["canRequestWithdraw"],
+            can_cancel_request_withdraw=permissions["canCancelRequestWithdraw"],
+            can_approve_request_withdraw=permissions["canApproveRequestWithdraw"],
+            can_reject_request_withdraw=permissions["canRejectRequestWithdraw"],
+            can_revise=permissions["canRequestRevise"],
         )
