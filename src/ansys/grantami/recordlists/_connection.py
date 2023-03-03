@@ -74,11 +74,7 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
         return RecordList._from_model(record_list)
 
     def search(
-        self,
-        criterion: Union[BooleanCriterion, SearchCriterion],
-        include_items: bool = False,
-        include_permissions: bool = False,
-        include_actions: bool = False,
+        self, criterion: Union[BooleanCriterion, SearchCriterion], include_items: bool = False
     ) -> List[SearchResult]:
         """
         Search for record lists matching the provided criteria.
@@ -91,12 +87,6 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
             Criterion to use to filter lists.
         include_items: bool
             Whether the search results should include record list items.
-        include_permissions: bool
-            Whether the search results should include the current user's permissions on the
-            associated list.
-        include_actions: bool
-            Whether the search results should include the current user's possible actions on the
-            associated list.
 
         Returns
         -------
@@ -105,8 +95,6 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
         """
         response_options = models.GrantaServerApiListsDtoResponseOptions(
             include_record_list_items=include_items,
-            include_user_permissions=include_permissions,
-            include_user_actions=include_actions,
         )
         search_resource = self.list_management_api.api_v1_lists_search_post(
             body=models.GrantaServerApiListsDtoRecordListSearchRequest(
@@ -122,9 +110,7 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
             )
         )
         return [
-            SearchResult._from_model(
-                search_result, include_items, include_permissions, include_actions
-            )
+            SearchResult._from_model(search_result, include_items)
             for search_result in search_results
         ]
 

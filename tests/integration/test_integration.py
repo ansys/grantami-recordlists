@@ -522,18 +522,3 @@ class TestSearch:
             assert result.items == [example_item]
         else:
             assert result.items is None
-
-    def test_include_actions_permissions(self, admin_client, list_c):
-        results = admin_client.search(
-            SearchCriterion(name_contains=self._name_suffix_C),
-            include_items=False,
-            include_actions=True,
-            include_permissions=True,
-        )
-        # First check we got the expected result
-        assert len(results) == 1
-        result = results[0]
-        assert result.list_details.identifier == list_c
-
-        assert result.permissions is not None
-        assert result.actions is not None
