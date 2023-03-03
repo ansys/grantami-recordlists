@@ -10,4 +10,5 @@ The following examples demonstrate key aspects of Granta MI RecordLists.
    :maxdepth: 2
 
    0_Getting_started
+   01_Searching
 

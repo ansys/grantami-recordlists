@@ -1,7 +1,15 @@
+import uuid
+
 from ansys.openapi.common import ApiException
 import pytest
 
-from ansys.grantami.recordlists.models import RecordList, RecordListItem
+from ansys.grantami.recordlists.models import (
+    BooleanCriterion,
+    RecordList,
+    RecordListItem,
+    SearchCriterion,
+    UserRole,
+)
 
 pytestmark = pytest.mark.integration
 
@@ -21,8 +29,9 @@ def test_get_list_items(admin_client, new_list_with_items):
     assert all(isinstance(item, RecordListItem) for item in record_list_items)
 
 
-def test_create_minimal_list(admin_client, list_name):
+def test_create_minimal_list(admin_client, cleanup_admin, list_name):
     record_list_id = admin_client.create_list(name=list_name)
+    cleanup_admin.append(record_list_id)
 
     record_list = admin_client.get_list(record_list_id)
     assert record_list.name == list_name
@@ -56,8 +65,9 @@ def test_update_list_nullable_property(admin_client, new_list_id):
     assert record_list.notes is None
 
 
-def test_copy_list(admin_client, new_list_id):
+def test_copy_list(admin_client, cleanup_admin, new_list_id):
     list_copy_identifier = admin_client.copy_list(new_list_id)
+    cleanup_admin.append(list_copy_identifier)
     assert list_copy_identifier != new_list_id
 
     original_list = admin_client.get_list(new_list_id)
@@ -77,17 +87,19 @@ def test_revise_unpublished_list(admin_client, new_list_id):
 
 
 @pytest.mark.parametrize(
-    ["create_client_name", "read_client_name"],
+    ["create_client_name", "read_client_name", "cleanup_fixture"],
     [
-        ("admin_client", "basic_client"),
-        ("basic_client", "admin_client"),
+        ("admin_client", "basic_client", "cleanup_admin"),
+        ("basic_client", "admin_client", "cleanup_basic"),
     ],
 )
-def test_list_access(create_client_name, read_client_name, request, list_name):
+def test_list_access(create_client_name, read_client_name, request, list_name, cleanup_fixture):
     """Check that lists that are not published are only available to their creator."""
     create_client = request.getfixturevalue(create_client_name)
     read_client = request.getfixturevalue(read_client_name)
+    cleanup = request.getfixturevalue(cleanup_fixture)
     list_id = create_client.create_list(name=list_name)
+    cleanup.append(list_id)
 
     with pytest.raises(ApiException) as e:
         read_client.get_list(list_id)
@@ -250,3 +262,247 @@ class TestLifeCyclePublishedAndAwaitingApproval(TestLifeCycle):
 
 
 # TODO test published list cannot be updated (properties or items)
+
+
+class TestSearch:
+    """Exercises some search criteria."""
+
+    _name_suffix_A = "_ListA"
+    _name_suffix_B = "_ListB"
+    _name_suffix_C = "_ListC"
+
+    @pytest.fixture(scope="class")
+    def list_a(self, admin_client, list_name):
+        """A personal list with a known name."""
+        list_id = admin_client.create_list(list_name + self._name_suffix_A)
+        yield list_id
+        admin_client.delete_list(list_id)
+
+    @pytest.fixture(scope="class")
+    def list_b(self, admin_client, list_name):
+        """A published list with a known name."""
+        list_id = admin_client.create_list(list_name + self._name_suffix_B)
+        admin_client.request_approval(list_id)
+        admin_client.publish(list_id)
+        yield list_id
+        admin_client.delete_list(list_id)
+
+    @pytest.fixture(scope="class")
+    def list_c(self, admin_client, list_name, list_b, example_item):
+        """A revision of list B with a known name and items."""
+        list_id = admin_client.revise_list(list_b)
+        admin_client.update_list(list_id, name=list_name + self._name_suffix_C)
+        admin_client.add_items_to_list(list_id, [example_item])
+        yield list_id
+        admin_client.delete_list(list_id)
+
+    @pytest.fixture(scope="class", autouse=True)
+    def multiple_lists(self, list_a, list_b, list_c):
+        yield list_a, list_b, list_c
+
+    def test_search_list_name_match_all(self, admin_client, list_name):
+        # All tests include name_contains=list_name to filter results to lists created in this test
+        #  session.
+        criteria = SearchCriterion(name_contains=list_name)
+        results = admin_client.search(criteria)
+        assert len(results) == 3
+
+    def test_search_list_name_match_one(self, admin_client, list_a):
+        criteria = SearchCriterion(name_contains=self._name_suffix_A)
+        results = admin_client.search(criteria)
+        assert len(results) == 1
+        assert results[0].identifier == list_a
+
+    def test_search_not_published_or_awaiting(self, admin_client, list_a):
+        criteria = SearchCriterion(
+            name_contains=self._name_suffix_A,
+            is_published=False,
+            is_awaiting_approval=False,
+            is_revision=False,
+            is_internal_use=False,
+        )
+        results = admin_client.search(criteria)
+        assert len(results) == 1
+        assert results[0].identifier == list_a
+
+    def test_search_published(self, admin_client, list_name, list_b):
+        criteria = SearchCriterion(name_contains=list_name, is_published=True)
+        results = admin_client.search(criteria)
+        assert len(results) == 1
+        assert results[0].identifier == list_b
+
+    def test_search_revision(self, admin_client, list_name, list_c):
+        criteria = SearchCriterion(name_contains=list_name, is_revision=True)
+        results = admin_client.search(criteria)
+        assert len(results) == 1
+        assert results[0].identifier == list_c
+
+    def test_search_by_database(self, admin_client, list_name, example_item, list_c):
+        criteria = SearchCriterion(
+            name_contains=list_name,
+            contains_records_in_databases=[example_item.database_guid],
+        )
+        results = admin_client.search(criteria)
+        assert len(results) == 1
+        assert results[0].identifier == list_c
+
+    def test_search_by_multiple_databases(self, admin_client, list_name, example_item, list_c):
+        # List of databases = Is in one OR the other
+        criteria = SearchCriterion(
+            name_contains=list_name,
+            contains_records_in_databases=[example_item.database_guid, str(uuid.uuid4())],
+        )
+        results = admin_client.search(criteria)
+        assert len(results) == 1
+        assert results[0].identifier == list_c
+
+    def test_search_by_table(self, admin_client, list_name, example_item, list_c):
+        criteria = SearchCriterion(
+            name_contains=list_name,
+            contains_records_in_tables=[example_item.table_guid],
+        )
+        results = admin_client.search(criteria)
+        assert len(results) == 1
+        assert results[0].identifier == list_c
+
+    def test_search_by_record(self, admin_client, list_name, example_item, list_c):
+        criteria = SearchCriterion(
+            name_contains=list_name,
+            contains_records=[example_item.record_history_guid],
+        )
+        results = admin_client.search(criteria)
+        assert len(results) == 1
+        assert results[0].identifier == list_c
+
+    def test_search_role_is_none(self, admin_client, list_name):
+        criteria = SearchCriterion(user_role=UserRole.NONE)
+        results = admin_client.search(criteria)
+        assert len(results) == 0
+        # TODO: Perhaps not worth keeping None as a value. Check what it's meant to be.
+
+    def test_search_role_is_owner(self, admin_client, list_name):
+        criteria = SearchCriterion(name_contains=list_name, user_role=UserRole.OWNER)
+        results = admin_client.search(criteria)
+        assert len(results) == 3
+
+    def test_match_all(self, admin_client, list_name, new_list_id, list_a):
+        # Uses fixture new_list_id to create a list with the root name only and assert that the
+        # match_all criteria is excluding it as expected.
+        criteria = BooleanCriterion(
+            match_all=[
+                SearchCriterion(name_contains=list_name),
+                SearchCriterion(name_contains=self._name_suffix_A),
+            ]
+        )
+        results = admin_client.search(criteria)
+        assert len(results) == 1
+        assert results[0].identifier == list_a
+
+    def test_nested_boolean_criteria(self, admin_client, list_name, new_list_id, list_a, list_b):
+        criteria = BooleanCriterion(
+            match_any=[
+                # Should match A only
+                BooleanCriterion(
+                    match_all=[
+                        SearchCriterion(name_contains=list_name),
+                        SearchCriterion(name_contains=self._name_suffix_A),
+                    ]
+                ),
+                # Should match B only
+                BooleanCriterion(
+                    match_all=[
+                        SearchCriterion(name_contains=list_name),
+                        SearchCriterion(name_contains=self._name_suffix_B),
+                        SearchCriterion(is_published=True),
+                    ]
+                ),
+            ]
+        )
+        results = admin_client.search(criteria)
+        assert len(results) == 2
+        ids = {result.identifier for result in results}
+        assert list_a in ids
+        assert list_b in ids
+
+    @pytest.fixture(scope="function")
+    def list_a_suffix_only(self, admin_client, unique_id, cleanup_admin):
+        list_id = admin_client.create_list(name=f"{unique_id}{self._name_suffix_A}")
+        cleanup_admin.append(list_id)
+        yield list_id
+
+    def test_boolean_match_any_and_all_is_not_OR(
+        self,
+        admin_client,
+        list_name,
+        new_list_id,
+        list_a,
+        list_b,
+        list_c,
+        list_a_suffix_only,
+    ):
+        # If it was OR, we'd have 5 result: all lists created as fixtures
+        criteria = BooleanCriterion(
+            match_any=[
+                SearchCriterion(name_contains=self._name_suffix_A),
+            ],
+            match_all=[SearchCriterion(name_contains=list_name)],
+        )
+        results = admin_client.search(criteria)
+        ids = {result.identifier for result in results}
+        assert new_list_id in ids
+        assert list_a in ids
+        assert list_b in ids
+        assert list_c in ids
+        assert list_a_suffix_only not in ids
+        assert len(results) == 4
+
+    def test_boolean_match_any_and_all_is_not_AND(
+        self,
+        admin_client,
+        list_name,
+        new_list_id,
+        list_a,
+        list_b,
+        list_c,
+        list_a_suffix_only,
+    ):
+        # If it was AND, we'd have 1 result: list_a
+        criteria = BooleanCriterion(
+            match_any=[
+                SearchCriterion(name_contains=self._name_suffix_A),
+            ],
+            match_all=[SearchCriterion(name_contains=list_name)],
+        )
+        results = admin_client.search(criteria)
+        ids = {result.identifier for result in results}
+        assert new_list_id in ids
+        assert list_a in ids
+        assert list_b in ids
+        assert list_c in ids
+        assert list_a_suffix_only not in ids
+        assert len(results) == 4
+
+    def test_boolean_match_all_takes_precedence(
+        self,
+        admin_client,
+        list_name,
+        new_list_id,
+        list_a,
+        list_b,
+        list_c,
+        list_a_suffix_only,
+    ):
+        criteria = BooleanCriterion(
+            match_any=[
+                SearchCriterion(name_contains=list_name),
+            ],
+            match_all=[SearchCriterion(name_contains=self._name_suffix_A)],
+        )
+        results = admin_client.search(criteria)
+        ids = {result.identifier for result in results}
+        assert new_list_id not in ids
+        assert list_a in ids
+        assert list_b not in ids
+        assert list_c not in ids
+        assert list_a_suffix_only in ids
+        assert len(results) == 2

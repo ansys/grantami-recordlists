@@ -54,7 +54,7 @@ def basic_client(sl_url, list_username_no_permissions, list_password_no_permissi
     """
     Fixture providing a real ApiClient to run integration tests against an instance of Granta MI
     Server API.
-
+    On teardown, deletes all lists named using the fixture `list_name`.
     """
     connection = Connection(sl_url).with_credentials(
         list_username_no_permissions, list_password_no_permissions
@@ -69,14 +69,20 @@ def basic_client(sl_url, list_username_no_permissions, list_password_no_permissi
 
 
 @pytest.fixture(scope="session")
-def list_name():
+def unique_id():
+    """Generate a unique id for the test session. Used to keep track of record lists created
+    during the session"""
+    return uuid.uuid4()
+
+
+@pytest.fixture(scope="session")
+def list_name(unique_id):
     """
     Provides a name for new lists. All lists created with this name are deleted on teardown of
     `api_client`.
     """
     prefix = "IntegrationTestList"
-    _uuid = uuid.uuid4()
-    return f"{prefix}_{_uuid}"
+    return f"{prefix}_{unique_id}"
 
 
 @pytest.fixture
@@ -92,14 +98,34 @@ def new_list_id(admin_client, request, list_name):
         admin_client.delete_list(list_id)
 
 
+@pytest.fixture(scope="session")
+def example_item():
+    # GUIDs need only have the correct format for record lists test to pass.
+    return RecordListItem(
+        "e595fe23-b450-4d18-8c08-4a0f378ef095",
+        "81dff531-0254-4fbe-9621-174b10aaee3d",
+        "3bc2b82f-0199-4f3b-a7af-8d520250b180",
+    )
+
+
 @pytest.fixture
-def new_list_with_items(admin_client, new_list_id):
-    items = [
-        RecordListItem(
-            "e595fe23-b450-4d18-8c08-4a0f378ef095",
-            "81dff531-0254-4fbe-9621-174b10aaee3d",
-            "3bc2b82f-0199-4f3b-a7af-8d520250b180",
-        )
-    ]
+def new_list_with_items(admin_client, new_list_id, example_item):
+    items = [example_item]
     admin_client.add_items_to_list(new_list_id, items)
     return new_list_id
+
+
+@pytest.fixture(scope="function")
+def cleanup_admin(admin_client):
+    to_delete = []
+    yield to_delete
+    for identifier in to_delete:
+        admin_client.delete_list(identifier)
+
+
+@pytest.fixture(scope="function")
+def cleanup_basic(basic_client):
+    to_delete = []
+    yield to_delete
+    for identifier in to_delete:
+        basic_client.delete_list(identifier)

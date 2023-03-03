@@ -9,7 +9,7 @@ from ansys.openapi.common import (  # type: ignore[import]
 import requests  # type: ignore[import]
 
 from ._utils import _ArgNotProvided, extract_identifier
-from .models import RecordList, RecordListItem
+from .models import BooleanCriterion, RecordList, RecordListItem, SearchCriterion
 
 PROXY_PATH = "/proxy/v1.svc"
 AUTH_PATH = "/Health/v2.svc"
@@ -72,6 +72,38 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
         """
         record_list = self.list_management_api.api_v1_lists_list_list_identifier_get(identifier)
         return RecordList._from_model(record_list)
+
+    def search(
+        self, criterion: Union[BooleanCriterion, SearchCriterion], include_items: bool = False
+    ) -> List[RecordList]:
+        """
+        Search for record lists matching the provided :class:`.SearchCriterion`.
+
+        Performs multiple HTTP requests against the Server API.
+
+        Parameters
+        ----------
+        criterion : :class:`.SearchCriterion`
+            Unique identifier of the record list.
+
+        Returns
+        -------
+        list of :class:`.RecordList`
+            List of record lists matching the provided criterion.
+        """
+        search_resource = self.list_management_api.api_v1_lists_search_post(
+            body=models.GrantaServerApiListsDtoRecordListSearchRequest(
+                search_criterion=criterion._to_model(),
+            )
+        )
+
+        search_resource_identifier = extract_identifier(search_resource)
+        search_results = (
+            self.list_management_api.api_v1_lists_search_results_result_resource_identifier_get(
+                search_resource_identifier
+            )
+        )
+        return [RecordList._from_model(search_result.header) for search_result in search_results]
 
     def get_list_items(self, identifier: str) -> List[RecordListItem]:
         """
