@@ -92,8 +92,7 @@ jobs:
 
       - name: Download dependencies
         run: |
-          $run_id = gh run list -R pyansys/grantami-serverapi-openapi -w "Build and Test Client Library" --json=databaseId,conclusion --jq 'map(select(.conclusion==\"success\")) | .[0].databaseId' 
-          gh run download -R pyansys/grantami-serverapi-openapi -n "ansys-grantami-serverapi-openapi-wheel" $run_id -D deps
+          gh run download -R pyansys/grantami-serverapi-openapi -n "ansys-grantami-serverapi-openapi-wheel" $(gh run list -R pyansys/grantami-serverapi-openapi -w "Build and Test Client Library" --json=databaseId,conclusion --jq 'map(select(.conclusion==\"success\")) | .[0].databaseId') -D deps
         env:
           GITHUB_TOKEN: ${{ steps.get_workflow_token.outputs.token }}
 
@@ -134,8 +133,7 @@ jobs:
 
       - name: Download dependencies
         run: |
-          $run_id = gh run list -R pyansys/grantami-serverapi-openapi -w "Build and Test Client Library" --json=databaseId,conclusion --jq 'map(select(.conclusion==\"success\")) | .[0].databaseId' 
-          gh run download -R pyansys/grantami-serverapi-openapi -n "ansys-grantami-serverapi-openapi-wheel" $run_id -D deps
+          gh run download -R pyansys/grantami-serverapi-openapi -n "ansys-grantami-serverapi-openapi-wheel" $(gh run list -R pyansys/grantami-serverapi-openapi -w "Build and Test Client Library" --json=databaseId,conclusion --jq 'map(select(.conclusion==\"success\")) | .[0].databaseId') -D deps
         env:
           GITHUB_TOKEN: ${{ steps.get_workflow_token.outputs.token }}
 
