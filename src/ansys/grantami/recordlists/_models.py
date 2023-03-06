@@ -302,7 +302,7 @@ class User:
 
 class SearchCriterion:
     """
-    Search criterion to use in a :meth:`~.RecordListApiClient.search` operation.
+    Search criterion to use in a :meth:`~.RecordListApiClient.search_for_lists` operation.
 
     The properties in this class represent an AND search - only lists that match all the
     non-null properties will be returned.
@@ -499,7 +499,7 @@ class SearchCriterion:
 
 class BooleanCriterion:
     """
-    Search criterion to use in a search operation :meth:`~.RecordListApiClient.search`.
+    Search criterion to use in a search operation :meth:`~.RecordListApiClient.search_for_lists`.
 
     Allow aggregation of multiple criteria defined as :class:`SearchCriterion` or
     :class:`BooleanCriterion`.
@@ -616,7 +616,7 @@ class SearchResult:
         Items of the record list associated with the search result.
 
         Will be ``None`` unless ``include_items`` has been specified in
-        :meth:`~.RecordListApiClient.search`
+        :meth:`~.RecordListApiClient.search_for_lists`
         """
         return self._items
 

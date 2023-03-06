@@ -31,32 +31,32 @@ class TestAuthoredListLifeCycle:
     """
 
     def test_can_request_approval_but_not_publish(self, basic_client, basic_list_id):
-        basic_client.request_approval(basic_list_id)
+        basic_client.request_list_approval(basic_list_id)
         list_details = basic_client.get_list(basic_list_id)
         assert list_details.awaiting_approval is True
         assert list_details.published is False
 
         with pytest.raises(ApiException) as e:
-            basic_client.publish(basic_list_id)
+            basic_client.publish_list(basic_list_id)
         assert e.value.status_code == 403
 
     @pytest.fixture
     def basic_published_list_id(self, admin_client, basic_client, basic_list_id):
-        basic_client.request_approval(basic_list_id)
-        admin_client.publish(basic_list_id)
+        basic_client.request_list_approval(basic_list_id)
+        admin_client.publish_list(basic_list_id)
         yield basic_list_id
 
         # Need to withdraw the list, otherwise the current user cannot delete its own list
-        admin_client.unpublish(basic_list_id)
+        admin_client.unpublish_list(basic_list_id)
 
     def test_can_request_withdrawal_but_not_withdraw(self, basic_client, basic_published_list_id):
-        basic_client.request_approval(basic_published_list_id)
+        basic_client.request_list_approval(basic_published_list_id)
         list_details = basic_client.get_list(basic_published_list_id)
         assert list_details.awaiting_approval is True
         assert list_details.published is True
 
         with pytest.raises(ApiException) as e:
-            basic_client.unpublish(basic_published_list_id)
+            basic_client.unpublish_list(basic_published_list_id)
         assert e.value.status_code == 403
 
 
@@ -71,20 +71,20 @@ class TestListLifeCycle:
         # new_list_id is the identifier of a list created by the admin user
 
         with pytest.raises(ApiException) as e:
-            basic_client.request_approval(new_list_id)
+            basic_client.request_list_approval(new_list_id)
         assert e.value.status_code == 403
 
-        admin_client.request_approval(new_list_id)
+        admin_client.request_list_approval(new_list_id)
         with pytest.raises(ApiException) as e:
-            basic_client.publish(new_list_id)
+            basic_client.publish_list(new_list_id)
         assert e.value.status_code == 403
 
-        admin_client.publish(new_list_id)
+        admin_client.publish_list(new_list_id)
         with pytest.raises(ApiException) as e:
-            basic_client.request_approval(new_list_id)
+            basic_client.request_list_approval(new_list_id)
         assert e.value.status_code == 403
 
-        admin_client.request_approval(new_list_id)
+        admin_client.request_list_approval(new_list_id)
         with pytest.raises(ApiException) as e:
-            basic_client.unpublish(new_list_id)
+            basic_client.unpublish_list(new_list_id)
         assert e.value.status_code == 403

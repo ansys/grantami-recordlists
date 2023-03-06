@@ -39,8 +39,8 @@ client = connection.connect()
 
 # + tags=[]
 identifier_a = client.create_list(name="Approved materials - Metals")
-client.request_approval(identifier_a)
-client.publish(identifier_a)
+client.request_list_approval(identifier_a)
+client.publish_list(identifier_a)
 
 identifier_b = client.create_list(name="Approved materials - Ceramics")
 client.add_items_to_list(
@@ -53,8 +53,8 @@ client.add_items_to_list(
         )
     ],
 )
-client.request_approval(identifier_b)
-client.publish(identifier_b)
+client.request_list_approval(identifier_b)
+client.publish_list(identifier_b)
 
 identifier_c = client.revise_list(identifier_b)
 identifier_d = client.create_list(name="My personal list")
@@ -63,7 +63,7 @@ identifier_d = client.create_list(name="My personal list")
 # ## Search for a list by name
 
 # + tags=[]
-results = client.search(SearchCriterion(name_contains="Approved materials - Ceramics"))
+results = client.search_for_lists(SearchCriterion(name_contains="Approved materials - Ceramics"))
 results
 # -
 
@@ -80,7 +80,7 @@ criterion = SearchCriterion(
     is_internal_use=False,
     user_role=UserRole.OWNER,
 )
-results = client.search(criterion)
+results = client.search_for_lists(criterion)
 results
 # -
 
@@ -90,7 +90,7 @@ results
 
 # + tags=[]
 criterion = SearchCriterion(contains_records=["c61e8f3a-d7e1-4b7f-8232-b2495eae6c15"])
-results = client.search(criterion, include_items=True)
+results = client.search_for_lists(criterion, include_items=True)
 print(results)
 print(results[0].items)
 # -
@@ -120,7 +120,7 @@ criterion = BooleanCriterion(
         ),
     ]
 )
-results = client.search(criterion)
+results = client.search_for_lists(criterion)
 results
 # -
 

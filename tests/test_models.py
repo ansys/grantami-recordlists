@@ -100,7 +100,7 @@ class TestRecordList:
         record_list = RecordList(**record_list_data)
         assert getattr(record_list, attr_name) is None
 
-    @patch("ansys.grantami.recordlists.models.User")
+    @patch("ansys.grantami.recordlists._models.User")
     def test_dto_mapping(self, mock_user_class):
         # Overriding User.from_model method to a no-op. It is tested separately
         mock_user_class._from_model = lambda x: x

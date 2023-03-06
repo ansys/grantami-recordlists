@@ -194,7 +194,7 @@ class TestPublishList(TestClientMethod):
 
     def test_publish_list(self, client, api_method):
         identifier = "00000-0000a"
-        client.publish(identifier)
+        client.publish_list(identifier)
         api_method.assert_called_once_with(identifier)
 
 
@@ -205,7 +205,7 @@ class TestUnpublishList(TestClientMethod):
 
     def test_unpublish_list(self, client, api_method):
         identifier = "00000-0000a"
-        client.unpublish(identifier)
+        client.unpublish_list(identifier)
         api_method.assert_called_once_with(identifier)
 
 
@@ -216,7 +216,7 @@ class TestResetApprovalList(TestClientMethod):
 
     def test_reset_approval(self, client, api_method):
         identifier = "00000-0000a"
-        client.reset_approval_request(identifier)
+        client.cancel_list_approval_request(identifier)
         api_method.assert_called_once_with(identifier)
 
 
@@ -227,7 +227,7 @@ class TestRequestApprovalList(TestClientMethod):
 
     def test_request_approval(self, client, api_method):
         identifier = "00000-0000a"
-        client.request_approval(identifier)
+        client.request_list_approval(identifier)
         api_method.assert_called_once_with(identifier)
 
 
@@ -341,7 +341,7 @@ class TestSearch:
         mock_from_model = Mock()
         monkeypatch.setattr(SearchResult, "_from_model", mock_from_model)
 
-        results = client.search(criterion, include_items=include_items)
+        results = client.search_for_lists(criterion, include_items=include_items)
 
         to_model_method.assert_called_once()
         expected_body = models.GrantaServerApiListsDtoRecordListSearchRequest(

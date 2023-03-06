@@ -73,7 +73,7 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
         record_list = self.list_management_api.api_v1_lists_list_list_identifier_get(identifier)
         return RecordList._from_model(record_list)
 
-    def search(
+    def search_for_lists(
         self, criterion: Union[BooleanCriterion, SearchCriterion], include_items: bool = False
     ) -> List[SearchResult]:
         """
@@ -369,17 +369,7 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
         )
         return extract_identifier(data)
 
-    @staticmethod
-    def _create_patch_operation(
-        value: Optional[str], name: str, op: str = "replace"
-    ) -> models.MicrosoftAspNetCoreJsonPatchOperationsOperation:
-        return models.MicrosoftAspNetCoreJsonPatchOperationsOperation(
-            value=value,
-            path=f"/{name}",
-            op=op,
-        )
-
-    def request_approval(self, identifier: str) -> None:
+    def request_list_approval(self, identifier: str) -> None:
         """
         Request approval for a record list.
 
@@ -393,7 +383,7 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
         """
         self.list_management_api.api_v1_lists_list_list_identifier_request_approval_post(identifier)
 
-    def publish(self, identifier: str) -> None:
+    def publish_list(self, identifier: str) -> None:
         """
         Publish a record list.
 
@@ -410,7 +400,7 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
         """
         self.list_management_api.api_v1_lists_list_list_identifier_publish_post(identifier)
 
-    def unpublish(self, identifier: str) -> None:
+    def unpublish_list(self, identifier: str) -> None:
         """
         Withdraw a record list.
 
@@ -426,7 +416,7 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
         """
         self.list_management_api.api_v1_lists_list_list_identifier_unpublish_post(identifier)
 
-    def reset_approval_request(self, identifier: str) -> None:
+    def cancel_list_approval_request(self, identifier: str) -> None:
         """
         Cancel a pending request for approval on a record list.
 
@@ -440,6 +430,16 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
             Unique identifier of the record list.
         """
         self.list_management_api.api_v1_lists_list_list_identifier_reset_post(identifier)
+
+    @staticmethod
+    def _create_patch_operation(
+        value: Optional[str], name: str, op: str = "replace"
+    ) -> models.MicrosoftAspNetCoreJsonPatchOperationsOperation:
+        return models.MicrosoftAspNetCoreJsonPatchOperationsOperation(
+            value=value,
+            path=f"/{name}",
+            op=op,
+        )
 
 
 class Connection(ApiClientFactory):  # type: ignore[misc]

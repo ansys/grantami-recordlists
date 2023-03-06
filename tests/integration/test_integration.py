@@ -118,21 +118,21 @@ class TestLifeCycleNewList(TestLifeCycle):
 
     def test_cannot_publish(self, admin_client, new_list_id):
         with pytest.raises(ApiException, match=self._not_awaiting_approval_error) as e:
-            admin_client.publish(new_list_id)
+            admin_client.publish_list(new_list_id)
         assert e.value.status_code == 400
 
     def test_cannot_withdraw(self, admin_client, new_list_id):
         with pytest.raises(ApiException, match=self._not_awaiting_approval_error) as e:
-            admin_client.unpublish(new_list_id)
+            admin_client.unpublish_list(new_list_id)
         assert e.value.status_code == 400
 
     def test_cannot_reset(self, admin_client, new_list_id):
         with pytest.raises(ApiException, match=self._not_awaiting_approval_error) as e:
-            admin_client.reset_approval_request(new_list_id)
+            admin_client.cancel_list_approval_request(new_list_id)
         assert e.value.status_code == 400
 
     def test_can_request_approval(self, admin_client, new_list_id):
-        admin_client.request_approval(new_list_id)
+        admin_client.request_list_approval(new_list_id)
         list_details = admin_client.get_list(new_list_id)
         assert list_details.awaiting_approval is True
 
@@ -144,10 +144,10 @@ class TestLifeCycleAwaitingApprovalAndNotPublished(TestLifeCycle):
 
     @pytest.fixture(autouse=True)
     def request_approval_for_list(self, admin_client, new_list_id):
-        admin_client.request_approval(new_list_id)
+        admin_client.request_list_approval(new_list_id)
 
     def test_can_publish(self, admin_client, new_list_id):
-        admin_client.publish(new_list_id)
+        admin_client.publish_list(new_list_id)
         list_details = admin_client.get_list(new_list_id)
         assert list_details.awaiting_approval is False
         assert list_details.published is True
@@ -156,17 +156,17 @@ class TestLifeCycleAwaitingApprovalAndNotPublished(TestLifeCycle):
 
     def test_cannot_withdraw(self, admin_client, new_list_id):
         with pytest.raises(ApiException, match="not currently published") as e:
-            admin_client.unpublish(new_list_id)
+            admin_client.unpublish_list(new_list_id)
         assert e.value.status_code == 400
 
     def test_can_reset(self, admin_client, new_list_id):
-        admin_client.reset_approval_request(new_list_id)
+        admin_client.cancel_list_approval_request(new_list_id)
         list_details = admin_client.get_list(new_list_id)
         assert list_details.awaiting_approval is False
 
     def test_cannot_request_approval(self, admin_client, new_list_id):
         with pytest.raises(ApiException, match=self._already_awaiting_approval_error) as e:
-            admin_client.request_approval(new_list_id)
+            admin_client.request_list_approval(new_list_id)
         assert e.value.status_code == 400
 
 
@@ -177,26 +177,26 @@ class TestLifeCyclePublishedAndNotAwaitingApproval(TestLifeCycle):
 
     @pytest.fixture(autouse=True)
     def publish_list(self, admin_client, new_list_id):
-        admin_client.request_approval(new_list_id)
-        admin_client.publish(new_list_id)
+        admin_client.request_list_approval(new_list_id)
+        admin_client.publish_list(new_list_id)
 
     def test_cannot_publish(self, admin_client, new_list_id):
         with pytest.raises(ApiException, match=self._not_awaiting_approval_error) as e:
-            admin_client.publish(new_list_id)
+            admin_client.publish_list(new_list_id)
         assert e.value.status_code == 400
 
     def test_cannot_withdraw(self, admin_client, new_list_id):
         with pytest.raises(ApiException, match=self._not_awaiting_approval_error) as e:
-            admin_client.unpublish(new_list_id)
+            admin_client.unpublish_list(new_list_id)
         assert e.value.status_code == 400
 
     def test_cannot_reset(self, admin_client, new_list_id):
         with pytest.raises(ApiException, match=self._not_awaiting_approval_error) as e:
-            admin_client.reset_approval_request(new_list_id)
+            admin_client.cancel_list_approval_request(new_list_id)
         assert e.value.status_code == 400
 
     def test_cannot_request_approval(self, admin_client, new_list_id):
-        admin_client.request_approval(new_list_id)
+        admin_client.request_list_approval(new_list_id)
         list_details = admin_client.get_list(new_list_id)
         assert list_details.awaiting_approval is True
         assert list_details.published is True
@@ -215,8 +215,8 @@ class TestRevisionLifeCycle(TestLifeCyclePublishedAndNotAwaitingApproval):
         updated_note = "Notes added to list revision"
         _ = admin_client.update_list(revision_id, notes=updated_note)
 
-        admin_client.request_approval(revision_id)
-        admin_client.publish(revision_id)
+        admin_client.request_list_approval(revision_id)
+        admin_client.publish_list(revision_id)
 
         with pytest.raises(ApiException) as e:
             revision_list_details = admin_client.get_list(revision_id)
@@ -234,30 +234,30 @@ class TestLifeCyclePublishedAndAwaitingApproval(TestLifeCycle):
     @pytest.fixture(autouse=True)
     def publish_and_request_approval_for_list(self, admin_client, new_list_id):
         # TODO refactor if we allow creating lists with predefined statuses
-        admin_client.request_approval(new_list_id)
-        admin_client.publish(new_list_id)
-        admin_client.request_approval(new_list_id)
+        admin_client.request_list_approval(new_list_id)
+        admin_client.publish_list(new_list_id)
+        admin_client.request_list_approval(new_list_id)
 
     def test_cannot_publish(self, admin_client, new_list_id):
         with pytest.raises(ApiException, match="already published") as e:
-            admin_client.publish(new_list_id)
+            admin_client.publish_list(new_list_id)
         assert e.value.status_code == 400
 
     def test_can_withdraw(self, admin_client, new_list_id):
-        admin_client.unpublish(new_list_id)
+        admin_client.unpublish_list(new_list_id)
         list_details = admin_client.get_list(new_list_id)
         assert list_details.published is False
         assert list_details.awaiting_approval is False
 
     def test_can_reset(self, admin_client, new_list_id):
-        admin_client.reset_approval_request(new_list_id)
+        admin_client.cancel_list_approval_request(new_list_id)
         list_details = admin_client.get_list(new_list_id)
         assert list_details.awaiting_approval is False
         assert list_details.published is True
 
     def test_cannot_request_approval(self, admin_client, new_list_id):
         with pytest.raises(ApiException, match=self._already_awaiting_approval_error) as e:
-            admin_client.request_approval(new_list_id)
+            admin_client.request_list_approval(new_list_id)
         assert e.value.status_code == 400
 
 
@@ -282,8 +282,8 @@ class TestSearch:
     def list_b(self, admin_client, list_name):
         """A published list with a known name."""
         list_id = admin_client.create_list(list_name + self._name_suffix_B)
-        admin_client.request_approval(list_id)
-        admin_client.publish(list_id)
+        admin_client.request_list_approval(list_id)
+        admin_client.publish_list(list_id)
         yield list_id
         admin_client.delete_list(list_id)
 
@@ -304,12 +304,12 @@ class TestSearch:
         # All tests include name_contains=list_name to filter results to lists created in this test
         #  session.
         criteria = SearchCriterion(name_contains=list_name)
-        results = admin_client.search(criteria)
+        results = admin_client.search_for_lists(criteria)
         assert len(results) == 3
 
     def test_search_list_name_match_one(self, admin_client, list_a):
         criteria = SearchCriterion(name_contains=self._name_suffix_A)
-        results = admin_client.search(criteria)
+        results = admin_client.search_for_lists(criteria)
         assert len(results) == 1
         assert results[0].list_details.identifier == list_a
 
@@ -321,19 +321,19 @@ class TestSearch:
             is_revision=False,
             is_internal_use=False,
         )
-        results = admin_client.search(criteria)
+        results = admin_client.search_for_lists(criteria)
         assert len(results) == 1
         assert results[0].list_details.identifier == list_a
 
     def test_search_published(self, admin_client, list_name, list_b):
         criteria = SearchCriterion(name_contains=list_name, is_published=True)
-        results = admin_client.search(criteria)
+        results = admin_client.search_for_lists(criteria)
         assert len(results) == 1
         assert results[0].list_details.identifier == list_b
 
     def test_search_revision(self, admin_client, list_name, list_c):
         criteria = SearchCriterion(name_contains=list_name, is_revision=True)
-        results = admin_client.search(criteria)
+        results = admin_client.search_for_lists(criteria)
         assert len(results) == 1
         assert results[0].list_details.identifier == list_c
 
@@ -342,7 +342,7 @@ class TestSearch:
             name_contains=list_name,
             contains_records_in_databases=[example_item.database_guid],
         )
-        results = admin_client.search(criteria)
+        results = admin_client.search_for_lists(criteria)
         assert len(results) == 1
         assert results[0].list_details.identifier == list_c
 
@@ -352,7 +352,7 @@ class TestSearch:
             name_contains=list_name,
             contains_records_in_databases=[example_item.database_guid, str(uuid.uuid4())],
         )
-        results = admin_client.search(criteria)
+        results = admin_client.search_for_lists(criteria)
         assert len(results) == 1
         assert results[0].list_details.identifier == list_c
 
@@ -361,7 +361,7 @@ class TestSearch:
             name_contains=list_name,
             contains_records_in_tables=[example_item.table_guid],
         )
-        results = admin_client.search(criteria)
+        results = admin_client.search_for_lists(criteria)
         assert len(results) == 1
         assert results[0].list_details.identifier == list_c
 
@@ -370,19 +370,19 @@ class TestSearch:
             name_contains=list_name,
             contains_records=[example_item.record_history_guid],
         )
-        results = admin_client.search(criteria)
+        results = admin_client.search_for_lists(criteria)
         assert len(results) == 1
         assert results[0].list_details.identifier == list_c
 
     def test_search_role_is_none(self, admin_client, list_name):
         criteria = SearchCriterion(user_role=UserRole.NONE)
-        results = admin_client.search(criteria)
+        results = admin_client.search_for_lists(criteria)
         assert len(results) == 0
         # TODO: Perhaps not worth keeping None as a value. Check what it's meant to be.
 
     def test_search_role_is_owner(self, admin_client, list_name):
         criteria = SearchCriterion(name_contains=list_name, user_role=UserRole.OWNER)
-        results = admin_client.search(criteria)
+        results = admin_client.search_for_lists(criteria)
         assert len(results) == 3
 
     def test_match_all(self, admin_client, list_name, new_list_id, list_a):
@@ -394,7 +394,7 @@ class TestSearch:
                 SearchCriterion(name_contains=self._name_suffix_A),
             ]
         )
-        results = admin_client.search(criteria)
+        results = admin_client.search_for_lists(criteria)
         assert len(results) == 1
         assert results[0].list_details.identifier == list_a
 
@@ -418,7 +418,7 @@ class TestSearch:
                 ),
             ]
         )
-        results = admin_client.search(criteria)
+        results = admin_client.search_for_lists(criteria)
         assert len(results) == 2
         ids = {result.list_details.identifier for result in results}
         assert list_a in ids
@@ -447,7 +447,7 @@ class TestSearch:
             ],
             match_all=[SearchCriterion(name_contains=list_name)],
         )
-        results = admin_client.search(criteria)
+        results = admin_client.search_for_lists(criteria)
         ids = {result.list_details.identifier for result in results}
         assert new_list_id in ids
         assert list_a in ids
@@ -473,7 +473,7 @@ class TestSearch:
             ],
             match_all=[SearchCriterion(name_contains=list_name)],
         )
-        results = admin_client.search(criteria)
+        results = admin_client.search_for_lists(criteria)
         ids = {result.list_details.identifier for result in results}
         assert new_list_id in ids
         assert list_a in ids
@@ -498,7 +498,7 @@ class TestSearch:
             ],
             match_all=[SearchCriterion(name_contains=self._name_suffix_A)],
         )
-        results = admin_client.search(criteria)
+        results = admin_client.search_for_lists(criteria)
         ids = {result.list_details.identifier for result in results}
         assert new_list_id not in ids
         assert list_a in ids
@@ -509,7 +509,7 @@ class TestSearch:
 
     @pytest.mark.parametrize("include_items", [True, False])
     def test_include_items_flag(self, admin_client, list_c, include_items, example_item):
-        results = admin_client.search(
+        results = admin_client.search_for_lists(
             SearchCriterion(name_contains=self._name_suffix_C),
             include_items=include_items,
         )
