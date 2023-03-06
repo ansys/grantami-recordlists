@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from unittest.mock import Mock, patch
+from unittest.mock import Mock, call, patch
 import uuid
 
 from ansys.grantami.serverapi_openapi.models import (
@@ -7,6 +7,7 @@ from ansys.grantami.serverapi_openapi.models import (
     GrantaServerApiListsDtoListItem,
     GrantaServerApiListsDtoRecordListHeader,
     GrantaServerApiListsDtoRecordListSearchCriterion,
+    GrantaServerApiListsDtoRecordListSearchResult,
     GrantaServerApiListsDtoUserOrGroup,
     GrantaServerApiListsDtoUserRole,
 )
@@ -17,6 +18,7 @@ from ansys.grantami.recordlists.models import (
     RecordList,
     RecordListItem,
     SearchCriterion,
+    SearchResult,
     User,
     UserRole,
 )
@@ -279,3 +281,28 @@ class TestSearchCriterion:
         assert isinstance(leaf_criterion, GrantaServerApiListsDtoRecordListSearchCriterion)
         assert leaf_criterion.name_contains == "A"
         assert leaf_criterion.user_role == GrantaServerApiListsDtoUserRole.OWNER
+
+
+class TestSearchResult:
+    @pytest.mark.parametrize("include_items", [True, False])
+    def test_dto_mapping(self, monkeypatch, include_items):
+        header_mock = Mock(spec=GrantaServerApiListsDtoRecordListHeader)
+        item_1_mock = Mock(spec=GrantaServerApiListsDtoListItem)
+        item_2_mock = Mock(spec=GrantaServerApiListsDtoListItem)
+        search_result_dto = GrantaServerApiListsDtoRecordListSearchResult(
+            header=header_mock, items=[item_1_mock, item_2_mock]
+        )
+        # Mock RecordListItem._from_model and RecordList._from_model to be able to assert that they
+        # have been called with the expected args.
+        item_from_model_mock = Mock()
+        monkeypatch.setattr(RecordListItem, "_from_model", item_from_model_mock)
+        record_list_from_model_mock = Mock()
+        monkeypatch.setattr(RecordList, "_from_model", record_list_from_model_mock)
+
+        search_result = SearchResult._from_model(search_result_dto, include_items)
+
+        record_list_from_model_mock.assert_called_once_with(header_mock)
+        if include_items:
+            item_from_model_mock.assert_has_calls([call(item_1_mock), call(item_2_mock)])
+        else:
+            assert search_result.items is None

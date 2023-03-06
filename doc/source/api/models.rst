@@ -37,3 +37,10 @@ Search criteria
 .. autoclass:: ansys.grantami.recordlists.models.UserRole
    :members:
    :undoc-members:
+
+
+Search results
+~~~~~~~~~~~~~~~
+
+.. autoclass:: ansys.grantami.recordlists.models.SearchResult
+   :members:

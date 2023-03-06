@@ -9,7 +9,7 @@ from ansys.openapi.common import (  # type: ignore[import]
 import requests  # type: ignore[import]
 
 from ._utils import _ArgNotProvided, extract_identifier
-from .models import BooleanCriterion, RecordList, RecordListItem, SearchCriterion
+from .models import BooleanCriterion, RecordList, RecordListItem, SearchCriterion, SearchResult
 
 PROXY_PATH = "/proxy/v1.svc"
 AUTH_PATH = "/Health/v2.svc"
@@ -75,25 +75,31 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
 
     def search(
         self, criterion: Union[BooleanCriterion, SearchCriterion], include_items: bool = False
-    ) -> List[RecordList]:
+    ) -> List[SearchResult]:
         """
-        Search for record lists matching the provided :class:`.SearchCriterion`.
+        Search for record lists matching the provided criteria.
 
         Performs multiple HTTP requests against the Server API.
 
         Parameters
         ----------
-        criterion : :class:`.SearchCriterion`
-            Unique identifier of the record list.
+        criterion : :class:`.SearchCriterion` | :class:`.BooleanCriterion`
+            Criterion to use to filter lists.
+        include_items: bool
+            Whether the search results should include record list items.
 
         Returns
         -------
-        list of :class:`.RecordList`
+        list of :class:`.SearchResult`
             List of record lists matching the provided criterion.
         """
+        response_options = models.GrantaServerApiListsDtoResponseOptions(
+            include_record_list_items=include_items,
+        )
         search_resource = self.list_management_api.api_v1_lists_search_post(
             body=models.GrantaServerApiListsDtoRecordListSearchRequest(
                 search_criterion=criterion._to_model(),
+                response_options=response_options,
             )
         )
 
@@ -103,7 +109,10 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
                 search_resource_identifier
             )
         )
-        return [RecordList._from_model(search_result.header) for search_result in search_results]
+        return [
+            SearchResult._from_model(search_result, include_items)
+            for search_result in search_results
+        ]
 
     def get_list_items(self, identifier: str) -> List[RecordListItem]:
         """
