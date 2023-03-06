@@ -25,10 +25,6 @@ on:
         required: true
       TEST_SERVER_PASS:
         required: true
-      BOT_APPLICATION_ID:
-        required: true
-      BOT_APPLICATION_PRIVATE_KEY:
-        required: true
   workflow_dispatch:
 
 concurrency:
@@ -83,18 +79,11 @@ jobs:
       - name: Install dependencies
         run: pip install poetry 'tox<4' --disable-pip-version-check
 
-      - name: Get Bot Application Token
-        id: get_workflow_token
-        uses: peter-murray/workflow-application-token-action@v1
-        with:
-          application_id: ${{ secrets.BOT_APPLICATION_ID }}
-          application_private_key: ${{ secrets.BOT_APPLICATION_PRIVATE_KEY }}
-
       - name: Download dependencies
-        run: |
-          gh run download -R pyansys/grantami-serverapi-openapi -n "ansys-grantami-serverapi-openapi-wheel" $(gh run list -R pyansys/grantami-serverapi-openapi -w "Build and Test Client Library" --json=databaseId,conclusion --jq 'map(select(.conclusion==\"success\")) | .[0].databaseId') -D deps
-        env:
-          GITHUB_TOKEN: ${{ steps.get_workflow_token.outputs.token }}
+        uses: actions/download-artifact@v3
+        with:
+          name: ansys-grantami-serverapi-openapi-wheel
+          path: deps
 
       - name: Test with tox (integration tests only)
         run: tox -e py39 -- -m "integration"
@@ -124,18 +113,11 @@ jobs:
           sudo apt install pandoc
           sudo apt install texlive-latex-extra latexmk texlive-xetex fonts-freefont-otf xindy
 
-      - name: Get Bot Application Token
-        id: get_workflow_token
-        uses: peter-murray/workflow-application-token-action@v1
-        with:
-          application_id: ${{ secrets.BOT_APPLICATION_ID }}
-          application_private_key: ${{ secrets.BOT_APPLICATION_PRIVATE_KEY }}
-
       - name: Download dependencies
-        run: |
-          gh run download -R pyansys/grantami-serverapi-openapi -n "ansys-grantami-serverapi-openapi-wheel" $(gh run list -R pyansys/grantami-serverapi-openapi -w "Build and Test Client Library" --json=databaseId,conclusion --jq 'map(select(.conclusion==\"success\")) | .[0].databaseId') -D deps
-        env:
-          GITHUB_TOKEN: ${{ steps.get_workflow_token.outputs.token }}
+        uses: actions/download-artifact@v3
+        with:
+          name: ansys-grantami-serverapi-openapi-wheel
+          path: deps
 
       - name: Install library
         run: |
