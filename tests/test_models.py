@@ -13,7 +13,7 @@ from ansys.grantami.serverapi_openapi.models import (
 )
 import pytest
 
-from ansys.grantami.recordlists.models import (
+from ansys.grantami.recordlists import (
     BooleanCriterion,
     RecordList,
     RecordListItem,

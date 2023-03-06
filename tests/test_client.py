@@ -15,8 +15,7 @@ from ansys.grantami.serverapi_openapi.models import (
 import pytest
 import requests
 
-from ansys.grantami.recordlists._connection import RecordListApiClient
-from ansys.grantami.recordlists.models import RecordListItem, SearchResult
+from ansys.grantami.recordlists import RecordListApiClient, RecordListItem, SearchResult
 
 
 @pytest.fixture

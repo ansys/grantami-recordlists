@@ -23,9 +23,9 @@
 # ## Connect to Granta MI
 
 # + tags=[]
-from ansys.grantami.recordlists import Connection
-from ansys.grantami.recordlists.models import (
+from ansys.grantami.recordlists import (
     BooleanCriterion,
+    Connection,
     RecordListItem,
     SearchCriterion,
     UserRole,

@@ -3,7 +3,7 @@ import uuid
 from ansys.openapi.common import ApiException
 import pytest
 
-from ansys.grantami.recordlists.models import (
+from ansys.grantami.recordlists import (
     BooleanCriterion,
     RecordList,
     RecordListItem,

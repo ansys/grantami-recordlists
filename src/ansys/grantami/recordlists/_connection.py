@@ -8,8 +8,8 @@ from ansys.openapi.common import (  # type: ignore[import]
 )
 import requests  # type: ignore[import]
 
+from ._models import BooleanCriterion, RecordList, RecordListItem, SearchCriterion, SearchResult
 from ._utils import _ArgNotProvided, extract_identifier
-from .models import BooleanCriterion, RecordList, RecordListItem, SearchCriterion, SearchResult
 
 PROXY_PATH = "/proxy/v1.svc"
 AUTH_PATH = "/Health/v2.svc"

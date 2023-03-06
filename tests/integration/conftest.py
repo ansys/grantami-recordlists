@@ -3,8 +3,7 @@ import uuid
 
 import pytest
 
-from ansys.grantami.recordlists import Connection
-from ansys.grantami.recordlists.models import RecordListItem
+from ansys.grantami.recordlists import Connection, RecordListItem
 
 
 @pytest.fixture(scope="session")
