@@ -4,6 +4,7 @@ from ansys.grantami.serverapi_openapi import api, models  # type: ignore[import]
 from ansys.openapi.common import (  # type: ignore[import]
     ApiClient,
     ApiClientFactory,
+    ApiException,
     SessionConfiguration,
 )
 import requests  # type: ignore[import]
@@ -13,6 +14,7 @@ from ._utils import _ArgNotProvided, extract_identifier
 
 PROXY_PATH = "/proxy/v1.svc"
 AUTH_PATH = "/Health/v2.svc"
+API_DEFINITION_PATH = "/swagger/v1/swagger.json"
 
 
 class RecordListApiClient(ApiClient):  # type: ignore[misc]
@@ -514,5 +516,38 @@ class Connection(ApiClientFactory):  # type: ignore[misc]
             self._session_configuration,
         )
         client.setup_client(models)
-        # TODO: test connection
+        self._test_connection(client)
         return client
+
+    @staticmethod
+    def _test_connection(client: RecordListApiClient) -> None:
+        """Check if the created client can be used to perform a request.
+
+        This method asserts that the API definition can be obtained.
+        It specifically checks for a 404 error, which most likely means that the targeted Service
+        Layer does not include Server API.
+
+        Parameters
+        ----------
+        client : :class:`~.RecordListApiClient`
+            Client object to test.
+
+        Raises
+        ------
+        ConnectionError
+            Error raised if the test query fails.
+        """
+        try:
+            client.call_api(resource_path=API_DEFINITION_PATH, method="GET")
+        except ApiException as e:
+            if e.status_code == 404:
+                raise ConnectionError(
+                    "Cannot find the Server API definition in Granta MI Service Layer. Ensure a "
+                    "compatible version of Granta MI is available try again."
+                ) from e
+            else:
+                raise ConnectionError(
+                    "An unexpected error occurred when trying to connect Server API in Granta MI "
+                    "Service Layer. Check the Service Layer logs for more information and try "
+                    "again."
+                ) from e
