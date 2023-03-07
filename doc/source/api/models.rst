@@ -13,28 +13,28 @@ Record list
 Record list item
 ~~~~~~~~~~~~~~~~~
 
-.. autoclass:: ansys.grantami.recordlists.models.RecordListItem
+.. autoclass:: ansys.grantami.recordlists.RecordListItem
    :members:
 
 
 User
 ~~~~~
-.. autoclass:: ansys.grantami.recordlists.models.User
+.. autoclass:: ansys.grantami.recordlists.User
    :members:
 
 
 Search criteria
 ~~~~~~~~~~~~~~~
 
-.. autoclass:: ansys.grantami.recordlists.models.SearchCriterion
+.. autoclass:: ansys.grantami.recordlists.SearchCriterion
    :members:
 
 
-.. autoclass:: ansys.grantami.recordlists.models.BooleanCriterion
+.. autoclass:: ansys.grantami.recordlists.BooleanCriterion
    :members:
 
 
-.. autoclass:: ansys.grantami.recordlists.models.UserRole
+.. autoclass:: ansys.grantami.recordlists.UserRole
    :members:
    :undoc-members:
 
@@ -42,5 +42,5 @@ Search criteria
 Search results
 ~~~~~~~~~~~~~~~
 
-.. autoclass:: ansys.grantami.recordlists.models.SearchResult
+.. autoclass:: ansys.grantami.recordlists.SearchResult
    :members:
