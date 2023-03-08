@@ -67,6 +67,7 @@ print_status(list_identifier)
 
 # ### Creating a list revision
 # Revising a record list creates a copy of the original list, on which modifications can be made.
+
 # + tags=[]
 revision_identifier = client.revise_list(list_identifier)
 
