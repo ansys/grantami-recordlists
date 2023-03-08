@@ -1,7 +1,7 @@
 .. _ref_grantami_recordlists_api_reference:
 
 API reference
-=============
+#############
 
 The API for Granta MI RecordLists comprises the following key areas:
 

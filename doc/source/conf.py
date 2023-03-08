@@ -31,6 +31,7 @@ html_theme_options = {
     "show_breadcrumbs": True,
     "additional_breadcrumbs": [
         ("PyAnsys", "https://docs.pyansys.com/"),
+        ("Granta MI", "https://grantami.docs.pyansys.com/"),
     ],
     "switcher": {
         "json_url": f"https://{cname}/versions.json",

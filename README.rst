@@ -28,166 +28,63 @@
    :target: https://github.com/psf/black
    :alt: Black
 
-.. after-badges:
+.. _after-badges:
 
 Granta MI RecordLists
 ======================
 
-A Python wrapper for GRANTA MI RecordLists API
+A Python wrapper for Granta MI Lists API.
+
+To avoid ambiguity with the Python object ``list``, lists available via the Granta MI Lists API are referred to as
+``record lists``. Granta MI users might also know the feature as ``Favorites Lists``.
+
+Using the Granta MI Lists API requires the user to have necessary permissions on the Granta MI Server. Some
+operations on record lists require additional permissions, specific to record lists. For more information,
+see the Help for the Favorites app in Granta MI.
 
 
-How to install
+Installation
 --------------
+.. readme_installation
 
-At least two installation modes are provided: user and developer.
+To install the latest release from `PyPI <https://pypi.org/project/ansys-grantami-recordlists/>`_, use
+this code:
 
-For users
-^^^^^^^^^
+.. code::
 
-In order to install Granta MI RecordLists, make sure you
-have the latest version of `pip`_. To do so, run:
-
-.. code:: bash
-
-    python -m pip install -U pip
-
-Then, you can simply execute:
-
-.. code:: bash
-
-    poetry run python -m pip install ansys-grantami-recordlists
-    
-For developers
-^^^^^^^^^^^^^^
-
-Installing Granta MI RecordLists in developer mode allows
-you to modify the source and enhance it.
-
-Before contributing to the project, please refer to the `PyAnsys Developer's guide`_. You will 
-need to follow these steps:
-
-#. Start by cloning this repository:
-
-   .. code:: bash
-
-      git clone https://github.com/pyansys/grantami-recordlists
-
-#. Create a fresh-clean Python environment and activate it:
-
-   .. code:: bash
-
-      # Create a virtual environment
-      python -m venv .venv
-
-      # Activate it in a POSIX system
-      source .venv/bin/activate
-
-      # Activate it in Windows CMD environment
-      .venv\Scripts\activate.bat
-
-      # Activate it in Windows Powershell
-      .venv\Scripts\Activate.ps1
-
-#. Make sure you have the latest required build system and doc, testing, and CI tools:
-
-   .. code:: bash
-
-      python -m pip install -U pip poetry tox
-      python -m pip install -r requirements/requirements_build.txt
-      python -m pip install -r requirements/requirements_doc.txt
-      python -m pip install -r requirements/requirements_tests.txt
+    pip install ansys-grantami-recordlists
 
 
-#. Install the project in editable mode:
+Alternatively, to install the latest from ``ansys-grantami-recordlists`` `GitHub <https://github.com/pyansys/grantami-recordlists>`_,
+use this code:
 
-    .. code:: bash
-    
-      poetry run python -m pip install ansys-grantami-recordlists
-        
-    #. Finally, verify your development installation by running:
+.. code::
 
-   .. code:: bash
-        
-      tox
+    pip install git:https://github.com/pyansys/grantami-recordlists.git
 
 
-How to testing
---------------
+To install a local *development* version with Git and Poetry, use this code:
 
-This project takes advantage of `tox`_. This tool allows to automate common
-development tasks (similar to Makefile) but it is oriented towards Python
-development. 
+.. code::
 
-Using tox
-^^^^^^^^^
-
-As Makefile has rules, `tox`_ has environments. In fact, the tool creates its
-own virtual environment so anything being tested is isolated from the project in
-order to guarantee project's integrity. The following environments commands are provided:
-
-- **tox -e style**: will check for coding style quality.
-- **tox -e py**: checks for unit tests.
-- **tox -e py-coverage**: checks for unit testing and code coverage.
-- **tox -e doc**: checs for documentation building process.
+    git clone https://github.com/pyansys/grantami-recordlists
+    cd grantami-recordlists
+    poetry install
 
 
-Raw testing
-^^^^^^^^^^^
+The preceding code installs the package and allows you to modify it locally,
+with your changes reflected in your Python setup after restarting the Python kernel.
 
-If required, you can always call the style commands (`black`_, `isort`_,
-`flake8`_...) or unit testing ones (`pytest`_) from the command line. However,
-this does not guarantee that your project is being tested in an isolated
-environment, which is the reason why tools like `tox`_ exist.
+.. readme_installation_end
 
-
-A note on pre-commit
-^^^^^^^^^^^^^^^^^^^^
-
-The style checks take advantage of `pre-commit`_. Developers are not forced but
-encouraged to install this tool via:
-
-.. code:: bash
-
-    python -m pip install pre-commit && pre-commit install
-
-
-Documentation
--------------
-
-For building documentation, you can either run the usual rules provided in the
-`Sphinx`_ Makefile, such us:
-
-.. code:: bash
-
-    make -C doc/ html && your_browser_name doc/html/index.html
-
-However, the recommended way of checking documentation integrity is using:
-
-.. code:: bash
-
-    tox -e doc && your_browser_name .tox/doc_out/index.html
-
-
-Distributing
+Dependencies
 ------------
+.. readme_software_requirements
 
-If you would like to create either source or wheel files, start by installing
-the building requirements and then executing the build module:
+To use the ``ansys.grantami.recordlists`` package, you must have access to a
+Granta MI server that includes Granta MI Server API.
 
-.. code:: bash
+The ``ansys.grantami.recordlists`` package currently supports Python 3.7
+through 3.11 on Windows and Linux.
 
-    python -m pip install -r requirements/requirements_build.txt
-    python -m build
-    python -m twine check dist/*
-
-
-.. LINKS AND REFERENCES
-.. _black: https://github.com/psf/black
-.. _flake8: https://flake8.pycqa.org/en/latest/
-.. _isort: https://github.com/PyCQA/isort
-.. _pip: https://pypi.org/project/pip/
-.. _pre-commit: https://pre-commit.com/
-.. _PyAnsys Developer's guide: https://dev.docs.pyansys.com/
-.. _pytest: https://docs.pytest.org/en/stable/
-.. _Sphinx: https://www.sphinx-doc.org/en/master/
-.. _tox: https://tox.wiki/
+.. readme_software_requirements_end
