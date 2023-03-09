@@ -62,11 +62,14 @@ Tox
 Tests can be run using `tox`_. The project defines tox test environment in ``tox.ini``.
 The following environments commands are provided:
 
-- **tox -e style**: will check for coding style quality.
+.. vale off
+
+- **tox -e style**: checks for coding style quality.
 - **tox -e py**: checks for unit tests.
 - **tox -e py-coverage**: checks for unit testing and code coverage.
 - **tox -e doc**: checks for documentation building process.
 
+.. vale on
 
 Server access
 --------------
@@ -86,8 +89,8 @@ creation and updates of pull requests.
 Code formatting and styling
 ===========================
 
-This project adheres with PyAnsys recommendation of styling and formatting. The easiest way to check compliance is to
-run the following command:
+This project adheres with PyAnsys recommendation of styling and formatting. The easiest way to validate changes are
+compliant is to run the following command:
 
 .. code:: bash
 
