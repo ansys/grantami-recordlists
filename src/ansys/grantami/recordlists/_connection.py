@@ -551,3 +551,9 @@ class Connection(ApiClientFactory):  # type: ignore[misc]
                     "Service Layer. Check the Service Layer logs for more information and try "
                     "again."
                 ) from e
+        except requests.exceptions.RetryError as e:
+            raise ConnectionError(
+                "An unexpected error occurred when trying to connect Granta MI Server API. Check "
+                "that SSL certificates have been configured for communications between Granta MI "
+                "Server and client Granta MI applications."
+            ) from e

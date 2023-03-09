@@ -1,6 +1,8 @@
 import re
 
 import pytest
+import requests.exceptions
+import requests_mock
 
 from ansys.grantami.recordlists import Connection
 from ansys.grantami.recordlists._connection import AUTH_PATH, PROXY_PATH
@@ -37,3 +39,13 @@ def test_unhandled_test_connection_response_raises_informative_error(
         mocker.get(service_matcher, status_code=500)
         with pytest.raises(ConnectionError, match="An unexpected error occurred"):
             Connection(sl_url).with_anonymous().connect()
+
+
+def test_500_on_test_connection_is_handled(sl_url, successful_auth, mocker):
+    with mocker:
+        connection = Connection(sl_url).with_anonymous()
+        mocker.get(requests_mock.ANY, exc=requests.exceptions.RetryError)
+        with pytest.raises(
+            ConnectionError, match="Check that SSL certificates have been configured"
+        ):
+            client = connection.connect()
