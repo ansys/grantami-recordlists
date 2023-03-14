@@ -17,6 +17,9 @@
 # This example shows how to connect to Granta MI and perform advanced operations on record lists,
 # such as publishing, withdrawing, revising a list.
 
+# .. note:: Running this notebook requires permissions to request publication, publish, and revise a
+# list.
+
 # + tags=[]
 from ansys.grantami.recordlists import Connection
 
