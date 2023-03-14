@@ -117,8 +117,9 @@ For building documentation, you can either run the usual rules provided in the
 
     make -C doc/ html && your_browser_name doc/build/html/index.html
 
-It is recommended to run sphinx with the following extra arguments, which ensure all references are valid, and turns
-warnings into errors:
+It is strongly recommended to run sphinx with the following extra arguments. They ensure all references are valid, and
+turn warnings into errors. CI uses the same configuration, so it is advised to resolve any warnings/errors locally
+before pushing changes.
 
 .. code:: bash
 
