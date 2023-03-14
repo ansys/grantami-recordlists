@@ -25,6 +25,10 @@ def client():
     return client
 
 
+def test_client_has_expected_api_url(client):
+    assert client.api_url == "http://server_name/mi_servicelayer/proxy/v1.svc"
+
+
 class TestClientMethod:
     _return_value: Any
     _api: Type
