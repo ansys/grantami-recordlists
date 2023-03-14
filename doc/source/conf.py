@@ -21,7 +21,7 @@ html_theme = "ansys_sphinx_theme"
 html_short_title = html_title = "Granta MI RecordLists"
 html_favicon = ansys_favicon
 
-cname = os.getenv("DOCUMENTATION_CNAME", "refactored-broccoli-35j5wg9.pages.github.io")
+cname = os.getenv("DOCUMENTATION_CNAME", "<DEFAULT_CNAME>")
 """The canonical name of the webpage hosting the documentation."""
 
 # specify the location of your github repo
@@ -37,6 +37,7 @@ html_theme_options = {
         "json_url": f"https://{cname}/versions.json",
         "version_match": get_version_match(__version__),
     },
+    "check_switcher": False,
 }
 
 # Sphinx extensions
