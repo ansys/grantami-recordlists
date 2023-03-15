@@ -13,6 +13,7 @@
    :maxdepth: 3
 
    getting_started/index
+   userguide
    api/index
    examples/index
    contributing

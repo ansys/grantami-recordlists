@@ -17,10 +17,9 @@
 # This notebook demonstrates how to search for record lists, using ``SearchCriterion`` and
 # ``BooleanCriterion``.
 
-# .. note:: Running this notebook requires permissions to request publication, publish and revise a
+# .. note:: Running this notebook requires permissions to request publication, publish, and revise a
 # list.
 
-# ## Connect to Granta MI
 
 # + tags=[]
 from ansys.grantami.recordlists import (
@@ -35,7 +34,7 @@ connection = Connection("http://my_grantami_server/mi_servicelayer").with_autolo
 client = connection.connect()
 # -
 
-# ## Create some lists to search on
+# First, let's create some lists to search on
 
 # + tags=[]
 identifier_a = client.create_list(name="Approved materials - Metals")
@@ -91,12 +90,15 @@ results
 # + tags=[]
 criterion = SearchCriterion(contains_records=["c61e8f3a-d7e1-4b7f-8232-b2495eae6c15"])
 results = client.search_for_lists(criterion, include_items=True)
-print(results)
-print(results[0].items)
+results
+# -
+
+# + tags=[]
+results[0].items
 # -
 
 
-# ## Complex criterion
+# ## Search using a complex criterion
 # Using ``BooleanCriterion``, we can build complex queries. Here we search for published lists
 # following the naming convention "Approved materials - {Material family}" and specifically,
 # metals and ceramics.

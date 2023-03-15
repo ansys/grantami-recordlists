@@ -4,3 +4,5 @@ ansys
 Granta MI
 RecordLists
 API
+Makefile
+jupytext
