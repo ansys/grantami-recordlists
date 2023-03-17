@@ -29,6 +29,10 @@ def test_client_has_expected_api_url(client):
     assert client.api_url == "http://server_name/mi_servicelayer/proxy/v1.svc"
 
 
+def test_client_repr(client):
+    assert repr(client) == "<RecordListApiClient url: http://server_name/mi_servicelayer>"
+
+
 class TestClientMethod:
     _return_value: Any
     _api: Type
@@ -178,12 +182,28 @@ class TestUpdate(TestClientMethod):
             client.update_list(self._mock_uuid, name=None)
         api_method.assert_not_called()
 
-    @pytest.mark.parametrize("prop_name", ["notes", "description"])
-    def test_update_list_single_nullable_args(self, client, api_method, prop_name):
-        client.update_list(self._mock_uuid, **{prop_name: None})
+    @pytest.mark.parametrize("prop_name", ["name"])
+    @pytest.mark.parametrize("prop_value", ["Some text"])
+    def test_update_list_non_nullable_args_with_value(
+        self, client, api_method, prop_name, prop_value
+    ):
+        client.update_list(self._mock_uuid, **{prop_name: prop_value})
         expected_body = [
             MicrosoftAspNetCoreJsonPatchOperationsOperation(
-                value=None,
+                value=prop_value,
+                path=f"/{prop_name}",
+                op="replace",
+            )
+        ]
+        api_method.assert_called_once_with(self._mock_uuid, body=expected_body)
+
+    @pytest.mark.parametrize("prop_name", ["notes", "description"])
+    @pytest.mark.parametrize("prop_value", [None, "Some text"])
+    def test_update_list_single_nullable_args(self, client, api_method, prop_name, prop_value):
+        client.update_list(self._mock_uuid, **{prop_name: prop_value})
+        expected_body = [
+            MicrosoftAspNetCoreJsonPatchOperationsOperation(
+                value=prop_value,
                 path=f"/{prop_name}",
                 op="replace",
             )
@@ -272,6 +292,44 @@ def test_create_list(client, mock_api_method, mock_id):
     assert returned_identifier == mock_id
 
 
+def test_create_list_returns_unexpected_status_code(client, monkeypatch):
+    mock = Mock(
+        spec=requests.Response,
+        status_code=200,
+    )
+
+    mocked_method = Mock(return_value=(mock, 200, {}))
+    monkeypatch.setattr(ListManagementApi, "api_v1_lists_post_with_http_info", mocked_method)
+    list_name = "ListName"
+
+    with pytest.raises(NotImplementedError):
+        returned_identifier = client.create_list(list_name)
+
+
+@pytest.mark.parametrize(
+    "mock_api_method", [{"method_name": "api_v1_lists_post_with_http_info"}], indirect=True
+)
+def test_create_list_with_items(client, mock_api_method, mock_id, example_item):
+    list_name = "ListName"
+
+    returned_identifier = client.create_list(list_name, items=[example_item])
+
+    expected_body = GrantaServerApiListsDtoRecordListCreate(
+        name=list_name,
+        items=GrantaServerApiListsDtoRecordListItems(
+            items=[
+                GrantaServerApiListsDtoListItem(
+                    database_guid=example_item.database_guid,
+                    record_history_guid=example_item.record_history_guid,
+                    table_guid=example_item.table_guid,
+                )
+            ]
+        ),
+    )
+    mock_api_method.assert_called_once_with(_preload_content=False, body=expected_body)
+    assert returned_identifier == mock_id
+
+
 @pytest.mark.parametrize(
     "mock_api_method",
     [{"method_name": "api_v1_lists_list_list_identifier_copy_post_with_http_info"}],
@@ -283,6 +341,24 @@ def test_copy_list(client, mock_api_method, mock_id):
     returned_identifier = client.copy_list(existing_list_identifier)
     mock_api_method.assert_called_once_with(existing_list_identifier, _preload_content=False)
     assert returned_identifier == mock_id
+
+
+def test_copy_list_returns_unexpected_status_code(client, monkeypatch):
+    mock = Mock(
+        spec=requests.Response,
+        status_code=200,
+    )
+
+    mocked_method = Mock(return_value=(mock, 200, {}))
+    monkeypatch.setattr(
+        ListManagementApi,
+        "api_v1_lists_list_list_identifier_copy_post_with_http_info",
+        mocked_method,
+    )
+    existing_list_identifier = str(uuid.uuid4())
+
+    with pytest.raises(NotImplementedError):
+        returned_identifier = client.copy_list(existing_list_identifier)
 
 
 @pytest.mark.parametrize(
@@ -297,6 +373,24 @@ def test_revise_list(client, mock_api_method, mock_id):
 
     mock_api_method.assert_called_once_with(existing_list_identifier, _preload_content=False)
     assert returned_identifier == mock_id
+
+
+def test_revise_list_returns_unexpected_status_code(client, monkeypatch):
+    mock = Mock(
+        spec=requests.Response,
+        status_code=200,
+    )
+
+    mocked_method = Mock(return_value=(mock, 200, {}))
+    monkeypatch.setattr(
+        ListManagementApi,
+        "api_v1_lists_list_list_identifier_revise_post_with_http_info",
+        mocked_method,
+    )
+    existing_list_identifier = str(uuid.uuid4())
+
+    with pytest.raises(NotImplementedError):
+        returned_identifier = client.revise_list(existing_list_identifier)
 
 
 class TestSearch:

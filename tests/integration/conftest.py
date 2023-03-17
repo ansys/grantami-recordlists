@@ -3,7 +3,7 @@ import uuid
 
 import pytest
 
-from ansys.grantami.recordlists import Connection, RecordListItem
+from ansys.grantami.recordlists import Connection
 
 
 @pytest.fixture(scope="session")
@@ -95,16 +95,6 @@ def new_list_id(admin_client, request, list_name):
     yield list_id
     if cleanup:
         admin_client.delete_list(list_id)
-
-
-@pytest.fixture(scope="session")
-def example_item():
-    # GUIDs need only have the correct format for record lists test to pass.
-    return RecordListItem(
-        "e595fe23-b450-4d18-8c08-4a0f378ef095",
-        "81dff531-0254-4fbe-9621-174b10aaee3d",
-        "3bc2b82f-0199-4f3b-a7af-8d520250b180",
-    )
 
 
 @pytest.fixture
