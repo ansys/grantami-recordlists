@@ -58,6 +58,13 @@ class TestRecordList:
         record_list = RecordList(**self._data)
         return record_list
 
+    def test_repr(self, record_list):
+        assert repr(record_list) == "<RecordList name: UnitTestList>"
+
+    def test_search_result_repr(self, record_list):
+        result = SearchResult(record_list, None)
+        assert repr(result) == "<SearchResult name: UnitTestList>"
+
     @pytest.mark.parametrize("attr_name", list(_data.keys()))
     def test_record_list_is_read_only(self, record_list, attr_name):
         with pytest.raises(AttributeError):
@@ -281,6 +288,39 @@ class TestSearchCriterion:
         assert isinstance(leaf_criterion, GrantaServerApiListsDtoRecordListSearchCriterion)
         assert leaf_criterion.name_contains == "A"
         assert leaf_criterion.user_role == GrantaServerApiListsDtoUserRole.OWNER
+
+    @pytest.mark.parametrize(
+        ["name", "value"],
+        [
+            ("name_contains", "Approved materials"),
+            ("user_role", "Owner"),
+            ("is_published", True),
+            ("is_awaiting_approval", True),
+            ("is_internal_use", True),
+            ("is_revision", True),
+            ("contains_records_in_databases", [str(uuid.uuid4())]),
+            ("contains_records_in_integration_schemas", [str(uuid.uuid4())]),
+            ("contains_records_in_tables", [str(uuid.uuid4())]),
+            ("contains_records", [str(uuid.uuid4())]),
+            ("user_can_add_or_remove_items", True),
+        ],
+    )
+    def test_simple_search_setters(self, name, value):
+        search_criterion = SearchCriterion()
+        setattr(search_criterion, name, value)
+        assert getattr(search_criterion, f"_{name}") == value
+
+    def test_boolean_search_setter_any(self):
+        search_criterion = SearchCriterion()
+        boolean_criterion = BooleanCriterion()
+        boolean_criterion.match_any = [search_criterion]
+        assert boolean_criterion._match_any == [search_criterion]
+
+    def test_boolean_search_setter_all(self):
+        search_criterion = SearchCriterion()
+        boolean_criterion = BooleanCriterion()
+        boolean_criterion.match_all = [search_criterion]
+        assert boolean_criterion._match_all == [search_criterion]
 
 
 class TestSearchResult:
