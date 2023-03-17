@@ -112,6 +112,14 @@ jobs:
       - name: Test with tox
         run: tox -- -m "not integration"
 
+      - name: "Upload coverage results"
+        uses: actions/upload-artifact@v3
+        if: matrix.python-version == ${{ env.MAIN_PYTHON_VERSION }}
+        with:
+          name: coverage-html
+          path: .cov/html
+          retention-days: 7
+
   server_checks:
     name: "Server checks"
     needs: [tests]
