@@ -10,7 +10,7 @@ from ansys.grantami.serverapi_openapi.models import (
     GrantaServerApiListsDtoRecordListHeader,
     GrantaServerApiListsDtoRecordListItems,
     GrantaServerApiListsDtoRecordListResource,
-    MicrosoftAspNetCoreJsonPatchOperationsOperation,
+    JsonPatchDocument,
 )
 import pytest
 import requests
@@ -189,7 +189,7 @@ class TestUpdate(TestClientMethod):
     ):
         client.update_list(self._mock_uuid, **{prop_name: prop_value})
         expected_body = [
-            MicrosoftAspNetCoreJsonPatchOperationsOperation(
+            JsonPatchDocument(
                 value=prop_value,
                 path=f"/{prop_name}",
                 op="replace",
@@ -202,7 +202,7 @@ class TestUpdate(TestClientMethod):
     def test_update_list_single_nullable_args(self, client, api_method, prop_name, prop_value):
         client.update_list(self._mock_uuid, **{prop_name: prop_value})
         expected_body = [
-            MicrosoftAspNetCoreJsonPatchOperationsOperation(
+            JsonPatchDocument(
                 value=prop_value,
                 path=f"/{prop_name}",
                 op="replace",

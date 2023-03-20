@@ -436,8 +436,8 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
     @staticmethod
     def _create_patch_operation(
         value: Optional[str], name: str, op: str = "replace"
-    ) -> models.MicrosoftAspNetCoreJsonPatchOperationsOperation:
-        return models.MicrosoftAspNetCoreJsonPatchOperationsOperation(
+    ) -> models.JsonPatchDocument:
+        return models.JsonPatchDocument(
             value=value,
             path=f"/{name}",
             op=op,
