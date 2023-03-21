@@ -195,17 +195,17 @@ jobs:
     needs: [server_checks]
     if: github.event_name == 'push' && contains(github.ref, 'refs/tags')
     steps:
-      - uses: pyansys/actions/doc-deploy-stable@v4
-        name: "Deploy stable documentation"
-        with:
-          cname: ${{ env.DOCUMENTATION_CNAME }}
-          token: ${{ secrets.GITHUB_TOKEN }}
-          doc-artifact-name: documentation-html
+#      - uses: pyansys/actions/doc-deploy-stable@v4
+#        name: "Deploy stable documentation"
+#        with:
+#          cname: ${{ env.DOCUMENTATION_CNAME }}
+#          token: ${{ secrets.GITHUB_TOKEN }}
+#          doc-artifact-name: documentation-html
 
-      - uses: actions/download-artifact@v3
-        with:
-          name: ${{ env.LIBRARY_NAME }}-artifacts
-          path: dist/${{ env.LIBRARY_NAME }}-artifacts/
+#      - uses: actions/download-artifact@v3
+#        with:
+#          name: ${{ env.LIBRARY_NAME }}-artifacts
+#          path: dist/${{ env.LIBRARY_NAME }}-artifacts/
 
       - uses: pyansys/actions/release-github@v4
         name: "Release to GitHub"
