@@ -121,7 +121,7 @@ jobs:
 
       - name: Install library
         run: |
-          pip install poetry --disable-pip-version-check
+          pip install poetry~=1.3.0 --disable-pip-version-check
           poetry install --with doc
 
       - name: Build HTML Documentation
@@ -138,14 +138,14 @@ jobs:
       - name: Upload HTML Documentation
         uses: actions/upload-artifact@v3
         with:
-          name: ansys-grantami-recordlists-Documentation-html
+          name: documentation-html
           path: doc/build/html
           retention-days: 7
 
       - name: Upload PDF Documentation
         uses: actions/upload-artifact@v3
         with:
-          name: ansys-grantami-recordlists-Documentation-pdf
+          name: documentation-pdf
           path: doc/build/latex/*.pdf
           retention-days: 7
 
