@@ -437,7 +437,7 @@ class SearchCriterion:
 
     @property
     def contains_records_in_databases(self) -> Optional[List[str]]:
-        """Limits results to lists containing records in the specified databases."""
+        """Limits results to lists containing records in databases specified by GUIDs."""
         return self._contains_records_in_databases
 
     @contains_records_in_databases.setter
@@ -446,7 +446,7 @@ class SearchCriterion:
 
     @property
     def contains_records_in_integration_schemas(self) -> Optional[List[str]]:
-        """Limits results to lists containing records in the specified integration schemas."""
+        """Limits results to lists containing records in integration schemas specified by GUIDs."""
         return self._contains_records_in_integration_schemas
 
     @contains_records_in_integration_schemas.setter
@@ -455,7 +455,7 @@ class SearchCriterion:
 
     @property
     def contains_records_in_tables(self) -> Optional[List[str]]:
-        """Limits results to lists containing records in the specified tables specified."""
+        """Limits results to lists containing records in tables specified by GUIDs."""
         return self._contains_records_in_tables
 
     @contains_records_in_tables.setter
@@ -464,7 +464,7 @@ class SearchCriterion:
 
     @property
     def contains_records(self) -> Optional[List[str]]:
-        """Limits results to lists containing records specified by their GUIDs."""
+        """Limits results to lists containing records specified by their history GUIDs."""
         return self._contains_records
 
     @contains_records.setter
