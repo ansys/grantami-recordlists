@@ -8,13 +8,17 @@ name = "ansys-grantami-recordlists"
 version = "0.1.dev2"
 description = "A python wrapper for the Granta MI RecordLists API"
 license = "MIT"
-authors = ["ANSYS, Inc. <ansys.support@ansys.com>"]
-maintainers = ["PyAnsys developers <pyansys.maintainers@ansys.com>"]
+authors = ["ANSYS, Inc. <pyansys.core@ansys.com>"]
+maintainers = ["ANSYS, Inc. <pyansys.core@ansys.com>"]
 readme = "README.rst"
 repository = "https://github.com/pyansys/grantami-recordlists"
 classifiers = [
     "Development Status :: 4 - Beta",
     "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
 ]
