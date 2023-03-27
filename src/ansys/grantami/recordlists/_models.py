@@ -188,6 +188,19 @@ class RecordListItem:
     Describes an item of a :class:`RecordList`, i.e. a record in a Granta MI database.
 
     An item does not necessarily represent a record that exists on the server.
+
+    Parameters
+    ----------
+    database_guid : str
+       GUID of the database.
+    table_guid : str
+       GUID of the table.
+    record_history_guid : str
+       Record History GUID.
+    record_version : int, optional
+       Record version number - for records in version-controlled tables. If provided, the requested
+       version of the record is added to the list. If not provided, the list tracks the latest
+       available version of the record.
     """
 
     def __init__(
@@ -229,7 +242,8 @@ class RecordListItem:
         Record GUID.
 
         Only populated if the :class:`RecordListItem` has been obtained via an API request and
-        represents a record in a version-controlled table.
+        represents a specific version of a record, specified with
+        :attr:`~RecordListItem.record_version`.
         """
         return self._record_guid
 
