@@ -19,7 +19,7 @@ class RecordList:
         identifier: str,
         name: str,
         created_timestamp: datetime,
-        created_user: "User",
+        created_user: "UserOrGroup",
         published: bool,
         is_revision: bool,
         awaiting_approval: bool,
@@ -27,16 +27,16 @@ class RecordList:
         description: Optional[str] = None,
         notes: Optional[str] = None,
         last_modified_timestamp: Optional[datetime] = None,
-        last_modified_user: Optional["User"] = None,
+        last_modified_user: Optional["UserOrGroup"] = None,
         published_timestamp: Optional[datetime] = None,
-        published_user: Optional["User"] = None,
+        published_user: Optional["UserOrGroup"] = None,
         parent_record_list_identifier: Optional[str] = None,
     ):
 
         self._identifier: str = identifier
         self._name: str = name
         self._created_timestamp: datetime = created_timestamp
-        self._created_user: User = created_user
+        self._created_user: UserOrGroup = created_user
         self._published: bool = published
         self._is_revision: bool = is_revision
         self._awaiting_approval: bool = awaiting_approval
@@ -45,9 +45,9 @@ class RecordList:
         self._description: Optional[str] = description
         self._notes: Optional[str] = notes
         self._last_modified_timestamp: Optional[datetime] = last_modified_timestamp
-        self._last_modified_user: Optional[User] = last_modified_user
+        self._last_modified_user: Optional[UserOrGroup] = last_modified_user
         self._published_timestamp: Optional[datetime] = published_timestamp
-        self._published_user: Optional[User] = published_user
+        self._published_user: Optional[UserOrGroup] = published_user
 
         self._parent_record_list_identifier: Optional[str] = parent_record_list_identifier
 
@@ -92,7 +92,7 @@ class RecordList:
         return self._created_timestamp
 
     @property
-    def created_user(self) -> "User":
+    def created_user(self) -> "UserOrGroup":
         """User who created the Record List. Read-only."""
         return self._created_user
 
@@ -102,7 +102,7 @@ class RecordList:
         return self._last_modified_timestamp
 
     @property
-    def last_modified_user(self) -> Optional["User"]:
+    def last_modified_user(self) -> Optional["UserOrGroup"]:
         """User who last modified the Record List. Read-only."""
         return self._last_modified_user
 
@@ -113,7 +113,7 @@ class RecordList:
         return self._published_timestamp
 
     @property
-    def published_user(self) -> Optional["User"]:
+    def published_user(self) -> Optional["UserOrGroup"]:
         """User who published/withdrew the Record List. Read-only."""
         # TODO also represents last withdrawal date. Consider renaming
         return self._published_user
@@ -163,15 +163,17 @@ class RecordList:
             description=model.description,
             notes=model.notes,
             created_timestamp=model.created_timestamp,
-            created_user=User._from_model(model.created_user),
+            created_user=UserOrGroup._from_model(model.created_user),
             is_revision=model.is_revision,
             published=model.published,
             awaiting_approval=model.awaiting_approval,
             internal_use=model.internal_use,
             last_modified_timestamp=model.last_modified_timestamp,
-            last_modified_user=User._from_model(model.last_modified_user),
+            last_modified_user=UserOrGroup._from_model(model.last_modified_user),
             published_timestamp=model.published_timestamp,
-            published_user=User._from_model(model.published_user) if model.published_user else None,
+            published_user=UserOrGroup._from_model(model.published_user)
+            if model.published_user
+            else None,
             parent_record_list_identifier=model.parent_record_list_identifier,
         )
         return instance
@@ -278,8 +280,7 @@ class RecordListItem:
         )
 
 
-class User:
-    # TODO change name to something user-friendly that means User AND Group
+class UserOrGroup:
     """Read-only description of a Granta MI User or Group."""
 
     def __init__(self) -> None:
@@ -303,9 +304,9 @@ class User:
         return self._name
 
     @classmethod
-    def _from_model(cls, dto_user: models.GrantaServerApiListsDtoUserOrGroup) -> "User":
+    def _from_model(cls, dto_user: models.GrantaServerApiListsDtoUserOrGroup) -> "UserOrGroup":
         """Instantiate from a model defined in the auto-generated client code."""
-        user: User = User()
+        user: UserOrGroup = UserOrGroup()
         user._identifier = dto_user.identifier
         user._display_name = dto_user.display_name
         user._name = dto_user.name

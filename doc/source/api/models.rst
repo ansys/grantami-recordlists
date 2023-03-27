@@ -19,7 +19,7 @@ Record list item
 
 User
 ~~~~~
-.. autoclass:: ansys.grantami.recordlists.User
+.. autoclass:: ansys.grantami.recordlists.UserOrGroup
    :members:
 
 

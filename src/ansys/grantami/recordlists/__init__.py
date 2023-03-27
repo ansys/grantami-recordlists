@@ -8,7 +8,7 @@ from ._models import (
     RecordListItem,
     SearchCriterion,
     SearchResult,
-    User,
+    UserOrGroup,
     UserRole,
 )
 
@@ -20,7 +20,7 @@ __all__ = [
     "RecordListItem",
     "SearchCriterion",
     "SearchResult",
-    "User",
+    "UserOrGroup",
     "UserRole",
 ]
 __version__ = importlib_metadata.version(__name__.replace(".", "-"))

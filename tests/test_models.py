@@ -19,7 +19,7 @@ from ansys.grantami.recordlists import (
     RecordListItem,
     SearchCriterion,
     SearchResult,
-    User,
+    UserOrGroup,
     UserRole,
 )
 
@@ -27,7 +27,7 @@ from ansys.grantami.recordlists import (
 class TestRecordList:
     _list_name = "UnitTestList"
     _mock_id = "889dcaef-1ef4-4b92-8ff9-46f08d936f39"
-    _mock_user = Mock(spec=User)
+    _mock_user = Mock(spec=UserOrGroup)
 
     _notes = "TestNotes"
     _description = "TestDescription"
@@ -107,9 +107,9 @@ class TestRecordList:
         record_list = RecordList(**record_list_data)
         assert getattr(record_list, attr_name) is None
 
-    @patch("ansys.grantami.recordlists._models.User")
+    @patch("ansys.grantami.recordlists._models.UserOrGroup")
     def test_dto_mapping(self, mock_user_class):
-        # Overriding User.from_model method to a no-op. It is tested separately
+        # Overriding UserOrGroup.from_model method to a no-op. It is tested separately
         mock_user_class._from_model = lambda x: x
         # Using mock to generate unique values for each property
         mock_dto = Mock(spec=GrantaServerApiListsDtoRecordListHeader)
@@ -138,7 +138,7 @@ def test_user_dto_mapping():
     display_name = "domain\\displayname"
     dto_user = GrantaServerApiListsDtoUserOrGroup(user_id, display_name, username)
 
-    user = User._from_model(dto_user)
+    user = UserOrGroup._from_model(dto_user)
 
     assert user.identifier == user_id
     assert user.name == username
