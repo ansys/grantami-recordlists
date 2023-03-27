@@ -220,10 +220,23 @@ class TestRevisionLifeCycle(TestLifeCyclePublishedAndNotAwaitingApproval):
 
         with pytest.raises(ApiException) as e:
             revision_list_details = admin_client.get_list(revision_id)
-        e.value.status_code == 404
+        assert e.value.status_code == 404
 
         original_list_details = admin_client.get_list(new_list_id)
         assert original_list_details.notes == updated_note
+
+    def test_cannot_edit_properties_of_published_list(self, admin_client, new_list_id):
+        with pytest.raises(ApiException) as e:
+            admin_client.update_list(new_list_id, description="Updated description")
+        assert e.value.status_code == 403
+
+    def test_cannot_edit_items_of_published_list(self, admin_client, new_list_id, example_item):
+        with pytest.raises(ApiException) as e:
+            admin_client.add_items_to_list(
+                new_list_id,
+                items=[example_item],
+            )
+        assert e.value.status_code == 403
 
 
 class TestLifeCyclePublishedAndAwaitingApproval(TestLifeCycle):
@@ -259,9 +272,6 @@ class TestLifeCyclePublishedAndAwaitingApproval(TestLifeCycle):
         with pytest.raises(ApiException, match=self._already_awaiting_approval_error) as e:
             admin_client.request_list_approval(new_list_id)
         assert e.value.status_code == 400
-
-
-# TODO test published list cannot be updated (properties or items)
 
 
 class TestSearch:
@@ -378,7 +388,6 @@ class TestSearch:
         criteria = SearchCriterion(user_role=UserRole.NONE)
         results = admin_client.search_for_lists(criteria)
         assert len(results) == 0
-        # TODO: Perhaps not worth keeping None as a value. Check what it's meant to be.
 
     def test_search_role_is_owner(self, admin_client, list_name):
         criteria = SearchCriterion(name_contains=list_name, user_role=UserRole.OWNER)
