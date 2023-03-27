@@ -7,9 +7,12 @@ from ansys.grantami.serverapi_openapi import models  # type: ignore
 
 
 class RecordList:
-    # TODO Skipped, might be for internal use?
-    #  - metadata
-    """Describes a RecordList as obtained from the API. Read-only."""
+    """
+    Describes a RecordList as obtained from the API.
+
+    Read-only - users are never expected to instantiate this class or modify instances of the
+    class.
+    """
 
     def __init__(
         self,
@@ -23,9 +26,7 @@ class RecordList:
         internal_use: bool,
         description: Optional[str] = None,
         notes: Optional[str] = None,
-        # TODO is set at creation, so not optional?
         last_modified_timestamp: Optional[datetime] = None,
-        # TODO is set at creation, so not optional?
         last_modified_user: Optional["User"] = None,
         published_timestamp: Optional[datetime] = None,
         published_user: Optional["User"] = None,
@@ -139,9 +140,6 @@ class RecordList:
 
         Lists flagged as for internal use are periodically deleted from the system.
         """
-        # TODO internal_use flags that the list has been created by another MI application. Internal
-        #  lists are periodically deleted.
-        #  Consider not exposing the property and filtering out all internal lists?
         return self._internal_use
 
     @property
