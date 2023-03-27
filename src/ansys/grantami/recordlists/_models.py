@@ -109,13 +109,11 @@ class RecordList:
     @property
     def published_timestamp(self) -> Optional[datetime]:
         """Datetime at which the Record List was published. Read-only."""
-        # TODO also represents last withdrawal date. Consider renaming
         return self._published_timestamp
 
     @property
     def published_user(self) -> Optional["UserOrGroup"]:
         """User who published/withdrew the Record List. Read-only."""
-        # TODO also represents last withdrawal date. Consider renaming
         return self._published_user
 
     @property

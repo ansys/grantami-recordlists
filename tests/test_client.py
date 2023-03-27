@@ -56,8 +56,6 @@ class TestReadList(TestClientMethod):
         client.get_list(identifier)
         api_method.assert_called_once_with(identifier)
 
-    # TODO test variations of invalid identifiers
-
 
 class TestReadAllLists(TestClientMethod):
     _return_value = []
@@ -68,8 +66,6 @@ class TestReadAllLists(TestClientMethod):
         lists = client.get_all_lists()
         api_method.assert_called_once_with()
         assert lists == []
-
-    # TODO test with return value
 
 
 class TestReadItems(TestClientMethod):
@@ -85,8 +81,6 @@ class TestReadItems(TestClientMethod):
 
         api_method.assert_called_once_with(identifier)
         assert items == []
-
-    # TODO test with return value
 
 
 class TestAddItems(TestClientMethod):
@@ -151,9 +145,6 @@ class TestRemoveItems(TestClientMethod):
 
         assert response is None
         api_method.assert_called_once_with(identifier, body=expected_body)
-
-
-# TODO unit test for create list when server-openapi documents its 201 response.
 
 
 class TestDeleteList(TestClientMethod):
