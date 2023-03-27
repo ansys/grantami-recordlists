@@ -378,7 +378,6 @@ class TestSearch:
         criteria = SearchCriterion(user_role=UserRole.NONE)
         results = admin_client.search_for_lists(criteria)
         assert len(results) == 0
-        # TODO: Perhaps not worth keeping None as a value. Check what it's meant to be.
 
     def test_search_role_is_owner(self, admin_client, list_name):
         criteria = SearchCriterion(name_contains=list_name, user_role=UserRole.OWNER)

@@ -605,9 +605,9 @@ class UserRole(str, Enum):
     Can be used in :attr:`SearchCriterion.user_role`.
     """
 
-    NONE = (
-        models.GrantaServerApiListsDtoUserRole.NONE
-    )  # TODO: = Search for lists one has no permissions on?
+    NONE = models.GrantaServerApiListsDtoUserRole.NONE
+    """:class:`UserRole` is currently only supported in searches. Searching for lists with user
+    role = :attr:`.NONE` as criteria would exclude all lists from the results."""
     OWNER = models.GrantaServerApiListsDtoUserRole.OWNER
     SUBSCRIBER = models.GrantaServerApiListsDtoUserRole.SUBSCRIBER
     CURATOR = models.GrantaServerApiListsDtoUserRole.CURATOR
