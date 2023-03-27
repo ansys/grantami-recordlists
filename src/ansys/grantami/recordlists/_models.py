@@ -281,7 +281,11 @@ class RecordListItem:
 
 
 class UserOrGroup:
-    """Read-only description of a Granta MI User or Group."""
+    """Description of a Granta MI User or Group.
+
+    Read-only - users are never expected to instantiate this class or modify instances of the
+    class.
+    """
 
     def __init__(self) -> None:
         self._identifier: Optional[str] = None
@@ -612,7 +616,11 @@ class UserRole(str, Enum):
 
 
 class SearchResult:
-    """Describes the result of a search."""
+    """Describes the result of a search.
+
+    Read-only - users are never expected to instantiate this class or modify instances of the
+    class.
+    """
 
     def __init__(self, list_details: RecordList, items: Optional[List[RecordListItem]]):
         self._list_details = list_details
