@@ -32,6 +32,6 @@ Check that you can start the RecordLists Client from Python by running this code
     <RecordListApiClient url: http://my.server.name/mi_servicelayer>
 
 If you see a response from the server, congratulations. You can start using
-the record lists client. For information about available queries,
-see :ref:`ref_grantami_recordlists_userguide`. For more in-depth descriptions,
+the record lists client. For more detailed examples,
+see :ref:`_ref_grantami_recordlists_examples`. For more in-depth descriptions,
 consult :ref:`ref_grantami_recordlists_api_reference`.
