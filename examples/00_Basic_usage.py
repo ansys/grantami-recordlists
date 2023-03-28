@@ -13,10 +13,19 @@
 #     name: python3
 # ---
 
-# # Basic usage
+# # Getting started
 # This example shows how to connect to Granta MI and perform basic operations on record lists.
 
 # ## Connect to Granta MI
+
+# First, use the ``ansys.grantami.recordlists.Connection`` class to connect to the Granta MI server. The ``Connection``
+# class uses a fluent interface to build the connection, which is always invoked in the following sequence:
+#
+# 1. Specify your Granta MI Service Layer URL as a parameter to the ``Connection`` class.
+# 2. Specify the authentication method using a ``Connection.with_...()`` method.
+# 3. Use the ``Connection.connect()`` method to finalize the connection.
+#
+# This returns a client object, called ``client`` in these examples.
 
 # + tags=[]
 from ansys.grantami.recordlists import Connection, RecordListItem
@@ -25,8 +34,7 @@ connection = Connection("http://my_grantami_server/mi_servicelayer").with_autolo
 client = connection.connect()
 # -
 
-# ## CRUD operations
-# ### Creating a new list
+# ## Create a new record list
 
 # + tags=[]
 list_identifier = client.create_list(
@@ -36,7 +44,7 @@ list_identifier = client.create_list(
 list_identifier
 # -
 
-# ### Getting details of a record list
+# ## Get the details of an existing record list
 
 # + tags=[]
 list_details = client.get_list(list_identifier)
@@ -44,28 +52,28 @@ list_details
 # -
 
 # + tags=[]
-print(list_details.name)
-print(list_details.identifier)
-print(list_details.notes)
-print(list_details.description)
-print(list_details.created_timestamp)
+print(f"Name: {list_details.name}")
+print(f"Identifier: {list_details.identifier}")
+print(f"Notes: {list_details.notes}")
+print(f"Description: {list_details.description}")
+print(f"Created timestamp: {list_details.created_timestamp}")
 # -
 
-# ### Getting all record lists
+# ## Get all record lists
 
 # + tags=[]
 all_lists = client.get_all_lists()
 all_lists
 # -
 
-# ### Copying a record list
+# ## Copy a record list
 
 # + tags=[]
 copied_list_identifier = client.copy_list(list_identifier)
 copied_list_identifier
 # -
 
-# ### Updating a record list
+# ## Update a record list
 
 # + tags=[]
 copied_list_details = client.update_list(
@@ -74,31 +82,30 @@ copied_list_details = client.update_list(
     description=None,
     notes="Copy of the example list",
 )
-print(copied_list_details.name)
-print(copied_list_details.identifier)
-print(copied_list_details.description)
-print(copied_list_details.notes)
+print(f"Name: {copied_list_details.name}")
+print(f"Identifier: {copied_list_details.identifier}")
+print(f"Notes: {copied_list_details.notes}")
+print(f"Description: {copied_list_details.description}")
+print(f"Created timestamp: {copied_list_details.created_timestamp}")
 # -
 
-# ### Deleting a record list
+# ## Delete a record list
 
 # + tags=[]
 client.delete_list(copied_list_identifier)
 # -
 
-# ## Managing record list items
-# ### Read items of a record list
-# We have just created the record list. We can get its items and confirm that there aren't any.
+# ## Read the items in a record list
+# The list was created at the beginning of this example, so the list is currently empty.
 
 # + tags=[]
 items = client.get_list_items(list_identifier)
 items
 # -
 
-# ### Add items to a record list
-# One can add items to a list, using `add_items_to_list`.
+# ## Add items to a record list
+# Add items to a list using ``add_items_to_list``.
 # Items are described using the database GUID, table GUID, and record history GUID.
-# We then retrieve the items again, and confirm that the list now includes the added items.
 
 # + tags=[]
 client.add_items_to_list(
@@ -111,19 +118,28 @@ client.add_items_to_list(
         ),
     ],
 )
+# -
+
+# Then retrieve the items and confirm that the record list now includes the added items.
+
+# + tags=[]
 list_items = client.get_list_items(list_identifier)
 list_items
 # -
 
-# ### Remove items from a record list
-# One can remove items from a list, using `remove_items_from_list`.
-# We then retrieve the items again, and confirm that the list has no items anymore.
+# ## Remove items from a record list
+# Remove items from a record list using ``remove_items_from_list``.
 
 # + tags=[]
 client.remove_items_from_list(
     list_identifier,
     items=list_items,
 )
+# -
+
+# Then retrieve the items again and confirm that the record list is empty.
+
+# + tags=[]
 items = client.get_list_items(list_identifier)
 items
 # -

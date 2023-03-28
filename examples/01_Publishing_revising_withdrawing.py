@@ -13,12 +13,18 @@
 #     name: python3
 # ---
 
-# # Advanced usage
+# # Publishing, revising, and withdrawing record lists
 # This example shows how to connect to Granta MI and perform advanced operations on record lists,
-# such as publishing, withdrawing, revising a list.
+# such as publishing, withdrawing, and revising a list. For more information about the concepts discussed
+# here, see the Help in the Granta MI Favorites app.
 
-# .. note:: Running this notebook requires permissions to request publication, publish, and revise a
-# list.
+# .. note:: Running this notebook requires permissions to request publication of, to publish, and to revise a
+# record list. Contact your Granta MI administrator for more information.
+
+# ## Connect to Granta MI and create a record list
+
+# Import the ``Connection`` class and create the connection. See the [Basic usage](00_Basic_usage.ipynb)
+# example for more details.
 
 # + tags=[]
 from ansys.grantami.recordlists import Connection
@@ -26,6 +32,8 @@ from ansys.grantami.recordlists import Connection
 connection = Connection("http://my_grantami_server/mi_servicelayer").with_autologon()
 client = connection.connect()
 # -
+
+# Create a record list for use in this example.
 
 # + tags=[]
 list_identifier = client.create_list(
@@ -35,9 +43,9 @@ list_identifier = client.create_list(
 list_identifier
 # -
 
-# Record lists include properties describing their current status: whether they are published or
-# awaiting approval.
-# We define a function to retrieve the details of a list and print its statuses.
+# Record lists include two properties describing two aspects of their status: whether they are awaiting approval to
+# be published, and whether they are currently published.
+# Define a function to retrieve the details of a record list and display the status properties.
 
 # + tags=[]
 def print_status(identifier):
@@ -49,7 +57,10 @@ def print_status(identifier):
 print_status(list_identifier)
 # -
 
-# ## Requesting publication
+# ## Publish a record list
+
+# A record list is proposed for publication by calling the ``request_list_approval`` method with the identifier
+# of the record list to be published.
 
 # + tags=[]
 client.request_list_approval(list_identifier)
@@ -57,8 +68,7 @@ client.request_list_approval(list_identifier)
 print_status(list_identifier)
 # -
 
-# ## Publishing
-# A published list cannot be modified. To update a published list, one can create a revision of it.
+# Publish the record list by using the ``publish_list`` method.
 
 # + tags=[]
 client.publish_list(list_identifier)
@@ -66,10 +76,11 @@ client.publish_list(list_identifier)
 print_status(list_identifier)
 # -
 
-# ## Revising a list
+# ## Revise a record list
 
-# ### Creating a list revision
-# Revising a record list creates a copy of the original list, on which modifications can be made.
+# A published record list cannot be modified directly. Instead, first create a revision of the published record list
+# using the ``revise_list`` method. This creates an editable copy of the original record list (a list revision), and
+# leaves the original record list unchanged.
 
 # + tags=[]
 revision_identifier = client.revise_list(list_identifier)
@@ -77,7 +88,7 @@ revision_identifier = client.revise_list(list_identifier)
 print_status(list_identifier)
 # -
 
-# The original list is unchanged. The revision list includes a property tracking the parent list:
+# The record list revision includes a property tracking the parent record list:
 
 # + tags=[]
 revision_details = client.get_list(revision_identifier)
@@ -86,9 +97,8 @@ print(f"Is revision: {revision_details.is_revision}")
 print(f"Parent identifier: {revision_details.parent_record_list_identifier}")
 # -
 
-# ### Updating a published list
-# Modifications made to the revision list will be applied to the original list when the revision
-# list is published. At this point, the revision list will also be deleted.
+# Modifications made to the list revision are applied to the original list when the list revision
+# is published. Once the original list is updated, the list revision deleted and is no longer available.
 
 # + tags=[]
 updated_revision_list = client.update_list(
@@ -97,15 +107,14 @@ updated_revision_list = client.update_list(
 client.request_list_approval(revision_identifier)
 client.publish_list(revision_identifier)
 
-# Checking the notes of the original list
+# Check the notes of the list to confirm the revisions were made successfully.
 list_details = client.get_list(list_identifier)
 print(f"Notes: {list_details.notes}")
 print(f"Is published: {list_details.published}")
 # -
 
-# ## Requesting withdrawal
-# When a list is already published, calling `request_list_approval` is equivalent to requesting
-# the withdrawal of the list.
+# ## Withdraw a record list
+# When a record list is in the published state, calling ``request_list_approval`` requests the withdrawal of that list.
 
 # + tags=[]
 client.request_list_approval(list_identifier)
@@ -113,7 +122,7 @@ client.request_list_approval(list_identifier)
 print_status(list_identifier)
 # -
 
-# ## Withdrawing
+# Use the ``unpublish_list`` method to withdraw a record list.
 
 # + tags=[]
 client.unpublish_list(list_identifier)
