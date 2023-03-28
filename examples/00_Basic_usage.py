@@ -18,8 +18,9 @@
 
 # ## Connect to Granta MI
 
-# First, use the ``ansys.grantami.recordlists.Connection`` class to connect to the Granta MI server. The ``Connection``
-# class uses a fluent interface to build the connection, which is always invoked in the following sequence:
+# First, use the ``ansys.grantami.recordlists.Connection`` class to connect to the Granta MI
+# server. The ``Connection`` class uses a fluent interface to build the connection, which is
+# always invoked in the following sequence:
 #
 # 1. Specify your Granta MI Service Layer URL as a parameter to the ``Connection`` class.
 # 2. Specify the authentication method using a ``Connection.with_...()`` method.

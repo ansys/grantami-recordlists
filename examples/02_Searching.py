@@ -14,15 +14,16 @@
 # ---
 
 # # Searching
-# This notebook demonstrates how to search for record lists using ``SearchCriterion`` and ``BooleanCriterion``.
+# This notebook demonstrates how to search for record lists using ``SearchCriterion`` and
+# ``BooleanCriterion``.
 
-# .. note:: Running this notebook requires permissions to request publication of, to publish, and to revise a
-# record list. Contact your Granta MI administrator for more information.
+# .. note:: Running this notebook requires permissions to request publication of, to publish, and to
+# revise a record list. Contact your Granta MI administrator for more information.
 
 # ## Connect to Granta MI and create a record list
 
-# Import the ``Connection`` class and create the connection. See the [Basic usage](00_Basic_usage.ipynb)
-# example for more details.
+# Import the ``Connection`` class and create the connection. See the
+# [Basic usage](00_Basic_usage.ipynb) example for more details.
 
 # + tags=[]
 from ansys.grantami.recordlists import (
@@ -44,7 +45,8 @@ client = connection.connect()
 # * ``identifier_c``: Revision of ``identifier_b``
 # * ``identifier_d``: Unpublished
 #
-# See the [Publishing, revising, and withdrawing record lists](01_Publishing_revising_withdrawing.ipynb)
+# See the
+# [Publishing, revising, and withdrawing record lists](01_Publishing_revising_withdrawing.ipynb)
 # example for more details.
 
 # + tags=[]
@@ -82,12 +84,12 @@ results
 
 # ## Search for 'personal' record lists
 # A 'personal' record list is a list that the current user has created for their own use. It is
-# owned by the current user, is not published, is not awaiting approval, and is not a revision of another list.
-# Lists are generally in this state if they are created in the Favorites or Explore apps and are not submitted
-# for publication.
+# owned by the current user, is not published, is not awaiting approval, and is not a revision of
+# another list. Lists are generally in this state if they are created in the Favorites or Explore
+# apps and are not submitted for publication.
 
-# To search for a list of this type, use the ``SearchCriterion`` below (``is_internal_use=False`` excludes
-# record lists created by other Granta MI applications for internal operations).
+# To search for a list of this type, use the ``SearchCriterion`` below (``is_internal_use=False``
+# excludes record lists created by other Granta MI applications for internal operations).
 
 # + tags=[]
 criterion = SearchCriterion(
@@ -103,7 +105,8 @@ results
 
 # ## Search for a record list by contents
 # Search for record lists that contain a specific record with the ``contains_records`` keyword.
-# Specifying ``include_items=True`` when calling ``search_for_lists`` will populate ``items`` on the results.
+# Specifying ``include_items=True`` when calling ``search_for_lists`` will populate ``items`` on
+# the results.
 
 # + tags=[]
 criterion = SearchCriterion(contains_records=["c61e8f3a-d7e1-4b7f-8232-b2495eae6c15"])
