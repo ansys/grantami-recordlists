@@ -33,5 +33,5 @@ Check that you can start the RecordLists Client from Python by running this code
 
 If you see a response from the server, congratulations. You can start using
 the record lists client. For more detailed examples,
-see :ref:`_ref_grantami_recordlists_examples`. For more in-depth descriptions,
+see :ref:`ref_grantami_recordlists_examples`. For more in-depth descriptions,
 consult :ref:`ref_grantami_recordlists_api_reference`.
