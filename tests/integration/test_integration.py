@@ -30,10 +30,9 @@ def test_get_list_items(admin_client, new_list_with_items):
 
 
 def test_create_minimal_list(admin_client, cleanup_admin, list_name):
-    record_list_id = admin_client.create_list(name=list_name)
-    cleanup_admin.append(record_list_id)
+    record_list = admin_client.create_list(name=list_name)
+    cleanup_admin.append(record_list.identifier)
 
-    record_list = admin_client.get_list(record_list_id)
     assert record_list.name == list_name
     assert record_list.notes is None
     assert record_list.description is None
@@ -66,17 +65,16 @@ def test_update_list_nullable_property(admin_client, new_list_id):
 
 
 def test_copy_list(admin_client, cleanup_admin, new_list_id):
-    list_copy_identifier = admin_client.copy_list(new_list_id)
-    cleanup_admin.append(list_copy_identifier)
-    assert list_copy_identifier != new_list_id
+    list_copy = admin_client.copy_list(new_list_id)
+    cleanup_admin.append(list_copy.identifier)
+    assert list_copy.identifier != new_list_id
 
     original_list = admin_client.get_list(new_list_id)
-    copied_list = admin_client.get_list(list_copy_identifier)
 
     # Copied list name is original list name + " copy_{timestamp}"
-    assert original_list.name in copied_list.name
-    assert copied_list.description == original_list.description
-    assert copied_list.notes == original_list.notes
+    assert original_list.name in list_copy.name
+    assert list_copy.description == original_list.description
+    assert list_copy.notes == original_list.notes
 
 
 def test_revise_unpublished_list(admin_client, new_list_id):
@@ -98,7 +96,7 @@ def test_list_access(create_client_name, read_client_name, request, list_name, c
     create_client = request.getfixturevalue(create_client_name)
     read_client = request.getfixturevalue(read_client_name)
     cleanup = request.getfixturevalue(cleanup_fixture)
-    list_id = create_client.create_list(name=list_name)
+    list_id = create_client.create_list(name=list_name).identifier
     cleanup.append(list_id)
 
     with pytest.raises(ApiException) as e:
@@ -132,8 +130,7 @@ class TestLifeCycleNewList(TestLifeCycle):
         assert e.value.status_code == 400
 
     def test_can_request_approval(self, admin_client, new_list_id):
-        admin_client.request_list_approval(new_list_id)
-        list_details = admin_client.get_list(new_list_id)
+        list_details = admin_client.request_list_approval(new_list_id)
         assert list_details.awaiting_approval is True
 
 
@@ -147,8 +144,7 @@ class TestLifeCycleAwaitingApprovalAndNotPublished(TestLifeCycle):
         admin_client.request_list_approval(new_list_id)
 
     def test_can_publish(self, admin_client, new_list_id):
-        admin_client.publish_list(new_list_id)
-        list_details = admin_client.get_list(new_list_id)
+        list_details = admin_client.publish_list(new_list_id)
         assert list_details.awaiting_approval is False
         assert list_details.published is True
         assert list_details.published_timestamp is not None
@@ -160,8 +156,7 @@ class TestLifeCycleAwaitingApprovalAndNotPublished(TestLifeCycle):
         assert e.value.status_code == 400
 
     def test_can_reset(self, admin_client, new_list_id):
-        admin_client.cancel_list_approval_request(new_list_id)
-        list_details = admin_client.get_list(new_list_id)
+        list_details = admin_client.cancel_list_approval_request(new_list_id)
         assert list_details.awaiting_approval is False
 
     def test_cannot_request_approval(self, admin_client, new_list_id):
@@ -196,8 +191,7 @@ class TestLifeCyclePublishedAndNotAwaitingApproval(TestLifeCycle):
         assert e.value.status_code == 400
 
     def test_cannot_request_approval(self, admin_client, new_list_id):
-        admin_client.request_list_approval(new_list_id)
-        list_details = admin_client.get_list(new_list_id)
+        list_details = admin_client.request_list_approval(new_list_id)
         assert list_details.awaiting_approval is True
         assert list_details.published is True
 
@@ -206,8 +200,8 @@ class TestRevisionLifeCycle(TestLifeCyclePublishedAndNotAwaitingApproval):
     # Inherits the auto-use fixture to publish the list
 
     def test_revise_published_list(self, admin_client, new_list_id):
-        revision_id = admin_client.revise_list(new_list_id)
-        list_details = admin_client.get_list(revision_id)
+        list_details = admin_client.revise_list(new_list_id)
+        revision_id = list_details.identifier
         assert list_details.published is False
         assert list_details.awaiting_approval is False
         assert list_details.parent_record_list_identifier == new_list_id
@@ -257,14 +251,12 @@ class TestLifeCyclePublishedAndAwaitingApproval(TestLifeCycle):
         assert e.value.status_code == 400
 
     def test_can_withdraw(self, admin_client, new_list_id):
-        admin_client.unpublish_list(new_list_id)
-        list_details = admin_client.get_list(new_list_id)
+        list_details = admin_client.unpublish_list(new_list_id)
         assert list_details.published is False
         assert list_details.awaiting_approval is False
 
     def test_can_reset(self, admin_client, new_list_id):
-        admin_client.cancel_list_approval_request(new_list_id)
-        list_details = admin_client.get_list(new_list_id)
+        list_details = admin_client.cancel_list_approval_request(new_list_id)
         assert list_details.awaiting_approval is False
         assert list_details.published is True
 
@@ -284,14 +276,14 @@ class TestSearch:
     @pytest.fixture(scope="class")
     def list_a(self, admin_client, list_name):
         """A personal list with a known name."""
-        list_id = admin_client.create_list(list_name + self._name_suffix_A)
+        list_id = admin_client.create_list(list_name + self._name_suffix_A).identifier
         yield list_id
         admin_client.delete_list(list_id)
 
     @pytest.fixture(scope="class")
     def list_b(self, admin_client, list_name):
         """A published list with a known name."""
-        list_id = admin_client.create_list(list_name + self._name_suffix_B)
+        list_id = admin_client.create_list(list_name + self._name_suffix_B).identifier
         admin_client.request_list_approval(list_id)
         admin_client.publish_list(list_id)
         yield list_id
@@ -300,7 +292,7 @@ class TestSearch:
     @pytest.fixture(scope="class")
     def list_c(self, admin_client, list_name, list_b, example_item):
         """A revision of list B with a known name and items."""
-        list_id = admin_client.revise_list(list_b)
+        list_id = admin_client.revise_list(list_b).identifier
         admin_client.update_list(list_id, name=list_name + self._name_suffix_C)
         admin_client.add_items_to_list(list_id, [example_item])
         yield list_id
@@ -435,7 +427,7 @@ class TestSearch:
 
     @pytest.fixture(scope="function")
     def list_a_suffix_only(self, admin_client, unique_id, cleanup_admin):
-        list_id = admin_client.create_list(name=f"{unique_id}{self._name_suffix_A}")
+        list_id = admin_client.create_list(name=f"{unique_id}{self._name_suffix_A}").identifier
         cleanup_admin.append(list_id)
         yield list_id
 

@@ -5,17 +5,17 @@ pytestmark = pytest.mark.integration
 
 
 def test_create_list(basic_client, list_name):
-    record_list_id = basic_client.create_list(name=list_name)
+    record_list = basic_client.create_list(name=list_name)
 
-    record_list = basic_client.get_list(record_list_id)
     assert record_list.name == list_name
     assert isinstance(record_list.identifier, str)
 
 
 @pytest.fixture
 def basic_list_id(basic_client, list_name, request):
-    list_id = basic_client.create_list(name=list_name)
+    new_list = basic_client.create_list(name=list_name)
     cleanup = getattr(request, "param", {}).get("cleanup", True)
+    list_id = new_list.identifier
     yield list_id
     if cleanup:
         basic_client.delete_list(list_id)
@@ -31,8 +31,7 @@ class TestAuthoredListLifeCycle:
     """
 
     def test_can_request_approval_but_not_publish(self, basic_client, basic_list_id):
-        basic_client.request_list_approval(basic_list_id)
-        list_details = basic_client.get_list(basic_list_id)
+        list_details = basic_client.request_list_approval(basic_list_id)
         assert list_details.awaiting_approval is True
         assert list_details.published is False
 
@@ -50,8 +49,7 @@ class TestAuthoredListLifeCycle:
         admin_client.unpublish_list(basic_list_id)
 
     def test_can_request_withdrawal_but_not_withdraw(self, basic_client, basic_published_list_id):
-        basic_client.request_list_approval(basic_published_list_id)
-        list_details = basic_client.get_list(basic_published_list_id)
+        list_details = basic_client.request_list_approval(basic_published_list_id)
         assert list_details.awaiting_approval is True
         assert list_details.published is True
 

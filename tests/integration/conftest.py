@@ -90,8 +90,9 @@ def new_list_id(admin_client, request, list_name):
     Provides the identifier of newly created list.
     The created list include the name of the calling test as a `description`.
     """
-    list_id = admin_client.create_list(name=list_name, description=request.node.name)
+    new_list = admin_client.create_list(name=list_name, description=request.node.name)
     cleanup = getattr(request, "param", {}).get("cleanup", True)
+    list_id = new_list.identifier
     yield list_id
     if cleanup:
         admin_client.delete_list(list_id)
