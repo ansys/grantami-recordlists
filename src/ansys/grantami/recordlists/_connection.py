@@ -135,7 +135,9 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
         items = self.list_item_api.api_v1_lists_list_list_identifier_items_get(identifier)
         return [RecordListItem._from_model(item) for item in items.items]
 
-    def add_items_to_list(self, identifier: str, items: List[RecordListItem]) -> None:
+    def add_items_to_list(
+        self, identifier: str, items: List[RecordListItem]
+    ) -> List[RecordListItem]:
         """
         Add items to a record list.
 
@@ -149,18 +151,23 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
             Unique identifier of the record list.
         items : list of :class:`.RecordListItem`
             List of items to add to the record list.
+
+        Returns
+        -------
+        list of :class:`.RecordListItem`
+           List of items included in the record list.
         """
-        if not items:
-            return
-        # TODO is it all items of the list or just the added items that are returned?
-        items = self.list_item_api.api_v1_lists_list_list_identifier_items_add_post(
+        response_items = self.list_item_api.api_v1_lists_list_list_identifier_items_add_post(
             identifier,
             body=models.GrantaServerApiListsDtoRecordListItems(
                 items=[item._to_model() for item in items]
             ),
         )
+        return [RecordListItem._from_model(item) for item in response_items.items]
 
-    def remove_items_from_list(self, identifier: str, items: List[RecordListItem]) -> None:
+    def remove_items_from_list(
+        self, identifier: str, items: List[RecordListItem]
+    ) -> List[RecordListItem]:
         """
         Remove items from a record list.
 
@@ -173,16 +180,19 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
             Unique identifier of the record list.
         items : list of :class:`.RecordListItem`
             List of items to remove from the record list.
+
+        Returns
+        -------
+        list of :class:`.RecordListItem`
+           List of items included in the record list.
         """
-        if not items:
-            return
-        # TODO is it all items of the list or just the removed items that are returned?
-        self.list_item_api.api_v1_lists_list_list_identifier_items_remove_post(
+        response_items = self.list_item_api.api_v1_lists_list_list_identifier_items_remove_post(
             identifier,
             body=models.GrantaServerApiListsDtoRecordListItems(
                 items=[item._to_model() for item in items]
             ),
         )
+        return [RecordListItem._from_model(item) for item in response_items.items]
 
     def create_list(
         self,

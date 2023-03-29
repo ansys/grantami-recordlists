@@ -29,6 +29,23 @@ def test_get_list_items(admin_client, new_list_with_items):
     assert all(isinstance(item, RecordListItem) for item in record_list_items)
 
 
+def test_items_management(admin_client, new_list_id, example_item):
+    another_item = RecordListItem(
+        example_item.database_guid, example_item.table_guid, record_history_guid=str(uuid.uuid4())
+    )
+    items = admin_client.add_items_to_list(new_list_id, items=[example_item])
+    assert items == [example_item]
+
+    items = admin_client.add_items_to_list(new_list_id, items=[another_item])
+    assert items == [example_item, another_item]
+
+    items = admin_client.remove_items_from_list(new_list_id, items=[example_item])
+    assert items == [another_item]
+
+    items = admin_client.remove_items_from_list(new_list_id, items=[another_item])
+    assert items == []
+
+
 def test_create_minimal_list(admin_client, cleanup_admin, list_name):
     record_list = admin_client.create_list(name=list_name)
     cleanup_admin.append(record_list.identifier)
@@ -209,8 +226,8 @@ class TestRevisionLifeCycle(TestLifeCyclePublishedAndNotAwaitingApproval):
         updated_note = "Notes added to list revision"
         _ = admin_client.update_list(revision_id, notes=updated_note)
 
-        admin_client.request_list_approval(revision_id)
-        admin_client.publish_list(revision_id)
+        updated_list = admin_client.request_list_approval(revision_id)
+        returned_list = admin_client.publish_list(revision_id)
 
         with pytest.raises(ApiException) as e:
             revision_list_details = admin_client.get_list(revision_id)
