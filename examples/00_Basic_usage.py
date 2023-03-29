@@ -38,10 +38,11 @@ client = connection.connect()
 # ## Create a new record list
 
 # + tags=[]
-list_identifier = client.create_list(
+new_list = client.create_list(
     name="Example list",
     description=f"Created by example 00_Basic_usage",
 )
+list_identifier = new_list.identifier
 list_identifier
 # -
 

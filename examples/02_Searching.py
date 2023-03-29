@@ -50,11 +50,13 @@ client = connection.connect()
 # example for more details.
 
 # + tags=[]
-identifier_a = client.create_list(name="Approved materials - Metals")
+list_a = client.create_list(name="Approved materials - Metals")
+identifier_a = list_a.identifier
 client.request_list_approval(identifier_a)
 client.publish_list(identifier_a)
 
-identifier_b = client.create_list(name="Approved materials - Ceramics")
+list_b = client.create_list(name="Approved materials - Ceramics")
+identifier_b = list_b.identifier
 client.add_items_to_list(
     identifier_b,
     items=[
@@ -68,8 +70,10 @@ client.add_items_to_list(
 client.request_list_approval(identifier_b)
 client.publish_list(identifier_b)
 
-identifier_c = client.revise_list(identifier_b)
-identifier_d = client.create_list(name="My personal list")
+list_c = client.revise_list(identifier_b)
+identifier_c = list_c.identifier
+list_d = client.create_list(name="My personal list")
+identifier_d = list_d.identifier
 # -
 
 # ## Search for a record list by name
