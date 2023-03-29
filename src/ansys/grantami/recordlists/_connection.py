@@ -1,4 +1,4 @@
-from typing import List, Optional, Union, cast
+from typing import List, Optional, Union
 
 from ansys.grantami.serverapi_openapi import api, models  # type: ignore[import]
 from ansys.openapi.common import (  # type: ignore[import]
@@ -10,11 +10,12 @@ from ansys.openapi.common import (  # type: ignore[import]
 import requests  # type: ignore[import]
 
 from ._models import BooleanCriterion, RecordList, RecordListItem, SearchCriterion, SearchResult
-from ._utils import _ArgNotProvided, extract_identifier
 
 PROXY_PATH = "/proxy/v1.svc"
 AUTH_PATH = "/Health/v2.svc"
 API_DEFINITION_PATH = "/swagger/v1/swagger.json"
+
+_ArgNotProvided = "_ArgNotProvided"
 
 
 class RecordListApiClient(ApiClient):  # type: ignore[misc]
@@ -98,17 +99,16 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
         response_options = models.GrantaServerApiListsDtoResponseOptions(
             include_record_list_items=include_items,
         )
-        search_resource = self.list_management_api.api_v1_lists_search_post(
+        search_info = self.list_management_api.api_v1_lists_search_post(
             body=models.GrantaServerApiListsDtoRecordListSearchRequest(
                 search_criterion=criterion._to_model(),
                 response_options=response_options,
             )
         )
 
-        search_resource_identifier = extract_identifier(search_resource)
         search_results = (
             self.list_management_api.api_v1_lists_search_results_result_resource_identifier_get(
-                search_resource_identifier
+                search_info.search_result_identifier
             )
         )
         return [
@@ -152,8 +152,8 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
         """
         if not items:
             return
-
-        self.list_item_api.api_v1_lists_list_list_identifier_items_add_post(
+        # TODO is it all items of the list or just the added items that are returned?
+        items = self.list_item_api.api_v1_lists_list_list_identifier_items_add_post(
             identifier,
             body=models.GrantaServerApiListsDtoRecordListItems(
                 items=[item._to_model() for item in items]
@@ -176,7 +176,7 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
         """
         if not items:
             return
-
+        # TODO is it all items of the list or just the removed items that are returned?
         self.list_item_api.api_v1_lists_list_list_identifier_items_remove_post(
             identifier,
             body=models.GrantaServerApiListsDtoRecordListItems(
@@ -190,7 +190,7 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
         description: Optional[str] = None,
         notes: Optional[str] = None,
         items: Optional[List[RecordListItem]] = None,
-    ) -> str:
+    ) -> RecordList:
         """
         Create a new record list with the provided arguments.
 
@@ -209,17 +209,15 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
 
         Returns
         -------
-        str
-            Unique identifier of the created record list.
+        :class:`.RecordList`
+            Created record list details.
         """
         if items is not None:
             items = models.GrantaServerApiListsDtoRecordListItems(
                 items=[list_item._to_model() for list_item in items]
             )
 
-        # TODO Workaround until Server API documents 201 response
-        response, status_code, _ = self.list_management_api.api_v1_lists_post_with_http_info(
-            _preload_content=False,
+        created_list = self.list_management_api.api_v1_lists_post(
             body=models.GrantaServerApiListsDtoRecordListCreate(
                 name=name,
                 description=description,
@@ -227,14 +225,7 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
                 items=items,
             ),
         )
-        if status_code != 201:
-            raise NotImplementedError("Expected response with status code 201")
-
-        data = cast(
-            models.GrantaServerApiListsDtoRecordListResource,
-            self.deserialize(response, "GrantaServerApiListsDtoRecordListResource"),
-        )
-        return extract_identifier(data)
+        return RecordList._from_model(created_list)
 
     def delete_list(self, identifier: str) -> None:
         """
@@ -301,7 +292,7 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
         )
         return RecordList._from_model(updated_resource)
 
-    def copy_list(self, identifier: str) -> str:
+    def copy_list(self, identifier: str) -> RecordList:
         """
         Create a copy of a record list.
 
@@ -314,28 +305,13 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
 
         Returns
         -------
-        str
-            Unique identifier of the created record list.
+        :class:`.RecordList`
+            Copied record list details.
         """
-        # TODO remove temp workaround when API documents operation return type
-        (
-            response,
-            status_code,
-            _,
-        ) = self.list_management_api.api_v1_lists_list_list_identifier_copy_post_with_http_info(
-            identifier,
-            _preload_content=False,
-        )
-        if status_code != 201:
-            raise NotImplementedError("Expected response with status code 201")
+        list_copy = self.list_management_api.api_v1_lists_list_list_identifier_copy_post(identifier)
+        return RecordList._from_model(list_copy)
 
-        data = cast(
-            models.GrantaServerApiListsDtoRecordListResource,
-            self.deserialize(response, "GrantaServerApiListsDtoRecordListResource"),
-        )
-        return extract_identifier(data)
-
-    def revise_list(self, identifier: str) -> str:
+    def revise_list(self, identifier: str) -> RecordList:
         """
         Revise a record list.
 
@@ -351,27 +327,15 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
 
         Returns
         -------
-        str
-            Unique identifier of the created personal record list.
+        :class:`.RecordList`
+            Revision record list details.
         """
-        # TODO remove temp workaround when API documents operation return type
-        (
-            response,
-            status_code,
-            _,
-        ) = self.list_management_api.api_v1_lists_list_list_identifier_revise_post_with_http_info(
-            identifier, _preload_content=False
+        list_revision = self.list_management_api.api_v1_lists_list_list_identifier_revise_post(
+            identifier,
         )
-        if status_code != 201:
-            raise NotImplementedError("Expected response with status code 201")
+        return RecordList._from_model(list_revision)
 
-        data = cast(
-            models.GrantaServerApiListsDtoRecordListResource,
-            self.deserialize(response, "GrantaServerApiListsDtoRecordListResource"),
-        )
-        return extract_identifier(data)
-
-    def request_list_approval(self, identifier: str) -> None:
+    def request_list_approval(self, identifier: str) -> RecordList:
         """
         Request approval for a record list.
 
@@ -382,10 +346,20 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
         ----------
         identifier : str
             Unique identifier of the record list.
-        """
-        self.list_management_api.api_v1_lists_list_list_identifier_request_approval_post(identifier)
 
-    def publish_list(self, identifier: str) -> None:
+        Returns
+        -------
+        :class:`.RecordList`
+            Updated record list details.
+        """
+        updated_list = (
+            self.list_management_api.api_v1_lists_list_list_identifier_request_approval_post(
+                identifier
+            )
+        )
+        return RecordList._from_model(updated_list)
+
+    def publish_list(self, identifier: str) -> RecordList:
         """
         Publish a record list.
 
@@ -399,10 +373,18 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
         ----------
         identifier : str
             Unique identifier of the record list.
-        """
-        self.list_management_api.api_v1_lists_list_list_identifier_publish_post(identifier)
 
-    def unpublish_list(self, identifier: str) -> None:
+        Returns
+        -------
+        :class:`.RecordList`
+            Updated record list details.
+        """
+        updated_list = self.list_management_api.api_v1_lists_list_list_identifier_publish_post(
+            identifier,
+        )
+        return RecordList._from_model(updated_list)
+
+    def unpublish_list(self, identifier: str) -> RecordList:
         """
         Withdraw a record list.
 
@@ -415,10 +397,18 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
         ----------
         identifier : str
             Unique identifier of the record list.
-        """
-        self.list_management_api.api_v1_lists_list_list_identifier_unpublish_post(identifier)
 
-    def cancel_list_approval_request(self, identifier: str) -> None:
+        Returns
+        -------
+        :class:`.RecordList`
+            Updated record list details.
+        """
+        updated_list = self.list_management_api.api_v1_lists_list_list_identifier_unpublish_post(
+            identifier,
+        )
+        return RecordList._from_model(updated_list)
+
+    def cancel_list_approval_request(self, identifier: str) -> RecordList:
         """
         Cancel a pending request for approval on a record list.
 
@@ -430,8 +420,16 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
         ----------
         identifier : str
             Unique identifier of the record list.
+
+        Returns
+        -------
+        :class:`.RecordList`
+            Updated record list details.
         """
-        self.list_management_api.api_v1_lists_list_list_identifier_reset_post(identifier)
+        updated_list = self.list_management_api.api_v1_lists_list_list_identifier_reset_post(
+            identifier,
+        )
+        return RecordList._from_model(updated_list)
 
     @staticmethod
     def _create_patch_operation(
