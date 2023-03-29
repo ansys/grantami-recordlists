@@ -42,7 +42,7 @@ jobs:
 
       - name: Download dependencies
         run: |
-          python -m pip download ansys-grantami-serverapi-openapi==0.1.0.dev17 --index-url ${{ env.INDEX_URL }} --no-dependencies --pre -d deps
+          python -m pip download ansys-grantami-serverapi-openapi==0.1.0.dev18 --index-url ${{ env.INDEX_URL }} --no-dependencies --pre -d deps
         env:
           INDEX_URL: https://${{ secrets.PYANSYS_PYPI_PRIVATE_PAT }}@pkgs.dev.azure.com/pyansys/_packaging/pyansys/pypi/simple/
 
