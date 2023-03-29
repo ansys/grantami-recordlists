@@ -10,8 +10,7 @@ class RecordList:
     """
     Describes a RecordList as obtained from the API.
 
-    Read-only - users are never expected to instantiate this class or modify instances of the
-    class.
+    Read-only - do not directly instantiate or modify instances of this class.
     """
 
     def __init__(
@@ -183,9 +182,10 @@ class RecordList:
 
 class RecordListItem:
     """
-    Describes an item of a :class:`RecordList`, i.e. a record in a Granta MI database.
+    Describes a :class:`RecordList` item, generally a reference to a record in a Granta MI database.
 
-    An item does not necessarily represent a record that exists on the server.
+    The record is not guaranteed to exist. Care should be taken to ensure that the reference to the
+    record is valid before using it.
 
     Parameters
     ----------
@@ -216,12 +216,12 @@ class RecordListItem:
 
     @property
     def database_guid(self) -> str:
-        """GUID of the database."""
+        """Database GUID."""
         return self._database_guid
 
     @property
     def table_guid(self) -> str:
-        """GUID of the table."""
+        """Table GUID."""
         return self._table_guid
 
     @property
@@ -239,9 +239,9 @@ class RecordListItem:
         """
         Record GUID.
 
-        Only populated if the :class:`RecordListItem` has been obtained via an API request and
-        represents a specific version of a record, specified with
-        :attr:`~RecordListItem.record_version`.
+        Only populated if the :class:`RecordListItem` has both been obtained via an API request and
+        represents a specific version of a record. See the note on the ``record_version`` parameter
+        for this class for more details.
         """
         return self._record_guid
 
@@ -281,8 +281,7 @@ class RecordListItem:
 class UserOrGroup:
     """Description of a Granta MI User or Group.
 
-    Read-only - users are never expected to instantiate this class or modify instances of the
-    class.
+    Read-only - do not directly instantiate or modify instances of this class.
     """
 
     def __init__(self) -> None:
@@ -319,7 +318,7 @@ class SearchCriterion:
     """
     Search criterion to use in a :meth:`~.RecordListApiClient.search_for_lists` operation.
 
-    The properties in this class represent an AND search - only lists that match all the
+    The properties in this class represent an *AND* search - only lists that match all the
     non-null properties will be returned.
 
     Examples
@@ -516,12 +515,12 @@ class BooleanCriterion:
     """
     Search criterion to use in a search operation :meth:`~.RecordListApiClient.search_for_lists`.
 
-    Allow aggregation of multiple criteria defined as :class:`SearchCriterion` or
-    :class:`BooleanCriterion`.
+    Use this class to combine multiple :class:`SearchCriterion` or
+    :class:`BooleanCriterion` objects together as either *AND* or *OR* searches.
 
     Examples
     --------
-    Search record lists and obtain the union of multiple criteria:
+    Search record lists and obtain the union of multiple criteria (*OR*):
 
     >>> criterion = BooleanCriterion(
     ...     match_any=[
@@ -530,7 +529,7 @@ class BooleanCriterion:
     ...     ]
     ... )
 
-    Search record lists and obtain the intersection of multiple criteria:
+    Search record lists and obtain the intersection of multiple criteria (*AND*):
 
     >>> criterion = BooleanCriterion(
     ...     match_all=[
@@ -616,8 +615,7 @@ class UserRole(str, Enum):
 class SearchResult:
     """Describes the result of a search.
 
-    Read-only - users are never expected to instantiate this class or modify instances of the
-    class.
+    Read-only - do not directly instantiate or modify instances of this class.
     """
 
     def __init__(self, list_details: RecordList, items: Optional[List[RecordListItem]]):

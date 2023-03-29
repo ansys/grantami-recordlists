@@ -47,7 +47,7 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
         """
         Get the details of all record lists available for the current user.
 
-        Performs an HTTP request against the Server API.
+        Performs an HTTP request against the Granta MI Server API.
 
         Returns
         -------
@@ -61,7 +61,7 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
         """
         Get the details of a record list.
 
-        Performs an HTTP request against the Server API.
+        Performs an HTTP request against the Granta MI Server API.
 
         Parameters
         ----------
@@ -120,7 +120,7 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
         """
         Get all items included in a record list.
 
-        Performs an HTTP request against the Server API.
+        Performs an HTTP request against the Granta MI Server API.
 
         Parameters
         ----------
@@ -139,7 +139,7 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
         """
         Add items to a record list.
 
-        Performs an HTTP request against the Server API.
+        Performs an HTTP request against the Granta MI Server API.
         Items are not validated against existing records on the server or existing items in the
         list.
 
@@ -164,7 +164,7 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
         """
         Remove items from a record list.
 
-        Performs an HTTP request against the Server API.
+        Performs an HTTP request against the Granta MI Server API.
         Attempting to remove items that are not in the list will not result in an error.
 
         Parameters
@@ -194,7 +194,7 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
         """
         Create a new record list with the provided arguments.
 
-        Performs an HTTP request against the Server API.
+        Performs an HTTP request against the Granta MI Server API.
 
         Parameters
         ----------
@@ -240,7 +240,7 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
         """
         Delete a record list.
 
-        Performs an HTTP request against the Server API.
+        Performs an HTTP request against the Granta MI Server API.
 
         Parameters
         ----------
@@ -260,7 +260,7 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
         """
         Update a record list with the provided arguments.
 
-        Performs an HTTP request against the Server API.
+        Performs an HTTP request against the Granta MI Server API.
 
         Parameters
         ----------
@@ -305,7 +305,7 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
         """
         Create a copy of a record list.
 
-        Performs an HTTP request against the Server API.
+        Performs an HTTP request against the Granta MI Server API.
 
         Parameters
         ----------
@@ -339,7 +339,7 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
         """
         Revise a record list.
 
-        Performs an HTTP request against the Server API.
+        Performs an HTTP request against the Granta MI Server API.
         Revising a list allows a user to create a personal copy of a published list and to modify
         its items or details. When the 'in-revision' list is published, it overwrites the original
         list.
@@ -375,8 +375,8 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
         """
         Request approval for a record list.
 
-        Performs an HTTP request against the Server API.
-        Requesting approval updates the ``awaiting approval`` status of the record list to `True`.
+        Performs an HTTP request against the Granta MI Server API.
+        Requesting approval updates the ``awaiting approval`` status of the record list to ``True``.
 
         Parameters
         ----------
@@ -389,9 +389,9 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
         """
         Publish a record list.
 
-        Performs an HTTP request against the Server API.
+        Performs an HTTP request against the Granta MI Server API.
         The list must be awaiting approval and not published already. Publishing the list updates
-        the status to "published" and resets the awaiting approval status.
+        the status to *published* and resets the awaiting approval status.
         Published lists can be viewed by all users and cannot be modified. To modify a published
         list, use :meth:`.revise_list`.
 
@@ -406,9 +406,9 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
         """
         Withdraw a record list.
 
-        Performs an HTTP request against the Server API.
+        Performs an HTTP request against the Granta MI Server API.
         The list must be published and awaiting approval. Withdrawing the list updates
-        the "published" status to False and resets the awaiting approval status.
+        the *published* status to False and resets the awaiting approval status.
         All existing subscriptions will be lost on withdrawal.
 
         Parameters
@@ -422,7 +422,7 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
         """
         Cancel a pending request for approval on a record list.
 
-        Performs an HTTP request against the Server API.
+        Performs an HTTP request against the Granta MI Server API.
         The list must be awaiting approval. Cancelling the approval request resets the awaiting
         approval status to False.
 
