@@ -51,14 +51,12 @@ client = connection.connect()
 
 # + tags=[]
 list_a = client.create_list(name="Approved materials - Metals")
-identifier_a = list_a.identifier
-client.request_list_approval(identifier_a)
-client.publish_list(identifier_a)
+list_a = client.request_list_approval(list_a)
+list_a = client.publish_list(list_a)
 
 list_b = client.create_list(name="Approved materials - Ceramics")
-identifier_b = list_b.identifier
 client.add_items_to_list(
-    identifier_b,
+    list_b,
     items=[
         RecordListItem(
             "9716c5a3-da85-4126-a922-3fbb854656d8",
@@ -67,13 +65,11 @@ client.add_items_to_list(
         )
     ],
 )
-client.request_list_approval(identifier_b)
-client.publish_list(identifier_b)
+list_b = client.request_list_approval(list_b)
+list_b = client.publish_list(list_b)
 
-list_c = client.revise_list(identifier_b)
-identifier_c = list_c.identifier
+list_c = client.revise_list(list_b)
 list_d = client.create_list(name="My personal list")
-identifier_d = list_d.identifier
 # -
 
 # ## Search for a record list by name
@@ -152,8 +148,8 @@ results
 # -
 
 # + nbsphinx="hidden"
-client.delete_list(identifier_a)
-client.delete_list(identifier_b)
-client.delete_list(identifier_c)
-client.delete_list(identifier_d)
+client.delete_list(list_a)
+client.delete_list(list_b)
+client.delete_list(list_c)
+client.delete_list(list_d)
 # -

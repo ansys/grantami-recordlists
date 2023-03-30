@@ -36,16 +36,16 @@ client = connection.connect()
 # Create a record list for use in this example.
 
 # + tags=[]
-new_list = client.create_list(
+example_list = client.create_list(
     name="Example list",
     description=f"Created by example 01_Advanced_usage",
 )
-list_identifier = new_list.identifier
+example_list
 # -
 
 # Record lists include two properties describing two aspects of their status: whether they are
 # awaiting approval to be published, and whether they are currently published.
-# Define a function to retrieve the details of a record list and display the status properties.
+# Define a function to display the status properties.
 
 # + tags=[]
 def print_status(record_list):
@@ -53,16 +53,16 @@ def print_status(record_list):
     print(f"Published: {record_list.published}")
 
 
-print_status(new_list)
+print_status(example_list)
 # -
 
 # ## Publish a record list
 
 # A record list is proposed for publication by calling the ``request_list_approval`` method with the
-# identifier of the record list to be published.
+# record list to be published.
 
 # + tags=[]
-updated_list = client.request_list_approval(list_identifier)
+updated_list = client.request_list_approval(example_list)
 
 print_status(updated_list)
 # -
@@ -70,7 +70,7 @@ print_status(updated_list)
 # Publish the record list by using the ``publish_list`` method.
 
 # + tags=[]
-updated_list = client.publish_list(list_identifier)
+updated_list = client.publish_list(example_list)
 
 print_status(updated_list)
 # -
@@ -82,7 +82,7 @@ print_status(updated_list)
 # original record list (a list revision), and leaves the original record list unchanged.
 
 # + tags=[]
-revision_list = client.revise_list(list_identifier)
+revision_list = client.revise_list(example_list)
 
 print_status(revision_list)
 # -
@@ -95,21 +95,18 @@ print(f"Parent identifier: {revision_list.parent_record_list_identifier}")
 # -
 
 # Modifications made to the list revision are applied to the original list when the list revision
-# is published. Once the original list is updated, the list revision deleted and is no longer
+# is published. Once the original list is updated, the list revision is deleted and is no longer
 # available.
 
 # + tags=[]
-revision_list_identifier = revision_list.identifier
-updated_revision_list = client.update_list(
-    revision_list_identifier, notes="Added during revision process"
-)
-client.request_list_approval(revision_list_identifier)
-list_details = client.publish_list(revision_list_identifier)
+updated_revision_list = client.update_list(revision_list, notes="Added during revision process")
+updated_revision_list = client.request_list_approval(updated_revision_list)
+updated_original_list = client.publish_list(updated_revision_list)
 
 # When publishing a revision list, the returned object is the updated parent list.
 # Check the notes of the list to confirm the revisions were made successfully.
-print(f"Notes: {list_details.notes}")
-print(f"Is published: {list_details.published}")
+print(f"Notes: {updated_original_list.notes}")
+print(f"Is published: {updated_original_list.published}")
 # -
 
 # ## Withdraw a record list
@@ -117,7 +114,7 @@ print(f"Is published: {list_details.published}")
 # withdrawal of that list.
 
 # + tags=[]
-updated_list = client.request_list_approval(list_identifier)
+updated_list = client.request_list_approval(example_list)
 
 print_status(updated_list)
 # -
@@ -125,11 +122,11 @@ print_status(updated_list)
 # Use the ``unpublish_list`` method to withdraw a record list.
 
 # + tags=[]
-updated_list = client.unpublish_list(list_identifier)
+updated_list = client.unpublish_list(example_list)
 
 print_status(updated_list)
 # -
 
 # + nbsphinx="hidden"
-client.delete_list(list_identifier)
+client.delete_list(example_list)
 # -

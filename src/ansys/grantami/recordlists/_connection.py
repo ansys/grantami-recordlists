@@ -116,7 +116,7 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
             for search_result in search_results
         ]
 
-    def get_list_items(self, identifier: str) -> List[RecordListItem]:
+    def get_list_items(self, record_list: RecordList) -> List[RecordListItem]:
         """
         Get all items included in a record list.
 
@@ -124,19 +124,21 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
 
         Parameters
         ----------
-        identifier : str
-            Unique identifier of the record list.
+        record_list : RecordList
+            Record list for which items will be fetched.
 
         Returns
         -------
         list of :class:`.RecordListItem`
             List of items included in the record list.
         """
-        items = self.list_item_api.api_v1_lists_list_list_identifier_items_get(identifier)
+        items = self.list_item_api.api_v1_lists_list_list_identifier_items_get(
+            record_list.identifier
+        )
         return [RecordListItem._from_model(item) for item in items.items]
 
     def add_items_to_list(
-        self, identifier: str, items: List[RecordListItem]
+        self, record_list: RecordList, items: List[RecordListItem]
     ) -> List[RecordListItem]:
         """
         Add items to a record list.
@@ -147,8 +149,8 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
 
         Parameters
         ----------
-        identifier : str
-            Unique identifier of the record list.
+        record_list : RecordList
+            Target record list.
         items : list of :class:`.RecordListItem`
             List of items to add to the record list.
 
@@ -158,7 +160,7 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
            List of items included in the record list.
         """
         response_items = self.list_item_api.api_v1_lists_list_list_identifier_items_add_post(
-            identifier,
+            record_list.identifier,
             body=models.GrantaServerApiListsDtoRecordListItems(
                 items=[item._to_model() for item in items]
             ),
@@ -166,7 +168,7 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
         return [RecordListItem._from_model(item) for item in response_items.items]
 
     def remove_items_from_list(
-        self, identifier: str, items: List[RecordListItem]
+        self, record_list: RecordList, items: List[RecordListItem]
     ) -> List[RecordListItem]:
         """
         Remove items from a record list.
@@ -176,8 +178,8 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
 
         Parameters
         ----------
-        identifier : str
-            Unique identifier of the record list.
+        record_list : RecordList
+            Target record list.
         items : list of :class:`.RecordListItem`
             List of items to remove from the record list.
 
@@ -187,7 +189,7 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
            List of items included in the record list.
         """
         response_items = self.list_item_api.api_v1_lists_list_list_identifier_items_remove_post(
-            identifier,
+            record_list.identifier,
             body=models.GrantaServerApiListsDtoRecordListItems(
                 items=[item._to_model() for item in items]
             ),
@@ -237,7 +239,7 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
         )
         return RecordList._from_model(created_list)
 
-    def delete_list(self, identifier: str) -> None:
+    def delete_list(self, record_list: RecordList) -> None:
         """
         Delete a record list.
 
@@ -245,14 +247,14 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
 
         Parameters
         ----------
-        identifier : str
-            Unique identifier of the record list.
+        record_list : RecordList
+            Record list to delete.
         """
-        self.list_management_api.api_v1_lists_list_list_identifier_delete(identifier)
+        self.list_management_api.api_v1_lists_list_list_identifier_delete(record_list.identifier)
 
     def update_list(
         self,
-        identifier: str,
+        record_list: RecordList,
         *,
         name: str = _ArgNotProvided,
         description: Union[str, None] = _ArgNotProvided,
@@ -265,8 +267,8 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
 
         Parameters
         ----------
-        identifier : str
-            Unique identifier of the record list.
+        record_list : RecordList
+            Record list to update.
         name : str, optional
             New value for the name of the record list.
         description : str or None, optional
@@ -298,30 +300,33 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
             body.append(self._create_patch_operation(notes, "notes"))
 
         updated_resource = self.list_management_api.api_v1_lists_list_list_identifier_patch(
-            identifier, body=body
+            record_list.identifier, body=body
         )
         return RecordList._from_model(updated_resource)
 
-    def copy_list(self, identifier: str) -> RecordList:
+    def copy_list(self, record_list: RecordList) -> RecordList:
         """
         Create a copy of a record list.
 
-        Performs an HTTP request against the Granta MI Server API.
+        Performs an HTTP request against the Granta MI Server API. The resulting list has a name
+        prefixed by the original list name.
 
         Parameters
         ----------
-        identifier : str
-            Unique identifier of the record list.
+        record_list : RecordList
+            Record list to copy.
 
         Returns
         -------
         :class:`.RecordList`
-            Copied record list details.
+            Record list created by the copy operation.
         """
-        list_copy = self.list_management_api.api_v1_lists_list_list_identifier_copy_post(identifier)
+        list_copy = self.list_management_api.api_v1_lists_list_list_identifier_copy_post(
+            record_list.identifier
+        )
         return RecordList._from_model(list_copy)
 
-    def revise_list(self, identifier: str) -> RecordList:
+    def revise_list(self, record_list: RecordList) -> RecordList:
         """
         Revise a record list.
 
@@ -332,20 +337,20 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
 
         Parameters
         ----------
-        identifier : str
-            Unique identifier of the record list.
+        record_list : RecordList
+            Record list to revise.
 
         Returns
         -------
         :class:`.RecordList`
-            Revision record list details.
+            Record list created by the revision operation.
         """
         list_revision = self.list_management_api.api_v1_lists_list_list_identifier_revise_post(
-            identifier,
+            record_list.identifier,
         )
         return RecordList._from_model(list_revision)
 
-    def request_list_approval(self, identifier: str) -> RecordList:
+    def request_list_approval(self, record_list: RecordList) -> RecordList:
         """
         Request approval for a record list.
 
@@ -354,22 +359,22 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
 
         Parameters
         ----------
-        identifier : str
-            Unique identifier of the record list.
+        record_list : RecordList
+            Target record list.
 
         Returns
         -------
         :class:`.RecordList`
-            Updated record list details.
+            Updated representation of the record list.
         """
         updated_list = (
             self.list_management_api.api_v1_lists_list_list_identifier_request_approval_post(
-                identifier
+                record_list.identifier
             )
         )
         return RecordList._from_model(updated_list)
 
-    def publish_list(self, identifier: str) -> RecordList:
+    def publish_list(self, record_list: RecordList) -> RecordList:
         """
         Publish a record list.
 
@@ -381,20 +386,20 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
 
         Parameters
         ----------
-        identifier : str
-            Unique identifier of the record list.
+        record_list : RecordList
+            Target record list.
 
         Returns
         -------
         :class:`.RecordList`
-            Updated record list details.
+            Updated representation of the record list.
         """
         updated_list = self.list_management_api.api_v1_lists_list_list_identifier_publish_post(
-            identifier,
+            record_list.identifier,
         )
         return RecordList._from_model(updated_list)
 
-    def unpublish_list(self, identifier: str) -> RecordList:
+    def unpublish_list(self, record_list: RecordList) -> RecordList:
         """
         Withdraw a record list.
 
@@ -405,20 +410,20 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
 
         Parameters
         ----------
-        identifier : str
-            Unique identifier of the record list.
+        record_list : RecordList
+            Target record list.
 
         Returns
         -------
         :class:`.RecordList`
-            Updated record list details.
+            Updated representation of the record list.
         """
         updated_list = self.list_management_api.api_v1_lists_list_list_identifier_unpublish_post(
-            identifier,
+            record_list.identifier,
         )
         return RecordList._from_model(updated_list)
 
-    def cancel_list_approval_request(self, identifier: str) -> RecordList:
+    def cancel_list_approval_request(self, record_list: RecordList) -> RecordList:
         """
         Cancel a pending request for approval on a record list.
 
@@ -428,16 +433,16 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
 
         Parameters
         ----------
-        identifier : str
-            Unique identifier of the record list.
+        record_list : RecordList
+            Target record list.
 
         Returns
         -------
         :class:`.RecordList`
-            Updated record list details.
+            Updated representation of the record list.
         """
         updated_list = self.list_management_api.api_v1_lists_list_list_identifier_reset_post(
-            identifier,
+            record_list.identifier,
         )
         return RecordList._from_model(updated_list)
 
