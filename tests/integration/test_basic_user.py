@@ -4,12 +4,27 @@ import pytest
 pytestmark = pytest.mark.integration
 
 
-def test_create_list(basic_client, list_name):
+def test_create_list(basic_client, list_name, cleanup_basic):
     record_list_id = basic_client.create_list(name=list_name)
+    cleanup_basic.append(record_list_id)
 
     record_list = basic_client.get_list(record_list_id)
     assert record_list.name == list_name
     assert isinstance(record_list.identifier, str)
+
+
+def test_cannot_create_published_list(basic_client, list_name):
+    with pytest.raises(ApiException) as e:
+        record_list_id = basic_client.create_list(name=list_name, published=True)
+    assert e.value.status_code == 403
+
+
+def test_can_create_ready_to_publish_list(basic_client, list_name, cleanup_basic):
+    record_list_id = basic_client.create_list(name=list_name, awaiting_approval=True)
+    cleanup_basic.append(record_list_id)
+
+    record_list = basic_client.get_list(record_list_id)
+    assert record_list.awaiting_approval is True
 
 
 @pytest.fixture
