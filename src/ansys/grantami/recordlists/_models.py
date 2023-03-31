@@ -618,14 +618,14 @@ class SearchResult:
     Read-only - do not directly instantiate or modify instances of this class.
     """
 
-    def __init__(self, list_details: RecordList, items: Optional[List[RecordListItem]]):
-        self._list_details = list_details
+    def __init__(self, record_list: RecordList, items: Optional[List[RecordListItem]]):
+        self._record_list = record_list
         self._items = items
 
     @property
-    def list_details(self) -> RecordList:
+    def record_list(self) -> RecordList:
         """Details of the record list associated with the search result."""
-        return self._list_details
+        return self._record_list
 
     @property
     def items(self) -> Optional[List[RecordListItem]]:
@@ -639,7 +639,7 @@ class SearchResult:
 
     def __repr__(self) -> str:
         """Printable representation of the object."""
-        return f"<{self.__class__.__name__} name: {self.list_details.name}>"
+        return f"<{self.__class__.__name__} name: {self.record_list.name}>"
 
     @classmethod
     def _from_model(
@@ -665,6 +665,6 @@ class SearchResult:
             items = [RecordListItem._from_model(item) for item in model.items]
 
         return cls(
-            list_details=RecordList._from_model(model.header),
+            record_list=RecordList._from_model(model.header),
             items=items,
         )
