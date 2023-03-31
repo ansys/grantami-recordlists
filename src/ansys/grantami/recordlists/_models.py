@@ -516,7 +516,8 @@ class BooleanCriterion:
     Search criterion to use in a search operation :meth:`~.RecordListApiClient.search_for_lists`.
 
     Use this class to combine multiple :class:`SearchCriterion` or
-    :class:`BooleanCriterion` objects together as either *AND* or *OR* searches.
+    :class:`BooleanCriterion` objects together as either *AND* or *OR* searches. :attr:`.match_any`
+    and :attr:`.match_all` cannot be used together.
 
     Examples
     --------

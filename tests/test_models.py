@@ -329,6 +329,12 @@ class TestSearchCriterion:
         with pytest.raises(ValueError):
             boolean_criterion._to_model()
 
+    def test_boolean_cannot_use_both_all_and_any_empty_list(self):
+        crit_1 = SearchCriterion()
+        boolean_criterion = BooleanCriterion(match_any=[crit_1], match_all=[])
+        with pytest.raises(ValueError):
+            boolean_criterion._to_model()
+
 
 class TestSearchResult:
     @pytest.mark.parametrize("include_items", [True, False])
