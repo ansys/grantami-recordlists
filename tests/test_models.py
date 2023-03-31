@@ -246,7 +246,8 @@ class TestSearchCriterion:
         assert dto.contains_records is criterion.contains_records
         assert dto.user_can_add_or_remove_items is criterion.user_can_add_or_remove_items
 
-    def test_simple_boolean_criterion_dto_mapping(self):
+    @pytest.mark.parametrize("prop_name", ["match_all", "match_any"])
+    def test_simple_boolean_criterion_dto_mapping(self, prop_name):
         crit_a_dto = Mock()
         crit_a = Mock(spec=SearchCriterion)
         crit_a.attach_mock(Mock(return_value=crit_a_dto), "_to_model")
@@ -254,12 +255,11 @@ class TestSearchCriterion:
         crit_b = Mock(spec=SearchCriterion)
         crit_b.attach_mock(Mock(return_value=crit_b_dto), "_to_model")
 
-        criterion = BooleanCriterion(match_any=[crit_a], match_all=[crit_a, crit_b])
+        criterion = BooleanCriterion(**{prop_name: [crit_a, crit_b]})
 
         dto = BooleanCriterion._to_model(criterion)
 
-        assert dto.match_any == [crit_a_dto]
-        assert dto.match_all == [crit_a_dto, crit_b_dto]
+        assert getattr(dto, prop_name) == [crit_a_dto, crit_b_dto]
 
     def test_nested_boolean_criterion_dto_mapping(self):
         criterion = BooleanCriterion(
