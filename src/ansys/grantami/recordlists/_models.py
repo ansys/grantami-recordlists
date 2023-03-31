@@ -540,8 +540,6 @@ class BooleanCriterion:
 
     """
 
-    # TODO Using both match_any and match_all ignores criteria in match_any (PUD-561)
-
     def __init__(
         self,
         match_any: Optional[List[Union["BooleanCriterion", "SearchCriterion"]]] = None,
@@ -586,6 +584,11 @@ class BooleanCriterion:
 
     def _to_model(self) -> models.GrantaServerApiListsDtoListBooleanCriterion:
         """Generate the DTO for use with the auto-generated client code."""
+        # Do not allow both `any` and `all` because current API behavior is not the expected
+        # behavior
+        if self.match_any is not None and self.match_all is not None:
+            raise ValueError("Cannot use `match_any` and `match_all` simultaneously.")
+
         return models.GrantaServerApiListsDtoListBooleanCriterion(
             match_any=[criteria._to_model() for criteria in self.match_any]
             if self.match_any is not None

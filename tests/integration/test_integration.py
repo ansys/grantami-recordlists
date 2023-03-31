@@ -433,21 +433,11 @@ class TestSearch:
         assert list_a in ids
         assert list_b in ids
 
-    @pytest.fixture(scope="function")
-    def list_a_suffix_only(self, admin_client, unique_id, cleanup_admin):
-        list_id = admin_client.create_list(name=f"{unique_id}{self._name_suffix_A}")
-        cleanup_admin.append(list_id)
-        yield list_id
-
-    def test_boolean_match_any_and_all_is_not_OR(
+    def test_boolean_match_any_and_all_is_forbidden(
         self,
         admin_client,
         list_name,
         new_list_id,
-        list_a,
-        list_b,
-        list_c,
-        list_a_suffix_only,
     ):
         # If it was OR, we'd have 5 result: all lists created as fixtures
         criteria = BooleanCriterion(
@@ -456,65 +446,8 @@ class TestSearch:
             ],
             match_all=[SearchCriterion(name_contains=list_name)],
         )
-        results = admin_client.search_for_lists(criteria)
-        ids = {result.record_list.identifier for result in results}
-        assert new_list_id in ids
-        assert list_a in ids
-        assert list_b in ids
-        assert list_c in ids
-        assert list_a_suffix_only not in ids
-        assert len(results) == 4
-
-    def test_boolean_match_any_and_all_is_not_AND(
-        self,
-        admin_client,
-        list_name,
-        new_list_id,
-        list_a,
-        list_b,
-        list_c,
-        list_a_suffix_only,
-    ):
-        # If it was AND, we'd have 1 result: list_a
-        criteria = BooleanCriterion(
-            match_any=[
-                SearchCriterion(name_contains=self._name_suffix_A),
-            ],
-            match_all=[SearchCriterion(name_contains=list_name)],
-        )
-        results = admin_client.search_for_lists(criteria)
-        ids = {result.record_list.identifier for result in results}
-        assert new_list_id in ids
-        assert list_a in ids
-        assert list_b in ids
-        assert list_c in ids
-        assert list_a_suffix_only not in ids
-        assert len(results) == 4
-
-    def test_boolean_match_all_takes_precedence(
-        self,
-        admin_client,
-        list_name,
-        new_list_id,
-        list_a,
-        list_b,
-        list_c,
-        list_a_suffix_only,
-    ):
-        criteria = BooleanCriterion(
-            match_any=[
-                SearchCriterion(name_contains=list_name),
-            ],
-            match_all=[SearchCriterion(name_contains=self._name_suffix_A)],
-        )
-        results = admin_client.search_for_lists(criteria)
-        ids = {result.record_list.identifier for result in results}
-        assert new_list_id not in ids
-        assert list_a in ids
-        assert list_b not in ids
-        assert list_c not in ids
-        assert list_a_suffix_only in ids
-        assert len(results) == 2
+        with pytest.raises(ValueError):
+            results = admin_client.search_for_lists(criteria)
 
     @pytest.mark.parametrize("include_items", [True, False])
     def test_include_items_flag(self, admin_client, list_c, include_items, example_item):

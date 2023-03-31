@@ -322,6 +322,13 @@ class TestSearchCriterion:
         boolean_criterion.match_all = [search_criterion]
         assert boolean_criterion._match_all == [search_criterion]
 
+    def test_boolean_cannot_use_both_all_and_any(self):
+        crit_1 = SearchCriterion()
+        crit_2 = SearchCriterion()
+        boolean_criterion = BooleanCriterion(match_any=[crit_1], match_all=[crit_2])
+        with pytest.raises(ValueError):
+            boolean_criterion._to_model()
+
 
 class TestSearchResult:
     @pytest.mark.parametrize("include_items", [True, False])
