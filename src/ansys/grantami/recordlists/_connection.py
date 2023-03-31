@@ -190,8 +190,6 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
         description: Optional[str] = None,
         notes: Optional[str] = None,
         items: Optional[List[RecordListItem]] = None,
-        published: Optional[bool] = None,
-        awaiting_approval: Optional[bool] = None,
     ) -> str:
         """
         Create a new record list with the provided arguments.
@@ -208,10 +206,6 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
             Notes of the record list.
         items : list of :class:`.RecordListItem` or None
             List of items to add to the record list.
-        published : bool
-            Whether the list is published.
-        awaiting_approval : bool
-            Whether the list is awaiting approval.
 
         Returns
         -------
@@ -231,8 +225,6 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
                 description=description,
                 notes=notes,
                 items=items,
-                published=published,
-                awaiting_approval=awaiting_approval,
             ),
         )
         if status_code != 201:

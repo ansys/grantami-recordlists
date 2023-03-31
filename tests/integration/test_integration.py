@@ -40,25 +40,6 @@ def test_create_minimal_list(admin_client, cleanup_admin, list_name):
     assert isinstance(record_list.identifier, str)
 
 
-@pytest.mark.parametrize(
-    ["kwargs", "expected_published", "expected_awaiting"],
-    [
-        ({"published": True}, True, False),
-        ({"awaiting_approval": True}, False, True),
-        ({"published": True, "awaiting_approval": True}, True, True),
-    ],
-)
-def test_create_list_with_status(
-    admin_client, cleanup_admin, list_name, kwargs, expected_published, expected_awaiting
-):
-    record_list_id = admin_client.create_list(name=list_name, **kwargs)
-    cleanup_admin.append(record_list_id)
-
-    record_list = admin_client.get_list(record_list_id)
-    assert record_list.published is expected_published
-    assert record_list.awaiting_approval is expected_awaiting
-
-
 @pytest.mark.parametrize("new_list_id", [{"cleanup": False}], indirect=True)
 def test_delete_list(admin_client, new_list_id, list_name):
     admin_client.delete_list(new_list_id)
