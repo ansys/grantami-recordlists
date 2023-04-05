@@ -49,7 +49,8 @@ example_list
 
 # ## Get the details of an existing record list
 # The ``get_list`` method allows obtaining a ``RecordList`` instance from an existing record list
-# unique identifier.
+# unique identifier. This can be useful when the identifier is already known, for example if it has
+# been obtained from the Favorites application or if it is hard-coded in the script configuration.
 
 # + tags=[]
 list_details = client.get_list(example_list.identifier)
