@@ -516,7 +516,8 @@ class BooleanCriterion:
     Search criterion to use in a search operation :meth:`~.RecordListApiClient.search_for_lists`.
 
     Use this class to combine multiple :class:`SearchCriterion` or
-    :class:`BooleanCriterion` objects together as either *AND* or *OR* searches.
+    :class:`BooleanCriterion` objects together as either *AND* or *OR* searches. :attr:`.match_any`
+    and :attr:`.match_all` cannot be used together.
 
     Examples
     --------
@@ -539,8 +540,6 @@ class BooleanCriterion:
     ... )
 
     """
-
-    # TODO Using both match_any and match_all ignores criteria in match_any (PUD-561)
 
     def __init__(
         self,
@@ -586,6 +585,11 @@ class BooleanCriterion:
 
     def _to_model(self) -> models.GrantaServerApiListsDtoListBooleanCriterion:
         """Generate the DTO for use with the auto-generated client code."""
+        # Do not allow both `any` and `all` because current API behavior is not the expected
+        # behavior
+        if self.match_any is not None and self.match_all is not None:
+            raise ValueError("Cannot use `match_any` and `match_all` simultaneously.")
+
         return models.GrantaServerApiListsDtoListBooleanCriterion(
             match_any=[criteria._to_model() for criteria in self.match_any]
             if self.match_any is not None
@@ -618,14 +622,14 @@ class SearchResult:
     Read-only - do not directly instantiate or modify instances of this class.
     """
 
-    def __init__(self, list_details: RecordList, items: Optional[List[RecordListItem]]):
-        self._list_details = list_details
+    def __init__(self, record_list: RecordList, items: Optional[List[RecordListItem]]):
+        self._record_list = record_list
         self._items = items
 
     @property
-    def list_details(self) -> RecordList:
+    def record_list(self) -> RecordList:
         """Details of the record list associated with the search result."""
-        return self._list_details
+        return self._record_list
 
     @property
     def items(self) -> Optional[List[RecordListItem]]:
@@ -639,7 +643,7 @@ class SearchResult:
 
     def __repr__(self) -> str:
         """Printable representation of the object."""
-        return f"<{self.__class__.__name__} name: {self.list_details.name}>"
+        return f"<{self.__class__.__name__} name: {self.record_list.name}>"
 
     @classmethod
     def _from_model(
@@ -665,6 +669,6 @@ class SearchResult:
             items = [RecordListItem._from_model(item) for item in model.items]
 
         return cls(
-            list_details=RecordList._from_model(model.header),
+            record_list=RecordList._from_model(model.header),
             items=items,
         )

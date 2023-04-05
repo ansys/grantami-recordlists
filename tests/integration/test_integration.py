@@ -329,7 +329,8 @@ class TestSearch:
         criteria = SearchCriterion(name_contains=self._name_suffix_A)
         results = admin_client.search_for_lists(criteria)
         assert len(results) == 1
-        assert results[0].list_details.identifier == list_a.identifier
+        assert results[0].record_list.identifier == list_a.identifier
+
 
     def test_search_not_published_or_awaiting(self, admin_client, list_a):
         criteria = SearchCriterion(
@@ -341,19 +342,19 @@ class TestSearch:
         )
         results = admin_client.search_for_lists(criteria)
         assert len(results) == 1
-        assert results[0].list_details.identifier == list_a.identifier
+        assert results[0].record_list.identifier == list_a.identifier
 
     def test_search_published(self, admin_client, list_name, list_b):
         criteria = SearchCriterion(name_contains=list_name, is_published=True)
         results = admin_client.search_for_lists(criteria)
         assert len(results) == 1
-        assert results[0].list_details.identifier == list_b.identifier
+        assert results[0].record_list.identifier == list_b.identifier
 
     def test_search_revision(self, admin_client, list_name, list_c):
         criteria = SearchCriterion(name_contains=list_name, is_revision=True)
         results = admin_client.search_for_lists(criteria)
         assert len(results) == 1
-        assert results[0].list_details.identifier == list_c.identifier
+        assert results[0].record_list.identifier == list_c.identifier
 
     def test_search_by_database(self, admin_client, list_name, example_item, list_c):
         criteria = SearchCriterion(
@@ -362,7 +363,7 @@ class TestSearch:
         )
         results = admin_client.search_for_lists(criteria)
         assert len(results) == 1
-        assert results[0].list_details.identifier == list_c.identifier
+        assert results[0].record_list.identifier == list_c.identifier
 
     def test_search_by_multiple_databases(self, admin_client, list_name, example_item, list_c):
         # List of databases = Is in one OR the other
@@ -372,7 +373,7 @@ class TestSearch:
         )
         results = admin_client.search_for_lists(criteria)
         assert len(results) == 1
-        assert results[0].list_details.identifier == list_c.identifier
+        assert results[0].record_list.identifier == list_c.identifier
 
     def test_search_by_table(self, admin_client, list_name, example_item, list_c):
         criteria = SearchCriterion(
@@ -381,7 +382,7 @@ class TestSearch:
         )
         results = admin_client.search_for_lists(criteria)
         assert len(results) == 1
-        assert results[0].list_details.identifier == list_c.identifier
+        assert results[0].record_list.identifier == list_c.identifier
 
     def test_search_by_record(self, admin_client, list_name, example_item, list_c):
         criteria = SearchCriterion(
@@ -390,7 +391,7 @@ class TestSearch:
         )
         results = admin_client.search_for_lists(criteria)
         assert len(results) == 1
-        assert results[0].list_details.identifier == list_c.identifier
+        assert results[0].record_list.identifier == list_c.identifier
 
     def test_search_role_is_none(self, admin_client, list_name):
         criteria = SearchCriterion(user_role=UserRole.NONE)
@@ -413,7 +414,7 @@ class TestSearch:
         )
         results = admin_client.search_for_lists(criteria)
         assert len(results) == 1
-        assert results[0].list_details.identifier == list_a.identifier
+        assert results[0].record_list.identifier == list_a.identifier
 
     def test_nested_boolean_criteria(self, admin_client, list_name, new_list, list_a, list_b):
         criteria = BooleanCriterion(
@@ -437,92 +438,23 @@ class TestSearch:
         )
         results = admin_client.search_for_lists(criteria)
         assert len(results) == 2
-        ids = {result.list_details.identifier for result in results}
+        ids = {result.record_list.identifier for result in results}
         assert list_a.identifier in ids
         assert list_b.identifier in ids
 
-    @pytest.fixture(scope="function")
-    def list_a_suffix_only(self, admin_client, unique_id, cleanup_admin):
-        created_list = admin_client.create_list(name=f"{unique_id}{self._name_suffix_A}")
-        cleanup_admin.append(created_list)
-        yield created_list
-
-    def test_boolean_match_any_and_all_is_not_OR(
+    def test_boolean_match_any_and_all_is_forbidden(
         self,
         admin_client,
         list_name,
-        new_list,
-        list_a,
-        list_b,
-        list_c,
-        list_a_suffix_only,
     ):
-        # If it was OR, we'd have 5 result: all lists created as fixtures
         criteria = BooleanCriterion(
             match_any=[
                 SearchCriterion(name_contains=self._name_suffix_A),
             ],
             match_all=[SearchCriterion(name_contains=list_name)],
         )
-        results = admin_client.search_for_lists(criteria)
-        ids = {result.list_details.identifier for result in results}
-        assert new_list.identifier in ids
-        assert list_a.identifier in ids
-        assert list_b.identifier in ids
-        assert list_c.identifier in ids
-        assert list_a_suffix_only.identifier not in ids
-        assert len(results) == 4
-
-    def test_boolean_match_any_and_all_is_not_AND(
-        self,
-        admin_client,
-        list_name,
-        new_list,
-        list_a,
-        list_b,
-        list_c,
-        list_a_suffix_only,
-    ):
-        # If it was AND, we'd have 1 result: list_a
-        criteria = BooleanCriterion(
-            match_any=[
-                SearchCriterion(name_contains=self._name_suffix_A),
-            ],
-            match_all=[SearchCriterion(name_contains=list_name)],
-        )
-        results = admin_client.search_for_lists(criteria)
-        ids = {result.list_details.identifier for result in results}
-        assert new_list.identifier in ids
-        assert list_a.identifier in ids
-        assert list_b.identifier in ids
-        assert list_c.identifier in ids
-        assert list_a_suffix_only.identifier not in ids
-        assert len(results) == 4
-
-    def test_boolean_match_all_takes_precedence(
-        self,
-        admin_client,
-        list_name,
-        new_list,
-        list_a,
-        list_b,
-        list_c,
-        list_a_suffix_only,
-    ):
-        criteria = BooleanCriterion(
-            match_any=[
-                SearchCriterion(name_contains=list_name),
-            ],
-            match_all=[SearchCriterion(name_contains=self._name_suffix_A)],
-        )
-        results = admin_client.search_for_lists(criteria)
-        ids = {result.list_details.identifier for result in results}
-        assert new_list not in ids
-        assert list_a.identifier in ids
-        assert list_b.identifier not in ids
-        assert list_c.identifier not in ids
-        assert list_a_suffix_only.identifier in ids
-        assert len(results) == 2
+        with pytest.raises(ValueError):
+            results = admin_client.search_for_lists(criteria)
 
     @pytest.mark.parametrize("include_items", [True, False])
     def test_include_items_flag(self, admin_client, list_c, include_items, example_item):
@@ -533,7 +465,7 @@ class TestSearch:
         # First check we got the expected result
         assert len(results) == 1
         result = results[0]
-        assert result.list_details.identifier == list_c.identifier
+        assert result.record_list.identifier == list_c.identifier
         # Check the result does have the expected items
         if include_items:
             assert result.items == [example_item]
