@@ -50,13 +50,13 @@ client = connection.connect()
 # example for more details.
 
 # + tags=[]
-identifier_a = client.create_list(name="Approved materials - Metals")
-client.request_list_approval(identifier_a)
-client.publish_list(identifier_a)
+list_a = client.create_list(name="Approved materials - Metals")
+list_a = client.request_list_approval(list_a)
+list_a = client.publish_list(list_a)
 
-identifier_b = client.create_list(name="Approved materials - Ceramics")
+list_b = client.create_list(name="Approved materials - Ceramics")
 client.add_items_to_list(
-    identifier_b,
+    list_b,
     items=[
         RecordListItem(
             "9716c5a3-da85-4126-a922-3fbb854656d8",
@@ -65,11 +65,11 @@ client.add_items_to_list(
         )
     ],
 )
-client.request_list_approval(identifier_b)
-client.publish_list(identifier_b)
+list_b = client.request_list_approval(list_b)
+list_b = client.publish_list(list_b)
 
-identifier_c = client.revise_list(identifier_b)
-identifier_d = client.create_list(name="My personal list")
+list_c = client.revise_list(list_b)
+list_d = client.create_list(name="My personal list")
 # -
 
 # ## Search for a record list by name
@@ -148,8 +148,8 @@ results
 # -
 
 # + nbsphinx="hidden"
-client.delete_list(identifier_a)
-client.delete_list(identifier_b)
-client.delete_list(identifier_c)
-client.delete_list(identifier_d)
+client.delete_list(list_a)
+client.delete_list(list_b)
+client.delete_list(list_c)
+client.delete_list(list_d)
 # -

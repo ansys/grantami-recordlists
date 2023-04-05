@@ -45,7 +45,7 @@ def admin_client(sl_url, list_admin_username, list_admin_password, list_name):
     all_lists = client.get_all_lists()
     for record_list in all_lists:
         if list_name in record_list.name:
-            client.delete_list(record_list.identifier)
+            client.delete_list(record_list)
 
 
 @pytest.fixture(scope="session")
@@ -64,7 +64,7 @@ def basic_client(sl_url, list_username_no_permissions, list_password_no_permissi
     all_lists = client.get_all_lists()
     for record_list in all_lists:
         if list_name in record_list.name:
-            client.delete_list(record_list.identifier)
+            client.delete_list(record_list)
 
 
 @pytest.fixture(scope="session")
@@ -85,36 +85,36 @@ def list_name(unique_id):
 
 
 @pytest.fixture
-def new_list_id(admin_client, request, list_name):
+def new_list(admin_client, request, list_name):
     """
     Provides the identifier of newly created list.
     The created list include the name of the calling test as a `description`.
     """
-    list_id = admin_client.create_list(name=list_name, description=request.node.name)
+    new_list = admin_client.create_list(name=list_name, description=request.node.name)
     cleanup = getattr(request, "param", {}).get("cleanup", True)
-    yield list_id
+    yield new_list
     if cleanup:
-        admin_client.delete_list(list_id)
+        admin_client.delete_list(new_list)
 
 
 @pytest.fixture
-def new_list_with_items(admin_client, new_list_id, example_item):
+def new_list_with_items(admin_client, new_list, example_item):
     items = [example_item]
-    admin_client.add_items_to_list(new_list_id, items)
-    return new_list_id
+    admin_client.add_items_to_list(new_list, items)
+    return new_list
 
 
 @pytest.fixture(scope="function")
 def cleanup_admin(admin_client):
     to_delete = []
     yield to_delete
-    for identifier in to_delete:
-        admin_client.delete_list(identifier)
+    for record_list in to_delete:
+        admin_client.delete_list(record_list)
 
 
 @pytest.fixture(scope="function")
 def cleanup_basic(basic_client):
     to_delete = []
     yield to_delete
-    for identifier in to_delete:
-        basic_client.delete_list(identifier)
+    for record_list in to_delete:
+        basic_client.delete_list(record_list)

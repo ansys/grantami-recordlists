@@ -36,19 +36,24 @@ client = connection.connect()
 # -
 
 # ## Create a new record list
+# API operations expect a ``RecordList`` instance as input. For the purpose of this example, create
+# a new record list, using the ``create_list`` method. It returns a ``RecordList`` instance.
 
 # + tags=[]
-list_identifier = client.create_list(
+example_list = client.create_list(
     name="Example list",
     description=f"Created by example 00_Basic_usage",
 )
-list_identifier
+example_list
 # -
 
 # ## Get the details of an existing record list
+# The ``get_list`` method allows obtaining a ``RecordList`` instance from an existing record list
+# unique identifier. This can be useful when the identifier is already known, for example if it has
+# been obtained from the Favorites application or if it is hard-coded in the script configuration.
 
 # + tags=[]
-list_details = client.get_list(list_identifier)
+list_details = client.get_list(example_list.identifier)
 list_details
 # -
 
@@ -70,37 +75,37 @@ all_lists
 # ## Copy a record list
 
 # + tags=[]
-copied_list_identifier = client.copy_list(list_identifier)
-copied_list_identifier
+list_copy = client.copy_list(example_list)
+list_copy
 # -
 
 # ## Update a record list
 
 # + tags=[]
-copied_list_details = client.update_list(
-    copied_list_identifier,
+updated_list_copy = client.update_list(
+    list_copy,
     name="Copied - Example List",
     description=None,
     notes="Copy of the example list",
 )
-print(f"Name: {copied_list_details.name}")
-print(f"Identifier: {copied_list_details.identifier}")
-print(f"Notes: {copied_list_details.notes}")
-print(f"Description: {copied_list_details.description}")
-print(f"Created timestamp: {copied_list_details.created_timestamp}")
+print(f"Name: {updated_list_copy.name}")
+print(f"Identifier: {updated_list_copy.identifier}")
+print(f"Notes: {updated_list_copy.notes}")
+print(f"Description: {updated_list_copy.description}")
+print(f"Created timestamp: {updated_list_copy.created_timestamp}")
 # -
 
 # ## Delete a record list
 
 # + tags=[]
-client.delete_list(copied_list_identifier)
+client.delete_list(updated_list_copy)
 # -
 
 # ## Read the items in a record list
 # The list was created at the beginning of this example, so the list is currently empty.
 
 # + tags=[]
-items = client.get_list_items(list_identifier)
+items = client.get_list_items(example_list)
 items
 # -
 
@@ -110,7 +115,7 @@ items
 
 # + tags=[]
 client.add_items_to_list(
-    list_identifier,
+    example_list,
     items=[
         RecordListItem(
             database_guid="e595fe23-b450-4d18-8c08-4a0f378ef095",
@@ -124,7 +129,7 @@ client.add_items_to_list(
 # Then retrieve the items and confirm that the record list now includes the added items.
 
 # + tags=[]
-list_items = client.get_list_items(list_identifier)
+list_items = client.get_list_items(example_list)
 list_items
 # -
 
@@ -133,7 +138,7 @@ list_items
 
 # + tags=[]
 client.remove_items_from_list(
-    list_identifier,
+    example_list,
     items=list_items,
 )
 # -
@@ -141,11 +146,11 @@ client.remove_items_from_list(
 # Then retrieve the items again and confirm that the record list is empty.
 
 # + tags=[]
-items = client.get_list_items(list_identifier)
+items = client.get_list_items(example_list)
 items
 # -
 
 
 # + nbsphinx="hidden"
-client.delete_list(list_identifier)
+client.delete_list(example_list)
 # -
