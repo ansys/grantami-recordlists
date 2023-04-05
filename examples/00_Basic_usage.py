@@ -36,6 +36,8 @@ client = connection.connect()
 # -
 
 # ## Create a new record list
+# API operations expect a ``RecordList`` instance as input. For the purpose of this example, create
+# a new record list, using the ``create_list`` method. It returns a ``RecordList`` instance.
 
 # + tags=[]
 example_list = client.create_list(
@@ -46,6 +48,8 @@ example_list
 # -
 
 # ## Get the details of an existing record list
+# The ``get_list`` method allows obtaining a ``RecordList`` instance from an existing record list
+# unique identifier.
 
 # + tags=[]
 list_details = client.get_list(example_list.identifier)
