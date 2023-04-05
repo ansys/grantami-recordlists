@@ -331,7 +331,6 @@ class TestSearch:
         assert len(results) == 1
         assert results[0].record_list.identifier == list_a.identifier
 
-
     def test_search_not_published_or_awaiting(self, admin_client, list_a):
         criteria = SearchCriterion(
             name_contains=self._name_suffix_A,
