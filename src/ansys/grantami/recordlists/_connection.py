@@ -150,7 +150,7 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
         Parameters
         ----------
         record_list : RecordList
-            Target record list.
+            Record list in which items will be added.
         items : list of :class:`.RecordListItem`
             List of items to add to the record list.
 
@@ -179,7 +179,7 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
         Parameters
         ----------
         record_list : RecordList
-            Target record list.
+            Record list from which items will be removed.
         items : list of :class:`.RecordListItem`
             List of items to remove from the record list.
 
@@ -360,7 +360,7 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
         Parameters
         ----------
         record_list : RecordList
-            Target record list.
+            Record list for which approval is requested.
 
         Returns
         -------
@@ -387,7 +387,7 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
         Parameters
         ----------
         record_list : RecordList
-            Target record list.
+            Record list to publish.
 
         Returns
         -------
@@ -411,7 +411,7 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
         Parameters
         ----------
         record_list : RecordList
-            Target record list.
+            Record list to unpublish.
 
         Returns
         -------
@@ -434,7 +434,7 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
         Parameters
         ----------
         record_list : RecordList
-            Target record list.
+            Record list for which to cancel the approval request.
 
         Returns
         -------
