@@ -277,6 +277,15 @@ class RecordListItem:
             record_version=self.record_version,
         )
 
+    def __repr__(self) -> str:
+        """Printable representation of the object."""
+        dbguid_text = f"database_guid='{self.database_guid}'"
+        hguid_text = f", record_history_guid='{self.record_history_guid}'"
+        version_text = (
+            f", record_version={self.record_version}" if self.record_version is not None else ""
+        )
+        return f"<{self.__class__.__name__}({dbguid_text}{hguid_text}{version_text})>"
+
 
 class UserOrGroup:
     """Description of a Granta MI User or Group.
@@ -312,6 +321,16 @@ class UserOrGroup:
         user._display_name = dto_user.display_name
         user._name = dto_user.name
         return user
+
+    def __repr__(self) -> str:
+        """Printable representation of the object."""
+        return f"<{self.__class__.__name__} display_name: {self.display_name}>"
+
+    def __eq__(self, other: object) -> bool:
+        """Evaluate equality by checking equality of identifiers."""
+        if not isinstance(other, UserOrGroup):
+            return False
+        return self.identifier == other.identifier
 
 
 class SearchCriterion:
