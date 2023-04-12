@@ -132,58 +132,90 @@ class TestRecordList:
         assert record_list.parent_record_list_identifier is mock_dto.parent_record_list_identifier
 
 
-def test_user_dto_mapping():
+class TestUserOrGroup:
     user_id = uuid.uuid4()
     username = "domain\\username"
     display_name = "domain\\displayname"
     dto_user = GrantaServerApiListsDtoUserOrGroup(user_id, display_name, username)
 
-    user = UserOrGroup._from_model(dto_user)
+    def test_user_dto_mapping(self):
+        user = UserOrGroup._from_model(self.dto_user)
 
-    assert user.identifier == user_id
-    assert user.name == username
-    assert user.display_name == display_name
+        assert user.identifier == self.user_id
+        assert user.name == self.username
+        assert user.display_name == self.display_name
 
+    def test_repr(self):
+        user = UserOrGroup._from_model(self.dto_user)
+        assert repr(user) == "<UserOrGroup display_name: domain\\displayname>"
 
-def test_record_list_item_from_dto_mapping():
-    db_guid = uuid.uuid4()
-    table_guid = uuid.uuid4()
-    record_history_guid = uuid.uuid4()
-    record_version = 1
-    record_guid = uuid.uuid4()
+    def test_inequality(self):
+        user_1 = UserOrGroup()
+        user_1._identifier = uuid.uuid4()
+        user_2 = UserOrGroup()
+        user_2._identifier = uuid.uuid4()
+        assert user_1 != user_2
 
-    dto_item = GrantaServerApiListsDtoListItem(
-        database_guid=db_guid,
-        table_guid=table_guid,
-        record_history_guid=record_history_guid,
-        record_version=record_version,
-        record_guid=record_guid,
-    )
-
-    item = RecordListItem._from_model(dto_item)
-
-    assert item.database_guid == db_guid
-    assert item.table_guid == table_guid
-    assert item.record_history_guid == record_history_guid
-    assert item.record_version == record_version
-    assert item.record_guid == record_guid
+    def test_equality(self):
+        identifier = uuid.uuid4()
+        user_1 = UserOrGroup()
+        user_1._identifier = identifier
+        user_2 = UserOrGroup()
+        user_2._identifier = identifier
+        assert user_1 == user_2
 
 
-def test_record_list_item_to_dto_mapping():
-    item = RecordListItem(
-        database_guid=str(uuid.uuid4()),
-        table_guid=str(uuid.uuid4()),
-        record_history_guid=str(uuid.uuid4()),
-        record_version=2,
-    )
-    item._record_guid = str(uuid.uuid4())
+class TestRecordListItem:
+    def test_record_list_item_from_dto_mapping(self):
+        db_guid = uuid.uuid4()
+        table_guid = uuid.uuid4()
+        record_history_guid = uuid.uuid4()
+        record_version = 1
+        record_guid = uuid.uuid4()
 
-    dto = item._to_model()
-    assert dto.database_guid == item.database_guid
-    assert dto.table_guid == item.table_guid
-    assert dto.record_history_guid == item.record_history_guid
-    assert dto.record_version == item.record_version
-    assert dto.record_guid is None
+        dto_item = GrantaServerApiListsDtoListItem(
+            database_guid=db_guid,
+            table_guid=table_guid,
+            record_history_guid=record_history_guid,
+            record_version=record_version,
+            record_guid=record_guid,
+        )
+
+        item = RecordListItem._from_model(dto_item)
+
+        assert item.database_guid == db_guid
+        assert item.table_guid == table_guid
+        assert item.record_history_guid == record_history_guid
+        assert item.record_version == record_version
+        assert item.record_guid == record_guid
+
+    def test_record_list_item_to_dto_mapping(self):
+        item = RecordListItem(
+            database_guid=str(uuid.uuid4()),
+            table_guid=str(uuid.uuid4()),
+            record_history_guid=str(uuid.uuid4()),
+            record_version=2,
+        )
+        item._record_guid = str(uuid.uuid4())
+
+        dto = item._to_model()
+        assert dto.database_guid == item.database_guid
+        assert dto.table_guid == item.table_guid
+        assert dto.record_history_guid == item.record_history_guid
+        assert dto.record_version == item.record_version
+        assert dto.record_guid is None
+
+    def test_record_list_item_repr(self):
+        item = RecordListItem(
+            database_guid="b0de1566-c2c5-49ac-a8d1-e6183b1a3b77",
+            table_guid=str(uuid.uuid4()),
+            record_history_guid="855360aa-d77b-4d66-bd39-536744677299",
+            record_version=2,
+        )
+        assert (
+            repr(item) == "<RecordListItem(database_guid='b0de1566-c2c5-49ac-a8d1-e6183b1a3b77', "
+            "record_history_guid='855360aa-d77b-4d66-bd39-536744677299', record_version=2)>"
+        )
 
 
 class TestItemEquality:
@@ -334,6 +366,12 @@ class TestSearchCriterion:
         boolean_criterion = BooleanCriterion(match_any=[crit_1], match_all=[])
         with pytest.raises(ValueError):
             boolean_criterion._to_model()
+
+    def test_boolean_criterion_repr(self):
+        assert repr(BooleanCriterion()) == "<BooleanCriterion ...>"
+
+    def test_search_criterion_repr(self):
+        assert repr(SearchCriterion()) == "<SearchCriterion ...>"
 
 
 class TestSearchResult:
