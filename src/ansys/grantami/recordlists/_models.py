@@ -529,6 +529,10 @@ class SearchCriterion:
             user_can_add_or_remove_items=self.user_can_add_or_remove_items,
         )
 
+    def __repr__(self) -> str:
+        """Printable representation of the object."""
+        return f"<{self.__class__.__name__} ...>"
+
 
 class BooleanCriterion:
     """
@@ -617,6 +621,10 @@ class BooleanCriterion:
             if self.match_all is not None
             else None,
         )
+
+    def __repr__(self) -> str:
+        """Printable representation of the object."""
+        return f"<{self.__class__.__name__} ...>"
 
 
 class UserRole(str, Enum):

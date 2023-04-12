@@ -367,6 +367,12 @@ class TestSearchCriterion:
         with pytest.raises(ValueError):
             boolean_criterion._to_model()
 
+    def test_boolean_criterion_repr(self):
+        assert repr(BooleanCriterion()) == "<BooleanCriterion ...>"
+
+    def test_search_criterion_repr(self):
+        assert repr(SearchCriterion()) == "<SearchCriterion ...>"
+
 
 class TestSearchResult:
     @pytest.mark.parametrize("include_items", [True, False])
