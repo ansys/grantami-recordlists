@@ -279,12 +279,14 @@ class RecordListItem:
 
     def __repr__(self) -> str:
         """Printable representation of the object."""
-        dbguid_text = f"database_guid='{self.database_guid}'"
-        hguid_text = f", record_history_guid='{self.record_history_guid}'"
-        version_text = (
-            f", record_version={self.record_version}" if self.record_version is not None else ""
-        )
-        return f"<{self.__class__.__name__}({dbguid_text}{hguid_text}{version_text})>"
+        properties = {
+            "database_guid": f"'{self.database_guid}'",
+            "record_history_guid": f"'{self.record_history_guid}'",
+        }
+        if self.record_version is not None:
+            properties["record_version"] = str(self.record_version)
+        formatted_properties = ", ".join(f"{name}={value}" for name, value in properties.items())
+        return f"<{self.__class__.__name__}({formatted_properties})>"
 
 
 class UserOrGroup:
