@@ -1,4 +1,4 @@
-name: GitHub CI
+name: CI
 on:
   pull_request:
   push:
@@ -23,7 +23,7 @@ jobs:
     name: "Code style"
     runs-on: ubuntu-latest
     steps:
-      - uses: pyansys/actions/code-style@v3
+      - uses: pyansys/actions/code-style@v4
         with:
           python-version: ${{ env.MAIN_PYTHON_VERSION }}
 
@@ -31,117 +31,89 @@ jobs:
     name: "Documentation style"
     runs-on: ubuntu-latest
     steps:
-      - uses: pyansys/actions/doc-style@v3
+      - uses: pyansys/actions/doc-style@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-
-  download-artifacts:
-    name: "Download ServerAPI artifacts"
-    runs-on: ubuntu-latest
-    steps:
-
-      - name: Download dependencies
-        run: |
-          python -m pip download ansys-grantami-serverapi-openapi==0.1.0.dev55 --index-url ${{ env.INDEX_URL }} --no-dependencies --pre -d deps
-        env:
-          INDEX_URL: https://${{ secrets.PYANSYS_PYPI_PRIVATE_PAT }}@pkgs.dev.azure.com/pyansys/_packaging/pyansys/pypi/simple/
-
-      - name: Upload as artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: ansys-grantami-serverapi-openapi-wheel
-          path: deps
 
   doc-build:
     name: "Build documentation"
     runs-on: ubuntu-latest
-    needs: [ doc-style, download-artifacts ]
+    needs: doc-style
     steps:
-      - uses: actions/checkout@v3
-      - name: Download dependencies
-        uses: actions/download-artifact@v3
-        with:
-          name: ansys-grantami-serverapi-openapi-wheel
-          path: deps
-      - name: Set up Python
+
+      - name: "Checkout the repository"
+        uses: actions/checkout@v3
+
+      - name: "Set up Python"
         uses: actions/setup-python@v4
         with:
           python-version: ${{ env.MAIN_PYTHON_VERSION }}
 
-      - name: Install system dependencies
+      - name: "Install system dependencies"
         run: |
-          sudo apt update
-          sudo apt install pandoc
-      - name: Install dependencies
+          sudo apt-get update && sudo apt-get install pandoc
+
+      - name: "Install Python dependencies"
         run: |
           python -m pip install --upgrade pip tox
           python -m pip install poetry~=1.3.0
-      - name: Generate the documentation with tox
+
+      - name: "Generate the documentation with tox"
         run: tox -e doc
 
-      - name: Upload HTML Documentation
+      # TODO: rename as documentation-html
+      - name: "Upload HTML documentation"
         uses: actions/upload-artifact@v3
         with:
           name: documentation-html-no-examples
-          path: .tox/doc_out/
+          path: doc/_build/html
           retention-days: 7
 
   smoke-tests:
-    name: "Build and Smoke tests"
+    name: "Build wheelhouse for latest Python versions"
     runs-on: ${{ matrix.os }}
-    needs: [code-style, download-artifacts]
+    needs: code-style
     strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, windows-latest]
-        python-version: ['3.8', '3.9', '3.10', '3.11']
+       matrix:
+           os: [ubuntu-latest, windows-latest]
+           python-version: ['3.7', '3.8', '3.9', '3.10']
     steps:
-      - uses: actions/checkout@v3
-      - name: Download dependencies
-        uses: actions/download-artifact@v3
-        with:
-          name: ansys-grantami-serverapi-openapi-wheel
-          path: deps
-
-      - uses: pyansys/actions/build-wheelhouse@v3
+      - uses: pyansys/actions/build-wheelhouse@v4
         with:
           library-name: ${{ env.LIBRARY_NAME }}
           library-namespace: ${{ env.LIBRARY_NAMESPACE }}
           operating-system: ${{ matrix.os }}
           python-version: ${{ matrix.python-version }}
-          checkout: false
 
   tests:
-    name: "Unit tests"
+    name: "Tests Python ${{ matrix.python-version }}"
     runs-on: ${{ matrix.os }}
-    needs: [smoke-tests]
+    needs: smoke-tests
     strategy:
       matrix:
        os: [ubuntu-latest, windows-latest]
        python-version: ['3.8', '3.9', '3.10', '3.11']
       fail-fast: false
     steps:
-      - uses: actions/checkout@v3
 
-      - name: Download dependencies
-        uses: actions/download-artifact@v3
-        with:
-          name: ansys-grantami-serverapi-openapi-wheel
-          path: deps
+      - name: "Checkout the repository"
+        uses: actions/checkout@v3
 
-      - name: Set up Python ${{ matrix.python-version }}
+      - name: "Set up Python ${{ matrix.python-version }}"
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Install dependencies
+
+      - name: "Install Python dependencies"
         run: |
-          python -m pip install --upgrade pip poetry tox tox-gh-actions
-      - name: Test with tox
-        run: tox -- -m "not integration"
+          python -m pip install --upgrade pip poetry tox
+
+      - name: "Test with tox"
+        run: tox -e py -m "not integration"
 
       - name: "Upload coverage results"
         uses: actions/upload-artifact@v3
-        if: matrix.python-version == ${{ env.MAIN_PYTHON_VERSION }}
+        if: matrix.python-version == ${{ env.MAIN_PYTHON_VERSION }} && matrix.os == 'ubuntu-latest'
         with:
           name: coverage-html
           path: .cov/html
@@ -150,23 +122,14 @@ jobs:
   build-library:
     name: "Build library"
     runs-on: ubuntu-latest
-    needs: [ tests ]
+    needs: [ doc-build, tests ]
     steps:
-      - uses: actions/checkout@v3
-
-      - name: Download dependencies
-        uses: actions/download-artifact@v3
-        with:
-          name: ansys-grantami-serverapi-openapi-wheel
-          path: grantami-recordlists/grantami-recordlists/deps
-
-      - uses: pyansys/actions/build-library@v3
+      - uses: pyansys/actions/build-library@v4
         with:
           library-name: ${{ env.LIBRARY_NAME }}
           python-version: ${{ env.MAIN_PYTHON_VERSION }}
-          checkout: false
 
-
+  # TODO: what is this check for?
   server_checks:
     name: "Server checks"
     needs: [tests]
@@ -180,13 +143,14 @@ jobs:
   doc-deploy-dev:
     name: "Deploy development documentation"
     runs-on: ubuntu-latest
-    needs: [server_checks]
+    needs: [build-library]
     if: github.event_name == 'push' && !contains(github.ref, 'refs/tags')
     steps:
       - uses: pyansys/actions/doc-deploy-dev@v4
         with:
           cname: ${{ env.DOCUMENTATION_CNAME }}
           token: ${{ secrets.GITHUB_TOKEN }}
+          # TODO: update artifact name
           doc-artifact-name: documentation-html
 
   release:
@@ -195,22 +159,6 @@ jobs:
     needs: [server_checks]
     if: github.event_name == 'push' && contains(github.ref, 'refs/tags')
     steps:
-#      - uses: pyansys/actions/doc-deploy-stable@v4
-#        name: "Deploy stable documentation"
-#        with:
-#          cname: ${{ env.DOCUMENTATION_CNAME }}
-#          token: ${{ secrets.GITHUB_TOKEN }}
-#          doc-artifact-name: documentation-html
-
-#      - uses: actions/download-artifact@v3
-#        with:
-#          name: ${{ env.LIBRARY_NAME }}-artifacts
-#          path: dist/${{ env.LIBRARY_NAME }}-artifacts/
-
-      - uses: pyansys/actions/release-github@v4
-        name: "Release to GitHub"
-        with:
-          library-name: ${{ env.LIBRARY_NAME }}
 
       - uses: pyansys/actions/release-pypi-private@v4
         name: "Release to private PyPI"
@@ -218,5 +166,10 @@ jobs:
           library-name: ${{ env.LIBRARY_NAME }}
           twine-username: "__token__"
           twine-token: ${{ secrets.PYANSYS_PYPI_PRIVATE_PAT }}
+
+      - uses: pyansys/actions/release-github@v4
+        name: "Release to GitHub"
+        with:
+          library-name: ${{ env.LIBRARY_NAME }}
 
       # TODO release to public PyPI
