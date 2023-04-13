@@ -277,6 +277,17 @@ class RecordListItem:
             record_version=self.record_version,
         )
 
+    def __repr__(self) -> str:
+        """Printable representation of the object."""
+        properties = {
+            "database_guid": f"'{self.database_guid}'",
+            "record_history_guid": f"'{self.record_history_guid}'",
+        }
+        if self.record_version is not None:
+            properties["record_version"] = str(self.record_version)
+        formatted_properties = ", ".join(f"{name}={value}" for name, value in properties.items())
+        return f"<{self.__class__.__name__}({formatted_properties})>"
+
 
 class UserOrGroup:
     """Description of a Granta MI User or Group.
@@ -312,6 +323,16 @@ class UserOrGroup:
         user._display_name = dto_user.display_name
         user._name = dto_user.name
         return user
+
+    def __repr__(self) -> str:
+        """Printable representation of the object."""
+        return f"<{self.__class__.__name__} display_name: {self.display_name}>"
+
+    def __eq__(self, other: object) -> bool:
+        """Evaluate equality by checking equality of identifiers."""
+        if not isinstance(other, UserOrGroup):
+            return False
+        return self.identifier == other.identifier
 
 
 class SearchCriterion:
@@ -510,6 +531,10 @@ class SearchCriterion:
             user_can_add_or_remove_items=self.user_can_add_or_remove_items,
         )
 
+    def __repr__(self) -> str:
+        """Printable representation of the object."""
+        return f"<{self.__class__.__name__} ...>"
+
 
 class BooleanCriterion:
     """
@@ -598,6 +623,10 @@ class BooleanCriterion:
             if self.match_all is not None
             else None,
         )
+
+    def __repr__(self) -> str:
+        """Printable representation of the object."""
+        return f"<{self.__class__.__name__} ...>"
 
 
 class UserRole(str, Enum):
