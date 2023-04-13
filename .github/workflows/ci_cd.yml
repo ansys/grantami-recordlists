@@ -134,7 +134,7 @@ jobs:
     uses: ./.github/workflows/server_checks.yml
     with:
       python-version: ${{ env.MAIN_PYTHON_VERSION }}
-      skip_vm_management: ${{ vars.SKIP_VM_MANAGEMENT == 'true' }}
+      skip-vm-management: ${{ vars.SKIP_VM_MANAGEMENT == 'true' }}
     secrets:
       inherit
 

@@ -122,10 +122,10 @@ jobs:
       - name: "Checkout the repository"
         uses: actions/checkout@v3
 
-      - name: "Set up Python 3.9"
+      - name: "Set up Python ${{ inputs.python-version }}"
         uses: actions/setup-python@v4
         with:
-          python-version: '3.9'
+          python-version: ${{ inputs.python-version }}
 
       - name: "Install system dependencies"
         run: |
