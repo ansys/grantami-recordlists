@@ -82,8 +82,8 @@ styling pass (:ref:`pre-commit <ref_precommit>`), and that the documentation can
 examples (:ref:`Documenting <ref_documenting>`).
 
 Continuous Integration on GitHub is configured to run the integration tests and generate the full documentation on
-creation and updates of pull requests. Continuous Integration will not run for pull requests from forks. External
-contributions will require approval from a maintainer for checks to run.
+creation and updates of pull requests. Continuous Integration is not configured to run for pull requests from forks.
+External contributions require approval from a maintainer for checks to run.
 
 .. _ref_precommit:
 

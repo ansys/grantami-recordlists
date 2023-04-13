@@ -10,10 +10,10 @@ The following examples demonstrate key aspects of Granta MI RecordLists.
    :maxdepth: 2
 
    00_Basic_usage
-   01_Advanced_usage
+   01_Publishing_revising_withdrawing
    02_Searching
 
 
-Users of the Granta MI Scripting Toolkit can find an example of interoperability in the Granta MI Scripting Toolkit
-documentation.
+The Granta MI Scripting Toolkit documentation includes an additional example focusing on interoperability
+between this package and the Granta MI Scripting Toolkit.
 

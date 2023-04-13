@@ -5,20 +5,19 @@ pytestmark = pytest.mark.integration
 
 
 def test_create_list(basic_client, list_name):
-    record_list_id = basic_client.create_list(name=list_name)
+    record_list = basic_client.create_list(name=list_name)
 
-    record_list = basic_client.get_list(record_list_id)
     assert record_list.name == list_name
     assert isinstance(record_list.identifier, str)
 
 
 @pytest.fixture
-def basic_list_id(basic_client, list_name, request):
-    list_id = basic_client.create_list(name=list_name)
+def basic_list(basic_client, list_name, request):
+    new_list = basic_client.create_list(name=list_name)
     cleanup = getattr(request, "param", {}).get("cleanup", True)
-    yield list_id
+    yield new_list
     if cleanup:
-        basic_client.delete_list(list_id)
+        basic_client.delete_list(new_list)
 
 
 class TestAuthoredListLifeCycle:
@@ -30,28 +29,26 @@ class TestAuthoredListLifeCycle:
     required to get a list in the expected state.
     """
 
-    def test_can_request_approval_but_not_publish(self, basic_client, basic_list_id):
-        basic_client.request_list_approval(basic_list_id)
-        list_details = basic_client.get_list(basic_list_id)
+    def test_can_request_approval_but_not_publish(self, basic_client, basic_list):
+        list_details = basic_client.request_list_approval(basic_list)
         assert list_details.awaiting_approval is True
         assert list_details.published is False
 
         with pytest.raises(ApiException) as e:
-            basic_client.publish_list(basic_list_id)
+            basic_client.publish_list(basic_list)
         assert e.value.status_code == 403
 
     @pytest.fixture
-    def basic_published_list_id(self, admin_client, basic_client, basic_list_id):
-        basic_client.request_list_approval(basic_list_id)
-        admin_client.publish_list(basic_list_id)
-        yield basic_list_id
+    def basic_published_list_id(self, admin_client, basic_client, basic_list):
+        basic_list = basic_client.request_list_approval(basic_list)
+        basic_list = admin_client.publish_list(basic_list)
+        yield basic_list
 
         # Need to withdraw the list, otherwise the current user cannot delete its own list
-        admin_client.unpublish_list(basic_list_id)
+        admin_client.unpublish_list(basic_list)
 
     def test_can_request_withdrawal_but_not_withdraw(self, basic_client, basic_published_list_id):
-        basic_client.request_list_approval(basic_published_list_id)
-        list_details = basic_client.get_list(basic_published_list_id)
+        list_details = basic_client.request_list_approval(basic_published_list_id)
         assert list_details.awaiting_approval is True
         assert list_details.published is True
 
@@ -66,25 +63,25 @@ class TestListLifeCycle:
     lifecycle operations on a list they have not authored.
     """
 
-    def test_all_stages(self, admin_client, basic_client, new_list_id):
+    def test_all_stages(self, admin_client, basic_client, new_list):
         """Single test to avoid duplication."""
         # new_list_id is the identifier of a list created by the admin user
 
         with pytest.raises(ApiException) as e:
-            basic_client.request_list_approval(new_list_id)
+            basic_client.request_list_approval(new_list)
         assert e.value.status_code == 403
 
-        admin_client.request_list_approval(new_list_id)
+        admin_client.request_list_approval(new_list)
         with pytest.raises(ApiException) as e:
-            basic_client.publish_list(new_list_id)
+            basic_client.publish_list(new_list)
         assert e.value.status_code == 403
 
-        admin_client.publish_list(new_list_id)
+        admin_client.publish_list(new_list)
         with pytest.raises(ApiException) as e:
-            basic_client.request_list_approval(new_list_id)
+            basic_client.request_list_approval(new_list)
         assert e.value.status_code == 403
 
-        admin_client.request_list_approval(new_list_id)
+        admin_client.request_list_approval(new_list)
         with pytest.raises(ApiException) as e:
-            basic_client.unpublish_list(new_list_id)
+            basic_client.unpublish_list(new_list)
         assert e.value.status_code == 403

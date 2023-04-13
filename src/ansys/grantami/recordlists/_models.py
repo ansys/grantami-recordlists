@@ -7,35 +7,35 @@ from ansys.grantami.serverapi_openapi import models  # type: ignore
 
 
 class RecordList:
-    # TODO Skipped, might be for internal use?
-    #  - metadata
-    """Describes a RecordList as obtained from the API. Read-only."""
+    """
+    Describes a RecordList as obtained from the API.
+
+    Read-only - do not directly instantiate or modify instances of this class.
+    """
 
     def __init__(
         self,
         identifier: str,
         name: str,
         created_timestamp: datetime,
-        created_user: "User",
+        created_user: "UserOrGroup",
         published: bool,
         is_revision: bool,
         awaiting_approval: bool,
         internal_use: bool,
         description: Optional[str] = None,
         notes: Optional[str] = None,
-        # TODO is set at creation, so not optional?
         last_modified_timestamp: Optional[datetime] = None,
-        # TODO is set at creation, so not optional?
-        last_modified_user: Optional["User"] = None,
+        last_modified_user: Optional["UserOrGroup"] = None,
         published_timestamp: Optional[datetime] = None,
-        published_user: Optional["User"] = None,
+        published_user: Optional["UserOrGroup"] = None,
         parent_record_list_identifier: Optional[str] = None,
     ):
 
         self._identifier: str = identifier
         self._name: str = name
         self._created_timestamp: datetime = created_timestamp
-        self._created_user: User = created_user
+        self._created_user: UserOrGroup = created_user
         self._published: bool = published
         self._is_revision: bool = is_revision
         self._awaiting_approval: bool = awaiting_approval
@@ -44,9 +44,9 @@ class RecordList:
         self._description: Optional[str] = description
         self._notes: Optional[str] = notes
         self._last_modified_timestamp: Optional[datetime] = last_modified_timestamp
-        self._last_modified_user: Optional[User] = last_modified_user
+        self._last_modified_user: Optional[UserOrGroup] = last_modified_user
         self._published_timestamp: Optional[datetime] = published_timestamp
-        self._published_user: Optional[User] = published_user
+        self._published_user: Optional[UserOrGroup] = published_user
 
         self._parent_record_list_identifier: Optional[str] = parent_record_list_identifier
 
@@ -91,7 +91,7 @@ class RecordList:
         return self._created_timestamp
 
     @property
-    def created_user(self) -> "User":
+    def created_user(self) -> "UserOrGroup":
         """User who created the Record List. Read-only."""
         return self._created_user
 
@@ -101,20 +101,18 @@ class RecordList:
         return self._last_modified_timestamp
 
     @property
-    def last_modified_user(self) -> Optional["User"]:
+    def last_modified_user(self) -> Optional["UserOrGroup"]:
         """User who last modified the Record List. Read-only."""
         return self._last_modified_user
 
     @property
     def published_timestamp(self) -> Optional[datetime]:
         """Datetime at which the Record List was published. Read-only."""
-        # TODO also represents last withdrawal date. Consider renaming
         return self._published_timestamp
 
     @property
-    def published_user(self) -> Optional["User"]:
+    def published_user(self) -> Optional["UserOrGroup"]:
         """User who published/withdrew the Record List. Read-only."""
-        # TODO also represents last withdrawal date. Consider renaming
         return self._published_user
 
     @property
@@ -139,9 +137,6 @@ class RecordList:
 
         Lists flagged as for internal use are periodically deleted from the system.
         """
-        # TODO internal_use flags that the list has been created by another MI application. Internal
-        #  lists are periodically deleted.
-        #  Consider not exposing the property and filtering out all internal lists?
         return self._internal_use
 
     @property
@@ -165,15 +160,17 @@ class RecordList:
             description=model.description,
             notes=model.notes,
             created_timestamp=model.created_timestamp,
-            created_user=User._from_model(model.created_user),
+            created_user=UserOrGroup._from_model(model.created_user),
             is_revision=model.is_revision,
             published=model.published,
             awaiting_approval=model.awaiting_approval,
             internal_use=model.internal_use,
             last_modified_timestamp=model.last_modified_timestamp,
-            last_modified_user=User._from_model(model.last_modified_user),
+            last_modified_user=UserOrGroup._from_model(model.last_modified_user),
             published_timestamp=model.published_timestamp,
-            published_user=User._from_model(model.published_user) if model.published_user else None,
+            published_user=UserOrGroup._from_model(model.published_user)
+            if model.published_user
+            else None,
             parent_record_list_identifier=model.parent_record_list_identifier,
         )
         return instance
@@ -185,9 +182,23 @@ class RecordList:
 
 class RecordListItem:
     """
-    Describes an item of a :class:`RecordList`, i.e. a record in a Granta MI database.
+    Describes a :class:`RecordList` item, generally a reference to a record in a Granta MI database.
 
-    An item does not necessarily represent a record that exists on the server.
+    The record is not guaranteed to exist. Care should be taken to ensure that the reference to the
+    record is valid before using it.
+
+    Parameters
+    ----------
+    database_guid : str
+       GUID of the database.
+    table_guid : str
+       GUID of the table.
+    record_history_guid : str
+       Record History GUID.
+    record_version : int, optional
+       Record version number - for records in version-controlled tables. If provided, the requested
+       version of the record is added to the list. If not provided, the list tracks the latest
+       available version of the record.
     """
 
     def __init__(
@@ -205,12 +216,12 @@ class RecordListItem:
 
     @property
     def database_guid(self) -> str:
-        """GUID of the database."""
+        """Database GUID."""
         return self._database_guid
 
     @property
     def table_guid(self) -> str:
-        """GUID of the table."""
+        """Table GUID."""
         return self._table_guid
 
     @property
@@ -228,8 +239,9 @@ class RecordListItem:
         """
         Record GUID.
 
-        Only populated if the :class:`RecordListItem` has been obtained via an API request and
-        represents a record in a version-controlled table.
+        Only populated if the :class:`RecordListItem` has both been obtained via an API request and
+        represents a specific version of a record. See the note on the ``record_version`` parameter
+        for this class for more details.
         """
         return self._record_guid
 
@@ -265,10 +277,23 @@ class RecordListItem:
             record_version=self.record_version,
         )
 
+    def __repr__(self) -> str:
+        """Printable representation of the object."""
+        properties = {
+            "database_guid": f"'{self.database_guid}'",
+            "record_history_guid": f"'{self.record_history_guid}'",
+        }
+        if self.record_version is not None:
+            properties["record_version"] = str(self.record_version)
+        formatted_properties = ", ".join(f"{name}={value}" for name, value in properties.items())
+        return f"<{self.__class__.__name__}({formatted_properties})>"
 
-class User:
-    # TODO change name to something user-friendly that means User AND Group
-    """Read-only description of a Granta MI User or Group."""
+
+class UserOrGroup:
+    """Description of a Granta MI User or Group.
+
+    Read-only - do not directly instantiate or modify instances of this class.
+    """
 
     def __init__(self) -> None:
         self._identifier: Optional[str] = None
@@ -291,20 +316,30 @@ class User:
         return self._name
 
     @classmethod
-    def _from_model(cls, dto_user: models.GrantaServerApiListsDtoUserOrGroup) -> "User":
+    def _from_model(cls, dto_user: models.GrantaServerApiListsDtoUserOrGroup) -> "UserOrGroup":
         """Instantiate from a model defined in the auto-generated client code."""
-        user: User = User()
+        user: UserOrGroup = UserOrGroup()
         user._identifier = dto_user.identifier
         user._display_name = dto_user.display_name
         user._name = dto_user.name
         return user
+
+    def __repr__(self) -> str:
+        """Printable representation of the object."""
+        return f"<{self.__class__.__name__} display_name: {self.display_name}>"
+
+    def __eq__(self, other: object) -> bool:
+        """Evaluate equality by checking equality of identifiers."""
+        if not isinstance(other, UserOrGroup):
+            return False
+        return self.identifier == other.identifier
 
 
 class SearchCriterion:
     """
     Search criterion to use in a :meth:`~.RecordListApiClient.search_for_lists` operation.
 
-    The properties in this class represent an AND search - only lists that match all the
+    The properties in this class represent an *AND* search - only lists that match all the
     non-null properties will be returned.
 
     Examples
@@ -437,7 +472,7 @@ class SearchCriterion:
 
     @property
     def contains_records_in_databases(self) -> Optional[List[str]]:
-        """Limits results to lists containing records in the specified databases."""
+        """Limits results to lists containing records in databases specified by GUIDs."""
         return self._contains_records_in_databases
 
     @contains_records_in_databases.setter
@@ -446,7 +481,7 @@ class SearchCriterion:
 
     @property
     def contains_records_in_integration_schemas(self) -> Optional[List[str]]:
-        """Limits results to lists containing records in the specified integration schemas."""
+        """Limits results to lists containing records in integration schemas specified by GUIDs."""
         return self._contains_records_in_integration_schemas
 
     @contains_records_in_integration_schemas.setter
@@ -455,7 +490,7 @@ class SearchCriterion:
 
     @property
     def contains_records_in_tables(self) -> Optional[List[str]]:
-        """Limits results to lists containing records in the specified tables specified."""
+        """Limits results to lists containing records in tables specified by GUIDs."""
         return self._contains_records_in_tables
 
     @contains_records_in_tables.setter
@@ -464,7 +499,7 @@ class SearchCriterion:
 
     @property
     def contains_records(self) -> Optional[List[str]]:
-        """Limits results to lists containing records specified by their GUIDs."""
+        """Limits results to lists containing records specified by their history GUIDs."""
         return self._contains_records
 
     @contains_records.setter
@@ -496,17 +531,22 @@ class SearchCriterion:
             user_can_add_or_remove_items=self.user_can_add_or_remove_items,
         )
 
+    def __repr__(self) -> str:
+        """Printable representation of the object."""
+        return f"<{self.__class__.__name__} ...>"
+
 
 class BooleanCriterion:
     """
     Search criterion to use in a search operation :meth:`~.RecordListApiClient.search_for_lists`.
 
-    Allow aggregation of multiple criteria defined as :class:`SearchCriterion` or
-    :class:`BooleanCriterion`.
+    Use this class to combine multiple :class:`SearchCriterion` or
+    :class:`BooleanCriterion` objects together as either *AND* or *OR* searches. :attr:`.match_any`
+    and :attr:`.match_all` cannot be used together.
 
     Examples
     --------
-    Search record lists and obtain the union of multiple criteria:
+    Search record lists and obtain the union of multiple criteria (*OR*):
 
     >>> criterion = BooleanCriterion(
     ...     match_any=[
@@ -515,7 +555,7 @@ class BooleanCriterion:
     ...     ]
     ... )
 
-    Search record lists and obtain the intersection of multiple criteria:
+    Search record lists and obtain the intersection of multiple criteria (*AND*):
 
     >>> criterion = BooleanCriterion(
     ...     match_all=[
@@ -525,8 +565,6 @@ class BooleanCriterion:
     ... )
 
     """
-
-    # TODO Using both match_any and match_all ignores criteria in match_any (PUD-561)
 
     def __init__(
         self,
@@ -572,6 +610,11 @@ class BooleanCriterion:
 
     def _to_model(self) -> models.GrantaServerApiListsDtoListBooleanCriterion:
         """Generate the DTO for use with the auto-generated client code."""
+        # Do not allow both `any` and `all` because current API behavior is not the expected
+        # behavior
+        if self.match_any is not None and self.match_all is not None:
+            raise ValueError("Cannot use `match_any` and `match_all` simultaneously.")
+
         return models.GrantaServerApiListsDtoListBooleanCriterion(
             match_any=[criteria._to_model() for criteria in self.match_any]
             if self.match_any is not None
@@ -581,6 +624,10 @@ class BooleanCriterion:
             else None,
         )
 
+    def __repr__(self) -> str:
+        """Printable representation of the object."""
+        return f"<{self.__class__.__name__} ...>"
+
 
 class UserRole(str, Enum):
     """Roles a user can have on a record list.
@@ -588,9 +635,9 @@ class UserRole(str, Enum):
     Can be used in :attr:`SearchCriterion.user_role`.
     """
 
-    NONE = (
-        models.GrantaServerApiListsDtoUserRole.NONE
-    )  # TODO: = Search for lists one has no permissions on?
+    NONE = models.GrantaServerApiListsDtoUserRole.NONE
+    """:class:`UserRole` is currently only supported in searches. Searching for lists with user
+    role = :attr:`.NONE` as criteria would exclude all lists from the results."""
     OWNER = models.GrantaServerApiListsDtoUserRole.OWNER
     SUBSCRIBER = models.GrantaServerApiListsDtoUserRole.SUBSCRIBER
     CURATOR = models.GrantaServerApiListsDtoUserRole.CURATOR
@@ -599,16 +646,19 @@ class UserRole(str, Enum):
 
 
 class SearchResult:
-    """Describes the result of a search."""
+    """Describes the result of a search.
 
-    def __init__(self, list_details: RecordList, items: Optional[List[RecordListItem]]):
-        self._list_details = list_details
+    Read-only - do not directly instantiate or modify instances of this class.
+    """
+
+    def __init__(self, record_list: RecordList, items: Optional[List[RecordListItem]]):
+        self._record_list = record_list
         self._items = items
 
     @property
-    def list_details(self) -> RecordList:
+    def record_list(self) -> RecordList:
         """Details of the record list associated with the search result."""
-        return self._list_details
+        return self._record_list
 
     @property
     def items(self) -> Optional[List[RecordListItem]]:
@@ -622,7 +672,7 @@ class SearchResult:
 
     def __repr__(self) -> str:
         """Printable representation of the object."""
-        return f"<{self.__class__.__name__} name: {self.list_details.name}>"
+        return f"<{self.__class__.__name__} name: {self.record_list.name}>"
 
     @classmethod
     def _from_model(
@@ -648,6 +698,6 @@ class SearchResult:
             items = [RecordListItem._from_model(item) for item in model.items]
 
         return cls(
-            list_details=RecordList._from_model(model.header),
+            record_list=RecordList._from_model(model.header),
             items=items,
         )

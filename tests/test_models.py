@@ -19,7 +19,7 @@ from ansys.grantami.recordlists import (
     RecordListItem,
     SearchCriterion,
     SearchResult,
-    User,
+    UserOrGroup,
     UserRole,
 )
 
@@ -27,7 +27,7 @@ from ansys.grantami.recordlists import (
 class TestRecordList:
     _list_name = "UnitTestList"
     _mock_id = "889dcaef-1ef4-4b92-8ff9-46f08d936f39"
-    _mock_user = Mock(spec=User)
+    _mock_user = Mock(spec=UserOrGroup)
 
     _notes = "TestNotes"
     _description = "TestDescription"
@@ -57,6 +57,13 @@ class TestRecordList:
     def record_list(self):
         record_list = RecordList(**self._data)
         return record_list
+
+    def test_repr(self, record_list):
+        assert repr(record_list) == "<RecordList name: UnitTestList>"
+
+    def test_search_result_repr(self, record_list):
+        result = SearchResult(record_list, None)
+        assert repr(result) == "<SearchResult name: UnitTestList>"
 
     @pytest.mark.parametrize("attr_name", list(_data.keys()))
     def test_record_list_is_read_only(self, record_list, attr_name):
@@ -100,9 +107,9 @@ class TestRecordList:
         record_list = RecordList(**record_list_data)
         assert getattr(record_list, attr_name) is None
 
-    @patch("ansys.grantami.recordlists._models.User")
+    @patch("ansys.grantami.recordlists._models.UserOrGroup")
     def test_dto_mapping(self, mock_user_class):
-        # Overriding User.from_model method to a no-op. It is tested separately
+        # Overriding UserOrGroup.from_model method to a no-op. It is tested separately
         mock_user_class._from_model = lambda x: x
         # Using mock to generate unique values for each property
         mock_dto = Mock(spec=GrantaServerApiListsDtoRecordListHeader)
@@ -125,58 +132,90 @@ class TestRecordList:
         assert record_list.parent_record_list_identifier is mock_dto.parent_record_list_identifier
 
 
-def test_user_dto_mapping():
+class TestUserOrGroup:
     user_id = uuid.uuid4()
     username = "domain\\username"
     display_name = "domain\\displayname"
     dto_user = GrantaServerApiListsDtoUserOrGroup(user_id, display_name, username)
 
-    user = User._from_model(dto_user)
+    def test_user_dto_mapping(self):
+        user = UserOrGroup._from_model(self.dto_user)
 
-    assert user.identifier == user_id
-    assert user.name == username
-    assert user.display_name == display_name
+        assert user.identifier == self.user_id
+        assert user.name == self.username
+        assert user.display_name == self.display_name
 
+    def test_repr(self):
+        user = UserOrGroup._from_model(self.dto_user)
+        assert repr(user) == "<UserOrGroup display_name: domain\\displayname>"
 
-def test_record_list_item_from_dto_mapping():
-    db_guid = uuid.uuid4()
-    table_guid = uuid.uuid4()
-    record_history_guid = uuid.uuid4()
-    record_version = 1
-    record_guid = uuid.uuid4()
+    def test_inequality(self):
+        user_1 = UserOrGroup()
+        user_1._identifier = uuid.uuid4()
+        user_2 = UserOrGroup()
+        user_2._identifier = uuid.uuid4()
+        assert user_1 != user_2
 
-    dto_item = GrantaServerApiListsDtoListItem(
-        database_guid=db_guid,
-        table_guid=table_guid,
-        record_history_guid=record_history_guid,
-        record_version=record_version,
-        record_guid=record_guid,
-    )
-
-    item = RecordListItem._from_model(dto_item)
-
-    assert item.database_guid == db_guid
-    assert item.table_guid == table_guid
-    assert item.record_history_guid == record_history_guid
-    assert item.record_version == record_version
-    assert item.record_guid == record_guid
+    def test_equality(self):
+        identifier = uuid.uuid4()
+        user_1 = UserOrGroup()
+        user_1._identifier = identifier
+        user_2 = UserOrGroup()
+        user_2._identifier = identifier
+        assert user_1 == user_2
 
 
-def test_record_list_item_to_dto_mapping():
-    item = RecordListItem(
-        database_guid=str(uuid.uuid4()),
-        table_guid=str(uuid.uuid4()),
-        record_history_guid=str(uuid.uuid4()),
-        record_version=2,
-    )
-    item._record_guid = str(uuid.uuid4())
+class TestRecordListItem:
+    def test_record_list_item_from_dto_mapping(self):
+        db_guid = uuid.uuid4()
+        table_guid = uuid.uuid4()
+        record_history_guid = uuid.uuid4()
+        record_version = 1
+        record_guid = uuid.uuid4()
 
-    dto = item._to_model()
-    assert dto.database_guid == item.database_guid
-    assert dto.table_guid == item.table_guid
-    assert dto.record_history_guid == item.record_history_guid
-    assert dto.record_version == item.record_version
-    assert dto.record_guid is None
+        dto_item = GrantaServerApiListsDtoListItem(
+            database_guid=db_guid,
+            table_guid=table_guid,
+            record_history_guid=record_history_guid,
+            record_version=record_version,
+            record_guid=record_guid,
+        )
+
+        item = RecordListItem._from_model(dto_item)
+
+        assert item.database_guid == db_guid
+        assert item.table_guid == table_guid
+        assert item.record_history_guid == record_history_guid
+        assert item.record_version == record_version
+        assert item.record_guid == record_guid
+
+    def test_record_list_item_to_dto_mapping(self):
+        item = RecordListItem(
+            database_guid=str(uuid.uuid4()),
+            table_guid=str(uuid.uuid4()),
+            record_history_guid=str(uuid.uuid4()),
+            record_version=2,
+        )
+        item._record_guid = str(uuid.uuid4())
+
+        dto = item._to_model()
+        assert dto.database_guid == item.database_guid
+        assert dto.table_guid == item.table_guid
+        assert dto.record_history_guid == item.record_history_guid
+        assert dto.record_version == item.record_version
+        assert dto.record_guid is None
+
+    def test_record_list_item_repr(self):
+        item = RecordListItem(
+            database_guid="b0de1566-c2c5-49ac-a8d1-e6183b1a3b77",
+            table_guid=str(uuid.uuid4()),
+            record_history_guid="855360aa-d77b-4d66-bd39-536744677299",
+            record_version=2,
+        )
+        assert (
+            repr(item) == "<RecordListItem(database_guid='b0de1566-c2c5-49ac-a8d1-e6183b1a3b77', "
+            "record_history_guid='855360aa-d77b-4d66-bd39-536744677299', record_version=2)>"
+        )
 
 
 class TestItemEquality:
@@ -239,7 +278,8 @@ class TestSearchCriterion:
         assert dto.contains_records is criterion.contains_records
         assert dto.user_can_add_or_remove_items is criterion.user_can_add_or_remove_items
 
-    def test_simple_boolean_criterion_dto_mapping(self):
+    @pytest.mark.parametrize("prop_name", ["match_all", "match_any"])
+    def test_simple_boolean_criterion_dto_mapping(self, prop_name):
         crit_a_dto = Mock()
         crit_a = Mock(spec=SearchCriterion)
         crit_a.attach_mock(Mock(return_value=crit_a_dto), "_to_model")
@@ -247,12 +287,11 @@ class TestSearchCriterion:
         crit_b = Mock(spec=SearchCriterion)
         crit_b.attach_mock(Mock(return_value=crit_b_dto), "_to_model")
 
-        criterion = BooleanCriterion(match_any=[crit_a], match_all=[crit_a, crit_b])
+        criterion = BooleanCriterion(**{prop_name: [crit_a, crit_b]})
 
         dto = BooleanCriterion._to_model(criterion)
 
-        assert dto.match_any == [crit_a_dto]
-        assert dto.match_all == [crit_a_dto, crit_b_dto]
+        assert getattr(dto, prop_name) == [crit_a_dto, crit_b_dto]
 
     def test_nested_boolean_criterion_dto_mapping(self):
         criterion = BooleanCriterion(
@@ -281,6 +320,58 @@ class TestSearchCriterion:
         assert isinstance(leaf_criterion, GrantaServerApiListsDtoRecordListSearchCriterion)
         assert leaf_criterion.name_contains == "A"
         assert leaf_criterion.user_role == GrantaServerApiListsDtoUserRole.OWNER
+
+    @pytest.mark.parametrize(
+        ["name", "value"],
+        [
+            ("name_contains", "Approved materials"),
+            ("user_role", "Owner"),
+            ("is_published", True),
+            ("is_awaiting_approval", True),
+            ("is_internal_use", True),
+            ("is_revision", True),
+            ("contains_records_in_databases", [str(uuid.uuid4())]),
+            ("contains_records_in_integration_schemas", [str(uuid.uuid4())]),
+            ("contains_records_in_tables", [str(uuid.uuid4())]),
+            ("contains_records", [str(uuid.uuid4())]),
+            ("user_can_add_or_remove_items", True),
+        ],
+    )
+    def test_simple_search_setters(self, name, value):
+        search_criterion = SearchCriterion()
+        setattr(search_criterion, name, value)
+        assert getattr(search_criterion, f"_{name}") == value
+
+    def test_boolean_search_setter_any(self):
+        search_criterion = SearchCriterion()
+        boolean_criterion = BooleanCriterion()
+        boolean_criterion.match_any = [search_criterion]
+        assert boolean_criterion._match_any == [search_criterion]
+
+    def test_boolean_search_setter_all(self):
+        search_criterion = SearchCriterion()
+        boolean_criterion = BooleanCriterion()
+        boolean_criterion.match_all = [search_criterion]
+        assert boolean_criterion._match_all == [search_criterion]
+
+    def test_boolean_cannot_use_both_all_and_any(self):
+        crit_1 = SearchCriterion()
+        crit_2 = SearchCriterion()
+        boolean_criterion = BooleanCriterion(match_any=[crit_1], match_all=[crit_2])
+        with pytest.raises(ValueError):
+            boolean_criterion._to_model()
+
+    def test_boolean_cannot_use_both_all_and_any_empty_list(self):
+        crit_1 = SearchCriterion()
+        boolean_criterion = BooleanCriterion(match_any=[crit_1], match_all=[])
+        with pytest.raises(ValueError):
+            boolean_criterion._to_model()
+
+    def test_boolean_criterion_repr(self):
+        assert repr(BooleanCriterion()) == "<BooleanCriterion ...>"
+
+    def test_search_criterion_repr(self):
+        assert repr(SearchCriterion()) == "<SearchCriterion ...>"
 
 
 class TestSearchResult:
