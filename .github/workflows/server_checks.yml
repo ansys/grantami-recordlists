@@ -153,14 +153,14 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: documentation-html
-          path: doc/build/html
+          path: doc/_build/html
           retention-days: 7
 
       - name: "Upload PDF documentation"
         uses: actions/upload-artifact@v3
         with:
           name: documentation-pdf
-          path: doc/build/latex/*.pdf
+          path: doc/_build/latex/*.pdf
           retention-days: 7
 
   stop-vm:
