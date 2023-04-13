@@ -10,7 +10,7 @@ on:
 
 env:
   MAIN_PYTHON_VERSION: '3.8'
-  DOCUMENTATION_CNAME: 'refactored-broccoli-35j5wg9.pages.github.io'
+  DOCUMENTATION_CNAME: 'recordlists.grantami.docs.pyansys.com'
   LIBRARY_NAME: 'ansys-grantami-recordlists'
   LIBRARY_NAMESPACE: 'ansys.grantami.recordlists'
 
