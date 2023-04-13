@@ -21,7 +21,7 @@ html_theme = "ansys_sphinx_theme"
 html_short_title = html_title = "Granta MI RecordLists"
 html_favicon = ansys_favicon
 
-cname = os.getenv("DOCUMENTATION_CNAME", "<DEFAULT_CNAME>")
+cname = os.getenv("DOCUMENTATION_CNAME", "recordlists.grantami.docs.pyansys.com")
 """The canonical name of the webpage hosting the documentation."""
 
 # specify the location of your github repo
