@@ -207,10 +207,10 @@ jobs:
 #          name: ${{ env.LIBRARY_NAME }}-artifacts
 #          path: dist/${{ env.LIBRARY_NAME }}-artifacts/
 
-#      - uses: pyansys/actions/release-github@v4
-#        name: "Release to GitHub"
-#        with:
-#          library-name: ${{ env.LIBRARY_NAME }}
+      - uses: pyansys/actions/release-github@v4
+        name: "Release to GitHub"
+        with:
+          library-name: ${{ env.LIBRARY_NAME }}
 
       - uses: pyansys/actions/release-pypi-private@v4
         name: "Release to private PyPI"
