@@ -37,7 +37,7 @@ server_url = "http://my_grantami_server/mi_servicelayer"
 
 
 def __repr__(self: RecordListApiClient) -> str:
-    return f'<RecordListApiClient: url="{server_url}", dbkey="{self._db_key}">'
+    return f"<RecordListApiClient url: {server_url}>"
 
 
 RecordListApiClient.__repr__ = __repr__
