@@ -638,6 +638,7 @@ class BooleanCriterion:
             else None,
         )
         logger.debug(model.to_str())
+        return model
 
     def __repr__(self) -> str:
         """Printable representation of the object."""
