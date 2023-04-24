@@ -45,8 +45,6 @@ ipykernel = "^6.21.2" # required by nbsphinx to run notebooks.
 pytest = "^7.1.2"
 pytest-cov = "^3.0.0"
 requests-mock = "^1.10.0"
-build = "^0.8.0"
-twine = "^4.0.1"
 pre-commit = "^3.2.2"
 
 [tool.black]
