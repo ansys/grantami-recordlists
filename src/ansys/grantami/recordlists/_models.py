@@ -5,6 +5,8 @@ from typing import List, Optional, Union
 
 from ansys.grantami.serverapi_openapi import models  # type: ignore
 
+from ._logger import logger
+
 
 class RecordList:
     """
@@ -154,6 +156,8 @@ class RecordList:
         model: models.GrantaServerApiListsDtoRecordListHeader,
     ) -> "RecordList":
         """Instantiate from a model defined in the auto-generated client code."""
+        logger.debug("Deserializing RecordList from API response")
+        logger.debug(model.to_str())
         instance = cls(
             name=model.name,
             identifier=model.identifier,
@@ -259,6 +263,8 @@ class RecordListItem:
     @classmethod
     def _from_model(cls, model: models.GrantaServerApiListsDtoListItem) -> "RecordListItem":
         """Instantiate from a model defined in the auto-generated client code."""
+        logger.debug("Deserializing RecordListItem from API response")
+        logger.debug(model.to_str())
         instance = cls(
             database_guid=model.database_guid,
             table_guid=model.table_guid,
@@ -270,12 +276,15 @@ class RecordListItem:
 
     def _to_model(self) -> models.GrantaServerApiListsDtoListItem:
         """Generate the DTO for use with the auto-generated client code."""
-        return models.GrantaServerApiListsDtoListItem(
+        logger.debug("Serializing RecordListItem to API model")
+        model = models.GrantaServerApiListsDtoListItem(
             database_guid=self.database_guid,
             table_guid=self.table_guid,
             record_history_guid=self.record_history_guid,
             record_version=self.record_version,
         )
+        logger.debug(model.to_str())
+        return model
 
     def __repr__(self) -> str:
         """Printable representation of the object."""
@@ -318,6 +327,8 @@ class UserOrGroup:
     @classmethod
     def _from_model(cls, dto_user: models.GrantaServerApiListsDtoUserOrGroup) -> "UserOrGroup":
         """Instantiate from a model defined in the auto-generated client code."""
+        logger.debug("Deserializing UserOrGroup from API response")
+        logger.debug(dto_user.to_str())
         user: UserOrGroup = UserOrGroup()
         user._identifier = dto_user.identifier
         user._display_name = dto_user.display_name
@@ -517,7 +528,8 @@ class SearchCriterion:
 
     def _to_model(self) -> models.GrantaServerApiListsDtoRecordListSearchCriterion:
         """Generate the DTO for use with the auto-generated client code."""
-        return models.GrantaServerApiListsDtoRecordListSearchCriterion(
+        logger.debug("Serializing SearchCriterion to API model")
+        model = models.GrantaServerApiListsDtoRecordListSearchCriterion(
             name_contains=self.name_contains,
             user_role=self.user_role,
             is_published=self.is_published,
@@ -530,6 +542,8 @@ class SearchCriterion:
             contains_records=self.contains_records,
             user_can_add_or_remove_items=self.user_can_add_or_remove_items,
         )
+        logger.debug(model.to_str())
+        return model
 
     def __repr__(self) -> str:
         """Printable representation of the object."""
@@ -614,8 +628,8 @@ class BooleanCriterion:
         # behavior
         if self.match_any is not None and self.match_all is not None:
             raise ValueError("Cannot use `match_any` and `match_all` simultaneously.")
-
-        return models.GrantaServerApiListsDtoListBooleanCriterion(
+        logger.debug("Serializing BooleanCriterion to API model")
+        model = models.GrantaServerApiListsDtoListBooleanCriterion(
             match_any=[criteria._to_model() for criteria in self.match_any]
             if self.match_any is not None
             else None,
@@ -623,6 +637,7 @@ class BooleanCriterion:
             if self.match_all is not None
             else None,
         )
+        logger.debug(model.to_str())
 
     def __repr__(self) -> str:
         """Printable representation of the object."""
@@ -690,6 +705,9 @@ class SearchResult:
         includes_items: bool
             Whether the DTO object includes items.
         """
+        logger.debug("Deserializing SearchResult from API response")
+        logger.debug(f"List items were{' ' if includes_items else ' not '}requested")
+        logger.debug(model.to_str())
         # Set items to None if they have not been requested to allow distinction between list
         # without items and list whose items have not been requested. On the DTO object, both are
         # represented by an empty list.
