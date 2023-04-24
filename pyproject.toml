@@ -41,18 +41,10 @@ jupytext = "^1.14.4"
 nbsphinx = "^0.8.12"
 ipykernel = "^6.21.2" # required by nbsphinx to run notebooks.
 
-# Optional testing dependencies
-[tool.poetry.group.tests]
-optional = true
-[tool.poetry.group.tests.dependencies]
+[tool.poetry.group.dev.dependencies]
 pytest = "^7.1.2"
 pytest-cov = "^3.0.0"
 requests-mock = "^1.10.0"
-
-# Optional build requirements
-[tool.poetry.group.build]
-optional = true
-[tool.poetry.group.build.dependencies]
 build = "^0.8.0"
 twine = "^4.0.1"
 
