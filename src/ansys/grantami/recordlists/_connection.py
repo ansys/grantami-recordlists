@@ -9,6 +9,7 @@ from ansys.openapi.common import (  # type: ignore[import]
 )
 import requests  # type: ignore[import]
 
+from ._logger import logger
 from ._models import BooleanCriterion, RecordList, RecordListItem, SearchCriterion, SearchResult
 
 PROXY_PATH = "/proxy/v1.svc"
@@ -35,6 +36,11 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
     ):
         self._service_layer_url = service_layer_url
         api_url = service_layer_url + PROXY_PATH
+
+        logger.debug("Creating RecordListApiClient")
+        logger.debug(f"Base Service Layer URL: {self._service_layer_url}")
+        logger.debug(f"Service URL: {api_url}")
+
         super().__init__(session, api_url, configuration)
         self.list_management_api = api.ListManagementApi(self)
         self.list_item_api = api.ListItemApi(self)
@@ -55,6 +61,7 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
         list of :class:`.RecordList`
             List of available record lists.
         """
+        logger.info(f"Getting all lists available with connection {self}")
         record_lists = self.list_management_api.api_v1_lists_get()
         return [RecordList._from_model(record_list) for record_list in record_lists]
 
@@ -73,6 +80,7 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
         -------
         :class:`.RecordList`
         """
+        logger.info(f"Getting list with identifier {identifier} with connection {self}")
         record_list = self.list_management_api.api_v1_lists_list_list_identifier_get(identifier)
         return RecordList._from_model(record_list)
 
@@ -96,6 +104,7 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
         list of :class:`.SearchResult`
             List of record lists matching the provided criterion.
         """
+        logger.info(f"Searching for lists with connection {self}")
         response_options = models.GrantaServerApiListsDtoResponseOptions(
             include_record_list_items=include_items,
         )
@@ -132,6 +141,7 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
         list of :class:`.RecordListItem`
             List of items included in the record list.
         """
+        logger.info(f"Getting items in list {record_list} with connection {self}")
         items = self.list_item_api.api_v1_lists_list_list_identifier_items_get(
             record_list.identifier
         )
@@ -159,6 +169,7 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
         list of :class:`.RecordListItem`
            List of items included in the record list.
         """
+        logger.info(f"Adding {len(items)} items to list {record_list} with connection {self}")
         response_items = self.list_item_api.api_v1_lists_list_list_identifier_items_add_post(
             record_list.identifier,
             body=models.GrantaServerApiListsDtoRecordListItems(
@@ -188,6 +199,7 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
         list of :class:`.RecordListItem`
            List of items included in the record list.
         """
+        logger.info(f"Removing {len(items)} items from list {record_list} with connection {self}")
         response_items = self.list_item_api.api_v1_lists_list_list_identifier_items_remove_post(
             record_list.identifier,
             body=models.GrantaServerApiListsDtoRecordListItems(
@@ -224,6 +236,8 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
         :class:`.RecordList`
             Created record list details.
         """
+        items_string = "no items" if items is None or len(items) == 0 else f"{len(items)} items"
+        logger.info(f"Creating new list {name} with {items_string} with connection {self}")
         if items is not None:
             items = models.GrantaServerApiListsDtoRecordListItems(
                 items=[list_item._to_model() for list_item in items]
@@ -250,6 +264,7 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
         record_list : RecordList
             Record list to delete.
         """
+        logger.info(f"Removing list {record_list} with connection {self}")
         self.list_management_api.api_v1_lists_list_list_identifier_delete(record_list.identifier)
 
     def update_list(
@@ -282,6 +297,7 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
         :class:`.RecordList`
             Updated representation of the record list.
         """
+        logger.info(f"Updating list {record_list} with connection {self}")
         if name == _ArgNotProvided and description == _ArgNotProvided and notes == _ArgNotProvided:
             raise ValueError(
                 f"Update must include at least one property to update. "
@@ -321,6 +337,7 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
         :class:`.RecordList`
             Record list created by the copy operation.
         """
+        logger.info(f"Copying list {record_list} with connection {self}")
         list_copy = self.list_management_api.api_v1_lists_list_list_identifier_copy_post(
             record_list.identifier
         )
@@ -345,6 +362,7 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
         :class:`.RecordList`
             Record list created by the revision operation.
         """
+        logger.info(f"Creating revision of list {record_list} with connection {self}")
         list_revision = self.list_management_api.api_v1_lists_list_list_identifier_revise_post(
             record_list.identifier,
         )
@@ -367,6 +385,7 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
         :class:`.RecordList`
             Updated representation of the record list.
         """
+        logger.info(f"Requesting approval for list {record_list} with connection {self}")
         updated_list = (
             self.list_management_api.api_v1_lists_list_list_identifier_request_approval_post(
                 record_list.identifier
@@ -394,6 +413,7 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
         :class:`.RecordList`
             Updated representation of the record list.
         """
+        logger.info(f"Publishing list {record_list} with connection {self}")
         updated_list = self.list_management_api.api_v1_lists_list_list_identifier_publish_post(
             record_list.identifier,
         )
@@ -418,6 +438,7 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
         :class:`.RecordList`
             Updated representation of the record list.
         """
+        logger.info(f"Withdrawing list {record_list} with connection {self}")
         updated_list = self.list_management_api.api_v1_lists_list_list_identifier_unpublish_post(
             record_list.identifier,
         )
@@ -441,6 +462,7 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
         :class:`.RecordList`
             Updated representation of the record list.
         """
+        logger.info(f"Cancelling request to approve list {record_list} with connection {self}")
         updated_list = self.list_management_api.api_v1_lists_list_list_identifier_reset_post(
             record_list.identifier,
         )
