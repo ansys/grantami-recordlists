@@ -84,7 +84,7 @@ Dependencies
 To use the ``ansys.grantami.recordlists`` package, you must have access to a
 Granta MI server that includes Granta MI Server API.
 
-The ``ansys.grantami.recordlists`` package currently supports Python from version 3.7 to version 3.11 on both Windows
+The ``ansys.grantami.recordlists`` package currently supports Python from version 3.8 to version 3.11 on both Windows
 and Linux.
 
 .. readme_software_requirements_end
