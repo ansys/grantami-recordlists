@@ -3,12 +3,13 @@ from unittest.mock import Mock
 import uuid
 
 from ansys.grantami.serverapi_openapi import models
-from ansys.grantami.serverapi_openapi.api import ListItemApi, ListManagementApi
+from ansys.grantami.serverapi_openapi.api import ListItemApi, ListManagementApi, ListPermissionsApi
 from ansys.grantami.serverapi_openapi.models import (
     GrantaServerApiListsDtoListItem,
     GrantaServerApiListsDtoRecordListCreate,
     GrantaServerApiListsDtoRecordListHeader,
     GrantaServerApiListsDtoRecordListItems,
+    GrantaServerApiListsDtoUserPermissionDto,
     JsonPatchDocument,
 )
 import pytest
@@ -395,3 +396,25 @@ class TestSearch:
         mock_from_model.assert_called_once_with(
             mock_search_result_get._mock_return_value[0], include_items
         )
+
+
+class TestSubscribe(TestClientMethod):
+    _return_value = Mock(spec=GrantaServerApiListsDtoUserPermissionDto)
+    _api = ListPermissionsApi
+    _api_method = "api_v1_lists_list_list_identifier_permissions_subscribe_post"
+
+    def test_subscribe(self, client, api_method, mock_list):
+        response = client.subscribe_to_list(mock_list)
+        assert response is None
+        api_method.assert_called_once_with(mock_list.identifier)
+
+
+class TestUnsubscribe(TestClientMethod):
+    _return_value = Mock(spec=GrantaServerApiListsDtoUserPermissionDto)
+    _api = ListPermissionsApi
+    _api_method = "api_v1_lists_list_list_identifier_permissions_unsubscribe_post"
+
+    def test_subscribe(self, client, api_method, mock_list):
+        response = client.unsubscribe_from_list(mock_list)
+        assert response is None
+        api_method.assert_called_once_with(mock_list.identifier)

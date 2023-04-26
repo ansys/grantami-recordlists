@@ -468,6 +468,45 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
         )
         return RecordList._from_model(updated_list)
 
+    def subscribe_to_list(self, record_list: RecordList) -> None:
+        """
+        Subscribe the current user to a record list.
+
+        Performs an HTTP request against the Granta MI Server API.
+        The list must be published.
+
+        Parameters
+        ----------
+        record_list : RecordList
+            Record list to subscribe to.
+
+        Returns
+        -------
+        None
+        """
+        self.list_permissions_api.api_v1_lists_list_list_identifier_permissions_subscribe_post(
+            record_list.identifier
+        )
+
+    def unsubscribe_from_list(self, record_list: RecordList) -> None:
+        """
+        Unsubscribe the current user from a record list.
+
+        Performs an HTTP request against the Granta MI Server API.
+
+        Parameters
+        ----------
+        record_list : RecordList
+            Record list to unsubscribe from.
+
+        Returns
+        -------
+        None
+        """
+        self.list_permissions_api.api_v1_lists_list_list_identifier_permissions_unsubscribe_post(
+            record_list.identifier
+        )
+
     @staticmethod
     def _create_patch_operation(
         value: Optional[str], name: str, op: str = "replace"

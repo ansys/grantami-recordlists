@@ -85,3 +85,50 @@ class TestListLifeCycle:
         with pytest.raises(ApiException) as e:
             basic_client.unpublish_list(new_list)
         assert e.value.status_code == 403
+
+
+class TestSubscriptionLifeCycle:
+    @pytest.fixture
+    def published_list(self, admin_client, new_list):
+        admin_client.request_list_approval(new_list)
+        _published_list = admin_client.publish_list(new_list)
+        return _published_list
+
+    def test_cannot_subscribe_to_non_published_list(self, basic_client, new_list):
+        with pytest.raises(ApiException) as e:
+            basic_client.subscribe_to_list(new_list)
+        assert e.value.status_code == 403
+
+    def test_can_unsubscribe_from_non_subscribed_list(self, basic_client, new_list):
+        basic_client.unsubscribe_from_list(new_list)
+
+    def test_can_unsubscribe_from_non_subscribed_published_list(self, basic_client, published_list):
+        basic_client.unsubscribe_from_list(published_list)
+
+    def test_can_subscribe_then_unsubscribe_to_published_list(
+        self, basic_client, published_list, list_username_no_permissions
+    ):
+        # Subscribe
+        basic_client.subscribe_to_list(published_list)
+
+        # Check as user with limited permissions, can only see its own permissions
+        permissions = (
+            basic_client.list_permissions_api.api_v1_lists_list_list_identifier_permissions_get(
+                published_list.identifier
+            )
+        )
+        assert len(permissions) == 1
+        user_permissions = permissions[0]
+        assert list_username_no_permissions in user_permissions.user_or_group_name
+        assert user_permissions.flags.is_subscribed is True
+
+        # Unsubscribe
+        basic_client.unsubscribe_from_list(published_list)
+
+        # Check
+        permissions = (
+            basic_client.list_permissions_api.api_v1_lists_list_list_identifier_permissions_get(
+                published_list.identifier
+            )
+        )
+        assert len(permissions) == 0
