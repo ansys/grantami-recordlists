@@ -6,6 +6,7 @@ from ansys.openapi.common import (  # type: ignore[import]
     ApiClientFactory,
     ApiException,
     SessionConfiguration,
+    generate_user_agent,
 )
 import requests  # type: ignore[import]
 
@@ -15,6 +16,7 @@ from ._models import BooleanCriterion, RecordList, RecordListItem, SearchCriteri
 PROXY_PATH = "/proxy/v1.svc"
 AUTH_PATH = "/Health/v2.svc"
 API_DEFINITION_PATH = "/swagger/v1/swagger.json"
+GRANTA_APPLICATION_NAME_HEADER = "PyGranta RecordLists"
 
 _ArgNotProvided = "_ArgNotProvided"
 
@@ -567,9 +569,17 @@ class Connection(ApiClientFactory):  # type: ignore[misc]
     def __init__(
         self, servicelayer_url: str, session_configuration: Optional[SessionConfiguration] = None
     ):
+        from . import __version__
+
         auth_url = servicelayer_url.strip("/") + AUTH_PATH
         super().__init__(auth_url, session_configuration)
         self._base_service_layer_url = servicelayer_url
+        self._session_configuration.headers[
+            "X-Granta-ApplicationName"
+        ] = GRANTA_APPLICATION_NAME_HEADER
+        self._session_configuration.headers["User-Agent"] = generate_user_agent(
+            "ansys-grantami-recordlists", __version__
+        )
 
     def connect(self) -> RecordListApiClient:
         """
