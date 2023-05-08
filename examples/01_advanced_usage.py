@@ -30,7 +30,7 @@ client = connection.connect()
 # + tags=[]
 list_identifier = client.create_list(
     name="Example list",
-    description=f"Created by example 01_Advanced_usage",
+    description=f"Created by example 01_advanced_usage",
 )
 list_identifier
 # -

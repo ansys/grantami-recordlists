@@ -43,6 +43,9 @@ goto end
 	cd "%BUILDDIR%\latex"
 	for %%f in (*.tex) do (
 	pdflatex "%%f" --interaction=nonstopmode)
-
+	if NOT EXIST ansys-grantami-recordlists.pdf (
+		Echo "no pdf generated!"
+		exit /b 1)
+	Echo "pdf generated!"
 :end
 popd
