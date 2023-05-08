@@ -2,6 +2,7 @@
 from datetime import datetime
 import os
 from pathlib import Path
+import re
 import shutil
 
 from ansys_sphinx_theme import ansys_favicon, get_version_match, pyansys_logo_black
@@ -110,60 +111,96 @@ master_doc = "index"
 autosectionlabel_maxdepth = 4
 
 
-# -- Example Script functions -------------------------------------------------
+# -- Examples configuration --------------------------------------------------
+def _copy_examples_and_convert_to_notebooks(source_dir, output_dir, ignored_files_regex=None):
+    """
+    Recursively copies all files from the source directory to the output directory.
 
-# Define some important paths and check were are where we expect to be
-cwd = Path(os.getcwd())
-assert cwd.name == "source"
-EXAMPLES_DIR_NAME = "examples"
-DUMMY_EXAMPLES_DIR_NAME = "examples-dummy"
+    Creates any necessary subfolders in the process. Python scripts with the ".py" extension
+    are also converted to Jupyter notebooks with the ".ipynb" extension using Jupytext.
 
-examples_output_dir = Path(EXAMPLES_DIR_NAME).absolute()
-examples_source_dir = Path("../../" + EXAMPLES_DIR_NAME).absolute()
-dummy_examples_source_dir = Path("../../" + DUMMY_EXAMPLES_DIR_NAME).absolute() / Path(
-    EXAMPLES_DIR_NAME
-)
-EXAMPLE_FLAG = os.getenv("BUILD_EXAMPLES")
+    Parameters
+    ----------
+    source_dir : Path
+        The source directory to copy files from.
+    output_dir : Path
+        The output directory to copy files to and convert Python scripts.
+    ignored_files_regex : str, optional
+        A regular expression pattern to match ignored files. Files whose names match
+        the pattern will be skipped. If None (default), no files are ignored.
 
-# If we are building examples, use the included ipython-profile
-if EXAMPLE_FLAG:
-    ipython_dir = Path("../../.ipython").absolute()
-    os.environ["IPYTHONDIR"] = str(ipython_dir)
+    Raises
+    ------
+    RuntimeError
+        If the output directory or any necessary subfolders cannot be created.
 
+    Notes
+    -----
+    - This function uses pathlib.Path methods for working with file paths.
+    - Any existing files in the output directory will be overwritten.
+    - If a Python script cannot be converted to a Jupyter notebook, an exception is raised.
 
-def _copy_examples_and_convert_to_notebooks(source_dir, output_dir):
-    for root, dirs, files in os.walk(source_dir):
-        root_path = Path(root)
-        index = root_path.parts.index(EXAMPLES_DIR_NAME) + 1  # Path elements below examples
-        root_output_path = output_dir.joinpath(*root_path.parts[index:])
-        root_output_path.mkdir(
-            parents=False, exist_ok=False
-        )  # Create new folders in corresponding output location
-        for file in files:
-            file_source_path = root_path / Path(file)
-            file_output_path = root_output_path / Path(file)
-            shutil.copy(file_source_path, file_output_path)  # Copy everything
-            if file_source_path.suffix == ".py":  # Also convert python scripts to jupyter notebooks
+    Examples
+    --------
+    >>> _copy_examples_and_convert_to_notebooks("my_project/examples", "docs/notebooks", ignored_files_regex=r"^test.*")
+
+    """
+    if not source_dir.exists():
+        raise ValueError(f"Source directory {source_dir.name} does not exist.")
+    if not output_dir.exists():
+        output_dir.mkdir(parents=True)
+
+    ignored_files_re = re.compile(ignored_files_regex) if ignored_files_regex else None
+
+    for file_source_path in source_dir.rglob("*"):
+        if not file_source_path.is_file():
+            continue
+
+        if ignored_files_re and ignored_files_re.match(file_source_path.name):
+            print(f"Ignoring {file_source_path.name}")
+            exclude_patterns.append(str(file_source_path.relative_to(source_dir)))
+            continue
+
+        rel_path = file_source_path.relative_to(source_dir)
+        file_output_path = output_dir / rel_path
+
+        if file_output_path.suffix != ".rst":
+            if ignored_files_re and ignored_files_re.match(file_source_path.name):
+                print(f"Ignoring {file_source_path.name}")
+                exclude_patterns.append(str(file_source_path.relative_to(source_dir)))
+                continue
+            elif BUILD_EXAMPLES == "false" and not file_source_path.name.startswith("test"):
+                print(f"Ignoring {file_source_path.name}")
+                continue
+
+        file_output_path.parent.mkdir(parents=True, exist_ok=True)
+        print(f"Copying {file_source_path.name}")
+        shutil.copy(file_source_path, file_output_path)
+
+        if file_source_path.suffix == ".py":
+            try:
                 ntbk = jupytext.read(file_source_path)
                 jupytext.write(ntbk, file_output_path.with_suffix(".ipynb"))
+            except Exception as e:
+                raise RuntimeError(f"Failed to convert {file_source_path} to notebook: {e}")
 
 
-# If we already have a source/examples directory then don't do anything.
-# If we don't have an examples folder, we must first create it
-# We don't delete the examples after every build because this triggers nbsphinx to re-run them,
-# which is very expensive
-if not examples_output_dir.is_dir():
-    # Only include examples if the environment variable is set to something truthy
-    if EXAMPLE_FLAG:
-        print("'BUILD_EXAMPLES' environment variable is set, including examples in docs build.")
-        _copy_examples_and_convert_to_notebooks(examples_source_dir, examples_output_dir)
+exclude_patterns = []
 
-    # If we are skipping examples in the docs, create a placeholder index.rst file to avoid sphinx
-    # errors.
-    else:
-        print("'BUILD_EXAMPLES' environment variable is not set, using standalone examples.")
-        _copy_examples_and_convert_to_notebooks(dummy_examples_source_dir, examples_output_dir)
+EXAMPLES_SOURCE_DIR = Path(__file__).parent.parent.parent.absolute() / "examples"
+EXAMPLES_OUTPUT_DIR = Path(__file__).parent.absolute() / "examples"
+BUILD_EXAMPLES = os.environ.get("BUILD_EXAMPLES", "false").lower()
 
+exclude_rst_regex = r"(?<!\.rst)$"
+ignore_example_files = (
+    r"test.*" + exclude_rst_regex if BUILD_EXAMPLES == "true" else r"^(?!test)" + exclude_rst_regex
+)
+
+_copy_examples_and_convert_to_notebooks(
+    EXAMPLES_SOURCE_DIR,
+    EXAMPLES_OUTPUT_DIR,
+    ignore_example_files,
+)
 
 nbsphinx_prolog = """
 Download this example as a :download:`Jupyter notebook </{{ env.docname }}.ipynb>` or a
