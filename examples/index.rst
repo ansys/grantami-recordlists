@@ -12,7 +12,7 @@ The following examples demonstrate key aspects of PyGranta RecordLists.
     .. nbgallery::
 
        00_basic_usage
-       01_advanced_usage
+       01_publishing_revising_withdrawing
        02_searching
 
     {% else %}
