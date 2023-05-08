@@ -44,6 +44,7 @@ sphinx-copybutton = "^0.5.0"
 jupytext = "^1.14.4"
 nbsphinx = "^0.8.12"
 ipykernel = "^6.21.2" # required by nbsphinx to run notebooks.
+sphinx-jinja = "^2.0.2"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.1.2"

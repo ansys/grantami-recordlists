@@ -46,6 +46,7 @@ extensions = [
     "numpydoc",
     "sphinx.ext.intersphinx",
     "sphinx_copybutton",
+    "sphinx_jinja",
     "nbsphinx",
 ]
 
@@ -156,22 +157,16 @@ def _copy_examples_and_convert_to_notebooks(source_dir, output_dir, ignored_file
         if not file_source_path.is_file():
             continue
 
-        if ignored_files_re and ignored_files_re.match(file_source_path.name):
+        matches_regex = ignored_files_re and ignored_files_re.match(file_source_path.name)
+        is_rst_file = file_source_path.name.endswith(".rst")
+
+        if matches_regex and not is_rst_file:
             print(f"Ignoring {file_source_path.name}")
             exclude_patterns.append(str(file_source_path.relative_to(source_dir)))
             continue
 
         rel_path = file_source_path.relative_to(source_dir)
         file_output_path = output_dir / rel_path
-
-        if file_output_path.suffix != ".rst":
-            if ignored_files_re and ignored_files_re.match(file_source_path.name):
-                print(f"Ignoring {file_source_path.name}")
-                exclude_patterns.append(str(file_source_path.relative_to(source_dir)))
-                continue
-            elif BUILD_EXAMPLES == "false" and not file_source_path.name.startswith("test"):
-                print(f"Ignoring {file_source_path.name}")
-                continue
 
         file_output_path.parent.mkdir(parents=True, exist_ok=True)
         print(f"Copying {file_source_path.name}")
@@ -189,12 +184,17 @@ exclude_patterns = []
 
 EXAMPLES_SOURCE_DIR = Path(__file__).parent.parent.parent.absolute() / "examples"
 EXAMPLES_OUTPUT_DIR = Path(__file__).parent.absolute() / "examples"
-BUILD_EXAMPLES = os.environ.get("BUILD_EXAMPLES", "false").lower()
+BUILD_EXAMPLES = True if os.environ.get("BUILD_EXAMPLES", "false") == "true" else False
 
-exclude_rst_regex = r"(?<!\.rst)$"
-ignore_example_files = (
-    r"test.*" + exclude_rst_regex if BUILD_EXAMPLES == "true" else r"^(?!test)" + exclude_rst_regex
-)
+ignore_example_files = r"test.*" if BUILD_EXAMPLES else r"^(?!test)"
+
+# Properly configure the table of contents for the examples/index.rst file
+print(str(BUILD_EXAMPLES).lower())
+jinja_contexts = {
+    "examples": {
+        "build_examples": BUILD_EXAMPLES,
+    }
+}
 
 _copy_examples_and_convert_to_notebooks(
     EXAMPLES_SOURCE_DIR,
