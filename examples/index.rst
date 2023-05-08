@@ -9,8 +9,7 @@ The following examples demonstrate key aspects of PyGranta RecordLists.
 
     {% if build_examples %}
 
-    .. toctree::
-       :maxdepth: 2
+    .. nbgallery::
 
        00_basic_usage
        01_advanced_usage
@@ -18,8 +17,7 @@ The following examples demonstrate key aspects of PyGranta RecordLists.
 
     {% else %}
 
-    .. toctree::
-       :maxdepth: 2
+    .. nbgallery::
 
        test_example
 
