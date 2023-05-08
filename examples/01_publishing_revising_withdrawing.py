@@ -47,6 +47,7 @@ example_list
 # awaiting approval to be published, and whether they are currently published.
 # Define a function to display the status properties.
 
+
 # + tags=[]
 def print_status(record_list):
     print(f"Awaiting approval: {record_list.awaiting_approval}")
