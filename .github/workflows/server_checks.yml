@@ -129,7 +129,7 @@ jobs:
 
       - name: "Install system dependencies"
         run: |
-          sudo apt-get update
+          sudo apt update
           sudo apt-get install pandoc
           sudo apt-get install texlive-latex-extra latexmk texlive-xetex fonts-freefont-otf xindy
 
