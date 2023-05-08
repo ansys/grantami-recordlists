@@ -116,7 +116,6 @@ jobs:
     if: ${{ !startsWith( github.event.pull_request.head.ref, 'dependabot/') }}
     uses: ./.github/workflows/server_checks.yml
     with:
-      python-version: ${{ env.MAIN_PYTHON_VERSION }}
       skip-vm-management: ${{ vars.SKIP_VM_MANAGEMENT == 'true' }}
     secrets:
       inherit
