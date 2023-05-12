@@ -33,7 +33,7 @@
 PyGranta RecordLists
 ====================
 
-A Python wrapper for Granta MI Lists API.
+A Python wrapper for the Granta MI Lists API.
 
 To avoid ambiguity with the Python object ``list``, lists available via the Granta MI Lists API are referred to as
 ``record lists``. Granta MI users might also know the feature as ``Favorites Lists``.
