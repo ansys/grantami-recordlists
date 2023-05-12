@@ -58,7 +58,7 @@ autodoc_member_order = "bysource"
 
 # Intersphinx mapping
 intersphinx_mapping = {
-    "python": ("https://docs.python.org/dev", None),
+    "python": ("https://docs.python.org/3", None),
     "openapi-common": ("https://openapi.docs.pyansys.com", None),
     "requests": ("https://requests.readthedocs.io/en/latest/", None),
     # kept here as an example
