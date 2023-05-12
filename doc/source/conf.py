@@ -18,7 +18,7 @@ release = version = __version__
 # Select desired logo, theme, and declare the html title
 html_logo = pyansys_logo_black
 html_theme = "ansys_sphinx_theme"
-html_short_title = html_title = "Granta MI RecordLists"
+html_short_title = html_title = "PyGranta RecordLists"
 html_favicon = ansys_favicon
 
 cname = os.getenv("DOCUMENTATION_CNAME", "recordlists.grantami.docs.pyansys.com")
@@ -31,7 +31,7 @@ html_theme_options = {
     "show_breadcrumbs": True,
     "additional_breadcrumbs": [
         ("PyAnsys", "https://docs.pyansys.com/"),
-        ("Granta MI", "https://grantami.docs.pyansys.com/"),
+        ("PyGranta", "https://grantami.docs.pyansys.com/"),
     ],
     "switcher": {
         "json_url": f"https://{cname}/versions.json",
@@ -58,7 +58,7 @@ autodoc_member_order = "bysource"
 
 # Intersphinx mapping
 intersphinx_mapping = {
-    "python": ("https://docs.python.org/dev", None),
+    "python": ("https://docs.python.org/3", None),
     "openapi-common": ("https://openapi.docs.pyansys.com", None),
     "requests": ("https://requests.readthedocs.io/en/latest/", None),
     # kept here as an example
