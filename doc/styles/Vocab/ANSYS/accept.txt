@@ -2,6 +2,7 @@ ANSYS
 Ansys
 ansys
 Granta MI
+PyGranta
 RecordLists
 API
 Makefile

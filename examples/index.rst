@@ -3,7 +3,7 @@
 Examples
 ========
 
-The following examples demonstrate key aspects of Granta MI RecordLists.
+The following examples demonstrate key aspects of PyGranta RecordLists.
 
 
 .. toctree::

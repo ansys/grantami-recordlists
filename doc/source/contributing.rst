@@ -12,7 +12,7 @@ with this guide before attempting to contribute to the ``grantami-recordlists``
 repository.
 
 The following contribution information is specific to the ``grantami-recordlists``
-repository, which is for the Granta MI RecordLists library. This PyAnsys library name
+repository, which is for the PyGranta RecordLists library. This PyAnsys library name
 is often used in place of the repository name to provide clarity and improve
 readability.
 

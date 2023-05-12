@@ -30,8 +30,8 @@
 
 .. _after-badges:
 
-Granta MI RecordLists
-======================
+PyGranta RecordLists
+====================
 
 A Python wrapper for Granta MI Lists API.
 
