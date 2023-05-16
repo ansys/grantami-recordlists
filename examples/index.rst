@@ -9,7 +9,8 @@ The following examples demonstrate key aspects of PyGranta RecordLists.
 
     {% if build_examples %}
 
-    .. nbgallery::
+    .. toctree::
+       :maxdepth: 2
 
        00_basic_usage
        01_publishing_revising_withdrawing
@@ -17,7 +18,8 @@ The following examples demonstrate key aspects of PyGranta RecordLists.
 
     {% else %}
 
-    .. nbgallery::
+    .. toctree::
+       :maxdepth: 2
 
        test_example
 
