@@ -189,7 +189,6 @@ BUILD_EXAMPLES = True if os.environ.get("BUILD_EXAMPLES", "false") == "true" els
 ignore_example_files = r"test.*" if BUILD_EXAMPLES else r"^(?!test)"
 
 # Properly configure the table of contents for the examples/index.rst file
-print(str(BUILD_EXAMPLES).lower())
 jinja_contexts = {
     "examples": {
         "build_examples": BUILD_EXAMPLES,
