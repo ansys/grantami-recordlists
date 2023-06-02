@@ -24,6 +24,22 @@ _ArgNotProvided = "_ArgNotProvided"
 
 
 def _get_mi_server_version(client: ApiClient) -> Tuple[int, ...]:
+    """Get the Granta MI version as a tuple.
+
+    Makes direct use of the underlying serverapi-openapi package. The API methods
+    in this package may change over time, and so it is expected that this method
+    will grow to support multiple versions of the serverapi-openapi package.
+
+    Parameters
+    ----------
+    client : :class:`~.RecordListApiClient`
+        Client object.
+
+    Returns
+    -------
+    tuple of int
+        Granta MI version number.
+    """
     schema_api = api.SchemaApi(client)
     server_version_response = schema_api.v1alpha_schema_mi_version_get()
     server_version_elements = server_version_response.version.split(".")
@@ -617,10 +633,10 @@ class Connection(ApiClientFactory):  # type: ignore[misc]
     def _test_connection(client: RecordListApiClient) -> None:
         """Check if the created client can be used to perform a request.
 
-        This method tests both that the API definition can be obtained and that the Granta MI
+        This method tests both that the API definition can be accessed and that the Granta MI
         version is compatible with this package.
 
-        The first checks ensures that the Server API exists and is accessible. The second check
+        The first checks ensures that the Server API exists and is functional. The second check
         ensures that the Granta MI server version is compatible with this version of the package.
 
         A failure at any point raises a ConnectionError.
@@ -633,7 +649,7 @@ class Connection(ApiClientFactory):  # type: ignore[misc]
         Raises
         ------
         ConnectionError
-            Error raised if the version check fails.
+            Error raised if the connection test fails.
         """
         try:
             client.call_api(resource_path=API_DEFINITION_PATH, method="GET")
