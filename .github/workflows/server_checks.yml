@@ -79,12 +79,6 @@ jobs:
       - name: Install dependencies
         run: pip install poetry 'tox<4' --disable-pip-version-check
 
-      - name: Download dependencies
-        uses: actions/download-artifact@v3
-        with:
-          name: ansys-grantami-serverapi-openapi-wheel
-          path: deps
-
       - name: Test with tox (integration tests only)
         run: tox -e py39 -- -m "integration"
         env:
@@ -112,12 +106,6 @@ jobs:
           sudo apt update
           sudo apt install pandoc
           sudo apt install texlive-latex-extra latexmk texlive-xetex fonts-freefont-otf xindy
-
-      - name: Download dependencies
-        uses: actions/download-artifact@v3
-        with:
-          name: ansys-grantami-serverapi-openapi-wheel
-          path: deps
 
       - name: Install library
         run: |
