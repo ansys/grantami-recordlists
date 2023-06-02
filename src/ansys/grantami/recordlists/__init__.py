@@ -1,7 +1,7 @@
 """Pythonic client for GRANTA MI ServerAPI RecordLists."""
 import importlib.metadata as importlib_metadata
 
-from ._connection import Connection, RecordListApiClient
+from ._connection import Connection, RecordListsApiClient
 from ._models import (
     BooleanCriterion,
     RecordList,
@@ -14,7 +14,7 @@ from ._models import (
 
 __all__ = [
     "Connection",
-    "RecordListApiClient",
+    "RecordListsApiClient",
     "BooleanCriterion",
     "RecordList",
     "RecordListItem",

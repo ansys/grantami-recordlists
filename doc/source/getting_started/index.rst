@@ -29,7 +29,7 @@ Check that you can start the RecordLists Client from Python by running this code
     >>> client = Connection("http://my.server.name/mi_servicelayer").with_autologon().connect()
     >>> print(client)
 
-    <RecordListApiClient url: http://my.server.name/mi_servicelayer>
+    <RecordListsApiClient url: http://my.server.name/mi_servicelayer>
 
 If you see a response from the server, congratulations. You can start using
 the record lists client. For more detailed examples,

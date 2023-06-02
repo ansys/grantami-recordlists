@@ -17,6 +17,6 @@ Connection builder
 Record lists client
 ~~~~~~~~~~~~~~~~~~~~
 
-.. autoclass:: ansys.grantami.recordlists.RecordListApiClient
+.. autoclass:: ansys.grantami.recordlists.RecordListsApiClient
    :members:
 
