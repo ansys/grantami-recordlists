@@ -66,14 +66,13 @@ The following tox environments are provided:
 .. vale off
 
 - ``tox -e style``: checks for coding style quality.
-- ``tox -e py``: runs all tests (see :ref:`ref_serveraccess` for requirements).
-- ``tox -e py-coverage``: runs all tests and checks code coverage.
+- ``tox -e tests``: runs all tests and checks code coverage (see :ref:`ref_serveraccess` for requirements).
 - ``tox -e doc``: checks the documentation building process.
 
 .. vale on
 
 Optionally add the ``-- -m "not integration"`` suffix to the commands above to skip integration
-tests. For example, ``tox -e py -- -m "not integration"`` will only run tests that
+tests. For example, ``tox -e tests -- -m "not integration"`` will only run tests that
 do not require a Granta MI instance.
 
 .. _ref_serveraccess:
