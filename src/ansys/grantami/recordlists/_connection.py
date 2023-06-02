@@ -1,4 +1,4 @@
-from typing import List, Optional, Union
+from typing import List, Optional, Tuple, Union
 
 from ansys.grantami.serverapi_openapi import api, models  # type: ignore[import]
 from ansys.openapi.common import (  # type: ignore[import]
@@ -18,7 +18,17 @@ AUTH_PATH = "/Health/v2.svc"
 API_DEFINITION_PATH = "/swagger/v1/swagger.json"
 GRANTA_APPLICATION_NAME_HEADER = "PyGranta RecordLists"
 
+MINIMUM_GRANTA_MI_VERSION = (23, 2)
+
 _ArgNotProvided = "_ArgNotProvided"
+
+
+def _get_mi_server_version(client: ApiClient) -> Tuple[int, ...]:
+    schema_api = api.SchemaApi(client)
+    server_version_response = schema_api.v1alpha_schema_mi_version_get()
+    server_version_elements = server_version_response.version.split(".")
+    server_version = tuple([int(e) for e in server_version_elements])
+    return server_version
 
 
 class RecordListApiClient(ApiClient):  # type: ignore[misc]
@@ -607,9 +617,13 @@ class Connection(ApiClientFactory):  # type: ignore[misc]
     def _test_connection(client: RecordListApiClient) -> None:
         """Check if the created client can be used to perform a request.
 
-        This method asserts that the API definition can be obtained.
-        It specifically checks for a 404 error, which most likely means that the targeted Service
-        Layer does not include Server API.
+        This method tests both that the API definition can be obtained and that the Granta MI
+        version is compatible with this package.
+
+        The first checks ensures that the Server API exists and is accessible. The second check
+        ensures that the Granta MI server version is compatible with this version of the package.
+
+        A failure at any point raises a ConnectionError.
 
         Parameters
         ----------
@@ -619,7 +633,7 @@ class Connection(ApiClientFactory):  # type: ignore[misc]
         Raises
         ------
         ConnectionError
-            Error raised if the test query fails.
+            Error raised if the version check fails.
         """
         try:
             client.call_api(resource_path=API_DEFINITION_PATH, method="GET")
@@ -641,3 +655,23 @@ class Connection(ApiClientFactory):  # type: ignore[misc]
                 "that SSL certificates have been configured for communications between Granta MI "
                 "Server and client Granta MI applications."
             ) from e
+
+        try:
+            server_version = _get_mi_server_version(client)
+        except ApiException as e:
+            raise ConnectionError(
+                "Cannot check the Granta MI server version. Ensure the Granta MI server version "
+                f"is at least {'.'.join([str(e) for e in MINIMUM_GRANTA_MI_VERSION])}."
+            ) from e
+
+        # Once there are multiple versions of this package targeting different Granta MI server
+        # versions, the error message should direct users towards the PyGranta meta-package for
+        # older versions. This is not necessary now though, because there is no support for
+        # versions older than 2023 R2.
+
+        if server_version < MINIMUM_GRANTA_MI_VERSION:
+            raise ConnectionError(
+                f"This package requires a more recent Granta MI version. Detected Granta MI server "
+                f"version is {'.'.join([str(e) for e in server_version])}, but this package "
+                f"requires at least {'.'.join([str(e) for e in MINIMUM_GRANTA_MI_VERSION])}."
+            )

@@ -6,6 +6,12 @@ import requests_mock
 from ansys.grantami.recordlists import Connection, RecordListItem
 from inputs.examples import examples_as_strings
 
+MI_VERSION_RESPONSE = {
+    "binary_compatibility_version": "99.99.0.0",
+    "version": "99.99.9.9",
+    "major_minor_version": "99.99",
+}
+
 
 @pytest.fixture(scope="session")
 def api_url():
@@ -21,7 +27,7 @@ def mocker():
 @pytest.fixture
 def mock_client(api_url, mocker):
     with mocker:
-        mocker.get(requests_mock.ANY)
+        mocker.get(requests_mock.ANY, status_code=200, json=MI_VERSION_RESPONSE)
         client = Connection(servicelayer_url=api_url).with_anonymous().connect()
     return client
 
