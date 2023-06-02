@@ -23,7 +23,6 @@ this repository to submit questions, report bugs, and request new features.
 
 To reach the PyAnsys support team, email `pyansys.support@ansys.com <pyansys.support@ansys.com>`_.
 
-
 Developer environment setup
 ===========================
 
@@ -57,33 +56,43 @@ encouraged to install this tool via:
 
     python -m pip install pre-commit && pre-commit install
 
+.. _ref_tox:
+
 Tox
 ~~~
-Tests can be run using `tox`_. The project defines tox test environment in ``tox.ini``.
-The following environments commands are provided:
+Tests can be run using `tox`_. The project defines the tox environments in ``tox.ini``.
+The following tox environments are provided:
 
 .. vale off
 
-- **tox -e style**: checks for coding style quality.
-- **tox -e py**: checks for unit tests.
-- **tox -e py-coverage**: checks for unit testing and code coverage.
-- **tox -e doc**: checks for documentation building process.
+- ``tox -e style``: checks for coding style quality.
+- ``tox -e py``: runs all tests (see :ref:`ref_serveraccess` for requirements).
+- ``tox -e py-coverage``: runs all tests and checks code coverage.
+- ``tox -e doc``: checks the documentation building process.
 
 .. vale on
 
+Optionally add the ``-- -m "not integration"`` suffix to the commands above to skip integration
+tests. For example, ``tox -e py -- -m "not integration"`` will only run tests that
+do not require a Granta MI instance.
+
+.. _ref_serveraccess:
+
 Server access
 --------------
+
 Running integration tests and building the examples requires access to a valid Granta MI instance
-(see :ref:`ref_software_requirements`.).
+(see :ref:`ref_software_requirements`).
 
 External contributors may not have an instance of Granta MI at their disposal. Prior to creating a pull request with the
-desired changes, they should make sure that unit tests pass (:ref:`Testing <ref_testing>`), static code validation and
+desired changes, they should make sure that unit tests pass (:ref:`ref_tox`), static code validation and
 styling pass (:ref:`pre-commit <ref_precommit>`), and that the documentation can be generated successfully without the
 examples (:ref:`Documenting <ref_documenting>`).
 
-Continuous Integration on GitHub is configured to run the integration tests and generate the full documentation on
-creation and updates of pull requests. Continuous Integration is not configured to run for pull requests from forks.
-External contributions require approval from a maintainer for checks to run.
+Continuous Integration (CI) on GitHub is configured to run the integration tests and generate the full documentation on
+creation and updates of pull requests. CI is not configured to run for pull requests from forks. External contributions
+require approval from a maintainer for checks to run.
+
 
 .. _ref_precommit:
 
@@ -98,11 +107,6 @@ compliant is to run the following command:
     pre-commit run --all-files
 
 
-.. _ref_testing:
-
-Testing
-=======
-
 .. _ref_documenting:
 
 Documenting
@@ -110,20 +114,21 @@ Documenting
 
 As per PyAnsys guidelines, the documentation is generated using `Sphinx`_.
 
-For building documentation, you can either run the usual rules provided in the
-`Sphinx`_ Makefile, such as:
+For building documentation, use the `Sphinx`_ Makefile:
 
 .. code:: bash
 
     make -C doc/ html && your_browser_name doc/build/html/index.html
 
-It is strongly recommended to run sphinx with the following extra arguments. They ensure all references are valid, and
-turn warnings into errors. CI uses the same configuration, so it is advised to resolve any warnings/errors locally
-before pushing changes.
+If any changes have been made to the documentation, it is strongly recommended
+to run sphinx directly with the following extra arguments. They ensure all references
+are valid, and turn warnings into errors. CI uses the same configuration, so it is
+advised to resolve any warnings/errors locally before pushing changes.
 
 .. code:: bash
 
-    doc> sphinx-build -b html source build -W -n --keep-going
+    sphinx-build -b html source build -W -n --keep-going
+
 
 Example notebooks
 -----------------
@@ -134,16 +139,15 @@ package that has not yet been covered.
 
 The example scripts are placed in the ``examples`` directory and are included
 in the documentation build if the environment variable ``BUILD_EXAMPLES`` is set
-to ``True``. Otherwise, a different set of examples is run, to validate the process.
+to ``True``. Otherwise, a different set of examples is run to validate the process.
 
 Examples are checked in as scripts using the ``light`` format, see `jupytext`_
 for more information. As part of the doc build process, the Python
-files are converted back into Jupyter notebooks and are executed, which populates
-the output cells.
+files are converted back into Jupyter notebooks and the output cells are populated
+by running the notebooks against a Granta MI instance.
 
 This conversion between Jupyter notebooks and Python files is performed by
-`nb-convert`_. For installation
-instructions, see the nb-convert documentation.
+`nb-convert`_. For installation instructions, see the nb-convert documentation.
 
 
 .. _poetry: https://python-poetry.org/

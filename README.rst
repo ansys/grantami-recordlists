@@ -30,6 +30,7 @@
 
 .. _after-badges:
 
+
 PyGranta RecordLists
 ====================
 
@@ -41,6 +42,20 @@ To avoid ambiguity with the Python object ``list``, lists available via the Gran
 Using the Granta MI Lists API requires the user to have necessary permissions on the Granta MI Server. Some
 operations on record lists require additional permissions, specific to record lists. For more information,
 see the Help for the Favorites app in Granta MI.
+
+
+Dependencies
+------------
+.. readme_software_requirements
+
+To use the ``ansys.grantami.recordlists`` package you must have access to a
+Granta MI 2023 R2 deployment.
+
+The ``ansys.grantami.recordlists`` package currently supports Python from version 3.8 to version 3.11 on both Windows
+and Linux.
+
+.. readme_software_requirements_end
+
 
 
 Installation
@@ -76,15 +91,3 @@ The preceding code installs the package and allows you to modify it locally,
 with your changes reflected in your Python setup after restarting the Python kernel.
 
 .. readme_installation_end
-
-Dependencies
-------------
-.. readme_software_requirements
-
-To use the ``ansys.grantami.recordlists`` package, you must have access to a
-Granta MI server that includes Granta MI Server API.
-
-The ``ansys.grantami.recordlists`` package currently supports Python from version 3.8 to version 3.11 on both Windows
-and Linux.
-
-.. readme_software_requirements_end
