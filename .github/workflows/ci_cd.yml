@@ -85,7 +85,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
   tests:
-    name: "Tests Python ${{ matrix.python-version }}"
+    name: "Tests Python ${{ matrix.os }}, ${{ matrix.python-version }}"
     runs-on: ${{ matrix.os }}
     needs: smoke-tests
     strategy:
@@ -96,12 +96,6 @@ jobs:
     steps:
       - name: "Checkout the repository"
         uses: actions/checkout@v3
-
-      - name: "Download dependencies"
-        uses: actions/download-artifact@v3
-        with:
-          name: ansys-grantami-serverapi-openapi-wheel
-          path: deps
 
       - name: "Set up Python ${{ matrix.python-version }}"
         uses: actions/setup-python@v4
