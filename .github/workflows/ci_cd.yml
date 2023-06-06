@@ -37,7 +37,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
   doc-build:
-    name: "Build documentation"
+    name: "Build documentation (mock examples)"
     runs-on: ubuntu-latest
     needs: doc-style
     steps:
@@ -64,7 +64,7 @@ jobs:
       - name: "Upload HTML documentation"
         uses: actions/upload-artifact@v3
         with:
-          name: documentation-html-no-examples
+          name: documentation-html-mock-examples
           path: doc/_build/html
           retention-days: 7
 
@@ -85,7 +85,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
   tests:
-    name: "Tests Python ${{ matrix.os }}, ${{ matrix.python-version }}"
+    name: "Tests Python ${{ matrix.python-version }}, ${{ matrix.os }}"
     runs-on: ${{ matrix.os }}
     needs: smoke-tests
     strategy:
@@ -140,7 +140,7 @@ jobs:
   doc-deploy-dev:
     name: "Deploy development documentation"
     runs-on: ubuntu-latest
-    needs: [build-library]
+    needs: [server-checks]
     if: github.event_name == 'push' && !contains(github.ref, 'refs/tags')
     steps:
       - uses: ansys/actions/doc-deploy-dev@v4
@@ -178,5 +178,3 @@ jobs:
           cname: ${{ env.DOCUMENTATION_CNAME }}
           token: ${{ secrets.GITHUB_TOKEN }}
           doc-artifact-name: documentation-html
-
-
