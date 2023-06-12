@@ -21,7 +21,7 @@ GRANTA_APPLICATION_NAME_HEADER = "PyGranta RecordLists"
 _ArgNotProvided = "_ArgNotProvided"
 
 
-class RecordListApiClient(ApiClient):  # type: ignore[misc]
+class RecordListsApiClient(ApiClient):  # type: ignore[misc]
     """
     Communicates with Granta MI.
 
@@ -39,7 +39,7 @@ class RecordListApiClient(ApiClient):  # type: ignore[misc]
         self._service_layer_url = service_layer_url
         api_url = service_layer_url + PROXY_PATH
 
-        logger.debug("Creating RecordListApiClient")
+        logger.debug("Creating RecordListsApiClient")
         logger.debug(f"Base Service Layer URL: {self._service_layer_url}")
         logger.debug(f"Service URL: {api_url}")
 
@@ -556,14 +556,14 @@ class Connection(ApiClientFactory):  # type: ignore[misc]
     --------
     >>> client = Connection("http://my_mi_server/mi_servicelayer").with_autologon().connect()
     >>> client
-    <RecordListApiClient: url=http://my_mi_server/mi_servicelayer>
+    <RecordListsApiClient: url=http://my_mi_server/mi_servicelayer>
     >>> client = (
     ...     Connection("http://my_mi_server/mi_servicelayer")
     ...     .with_credentials(username="my_username", password="my_password")
     ...     .connect()
     ... )
     >>> client
-    <RecordListApiClient: url: http://my_mi_server/mi_servicelayer>
+    <RecordListsApiClient: url: http://my_mi_server/mi_servicelayer>
     """
 
     def __init__(
@@ -581,20 +581,20 @@ class Connection(ApiClientFactory):  # type: ignore[misc]
             "ansys-grantami-recordlists", __version__
         )
 
-    def connect(self) -> RecordListApiClient:
+    def connect(self) -> RecordListsApiClient:
         """
-        Finalize the :class:`.RecordListApiClient` client and return it for use.
+        Finalize the :class:`.RecordListsApiClient` client and return it for use.
 
         Authentication must be configured for this method to succeed.
 
         Returns
         -------
-        :class:`.RecordListApiClient`
+        :class:`.RecordListsApiClient`
             Client object that can be used to connect to Granta MI and interact with the record
             list API.
         """
         self._validate_builder()
-        client = RecordListApiClient(
+        client = RecordListsApiClient(
             self._session,
             self._base_service_layer_url,
             self._session_configuration,
@@ -604,7 +604,7 @@ class Connection(ApiClientFactory):  # type: ignore[misc]
         return client
 
     @staticmethod
-    def _test_connection(client: RecordListApiClient) -> None:
+    def _test_connection(client: RecordListsApiClient) -> None:
         """Check if the created client can be used to perform a request.
 
         This method asserts that the API definition can be obtained.
@@ -613,7 +613,7 @@ class Connection(ApiClientFactory):  # type: ignore[misc]
 
         Parameters
         ----------
-        client : :class:`~.RecordListApiClient`
+        client : :class:`~.RecordListsApiClient`
             Client object to test.
 
         Raises

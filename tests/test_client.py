@@ -14,12 +14,17 @@ from ansys.grantami.serverapi_openapi.models import (
 )
 import pytest
 
-from ansys.grantami.recordlists import RecordList, RecordListApiClient, RecordListItem, SearchResult
+from ansys.grantami.recordlists import (
+    RecordList,
+    RecordListItem,
+    RecordListsApiClient,
+    SearchResult,
+)
 
 
 @pytest.fixture
 def client():
-    client = RecordListApiClient(Mock(), "http://server_name/mi_servicelayer", Mock())
+    client = RecordListsApiClient(Mock(), "http://server_name/mi_servicelayer", Mock())
     client.setup_client(models)
     return client
 
@@ -36,7 +41,7 @@ def test_client_has_expected_api_url(client):
 
 
 def test_client_repr(client):
-    assert repr(client) == "<RecordListApiClient url: http://server_name/mi_servicelayer>"
+    assert repr(client) == "<RecordListsApiClient url: http://server_name/mi_servicelayer>"
 
 
 class TestClientMethod:
