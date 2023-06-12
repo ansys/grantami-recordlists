@@ -42,7 +42,7 @@ numpydoc = "^1.4.0"
 ansys-sphinx-theme = "^0.9.5"
 sphinx-copybutton = "^0.5.0"
 jupytext = "^1.14.4"
-nbsphinx = "^0.8.12"
+nbsphinx = "^0.9.0"
 ipykernel = "^6.21.2" # required by nbsphinx to run notebooks.
 sphinx-jinja = "^2.0.2"
 
