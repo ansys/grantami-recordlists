@@ -49,3 +49,46 @@ def test_500_on_test_connection_is_handled(sl_url, successful_auth, mocker):
             ConnectionError, match="Check that SSL certificates have been configured"
         ):
             client = connection.connect()
+
+
+def test_new_server_version(sl_url, successful_auth, mocker):
+    mi_version_response = {
+        "binary_compatibility_version": "24.1.0.0",
+        "version": "24.1.572.0",
+        "major_minor_version": "24.1",
+    }
+
+    with mocker:
+        connection = Connection(sl_url).with_anonymous()
+        mocker.get(requests_mock.ANY, status_code=200, json=mi_version_response)
+        connection.connect()
+
+
+def test_old_server_version_is_handled(sl_url, successful_auth, mocker):
+    mi_version_response = {
+        "binary_compatibility_version": "12.0.0.0",
+        "version": "12.1.2.3",
+        "major_minor_version": "12.0",
+    }
+
+    with mocker:
+        connection = Connection(sl_url).with_anonymous()
+        mocker.get(requests_mock.ANY, status_code=200, json=mi_version_response)
+        with pytest.raises(
+            ConnectionError,
+            match=r"This package requires a more recent Granta MI version.*12\.1\.2\.3.*23\.2",
+        ):
+            connection.connect()
+
+
+def test_server_version_error_is_handled(sl_url, successful_auth, mocker):
+    with mocker:
+        connection = Connection(sl_url).with_anonymous()
+        mocker.get(requests_mock.ANY, status_code=200, json={})
+        version_path = re.compile("schema/mi-version")
+        mocker.get(version_path, status_code=404)
+        with pytest.raises(
+            ConnectionError,
+            match=r"Cannot check the Granta MI server version.*23\.2",
+        ):
+            connection.connect()
