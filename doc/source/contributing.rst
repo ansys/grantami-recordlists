@@ -21,7 +21,7 @@ Post issues
 Use the `Issues <https://github.com/pyansys/grantami-recordlists/issues>`_ page for
 this repository to submit questions, report bugs, and request new features.
 
-To reach the PyAnsys support team, email `pyansys.support@ansys.com <pyansys.support@ansys.com>`_.
+To reach the PyAnsys core team, email `pyansys.core@ansys.com <pyansys.core@ansys.com>`_.
 
 Developer environment setup
 ===========================
