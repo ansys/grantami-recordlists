@@ -115,7 +115,7 @@ jobs:
           TEST_LIST_PASS: ${{secrets.TEST_SERVER_PASS}}
 
   doc-build:
-    name: "Documentation build"
+    name: "Build documentation"
     runs-on: ubuntu-latest
     needs: integration-tests
     steps:
