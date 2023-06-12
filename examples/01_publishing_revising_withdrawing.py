@@ -24,7 +24,7 @@
 # ## Connect to Granta MI and create a record list
 
 # Import the ``Connection`` class and create the connection. See the
-# [Basic usage](00_Basic_usage.ipynb) example for more details.
+# [Getting started](00_Basic_usage.ipynb) example for more details.
 
 # + tags=[]
 from ansys.grantami.recordlists import Connection
