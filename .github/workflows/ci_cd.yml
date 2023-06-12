@@ -23,7 +23,7 @@ jobs:
     name: "Code style"
     runs-on: ubuntu-latest
     steps:
-      - uses: pyansys/actions/code-style@v3
+      - uses: pyansys/actions/code-style@v4
         with:
           python-version: ${{ env.MAIN_PYTHON_VERSION }}
 
@@ -31,7 +31,7 @@ jobs:
     name: "Documentation style"
     runs-on: ubuntu-latest
     steps:
-      - uses: pyansys/actions/doc-style@v3
+      - uses: pyansys/actions/doc-style@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -103,7 +103,7 @@ jobs:
           name: ansys-grantami-serverapi-openapi-wheel
           path: deps
 
-      - uses: pyansys/actions/build-wheelhouse@v3
+      - uses: pyansys/actions/build-wheelhouse@v4
         with:
           library-name: ${{ env.LIBRARY_NAME }}
           library-namespace: ${{ env.LIBRARY_NAMESPACE }}
@@ -160,7 +160,7 @@ jobs:
           name: ansys-grantami-serverapi-openapi-wheel
           path: grantami-recordlists/grantami-recordlists/deps
 
-      - uses: pyansys/actions/build-library@v3
+      - uses: pyansys/actions/build-library@v4
         with:
           library-name: ${{ env.LIBRARY_NAME }}
           python-version: ${{ env.MAIN_PYTHON_VERSION }}
