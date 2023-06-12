@@ -37,7 +37,7 @@ requests = "^2.26"
 optional = true
 
 [tool.poetry.group.doc.dependencies]
-Sphinx = "^5.1.1"
+Sphinx = "^7.0.1"
 numpydoc = "^1.4.0"
 ansys-sphinx-theme = "^0.9.5"
 sphinx-copybutton = "^0.5.0"
@@ -48,7 +48,7 @@ sphinx-jinja = "^2.0.2"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.1.2"
-pytest-cov = "^3.0.0"
+pytest-cov = "^4.1.0"
 requests-mock = "^1.10.0"
 pre-commit = "^3.2.2"
 
