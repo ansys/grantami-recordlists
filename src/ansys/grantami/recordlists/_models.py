@@ -33,7 +33,6 @@ class RecordList:
         published_user: Optional["UserOrGroup"] = None,
         parent_record_list_identifier: Optional[str] = None,
     ):
-
         self._identifier: str = identifier
         self._name: str = name
         self._created_timestamp: datetime = created_timestamp
