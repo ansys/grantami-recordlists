@@ -1,30 +1,55 @@
 on:
   workflow_call:
+
     inputs:
-      skip_vm_management:
+
+      python-version:
+        description: >
+          Python version used for installing and running ``pre-commit``.
+        default: '3.10'
+        required: false
+        type: string
+
+      skip-vm-management:
+        description: >
+            Whether to skip or not the start up of the virtual machine. Default
+            value is ``false``.
+        required: false
         default: false
-        type: 'boolean'
+        type: boolean
+
     secrets:
+
       AZURE_APP_ID:
         required: true
+
       AZURE_SECRET:
         required: true
+
       AZURE_TENANT_ID:
         required: true
+
       AZURE_RESOURCE_GROUP:
         required: true
+
       AZURE_VM_NAME:
         required: true
+
       TEST_SERVER_URL:
         required: true
+
       TEST_SERVER_ADMIN_USER:
         required: true
+
       TEST_SERVER_ADMIN_PASS:
         required: true
+
       TEST_SERVER_USER:
         required: true
+
       TEST_SERVER_PASS:
         required: true
+
   workflow_dispatch:
 
 concurrency:
@@ -32,60 +57,55 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  start_vm:
-    name: Start Azure VM
+
+  start-vm:
+    name: "Start Azure VM"
     runs-on: ubuntu-latest
-
     steps:
-      - uses: actions/checkout@v3
+      - name: "Checkout the repository"
+        uses: actions/checkout@v3
 
-      - name: Start VM with Azure CLI
+      - name: "Start VM with Azure CLI"
         id: azure_cli
         uses: azure/CLI@v1
-        if:   ${{ !(inputs.skip_vm_management)}}
+        if:   ${{ !(inputs.skip-vm-management)}}
         with:
           azcliversion: 2.32.0
           inlineScript: |
             az login --service-principal -u ${{ secrets.AZURE_APP_ID }} -p ${{ secrets.AZURE_SECRET }} --tenant ${{ secrets.AZURE_TENANT_ID }}
             az vm start -g ${{ secrets.AZURE_RESOURCE_GROUP }} -n ${{ secrets.AZURE_VM_NAME }}
 
-      - name: Check server is ready
+      - name: "Check if server is ready"
         run: |
-          pip install requests --disable-pip-version-check
-          python cicd/check_server.py
+          python -m pip install requests --disable-pip-version-check
+          python .github/scripts/check_server.py
         env:
           TEST_SL_URL: ${{secrets.TEST_SERVER_URL}}
           TEST_USER: ${{secrets.TEST_SERVER_ADMIN_USER}}
           TEST_PASS: ${{secrets.TEST_SERVER_ADMIN_PASS}}
 
-  integration_tests:
-    name: Integration tests
+  integration-tests:
+    name: "Integration tests in ${{ matrix.os }}"
     runs-on: ${{ matrix.os }}
-    needs: start_vm
-
+    needs: start-vm
     strategy:
       max-parallel: 1
       matrix:
         os: [ubuntu-latest, windows-latest]
-
     steps:
-      - uses: actions/checkout@v3
+      - name: "Checkout the repository"
+        uses: actions/checkout@v3
 
-      - name: Set up Python 3.9
+      - name: "Set up Python ${{ inputs.python-version }}"
         uses: actions/setup-python@v4
         with:
-          python-version: '3.9'
+          python-version: ${{ inputs.python-version }}
 
-      - name: Install dependencies
-        run: pip install poetry 'tox<4' --disable-pip-version-check
+      - name: "Install Python dependencies"
+        run: |
+          pip install poetry 'tox<4' --disable-pip-version-check
 
-      - name: Download dependencies
-        uses: actions/download-artifact@v3
-        with:
-          name: ansys-grantami-serverapi-openapi-wheel
-          path: deps
-
-      - name: Test with tox (integration tests only)
+      - name: "Test with tox (integration tests only)"
         run: tox -e py39 -- -m "integration"
         env:
           TEST_SL_URL: ${{secrets.TEST_SERVER_URL}}
@@ -94,37 +114,31 @@ jobs:
           TEST_LIST_USER: ${{secrets.TEST_SERVER_USER}}
           TEST_LIST_PASS: ${{secrets.TEST_SERVER_PASS}}
 
-  docs:
-    name: Build documentation
+  doc-build:
+    name: "Build documentation"
     runs-on: ubuntu-latest
-    needs: integration_tests
-
+    needs: integration-tests
     steps:
-      - uses: actions/checkout@v3
+      - name: "Checkout the repository"
+        uses: actions/checkout@v3
 
-      - name: Set up Python 3.9
+      - name: "Set up Python ${{ inputs.python-version }}"
         uses: actions/setup-python@v4
         with:
-          python-version: '3.9'
+          python-version: ${{ inputs.python-version }}
 
-      - name: Install system dependencies
+      - name: "Install system dependencies"
         run: |
           sudo apt update
-          sudo apt install pandoc
-          sudo apt install texlive-latex-extra latexmk texlive-xetex fonts-freefont-otf xindy
+          sudo apt-get install pandoc
+          sudo apt-get install texlive-latex-extra latexmk texlive-xetex fonts-freefont-otf xindy
 
-      - name: Download dependencies
-        uses: actions/download-artifact@v3
-        with:
-          name: ansys-grantami-serverapi-openapi-wheel
-          path: deps
-
-      - name: Install library
+      - name: "Install documentation dependencies"
         run: |
           pip install poetry~=1.3.0 --disable-pip-version-check
           poetry install --with doc
 
-      - name: Build HTML Documentation
+      - name: "Build HTML documentation"
         run: poetry run -- make -C doc html SPHINXOPTS="-n -W --keep-going"
         env:
           TEST_SL_URL: ${{secrets.TEST_SERVER_URL}}
@@ -132,31 +146,30 @@ jobs:
           TEST_PASS: ${{secrets.TEST_SERVER_ADMIN_PASS}}
           BUILD_EXAMPLES: 1
 
-      - name: Build PDF Documentation
+      - name: "Build PDF documentation"
         run: poetry run -- make -C doc latexpdf
 
-      - name: Upload HTML Documentation
+      - name: "Upload HTML documentation"
         uses: actions/upload-artifact@v3
         with:
           name: documentation-html
-          path: doc/build/html
+          path: doc/_build/html
           retention-days: 7
 
-      - name: Upload PDF Documentation
+      - name: "Upload PDF documentation"
         uses: actions/upload-artifact@v3
         with:
           name: documentation-pdf
-          path: doc/build/latex/*.pdf
+          path: doc/_build/latex/*.pdf
           retention-days: 7
 
-  stop_vm:
-    name: Stop Azure VM
+  stop-vm:
+    name: "Stop Azure VM"
     runs-on: ubuntu-latest
-    needs: docs
-    if:   ${{ always() && !(inputs.skip_vm_management)}}
+    needs: doc-build
+    if: ${{ always() && !(inputs.skip-vm-management)}}
     steps:
-      - name: Stop Azure VM
-        uses: azure/CLI@v1
+      - uses: azure/CLI@v1
         with:
           azcliversion: 2.32.0
           inlineScript: |

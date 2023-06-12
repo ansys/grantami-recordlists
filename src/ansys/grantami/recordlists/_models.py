@@ -33,7 +33,6 @@ class RecordList:
         published_user: Optional["UserOrGroup"] = None,
         parent_record_list_identifier: Optional[str] = None,
     ):
-
         self._identifier: str = identifier
         self._name: str = name
         self._created_timestamp: datetime = created_timestamp
@@ -58,7 +57,7 @@ class RecordList:
         Name of the Record List. Read-only.
 
         Can be updated via
-        :meth:`~ansys.grantami.recordlists.RecordListApiClient.update_list`.
+        :meth:`~ansys.grantami.recordlists.RecordListsApiClient.update_list`.
         """
         return self._name
 
@@ -68,7 +67,7 @@ class RecordList:
         Description of the Record List. Read-only.
 
         Can be updated via
-        :meth:`~ansys.grantami.recordlists.RecordListApiClient.update_list`.
+        :meth:`~ansys.grantami.recordlists.RecordListsApiClient.update_list`.
         """
         return self._description
 
@@ -78,7 +77,7 @@ class RecordList:
         Notes about the Record List. Read-only.
 
         Can be updated via
-        :meth:`~ansys.grantami.recordlists.RecordListApiClient.update_list`.
+        :meth:`~ansys.grantami.recordlists.RecordListsApiClient.update_list`.
         """
         return self._notes
 
@@ -348,7 +347,7 @@ class UserOrGroup:
 
 class SearchCriterion:
     """
-    Search criterion to use in a :meth:`~.RecordListApiClient.search_for_lists` operation.
+    Search criterion to use in a :meth:`~.RecordListsApiClient.search_for_lists` operation.
 
     The properties in this class represent an *AND* search - only lists that match all the
     non-null properties will be returned.
@@ -552,7 +551,7 @@ class SearchCriterion:
 
 class BooleanCriterion:
     """
-    Search criterion to use in a search operation :meth:`~.RecordListApiClient.search_for_lists`.
+    Search criterion to use in a search operation :meth:`~.RecordListsApiClient.search_for_lists`.
 
     Use this class to combine multiple :class:`SearchCriterion` or
     :class:`BooleanCriterion` objects together as either *AND* or *OR* searches. :attr:`.match_any`
@@ -682,7 +681,7 @@ class SearchResult:
         Items of the record list associated with the search result.
 
         Will be ``None`` unless ``include_items`` has been specified in
-        :meth:`~.RecordListApiClient.search_for_lists`
+        :meth:`~.RecordListsApiClient.search_for_lists`
         """
         return self._items
 

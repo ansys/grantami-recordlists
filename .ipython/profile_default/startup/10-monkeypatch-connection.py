@@ -1,7 +1,7 @@
 import os
 
 from ansys.grantami.recordlists import Connection
-from ansys.grantami.recordlists._connection import RecordListApiClient
+from ansys.grantami.recordlists._connection import RecordListsApiClient
 
 # Monkey patch the Connection() class to use the environment variable-specified server URL.
 original_ctor = Connection.__init__
@@ -36,8 +36,8 @@ Connection.with_autologon = with_autologon
 server_url = "http://my_grantami_server/mi_servicelayer"
 
 
-def __repr__(self: RecordListApiClient) -> str:
-    return f"<RecordListApiClient url: {server_url}>"
+def __repr__(self: RecordListsApiClient) -> str:
+    return f"<RecordListsApiClient url: {server_url}>"
 
 
-RecordListApiClient.__repr__ = __repr__
+RecordListsApiClient.__repr__ = __repr__

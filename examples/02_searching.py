@@ -23,7 +23,7 @@
 # ## Connect to Granta MI and create a record list
 
 # Import the ``Connection`` class and create the connection. See the
-# [Basic usage](00_Basic_usage.ipynb) example for more details.
+# [Getting started](00_Basic_usage.ipynb) example for more details.
 
 # + tags=[]
 from ansys.grantami.recordlists import (
@@ -88,8 +88,9 @@ results
 # another list. Lists are generally in this state if they are created in the Favorites or Explore
 # apps and are not submitted for publication.
 
-# To search for a list of this type, use the ``SearchCriterion`` below (``is_internal_use=False``
-# excludes record lists created by other Granta MI applications for internal operations).
+# To search for a list of this type, use the ``SearchCriterion`` below. Set
+# ``is_internal_use=False`` to exclude transient record lists created by Granta MI for
+# internal use only, which would otherwise be returned by this search.
 
 # + tags=[]
 criterion = SearchCriterion(

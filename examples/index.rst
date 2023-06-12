@@ -5,15 +5,26 @@ Examples
 
 The following examples demonstrate key aspects of PyGranta RecordLists.
 
+.. jinja:: examples
 
-.. toctree::
-   :maxdepth: 2
+    {% if build_examples %}
 
-   00_Basic_usage
-   01_Publishing_revising_withdrawing
-   02_Searching
+    .. toctree::
+       :maxdepth: 2
+
+       00_basic_usage
+       01_publishing_revising_withdrawing
+       02_searching
+
+    {% else %}
+
+    .. toctree::
+       :maxdepth: 2
+
+       test_example
+
+    {% endif %}
 
 
-The Granta MI Scripting Toolkit documentation includes an additional example focusing on interoperability
-between this package and the Granta MI Scripting Toolkit.
-
+Users of the Granta MI Scripting Toolkit can find an example of interoperability in the Granta MI Scripting Toolkit
+documentation.

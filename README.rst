@@ -1,6 +1,6 @@
 |pyansys| |python| |pypi| |GH-CI| |codecov| |MIT| |black|
 
-.. |pyansys| image:: https://img.shields.io/badge/Py-Ansys-ffc107.svg?logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAIAAACQkWg2AAABDklEQVQ4jWNgoDfg5mD8vE7q/3bpVyskbW0sMRUwofHD7Dh5OBkZGBgW7/3W2tZpa2tLQEOyOzeEsfumlK2tbVpaGj4N6jIs1lpsDAwMJ278sveMY2BgCA0NFRISwqkhyQ1q/Nyd3zg4OBgYGNjZ2ePi4rB5loGBhZnhxTLJ/9ulv26Q4uVk1NXV/f///////69du4Zdg78lx//t0v+3S88rFISInD59GqIH2esIJ8G9O2/XVwhjzpw5EAam1xkkBJn/bJX+v1365hxxuCAfH9+3b9/+////48cPuNehNsS7cDEzMTAwMMzb+Q2u4dOnT2vWrMHu9ZtzxP9vl/69RVpCkBlZ3N7enoDXBwEAAA+YYitOilMVAAAAAElFTkSuQmCC
+.. |pyansys| image:: https://img.shields.io/badge/Py-Ansys-ffc107.svg?labelColor=black&logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAIAAACQkWg2AAABDklEQVQ4jWNgoDfg5mD8vE7q/3bpVyskbW0sMRUwofHD7Dh5OBkZGBgW7/3W2tZpa2tLQEOyOzeEsfumlK2tbVpaGj4N6jIs1lpsDAwMJ278sveMY2BgCA0NFRISwqkhyQ1q/Nyd3zg4OBgYGNjZ2ePi4rB5loGBhZnhxTLJ/9ulv26Q4uVk1NXV/f///////69du4Zdg78lx//t0v+3S88rFISInD59GqIH2esIJ8G9O2/XVwhjzpw5EAam1xkkBJn/bJX+v1365hxxuCAfH9+3b9/+////48cPuNehNsS7cDEzMTAwMMzb+Q2u4dOnT2vWrMHu9ZtzxP9vl/69RVpCkBlZ3N7enoDXBwEAAA+YYitOilMVAAAAAElFTkSuQmCC
    :target: https://docs.pyansys.com/
    :alt: PyAnsys
 
@@ -30,6 +30,7 @@
 
 .. _after-badges:
 
+
 PyGranta RecordLists
 ====================
 
@@ -41,6 +42,18 @@ To avoid ambiguity with the Python object ``list``, lists available via the Gran
 Using the Granta MI Lists API requires the user to have necessary permissions on the Granta MI Server. Some
 operations on record lists require additional permissions, specific to record lists. For more information,
 see the Help for the Favorites app in Granta MI.
+
+
+Dependencies
+------------
+.. readme_software_requirements
+
+To use the ``ansys.grantami.recordlists`` package you must have access to a Granta MI 2023 R2 deployment.
+
+The ``ansys.grantami.recordlists`` package currently supports Python from version 3.8 to version 3.11.
+
+.. readme_software_requirements_end
+
 
 
 Installation
@@ -76,15 +89,3 @@ The preceding code installs the package and allows you to modify it locally,
 with your changes reflected in your Python setup after restarting the Python kernel.
 
 .. readme_installation_end
-
-Dependencies
-------------
-.. readme_software_requirements
-
-To use the ``ansys.grantami.recordlists`` package, you must have access to a
-Granta MI server that includes Granta MI Server API.
-
-The ``ansys.grantami.recordlists`` package currently supports Python from version 3.8 to version 3.11 on both Windows
-and Linux.
-
-.. readme_software_requirements_end
