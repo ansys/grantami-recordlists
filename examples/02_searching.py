@@ -23,7 +23,7 @@
 # ## Connect to Granta MI and create a record list
 
 # Import the ``Connection`` class and create the connection. See the
-# [Getting started](00_Basic_usage.ipynb) example for more details.
+# [Getting started](00_basic_usage.ipynb) example for more details.
 
 # + tags=[]
 from ansys.grantami.recordlists import (
@@ -46,7 +46,7 @@ client = connection.connect()
 # * ``identifier_d``: Unpublished
 #
 # See the
-# [Publishing, revising, and withdrawing record lists](01_Publishing_revising_withdrawing.ipynb)
+# [Publishing, revising, and withdrawing record lists](01_publishing_revising_withdrawing.ipynb)
 # example for more details.
 
 # + tags=[]
