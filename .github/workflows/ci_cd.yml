@@ -104,7 +104,7 @@ jobs:
 
       - name: "Install Python dependencies"
         run: |
-          python -m pip install --upgrade pip poetry tox tox-gh-actions
+          python -m pip install --upgrade pip poetry tox
 
       - name: "Test with tox"
         run: tox -- -m "not integration"
