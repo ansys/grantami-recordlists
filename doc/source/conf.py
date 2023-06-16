@@ -185,6 +185,9 @@ exclude_patterns = []
 EXAMPLES_SOURCE_DIR = Path(__file__).parent.parent.parent.absolute() / "examples"
 EXAMPLES_OUTPUT_DIR = Path(__file__).parent.absolute() / "examples"
 BUILD_EXAMPLES = True if os.environ.get("BUILD_EXAMPLES", "false") == "true" else False
+if BUILD_EXAMPLES:
+    ipython_dir = Path("../../.ipython").absolute()
+    os.environ["IPYTHONDIR"] = str(ipython_dir)
 
 ignore_example_files = r"test.*" if BUILD_EXAMPLES else r"^(?!test)"
 

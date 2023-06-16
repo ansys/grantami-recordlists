@@ -106,7 +106,7 @@ jobs:
           pip install poetry 'tox<4' --disable-pip-version-check
 
       - name: "Test with tox (integration tests only)"
-        run: tox -e py39 -- -m "integration"
+        run: tox -e tests -- -m "integration"
         env:
           TEST_SL_URL: ${{secrets.TEST_SERVER_URL}}
           TEST_LIST_ADMIN_USER: ${{secrets.TEST_SERVER_ADMIN_USER}}
@@ -144,10 +144,15 @@ jobs:
           TEST_SL_URL: ${{secrets.TEST_SERVER_URL}}
           TEST_USER: ${{secrets.TEST_SERVER_ADMIN_USER}}
           TEST_PASS: ${{secrets.TEST_SERVER_ADMIN_PASS}}
-          BUILD_EXAMPLES: 1
+          BUILD_EXAMPLES: "true"
 
       - name: "Build PDF documentation"
         run: poetry run -- make -C doc latexpdf
+        env:
+          TEST_SL_URL: ${{secrets.TEST_SERVER_URL}}
+          TEST_USER: ${{secrets.TEST_SERVER_ADMIN_USER}}
+          TEST_PASS: ${{secrets.TEST_SERVER_ADMIN_PASS}}
+          BUILD_EXAMPLES: "true"
 
       - name: "Upload HTML documentation"
         uses: actions/upload-artifact@v3
