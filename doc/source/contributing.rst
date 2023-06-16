@@ -39,7 +39,7 @@ dependencies to run the tests, build the docs and build the package.
 
 .. code:: bash
 
-    git clone https://github.com/pyansys/grantami-recordlists
+    git clone https://github.com/ansys/grantami-recordlists
     cd grantami-recordlists
     poetry install --with build,doc,tests
 
