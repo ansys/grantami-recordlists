@@ -27,7 +27,7 @@ cname = os.getenv("DOCUMENTATION_CNAME", "recordlists.grantami.docs.pyansys.com"
 
 # specify the location of your github repo
 html_theme_options = {
-    "github_url": "https://github.com/pyansys/grantami-recordlists",
+    "github_url": "https://github.com/ansys/grantami-recordlists",
     "show_prev_next": False,
     "show_breadcrumbs": True,
     "additional_breadcrumbs": [

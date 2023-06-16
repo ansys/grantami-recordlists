@@ -17,7 +17,7 @@
    :alt: Codecov
 
 .. |GH-CI| image:: https://github.com/pyansys/grantami-recordlists/actions/workflows/ci_cd.yml/badge.svg
-   :target: https://github.com/pyansys/grantami-recordlists/actions/workflows/ci_cd.yml
+   :target: https://github.com/ansys/grantami-recordlists/actions/workflows/ci_cd.yml
    :alt: GH-CI
 
 .. |MIT| image:: https://img.shields.io/badge/License-MIT-yellow.svg
@@ -68,19 +68,19 @@ this code:
     pip install ansys-grantami-recordlists
 
 
-Alternatively, to install the latest from ``ansys-grantami-recordlists`` `GitHub <https://github.com/pyansys/grantami-recordlists>`_,
+Alternatively, to install the latest from ``ansys-grantami-recordlists`` `GitHub <https://github.com/ansys/grantami-recordlists>`_,
 use this code:
 
 .. code::
 
-    pip install git:https://github.com/pyansys/grantami-recordlists.git
+    pip install git:https://github.com/ansys/grantami-recordlists.git
 
 
 To install a local *development* version with Git and Poetry, use this code:
 
 .. code::
 
-    git clone https://github.com/pyansys/grantami-recordlists
+    git clone https://github.com/ansys/grantami-recordlists
     cd grantami-recordlists
     poetry install
 
