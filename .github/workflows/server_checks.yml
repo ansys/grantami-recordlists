@@ -144,7 +144,7 @@ jobs:
           TEST_SL_URL: ${{secrets.TEST_SERVER_URL}}
           TEST_USER: ${{secrets.TEST_SERVER_ADMIN_USER}}
           TEST_PASS: ${{secrets.TEST_SERVER_ADMIN_PASS}}
-          BUILD_EXAMPLES: 1
+          BUILD_EXAMPLES: "true"
 
       - name: "Build PDF documentation"
         run: poetry run -- make -C doc latexpdf
