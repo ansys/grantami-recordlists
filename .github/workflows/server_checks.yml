@@ -106,13 +106,29 @@ jobs:
           pip install poetry 'tox<4' --disable-pip-version-check
 
       - name: "Test with tox (integration tests only)"
-        run: tox -e tests -- -m "integration"
+        run: tox -e tests-coverage -- -m "integration"
         env:
           TEST_SL_URL: ${{secrets.TEST_SERVER_URL}}
           TEST_LIST_ADMIN_USER: ${{secrets.TEST_SERVER_ADMIN_USER}}
           TEST_LIST_ADMIN_PASS: ${{secrets.TEST_SERVER_ADMIN_PASS}}
           TEST_LIST_USER: ${{secrets.TEST_SERVER_USER}}
           TEST_LIST_PASS: ${{secrets.TEST_SERVER_PASS}}
+
+      - name: "Upload coverage artifacts"
+        uses: actions/upload-artifact@v3
+        if: ${{ matrix.os  == 'ubuntu-latest' }}
+        with:
+          name: coverage-html-integrationtests
+          path: .cov/html
+          retention-days: 7
+
+      - name: "Upload coverage to Codecov"
+        uses: codecov/codecov-action@v3
+        if: ${{ matrix.os  == 'ubuntu-latest' }}
+        with:
+          files: .cov/xml
+          flags: integration
+          fail_ci_if_error: true
 
   doc-build:
     name: "Build documentation"
