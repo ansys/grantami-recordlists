@@ -4,11 +4,11 @@
    :target: https://docs.pyansys.com/
    :alt: PyAnsys
 
-.. |python| image:: https://img.shields.io/pypi/pyversions/grantami-recordlists?logo=pypi
+.. |python| image:: https://img.shields.io/pypi/pyversions/ansys-grantami-recordlists?logo=pypi
    :target: https://pypi.org/project/ansys-grantami-recordlists/
    :alt: Python
 
-.. |pypi| image:: https://img.shields.io/pypi/v/grantami-recordlists.svg?logo=python&logoColor=white
+.. |pypi| image:: https://img.shields.io/pypi/v/ansys-grantami-recordlists.svg?logo=python&logoColor=white
    :target: https://pypi.org/project/ansys-grantami-recordlists
    :alt: PyPI
 
