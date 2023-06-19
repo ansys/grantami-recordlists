@@ -12,8 +12,8 @@
    :target: https://pypi.org/project/ansys-grantami-recordlists
    :alt: PyPI
 
-.. |codecov| image:: https://codecov.io/gh/pyansys/grantami-recordlists/branch/main/graph/badge.svg
-   :target: https://codecov.io/gh/pyansys/grantami-recordlists
+.. |codecov| image:: https://codecov.io/gh/ansys/grantami-recordlists/branch/main/graph/badge.svg
+   :target: https://codecov.io/gh/ansys/grantami-recordlists
    :alt: Codecov
 
 .. |GH-CI| image:: https://github.com/pyansys/grantami-recordlists/actions/workflows/ci_cd.yml/badge.svg
