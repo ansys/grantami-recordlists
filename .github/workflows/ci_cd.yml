@@ -107,15 +107,23 @@ jobs:
           python -m pip install --upgrade pip poetry tox
 
       - name: "Test with tox"
-        run: tox -e tests -- -m "not integration"
+        run: tox -e tests-coverage -- -m "not integration"
 
-      - name: "Upload coverage results"
+      - name: "Upload coverage artifacts"
         uses: actions/upload-artifact@v3
-        if: matrix.python-version == ${{ env.MAIN_PYTHON_VERSION }}
+        if: ${{ matrix.python-version == env.MAIN_PYTHON_VERSION  && matrix.os == 'ubuntu-latest'}}
         with:
-          name: coverage-html
+          name: coverage-html-unittests
           path: .cov/html
           retention-days: 7
+
+      - name: "Upload coverage to Codecov"
+        uses: codecov/codecov-action@v3
+        if: ${{ matrix.python-version == env.MAIN_PYTHON_VERSION  && matrix.os == 'ubuntu-latest'}}
+        with:
+          files: .cov/xml
+          flags: unittests
+          fail_ci_if_error: true
 
   build-library:
     name: "Build library"
