@@ -915,17 +915,17 @@ files = [
 
 [[package]]
 name = "jupytext"
-version = "1.14.6"
+version = "1.14.7"
 description = "Jupyter notebooks as Markdown documents, Julia, Python or R scripts"
 optional = false
 python-versions = "~=3.6"
 files = [
-    {file = "jupytext-1.14.6-py3-none-any.whl", hash = "sha256:6a0f9b1d850b4173115065853b8a81956bbbe6ee7d4a7906e9817cd6f6892414"},
-    {file = "jupytext-1.14.6.tar.gz", hash = "sha256:f34b045d89edcecb47772761feaf001daf270fff9470c9b2125345eae9064eb6"},
+    {file = "jupytext-1.14.7-py3-none-any.whl", hash = "sha256:ab2fd066dce8112ac95a7c4f9218c1a40d6cefa76b09352c8d08acf21dad5349"},
+    {file = "jupytext-1.14.7.tar.gz", hash = "sha256:53cbfe90857369cf30ac055acf7820d6d9d1c53683eecd58edef5072de34b455"},
 ]
 
 [package.dependencies]
-markdown-it-py = ">=1.0.0,<3.0.0"
+markdown-it-py = ">=1.0.0"
 mdit-py-plugins = "*"
 nbformat = "*"
 pyyaml = "*"
