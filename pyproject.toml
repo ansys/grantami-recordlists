@@ -40,7 +40,7 @@ optional = true
 [tool.poetry.group.doc.dependencies]
 Sphinx = "^7.0.1"
 numpydoc = "^1.4.0"
-ansys-sphinx-theme = "^0.9.5"
+ansys-sphinx-theme = "^0.10.3"
 sphinx-copybutton = "^0.5.0"
 jupytext = "^1.14.4"
 nbsphinx = "^0.9.0"
