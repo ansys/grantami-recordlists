@@ -59,9 +59,10 @@ def check_status(url: str, auth_header: HTTPBasicAuth) -> bool:
 
 if __name__ == "__main__":
     sl_url = os.getenv("TEST_SL_URL")
+    domain = os.getenv("TEST_DOMAIN")
     username = os.getenv("TEST_USER")
     password = os.getenv("TEST_PASS")
 
     logger.info(f"Checking if Granta MI server is ready for requests")
-    auth = HTTPBasicAuth(username, password)
+    auth = HTTPBasicAuth(rf"{domain}\{username}", password)
     check_status(sl_url, auth)
