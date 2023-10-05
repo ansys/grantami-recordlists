@@ -36,7 +36,7 @@ def block_until_server_is_ok(func):
 @block_until_server_is_ok
 def check_status(url: str, auth_header: HTTPBasicAuth) -> bool:
     try:
-        response = requests.get(url + "/Health/v2.svc/", auth=auth_header, verify=False)
+        response = requests.get(url + "/Health/v2.svc/", auth=auth_header)
     except requests.exceptions.RequestException as e:
         # This generally won't happen in normal operation. But if a RequestException happens we want
         # to make sure we handle it and try again.
