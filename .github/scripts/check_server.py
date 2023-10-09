@@ -40,7 +40,9 @@ def check_status(url: str, auth_header: HTTPBasicAuth) -> bool:
             url + "/Health/v2.svc/",
             auth=auth_header,
             verify=False,
-            headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/117.0"}
+            headers={
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/117.0"
+            },
         )
     except requests.exceptions.RequestException as e:
         # This generally won't happen in normal operation. But if a RequestException happens we want
