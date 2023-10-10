@@ -63,7 +63,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: "Checkout the repository"
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: "Start VM with Azure CLI"
         id: azure_cli
@@ -75,9 +75,17 @@ jobs:
             az login --service-principal -u ${{ secrets.AZURE_APP_ID }} -p ${{ secrets.AZURE_SECRET }} --tenant ${{ secrets.AZURE_TENANT_ID }}
             az vm start -g ${{ secrets.AZURE_RESOURCE_GROUP }} -n ${{ secrets.AZURE_VM_NAME }}
 
+      - name: "Set up Python ${{ inputs.python-version }}"
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ inputs.python-version }}
+
       - name: "Check if server is ready"
         run: |
-          python -m pip install requests --disable-pip-version-check
+          python -m venv ./venv
+          source ./venv/bin/activate
+          pip install requests --disable-pip-version-check
+          pip freeze
           python .github/scripts/check_server.py
         env:
           TEST_SL_URL: ${{secrets.TEST_SERVER_URL}}
@@ -94,7 +102,7 @@ jobs:
         os: [ubuntu-latest, windows-latest]
     steps:
       - name: "Checkout the repository"
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: "Set up Python ${{ inputs.python-version }}"
         uses: actions/setup-python@v4
@@ -136,7 +144,7 @@ jobs:
     needs: integration-tests
     steps:
       - name: "Checkout the repository"
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: "Set up Python ${{ inputs.python-version }}"
         uses: actions/setup-python@v4
