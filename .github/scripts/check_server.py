@@ -2,6 +2,7 @@ from functools import wraps
 import json
 import logging
 import os
+import platform
 import time
 
 import requests
@@ -35,12 +36,17 @@ def block_until_server_is_ok(func):
 
 @block_until_server_is_ok
 def check_status(url: str, auth_header: HTTPBasicAuth) -> bool:
+    python_implementation = platform.python_implementation()
+    python_version = platform.python_version()
+    os_version = platform.platform()
+    user_agent = f"check_server.py {python_implementation}/{python_version} ({os_version})"
+
     try:
         response = requests.get(
             url + "/Health/v2.svc/",
             auth=auth_header,
             headers={
-                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/117.0"
+                "User-Agent": user_agent,
             },
         )
     except requests.exceptions.RequestException as e:
@@ -65,10 +71,9 @@ def check_status(url: str, auth_header: HTTPBasicAuth) -> bool:
 
 if __name__ == "__main__":
     sl_url = os.getenv("TEST_SL_URL")
-    domain = os.getenv("TEST_DOMAIN")
     username = os.getenv("TEST_USER")
     password = os.getenv("TEST_PASS")
 
     logger.info(f"Checking if Granta MI server is ready for requests")
-    auth = HTTPBasicAuth(rf"{domain}\{username}", password)
+    auth = HTTPBasicAuth(username, password)
     check_status(sl_url, auth)

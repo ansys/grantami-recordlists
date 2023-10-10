@@ -50,9 +50,6 @@ on:
       TEST_SERVER_PASS:
         required: true
 
-      TEST_SERVER_DOMAIN:
-        required: true
-
   workflow_dispatch:
 
 concurrency:
@@ -94,7 +91,6 @@ jobs:
           TEST_SL_URL: ${{secrets.TEST_SERVER_URL}}
           TEST_USER: ${{secrets.TEST_SERVER_ADMIN_USER}}
           TEST_PASS: ${{secrets.TEST_SERVER_ADMIN_PASS}}
-          TEST_DOMAIN: ${{secrets.TEST_SERVER_DOMAIN}}
 
   integration-tests:
     name: "Integration tests in ${{ matrix.os }}"
