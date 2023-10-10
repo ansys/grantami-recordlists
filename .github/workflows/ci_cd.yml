@@ -42,7 +42,7 @@ jobs:
     needs: doc-style
     steps:
       - name: "Checkout the repository"
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: "Set up Python"
         uses: actions/setup-python@v4
@@ -80,7 +80,6 @@ jobs:
       - uses: ansys/actions/build-wheelhouse@v4
         with:
           library-name: ${{ env.LIBRARY_NAME }}
-          library-namespace: ${{ env.LIBRARY_NAMESPACE }}
           operating-system: ${{ matrix.os }}
           python-version: ${{ matrix.python-version }}
 
@@ -95,7 +94,7 @@ jobs:
       fail-fast: false
     steps:
       - name: "Checkout the repository"
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: "Set up Python ${{ matrix.python-version }}"
         uses: actions/setup-python@v4
@@ -109,13 +108,21 @@ jobs:
       - name: "Test with tox"
         run: tox -e tests -- -m "not integration"
 
-      - name: "Upload coverage results"
+      - name: "Upload coverage artifacts"
         uses: actions/upload-artifact@v3
-        if: matrix.python-version == ${{ env.MAIN_PYTHON_VERSION }}
+        if: ${{ matrix.python-version == env.MAIN_PYTHON_VERSION  && matrix.os == 'ubuntu-latest'}}
         with:
-          name: coverage-html
+          name: coverage-html-unittests
           path: .cov/html
           retention-days: 7
+
+      - name: "Upload coverage to Codecov"
+        uses: codecov/codecov-action@v3
+        if: ${{ matrix.python-version == env.MAIN_PYTHON_VERSION  && matrix.os == 'ubuntu-latest'}}
+        with:
+          files: .cov/xml
+          flags: unittests
+          fail_ci_if_error: true
 
   build-library:
     name: "Build library"
