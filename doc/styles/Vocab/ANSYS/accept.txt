@@ -1,6 +1,4 @@
-ANSYS
-Ansys
-ansys
+(?!)ansys
 Granta MI
 PyGranta
 RecordLists
