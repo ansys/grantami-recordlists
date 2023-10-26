@@ -4,4 +4,4 @@ RecordLists
 API
 Makefile
 jupytext
-[Aa][Nn][Ss][Yy][Ss]
+(?i)ansys
