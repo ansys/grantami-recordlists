@@ -133,10 +133,12 @@ class TestRecordList:
 
 
 class TestUserOrGroup:
-    user_id = uuid.uuid4()
+    user_id = str(uuid.uuid4())
     username = "domain\\username"
     display_name = "domain\\displayname"
-    dto_user = GrantaServerApiListsDtoUserOrGroup(user_id, display_name, username)
+    dto_user = GrantaServerApiListsDtoUserOrGroup(
+        identifier=user_id, display_name=display_name, name=username
+    )
 
     def test_user_dto_mapping(self):
         user = UserOrGroup._from_model(self.dto_user)
@@ -167,11 +169,11 @@ class TestUserOrGroup:
 
 class TestRecordListItem:
     def test_record_list_item_from_dto_mapping(self):
-        db_guid = uuid.uuid4()
-        table_guid = uuid.uuid4()
-        record_history_guid = uuid.uuid4()
+        db_guid = str(uuid.uuid4())
+        table_guid = str(uuid.uuid4())
+        record_history_guid = str(uuid.uuid4())
         record_version = 1
-        record_guid = uuid.uuid4()
+        record_guid = str(uuid.uuid4())
 
         dto_item = GrantaServerApiListsDtoListItem(
             database_guid=db_guid,

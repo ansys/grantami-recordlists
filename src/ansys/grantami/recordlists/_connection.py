@@ -109,7 +109,9 @@ class RecordListsApiClient(ApiClient):  # type: ignore[misc]
         :class:`.RecordList`
         """
         logger.info(f"Getting list with identifier {identifier} with connection {self}")
-        record_list = self.list_management_api.api_v1_lists_list_list_identifier_get(identifier)
+        record_list = self.list_management_api.api_v1_lists_list_list_identifier_get(
+            list_identifier=identifier
+        )
         return RecordList._from_model(record_list)
 
     def search_for_lists(
@@ -145,7 +147,7 @@ class RecordListsApiClient(ApiClient):  # type: ignore[misc]
 
         search_results = (
             self.list_management_api.api_v1_lists_search_results_result_resource_identifier_get(
-                search_info.search_result_identifier
+                result_resource_identifier=search_info.search_result_identifier
             )
         )
         return [
@@ -171,7 +173,7 @@ class RecordListsApiClient(ApiClient):  # type: ignore[misc]
         """
         logger.info(f"Getting items in list {record_list} with connection {self}")
         items = self.list_item_api.api_v1_lists_list_list_identifier_items_get(
-            record_list.identifier
+            list_identifier=record_list.identifier
         )
         return [RecordListItem._from_model(item) for item in items.items]
 
@@ -199,7 +201,7 @@ class RecordListsApiClient(ApiClient):  # type: ignore[misc]
         """
         logger.info(f"Adding {len(items)} items to list {record_list} with connection {self}")
         response_items = self.list_item_api.api_v1_lists_list_list_identifier_items_add_post(
-            record_list.identifier,
+            list_identifier=record_list.identifier,
             body=models.GrantaServerApiListsDtoRecordListItems(
                 items=[item._to_model() for item in items]
             ),
@@ -229,7 +231,7 @@ class RecordListsApiClient(ApiClient):  # type: ignore[misc]
         """
         logger.info(f"Removing {len(items)} items from list {record_list} with connection {self}")
         response_items = self.list_item_api.api_v1_lists_list_list_identifier_items_remove_post(
-            record_list.identifier,
+            list_identifier=record_list.identifier,
             body=models.GrantaServerApiListsDtoRecordListItems(
                 items=[item._to_model() for item in items]
             ),
@@ -293,7 +295,9 @@ class RecordListsApiClient(ApiClient):  # type: ignore[misc]
             Record list to delete.
         """
         logger.info(f"Removing list {record_list} with connection {self}")
-        self.list_management_api.api_v1_lists_list_list_identifier_delete(record_list.identifier)
+        self.list_management_api.api_v1_lists_list_list_identifier_delete(
+            list_identifier=record_list.identifier
+        )
 
     def update_list(
         self,
@@ -344,7 +348,7 @@ class RecordListsApiClient(ApiClient):  # type: ignore[misc]
             body.append(self._create_patch_operation(notes, "notes"))
 
         updated_resource = self.list_management_api.api_v1_lists_list_list_identifier_patch(
-            record_list.identifier, body=body
+            list_identifier=record_list.identifier, body=body
         )
         return RecordList._from_model(updated_resource)
 
@@ -367,7 +371,7 @@ class RecordListsApiClient(ApiClient):  # type: ignore[misc]
         """
         logger.info(f"Copying list {record_list} with connection {self}")
         list_copy = self.list_management_api.api_v1_lists_list_list_identifier_copy_post(
-            record_list.identifier
+            list_identifier=record_list.identifier
         )
         return RecordList._from_model(list_copy)
 
@@ -392,7 +396,7 @@ class RecordListsApiClient(ApiClient):  # type: ignore[misc]
         """
         logger.info(f"Creating revision of list {record_list} with connection {self}")
         list_revision = self.list_management_api.api_v1_lists_list_list_identifier_revise_post(
-            record_list.identifier,
+            list_identifier=record_list.identifier,
         )
         return RecordList._from_model(list_revision)
 
@@ -416,7 +420,7 @@ class RecordListsApiClient(ApiClient):  # type: ignore[misc]
         logger.info(f"Requesting approval for list {record_list} with connection {self}")
         updated_list = (
             self.list_management_api.api_v1_lists_list_list_identifier_request_approval_post(
-                record_list.identifier
+                list_identifier=record_list.identifier,
             )
         )
         return RecordList._from_model(updated_list)
@@ -443,7 +447,7 @@ class RecordListsApiClient(ApiClient):  # type: ignore[misc]
         """
         logger.info(f"Publishing list {record_list} with connection {self}")
         updated_list = self.list_management_api.api_v1_lists_list_list_identifier_publish_post(
-            record_list.identifier,
+            list_identifier=record_list.identifier,
         )
         return RecordList._from_model(updated_list)
 
@@ -468,7 +472,7 @@ class RecordListsApiClient(ApiClient):  # type: ignore[misc]
         """
         logger.info(f"Withdrawing list {record_list} with connection {self}")
         updated_list = self.list_management_api.api_v1_lists_list_list_identifier_unpublish_post(
-            record_list.identifier,
+            list_identifier=record_list.identifier,
         )
         return RecordList._from_model(updated_list)
 
@@ -492,7 +496,7 @@ class RecordListsApiClient(ApiClient):  # type: ignore[misc]
         """
         logger.info(f"Cancelling request to approve list {record_list} with connection {self}")
         updated_list = self.list_management_api.api_v1_lists_list_list_identifier_reset_post(
-            record_list.identifier,
+            list_identifier=record_list.identifier,
         )
         return RecordList._from_model(updated_list)
 
@@ -513,7 +517,7 @@ class RecordListsApiClient(ApiClient):  # type: ignore[misc]
         None
         """
         self.list_permissions_api.api_v1_lists_list_list_identifier_permissions_subscribe_post(
-            record_list.identifier
+            list_identifier=record_list.identifier
         )
 
     def unsubscribe_from_list(self, record_list: RecordList) -> None:
@@ -532,7 +536,7 @@ class RecordListsApiClient(ApiClient):  # type: ignore[misc]
         None
         """
         self.list_permissions_api.api_v1_lists_list_list_identifier_permissions_unsubscribe_post(
-            record_list.identifier
+            list_identifier=record_list.identifier,
         )
 
     @staticmethod
