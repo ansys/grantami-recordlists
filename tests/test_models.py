@@ -321,7 +321,7 @@ class TestSearchCriterion:
         leaf_criterion = nested_boolean_criterion.match_all[0]
         assert isinstance(leaf_criterion, GrantaServerApiListsDtoRecordListSearchCriterion)
         assert leaf_criterion.name_contains == "A"
-        assert leaf_criterion.user_role == GrantaServerApiListsDtoUserRole.OWNER
+        assert leaf_criterion.user_role.value == GrantaServerApiListsDtoUserRole.OWNER.value
 
     @pytest.mark.parametrize(
         ["name", "value"],
