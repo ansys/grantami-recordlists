@@ -528,9 +528,14 @@ class SearchCriterion:
     def _to_model(self) -> models.GrantaServerApiListsDtoRecordListSearchCriterion:
         """Generate the DTO for use with the auto-generated client code."""
         logger.debug("Serializing SearchCriterion to API model")
+        user_role = (
+            models.GrantaServerApiListsDtoUserRole(self.user_role.value)
+            if self.user_role is not None
+            else None
+        )
         model = models.GrantaServerApiListsDtoRecordListSearchCriterion(
             name_contains=self.name_contains,
-            user_role=self.user_role,
+            user_role=user_role,
             is_published=self.is_published,
             is_awaiting_approval=self.is_awaiting_approval,
             is_internal_use=self.is_internal_use,
