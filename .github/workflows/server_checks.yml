@@ -123,7 +123,7 @@ jobs:
           TEST_LIST_PASS: ${{secrets.TEST_SERVER_PASS}}
 
       - name: "Upload coverage artifacts"
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: ${{ matrix.os  == 'ubuntu-latest' }}
         with:
           name: coverage-html-integrationtests
@@ -179,14 +179,14 @@ jobs:
           BUILD_EXAMPLES: "true"
 
       - name: "Upload HTML documentation"
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: documentation-html
           path: doc/_build/html
           retention-days: 7
 
       - name: "Upload PDF documentation"
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: documentation-pdf
           path: doc/_build/latex/*.pdf
