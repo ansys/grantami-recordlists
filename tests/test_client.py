@@ -65,7 +65,7 @@ class TestReadList(TestClientMethod):
     def test_read_list(self, client, api_method):
         identifier = str(uuid.uuid4())
         client.get_list(identifier)
-        api_method.assert_called_once_with(identifier)
+        api_method.assert_called_once_with(list_identifier=identifier)
 
 
 class TestReadAllLists(TestClientMethod):
@@ -88,7 +88,7 @@ class TestReadItems(TestClientMethod):
 
     def test_read_items(self, client, api_method, mock_list):
         items = client.get_list_items(mock_list)
-        api_method.assert_called_once_with(mock_list.identifier)
+        api_method.assert_called_once_with(list_identifier=mock_list.identifier)
         assert items == []
 
 
@@ -105,7 +105,7 @@ class TestAddItems(TestClientMethod):
 
     @pytest.fixture
     def api_method(self, monkeypatch):
-        def compute_result(identifier, body: GrantaServerApiListsDtoRecordListItems):
+        def compute_result(list_identifier, body: GrantaServerApiListsDtoRecordListItems):
             return GrantaServerApiListsDtoRecordListItems(
                 items=[self._existing_dto_item] + body.items
             )
@@ -118,7 +118,7 @@ class TestAddItems(TestClientMethod):
     def test_add_no_items(self, client, api_method, mock_list, items):
         response = client.add_items_to_list(mock_list, items)
         expected_body = GrantaServerApiListsDtoRecordListItems(items=[])
-        api_method.assert_called_once_with(mock_list.identifier, body=expected_body)
+        api_method.assert_called_once_with(list_identifier=mock_list.identifier, body=expected_body)
         assert response == [self._existing_item]
 
     def test_add_items(self, client, api_method, mock_list):
@@ -135,7 +135,7 @@ class TestAddItems(TestClientMethod):
 
         response = client.add_items_to_list(mock_list, [new_item])
 
-        api_method.assert_called_once_with(mock_list.identifier, body=expected_body)
+        api_method.assert_called_once_with(list_identifier=mock_list.identifier, body=expected_body)
         assert response == [self._existing_item, new_item]
 
 
@@ -152,7 +152,7 @@ class TestRemoveItems(TestClientMethod):
 
     @pytest.fixture
     def api_method(self, monkeypatch):
-        def compute_result(identifier, body: GrantaServerApiListsDtoRecordListItems):
+        def compute_result(list_identifier, body: GrantaServerApiListsDtoRecordListItems):
             # Naive, by reference, computation of items left after removal
             result_items = [item for item in [self._existing_dto_item] if item not in body.items]
             return GrantaServerApiListsDtoRecordListItems(items=result_items)
@@ -166,7 +166,7 @@ class TestRemoveItems(TestClientMethod):
         response = client.remove_items_from_list(mock_list, items)
 
         expected_body = GrantaServerApiListsDtoRecordListItems(items=[])
-        api_method.assert_called_once_with(mock_list.identifier, body=expected_body)
+        api_method.assert_called_once_with(list_identifier=mock_list.identifier, body=expected_body)
         assert response == [self._existing_item]
 
     def test_remove_items(self, client, api_method, mock_list):
@@ -176,7 +176,7 @@ class TestRemoveItems(TestClientMethod):
         )
 
         response = client.remove_items_from_list(mock_list, items)
-        api_method.assert_called_once_with(mock_list.identifier, body=expected_body)
+        api_method.assert_called_once_with(list_identifier=mock_list.identifier, body=expected_body)
         assert response == []
 
 
@@ -187,7 +187,7 @@ class TestDeleteList(TestClientMethod):
 
     def test_delete_list(self, client, api_method, mock_list):
         client.delete_list(mock_list)
-        api_method.assert_called_once_with(mock_list.identifier)
+        api_method.assert_called_once_with(list_identifier=mock_list.identifier)
 
 
 class TestUpdate(TestClientMethod):
@@ -223,7 +223,7 @@ class TestUpdate(TestClientMethod):
                 op="replace",
             )
         ]
-        api_method.assert_called_once_with(mock_list.identifier, body=expected_body)
+        api_method.assert_called_once_with(list_identifier=mock_list.identifier, body=expected_body)
 
     @pytest.mark.parametrize("prop_name", ["notes", "description"])
     @pytest.mark.parametrize("prop_value", [None, "Some text"])
@@ -238,7 +238,7 @@ class TestUpdate(TestClientMethod):
                 op="replace",
             )
         ]
-        api_method.assert_called_once_with(mock_list.identifier, body=expected_body)
+        api_method.assert_called_once_with(list_identifier=mock_list.identifier, body=expected_body)
 
 
 class TestPublishList(TestClientMethod):
@@ -248,7 +248,7 @@ class TestPublishList(TestClientMethod):
 
     def test_publish_list(self, client, api_method, mock_list):
         updated_list = client.publish_list(mock_list)
-        api_method.assert_called_once_with(mock_list.identifier)
+        api_method.assert_called_once_with(list_identifier=mock_list.identifier)
         assert isinstance(updated_list, RecordList)
 
 
@@ -259,7 +259,7 @@ class TestUnpublishList(TestClientMethod):
 
     def test_unpublish_list(self, client, api_method, mock_list):
         updated_list = client.unpublish_list(mock_list)
-        api_method.assert_called_once_with(mock_list.identifier)
+        api_method.assert_called_once_with(list_identifier=mock_list.identifier)
         assert isinstance(updated_list, RecordList)
 
 
@@ -270,7 +270,7 @@ class TestResetApprovalList(TestClientMethod):
 
     def test_reset_approval(self, client, api_method, mock_list):
         updated_list = client.cancel_list_approval_request(mock_list)
-        api_method.assert_called_once_with(mock_list.identifier)
+        api_method.assert_called_once_with(list_identifier=mock_list.identifier)
         assert isinstance(updated_list, RecordList)
 
 
@@ -281,7 +281,7 @@ class TestRequestApprovalList(TestClientMethod):
 
     def test_request_approval(self, client, api_method, mock_list):
         updated_list = client.request_list_approval(mock_list)
-        api_method.assert_called_once_with(mock_list.identifier)
+        api_method.assert_called_once_with(list_identifier=mock_list.identifier)
         assert isinstance(updated_list, RecordList)
 
 
@@ -327,7 +327,7 @@ class TestCopyList(TestClientMethod):
 
     def test_copy_list(self, client, api_method, mock_list):
         returned_list = client.copy_list(mock_list)
-        api_method.assert_called_once_with(mock_list.identifier)
+        api_method.assert_called_once_with(list_identifier=mock_list.identifier)
         assert isinstance(returned_list, RecordList)
 
 
@@ -338,7 +338,7 @@ class TestReviseList(TestClientMethod):
 
     def test_revise_list(self, client, api_method, mock_list):
         returned_list = client.revise_list(mock_list)
-        api_method.assert_called_once_with(mock_list.identifier)
+        api_method.assert_called_once_with(list_identifier=mock_list.identifier)
         assert isinstance(returned_list, RecordList)
 
 
@@ -397,7 +397,7 @@ class TestSearch:
             ),
         )
         mock_search_post.assert_called_once_with(body=expected_body)
-        mock_search_result_get.assert_called_once_with(search_result_id)
+        mock_search_result_get.assert_called_once_with(result_resource_identifier=search_result_id)
         mock_from_model.assert_called_once_with(
             mock_search_result_get._mock_return_value[0], include_items
         )
@@ -411,7 +411,7 @@ class TestSubscribe(TestClientMethod):
     def test_subscribe(self, client, api_method, mock_list):
         response = client.subscribe_to_list(mock_list)
         assert response is None
-        api_method.assert_called_once_with(mock_list.identifier)
+        api_method.assert_called_once_with(list_identifier=mock_list.identifier)
 
 
 class TestUnsubscribe(TestClientMethod):
@@ -422,4 +422,4 @@ class TestUnsubscribe(TestClientMethod):
     def test_subscribe(self, client, api_method, mock_list):
         response = client.unsubscribe_from_list(mock_list)
         assert response is None
-        api_method.assert_called_once_with(mock_list.identifier)
+        api_method.assert_called_once_with(list_identifier=mock_list.identifier)

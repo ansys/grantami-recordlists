@@ -528,9 +528,14 @@ class SearchCriterion:
     def _to_model(self) -> models.GrantaServerApiListsDtoRecordListSearchCriterion:
         """Generate the DTO for use with the auto-generated client code."""
         logger.debug("Serializing SearchCriterion to API model")
+        user_role = (
+            models.GrantaServerApiListsDtoUserRole(self.user_role.value)
+            if self.user_role is not None
+            else None
+        )
         model = models.GrantaServerApiListsDtoRecordListSearchCriterion(
             name_contains=self.name_contains,
-            user_role=self.user_role,
+            user_role=user_role,
             is_published=self.is_published,
             is_awaiting_approval=self.is_awaiting_approval,
             is_internal_use=self.is_internal_use,
@@ -650,14 +655,14 @@ class UserRole(str, Enum):
     Can be used in :attr:`SearchCriterion.user_role`.
     """
 
-    NONE = models.GrantaServerApiListsDtoUserRole.NONE
+    NONE = models.GrantaServerApiListsDtoUserRole.NONE.value
     """:class:`UserRole` is currently only supported in searches. Searching for lists with user
     role = :attr:`.NONE` as criteria would exclude all lists from the results."""
-    OWNER = models.GrantaServerApiListsDtoUserRole.OWNER
-    SUBSCRIBER = models.GrantaServerApiListsDtoUserRole.SUBSCRIBER
-    CURATOR = models.GrantaServerApiListsDtoUserRole.CURATOR
-    ADMINISTRATOR = models.GrantaServerApiListsDtoUserRole.ADMINISTRATOR
-    PUBLISHER = models.GrantaServerApiListsDtoUserRole.PUBLISHER
+    OWNER = models.GrantaServerApiListsDtoUserRole.OWNER.value
+    SUBSCRIBER = models.GrantaServerApiListsDtoUserRole.SUBSCRIBER.value
+    CURATOR = models.GrantaServerApiListsDtoUserRole.CURATOR.value
+    ADMINISTRATOR = models.GrantaServerApiListsDtoUserRole.ADMINISTRATOR.value
+    PUBLISHER = models.GrantaServerApiListsDtoUserRole.PUBLISHER.value
 
 
 class SearchResult:

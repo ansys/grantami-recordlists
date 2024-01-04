@@ -114,7 +114,7 @@ class TestSubscriptionLifeCycle:
         # Check as user with limited permissions, can only see its own permissions
         permissions = (
             basic_client.list_permissions_api.api_v1_lists_list_list_identifier_permissions_get(
-                published_list.identifier
+                list_identifier=published_list.identifier
             )
         )
         assert len(permissions) == 1
@@ -128,7 +128,7 @@ class TestSubscriptionLifeCycle:
         # Check
         permissions = (
             basic_client.list_permissions_api.api_v1_lists_list_list_identifier_permissions_get(
-                published_list.identifier
+                list_identifier=published_list.identifier
             )
         )
         assert len(permissions) == 0
