@@ -24,7 +24,7 @@ jobs:
     name: "Code style"
     runs-on: ubuntu-latest
     steps:
-      - uses: ansys/actions/code-style@v4
+      - uses: ansys/actions/code-style@v5
         with:
           python-version: ${{ env.MAIN_PYTHON_VERSION }}
 
@@ -32,7 +32,7 @@ jobs:
     name: "Documentation style"
     runs-on: ubuntu-latest
     steps:
-      - uses: ansys/actions/doc-style@v4
+      - uses: ansys/actions/doc-style@v5
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           vale-version: "2.29.6"
@@ -78,7 +78,7 @@ jobs:
            os: [ubuntu-latest, windows-latest]
            python-version: ['3.9', '3.10', '3.11', '3.12']
     steps:
-      - uses: ansys/actions/build-wheelhouse@v4
+      - uses: ansys/actions/build-wheelhouse@v5
         with:
           library-name: ${{ env.LIBRARY_NAME }}
           operating-system: ${{ matrix.os }}
@@ -130,7 +130,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [ doc-build, tests ]
     steps:
-      - uses: ansys/actions/build-library@v4
+      - uses: ansys/actions/build-library@v5
         with:
           library-name: ${{ env.LIBRARY_NAME }}
           python-version: ${{ env.MAIN_PYTHON_VERSION }}
@@ -151,7 +151,7 @@ jobs:
     needs: [server-checks]
     if: github.event_name == 'push' && !contains(github.ref, 'refs/tags')
     steps:
-      - uses: ansys/actions/doc-deploy-dev@v4
+      - uses: ansys/actions/doc-deploy-dev@v5
         with:
           cname: ${{ env.DOCUMENTATION_CNAME }}
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -163,14 +163,14 @@ jobs:
     needs: [build-library, server-checks]
     if: github.event_name == 'push' && contains(github.ref, 'refs/tags')
     steps:
-      - uses: ansys/actions/release-pypi-public@v4
+      - uses: ansys/actions/release-pypi-public@v5
         name: "Release to public PyPI"
         with:
           library-name: ${{ env.LIBRARY_NAME }}
           twine-username: "__token__"
           twine-token: ${{ secrets.PYPI_TOKEN }}
 
-      - uses: ansys/actions/release-github@v4
+      - uses: ansys/actions/release-github@v5
         name: "Release to GitHub"
         with:
           library-name: ${{ env.LIBRARY_NAME }}
@@ -181,7 +181,7 @@ jobs:
     needs: release
     if: github.event_name == 'push' && contains(github.ref, 'refs/tags')
     steps:
-      - uses: ansys/actions/doc-deploy-stable@v4
+      - uses: ansys/actions/doc-deploy-stable@v5
         with:
           cname: ${{ env.DOCUMENTATION_CNAME }}
           token: ${{ secrets.GITHUB_TOKEN }}
