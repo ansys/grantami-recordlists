@@ -28,11 +28,11 @@
    :target: https://github.com/psf/black
    :alt: Black
 
-.. _after-badges:
-
 
 PyGranta RecordLists
 ====================
+
+.. _after-badges
 
 A Python wrapper for the Granta MI Lists API.
 

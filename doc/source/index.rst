@@ -1,12 +1,8 @@
-.. only:: latexpdf
+PyGranta RecordLists |version|
+==============================
 
-   .. include:: ../../README.rst
-      :start-after: after-badges
-
-.. only:: html
-
-   .. include:: ../../README.rst
-
+.. include:: ../../README.rst
+   :start-after: after-badges
 
 .. toctree::
    :hidden:
