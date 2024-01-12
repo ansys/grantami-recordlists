@@ -32,7 +32,9 @@
 PyGranta RecordLists
 ====================
 
-.. _after-badges
+..
+   _after-badges
+
 
 A Python wrapper for the Granta MI Lists API.
 
