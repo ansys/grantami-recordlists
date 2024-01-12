@@ -30,7 +30,7 @@ packages = [
 [tool.poetry.dependencies]
 python = ">=3.9,<4.0"
 ansys-openapi-common = "^1.2.2"
-ansys-grantami-serverapi-openapi = "2.0.0rc0"
+ansys-grantami-serverapi-openapi = "2.0.0"
 requests = "^2.26"
 
 # Optional documentation dependencies
