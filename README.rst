@@ -68,7 +68,7 @@ this code:
     pip install ansys-grantami-recordlists
 
 To install a release compatible with a specific version of Granta MI, use the
-`PyGranta <https://grantami.docs.pyansys.com/>`_ meta-package with this code:
+`PyGranta <https://grantami.docs.pyansys.com/>`_ meta-package with a requirement specifier:
 
 .. code::
 
