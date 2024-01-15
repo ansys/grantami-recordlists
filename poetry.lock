@@ -63,19 +63,19 @@ oidc = ["keyring (>=22,<25)", "requests_auth (>=6,<8)"]
 
 [[package]]
 name = "ansys-sphinx-theme"
-version = "0.13.0"
+version = "0.13.1"
 description = "A theme devised by ANSYS, Inc. for Sphinx documentation."
 optional = false
 python-versions = ">=3.9,<4"
 files = [
-    {file = "ansys_sphinx_theme-0.13.0-py3-none-any.whl", hash = "sha256:b62368ff2fc2066951980c260ce8307bf06331ef26517b4c5a0632712c180aaa"},
-    {file = "ansys_sphinx_theme-0.13.0.tar.gz", hash = "sha256:93921a4db74eb7091445b44b1c6c6b39b791580b63869f8ee58be7726d95a83f"},
+    {file = "ansys_sphinx_theme-0.13.1-py3-none-any.whl", hash = "sha256:d82c266cecc46cf535e929ce4354d6392a731fe623d05977d88b408b032dd867"},
+    {file = "ansys_sphinx_theme-0.13.1.tar.gz", hash = "sha256:863574c46ed51eb12b55472d085df04c48cd0a84db84d5e95594683aedfbf4a3"},
 ]
 
 [package.dependencies]
 importlib-metadata = ">=4.0"
 Jinja2 = ">=3.1.2"
-pydata-sphinx-theme = ">=0.14.0"
+pydata-sphinx-theme = ">=0.14,<0.15"
 Sphinx = ">=4.2.0"
 
 [package.extras]
