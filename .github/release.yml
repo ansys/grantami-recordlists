@@ -9,7 +9,7 @@ changelog:
     - title: "Documentation"
       labels:
         - documentation
-    - title: "Maintenance & dependencies"
+    - title: "Maintenance"
       labels:
         - maintenance
-        - dependencies
+
