@@ -187,7 +187,9 @@ class RecordListItem:
     """
     Describes a :class:`RecordList` item, generally a reference to a record in a Granta MI database.
 
-    The record is not guaranteed to exist. Care should be taken to ensure that the reference to the
+    To ensure only :class:`RecordListItem` objects that refer to resolvable records are created, use
+    ``only_include_resolvable_items = True`` with :meth:`RecordListApiClient.get_list_items`. Otherwise,
+    the record is not guaranteed to be resolvable and care should be taken to ensure that the reference to the
     record is valid before using it.
 
     Parameters
@@ -210,12 +212,14 @@ class RecordListItem:
         table_guid: str,
         record_history_guid: str,
         record_version: Optional[int] = None,
+        is_resolvable: Optional[bool] = None,
     ):
         self._database_guid: str = database_guid
         self._table_guid: str = table_guid
         self._record_history_guid: str = record_history_guid
         self._record_version: Optional[int] = record_version
         self._record_guid: Optional[str] = None
+        self._is_resolvable: Optional[bool] = is_resolvable
 
     @property
     def database_guid(self) -> str:
