@@ -178,8 +178,8 @@ class RecordListsApiClient(ApiClient):  # type: ignore[misc]
         list of :class:`.RecordListItem`
             List of items included in the record list.
 
-        Note
-        ----
+        Notes
+        -----
         Specifying ``only_include_resolvable_items = True`` will filter out records from the returned
         list if they cannot be resolved in Granta MI.
         """
