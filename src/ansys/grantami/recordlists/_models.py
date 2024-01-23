@@ -188,7 +188,7 @@ class RecordListItem:
     Describes a :class:`RecordList` item, generally a reference to a record in a Granta MI database.
 
     To ensure only :class:`RecordListItem` objects that refer to resolvable records are created, use
-    ``only_include_resolvable_items = True`` with :meth:`.RecordListsApiClient.get_list_items`. Otherwise,
+    ``only_include_resolvable_items = True`` with :meth:`RecordListApiClient.get_list_items`. Otherwise,
     the record is not guaranteed to be resolvable and care should be taken to ensure that the reference to the
     record is valid before using it.
 
