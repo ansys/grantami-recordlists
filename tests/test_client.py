@@ -1,3 +1,4 @@
+from types import SimpleNamespace
 from typing import Any, Type
 from unittest.mock import Mock
 import uuid
@@ -5,12 +6,13 @@ import uuid
 from ansys.grantami.serverapi_openapi import models
 from ansys.grantami.serverapi_openapi.api import ListItemApi, ListManagementApi, ListPermissionsApi
 from ansys.grantami.serverapi_openapi.models import (
+    GrantaServerApiListsDtoCreateRecordList,
+    GrantaServerApiListsDtoCreateRecordListItemsInfo,
     GrantaServerApiListsDtoListItem,
-    GrantaServerApiListsDtoRecordListCreate,
     GrantaServerApiListsDtoRecordListHeader,
-    GrantaServerApiListsDtoRecordListItems,
-    GrantaServerApiListsDtoUserPermissionDto,
-    JsonPatchDocument,
+    GrantaServerApiListsDtoRecordListItemsInfo,
+    GrantaServerApiListsDtoUpdateRecordListProperties,
+    GrantaServerApiListsDtoUserPermission,
 )
 import pytest
 
@@ -69,7 +71,7 @@ class TestReadList(TestClientMethod):
 
 
 class TestReadAllLists(TestClientMethod):
-    _return_value = []
+    _return_value = SimpleNamespace(lists=[])
     _api = ListManagementApi
     _api_method = "api_v1_lists_get"
 
@@ -80,7 +82,7 @@ class TestReadAllLists(TestClientMethod):
 
 
 class TestReadItems(TestClientMethod):
-    r_value = Mock(spec=GrantaServerApiListsDtoRecordListItems)
+    r_value = Mock(spec=GrantaServerApiListsDtoRecordListItemsInfo)
     r_value.items = []
     _return_value = r_value
     _api = ListItemApi
@@ -105,8 +107,8 @@ class TestAddItems(TestClientMethod):
 
     @pytest.fixture
     def api_method(self, monkeypatch):
-        def compute_result(list_identifier, body: GrantaServerApiListsDtoRecordListItems):
-            return GrantaServerApiListsDtoRecordListItems(
+        def compute_result(list_identifier, body: GrantaServerApiListsDtoRecordListItemsInfo):
+            return GrantaServerApiListsDtoRecordListItemsInfo(
                 items=[self._existing_dto_item] + body.items
             )
 
@@ -117,13 +119,13 @@ class TestAddItems(TestClientMethod):
     @pytest.mark.parametrize("items", [[], set()])
     def test_add_no_items(self, client, api_method, mock_list, items):
         response = client.add_items_to_list(mock_list, items)
-        expected_body = GrantaServerApiListsDtoRecordListItems(items=[])
+        expected_body = GrantaServerApiListsDtoRecordListItemsInfo(items=[])
         api_method.assert_called_once_with(list_identifier=mock_list.identifier, body=expected_body)
         assert response == [self._existing_item]
 
     def test_add_items(self, client, api_method, mock_list):
         new_item = RecordListItem("a", "b", "c")
-        expected_body = GrantaServerApiListsDtoRecordListItems(
+        expected_body = GrantaServerApiListsDtoRecordListItemsInfo(
             items=[
                 GrantaServerApiListsDtoListItem(
                     database_guid="a",
@@ -152,10 +154,10 @@ class TestRemoveItems(TestClientMethod):
 
     @pytest.fixture
     def api_method(self, monkeypatch):
-        def compute_result(list_identifier, body: GrantaServerApiListsDtoRecordListItems):
+        def compute_result(list_identifier, body: GrantaServerApiListsDtoRecordListItemsInfo):
             # Naive, by reference, computation of items left after removal
             result_items = [item for item in [self._existing_dto_item] if item not in body.items]
-            return GrantaServerApiListsDtoRecordListItems(items=result_items)
+            return GrantaServerApiListsDtoRecordListItemsInfo(items=result_items)
 
         mocked_method = Mock(side_effect=compute_result)
         monkeypatch.setattr(self._api, self._api_method, mocked_method)
@@ -165,13 +167,13 @@ class TestRemoveItems(TestClientMethod):
     def test_remove_no_items(self, client, api_method, items, mock_list):
         response = client.remove_items_from_list(mock_list, items)
 
-        expected_body = GrantaServerApiListsDtoRecordListItems(items=[])
+        expected_body = GrantaServerApiListsDtoRecordListItemsInfo(items=[])
         api_method.assert_called_once_with(list_identifier=mock_list.identifier, body=expected_body)
         assert response == [self._existing_item]
 
     def test_remove_items(self, client, api_method, mock_list):
         items = [self._existing_item]
-        expected_body = GrantaServerApiListsDtoRecordListItems(
+        expected_body = GrantaServerApiListsDtoRecordListItemsInfo(
             items=[self._existing_dto_item],
         )
 
@@ -216,13 +218,9 @@ class TestUpdate(TestClientMethod):
         prop_value,
     ):
         client.update_list(mock_list, **{prop_name: prop_value})
-        expected_body = [
-            JsonPatchDocument(
-                value=prop_value,
-                path=f"/{prop_name}",
-                op="replace",
-            )
-        ]
+        expected_body = GrantaServerApiListsDtoUpdateRecordListProperties(
+            **{prop_name: prop_value},
+        )
         api_method.assert_called_once_with(list_identifier=mock_list.identifier, body=expected_body)
 
     @pytest.mark.parametrize("prop_name", ["notes", "description"])
@@ -231,13 +229,9 @@ class TestUpdate(TestClientMethod):
         self, client, api_method, mock_list, prop_name, prop_value
     ):
         client.update_list(mock_list, **{prop_name: prop_value})
-        expected_body = [
-            JsonPatchDocument(
-                value=prop_value,
-                path=f"/{prop_name}",
-                op="replace",
-            )
-        ]
+        expected_body = GrantaServerApiListsDtoUpdateRecordListProperties(
+            **{prop_name: prop_value},
+        )
         api_method.assert_called_once_with(list_identifier=mock_list.identifier, body=expected_body)
 
 
@@ -295,7 +289,7 @@ class TestCreateList(TestClientMethod):
 
         returned_list = client.create_list(list_name)
 
-        expected_body = GrantaServerApiListsDtoRecordListCreate(name=list_name)
+        expected_body = GrantaServerApiListsDtoCreateRecordList(name=list_name)
         api_method.assert_called_once_with(body=expected_body)
         assert isinstance(returned_list, RecordList)
 
@@ -304,9 +298,9 @@ class TestCreateList(TestClientMethod):
 
         returned_list = client.create_list(list_name, items=[example_item])
 
-        expected_body = GrantaServerApiListsDtoRecordListCreate(
+        expected_body = GrantaServerApiListsDtoCreateRecordList(
             name=list_name,
-            items=GrantaServerApiListsDtoRecordListItems(
+            items=GrantaServerApiListsDtoCreateRecordListItemsInfo(
                 items=[
                     GrantaServerApiListsDtoListItem(
                         database_guid=example_item.database_guid,
@@ -404,7 +398,7 @@ class TestSearch:
 
 
 class TestSubscribe(TestClientMethod):
-    _return_value = Mock(spec=GrantaServerApiListsDtoUserPermissionDto)
+    _return_value = Mock(spec=GrantaServerApiListsDtoUserPermission)
     _api = ListPermissionsApi
     _api_method = "api_v1_lists_list_list_identifier_permissions_subscribe_post"
 
@@ -415,7 +409,7 @@ class TestSubscribe(TestClientMethod):
 
 
 class TestUnsubscribe(TestClientMethod):
-    _return_value = Mock(spec=GrantaServerApiListsDtoUserPermissionDto)
+    _return_value = Mock(spec=GrantaServerApiListsDtoUserPermission)
     _api = ListPermissionsApi
     _api_method = "api_v1_lists_list_list_identifier_permissions_unsubscribe_post"
 
