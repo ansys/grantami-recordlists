@@ -191,7 +191,8 @@ class TestRecordListItem:
         assert item.record_version == record_version
         assert item.record_guid == record_guid
 
-    def test_record_list_item_to_dto_mapping(self):
+    @pytest.mark.parametrize("serialization_method", ["_to_create_model", "_to_delete_model"])
+    def test_record_list_item_to_dto_mapping(self, serialization_method):
         item = RecordListItem(
             database_guid=str(uuid.uuid4()),
             table_guid=str(uuid.uuid4()),
@@ -200,12 +201,12 @@ class TestRecordListItem:
         )
         item._record_guid = str(uuid.uuid4())
 
-        dto = item._to_model()
+        dto = getattr(item, serialization_method)()
         assert dto.database_guid == item.database_guid
-        assert dto.table_guid == item.table_guid
+        if serialization_method == "_to_create_model":
+            assert dto.table_guid == item.table_guid
         assert dto.record_history_guid == item.record_history_guid
         assert dto.record_version == item.record_version
-        assert dto.record_guid is None
 
     def test_record_list_item_repr(self):
         item = RecordListItem(
