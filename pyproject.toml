@@ -48,7 +48,7 @@ ipykernel = "^6.21.2" # required by nbsphinx to run notebooks.
 sphinx-jinja = "^2.0.2"
 
 [tool.poetry.group.dev.dependencies]
-pytest = "^7.1.2"
+pytest = "^8.0.0"
 pytest-cov = "^4.1.0"
 requests-mock = "^1.10.0"
 pre-commit = "^3.2.2"
