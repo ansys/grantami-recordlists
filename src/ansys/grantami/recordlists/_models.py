@@ -160,8 +160,8 @@ class RecordList:
         instance = cls(
             name=model.name,
             identifier=model.identifier,
-            description=model.description,
-            notes=model.notes,
+            description=model.description if model.description else None,
+            notes=model.notes if model.notes else None,
             created_timestamp=model.created_timestamp,
             created_user=UserOrGroup._from_model(model.created_user),
             is_revision=model.is_revision,
@@ -277,12 +277,23 @@ class RecordListItem:
         instance._record_guid = model.record_guid
         return instance
 
-    def _to_model(self) -> models.GrantaServerApiListsDtoCreateListItem:
+    def _to_create_model(self) -> models.GrantaServerApiListsDtoCreateListItem:
         """Generate the DTO for use with the auto-generated client code."""
         logger.debug("Serializing RecordListItem to API model")
         model = models.GrantaServerApiListsDtoCreateListItem(
             database_guid=self.database_guid,
             table_guid=self.table_guid,
+            record_history_guid=self.record_history_guid,
+            record_version=self.record_version,
+        )
+        logger.debug(model.to_str())
+        return model
+
+    def _to_delete_model(self) -> models.GrantaServerApiListsDtoDeleteRecordListItem:
+        """Generate the DTO for use with the auto-generated client code."""
+        logger.debug("Serializing RecordListItem to API model")
+        model = models.GrantaServerApiListsDtoDeleteRecordListItem(
+            database_guid=self.database_guid,
             record_history_guid=self.record_history_guid,
             record_version=self.record_version,
         )

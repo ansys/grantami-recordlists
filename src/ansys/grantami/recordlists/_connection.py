@@ -153,7 +153,7 @@ class RecordListsApiClient(ApiClient):  # type: ignore[misc]
         )
         return [
             SearchResult._from_model(search_result, include_items)
-            for search_result in search_results
+            for search_result in search_results.search_results
         ]
 
     def get_list_items(self, record_list: RecordList) -> List[RecordListItem]:
@@ -231,7 +231,7 @@ class RecordListsApiClient(ApiClient):  # type: ignore[misc]
         response_items = self.list_item_api.api_v1_lists_list_list_identifier_items_add_post(
             list_identifier=record_list.identifier,
             body=models.GrantaServerApiListsDtoCreateRecordListItemsInfo(
-                items=[item._to_model() for item in items]
+                items=[item._to_create_model() for item in items]
             ),
         )
         return [RecordListItem._from_model(item) for item in response_items.items]
@@ -260,8 +260,8 @@ class RecordListsApiClient(ApiClient):  # type: ignore[misc]
         logger.info(f"Removing {len(items)} items from list {record_list} with connection {self}")
         response_items = self.list_item_api.api_v1_lists_list_list_identifier_items_remove_post(
             list_identifier=record_list.identifier,
-            body=models.GrantaServerApiListsDtoRecordListItems(
-                items=[item._to_model() for item in items]
+            body=models.GrantaServerApiListsDtoDeleteRecordListItems(
+                items=[item._to_delete_model() for item in items]
             ),
         )
         return [RecordListItem._from_model(item) for item in response_items.items]
@@ -297,8 +297,8 @@ class RecordListsApiClient(ApiClient):  # type: ignore[misc]
         items_string = "no items" if items is None or len(items) == 0 else f"{len(items)} items"
         logger.info(f"Creating new list {name} with {items_string} with connection {self}")
         if items is not None:
-            items = models.GrantaServerApiListsDtoRecordListItemsInfo(
-                items=[list_item._to_model() for list_item in items]
+            items = models.GrantaServerApiListsDtoCreateRecordListItemsInfo(
+                items=[list_item._to_create_model() for list_item in items]
             )
 
         created_list = self.list_management_api.api_v1_lists_post(
@@ -367,14 +367,13 @@ class RecordListsApiClient(ApiClient):  # type: ignore[misc]
         if name is None:
             raise ValueError(f"If provided, argument 'name' cannot be None.")
 
-        body = []
+        body = models.GrantaServerApiListsDtoUpdateRecordListProperties()
         if name != _ArgNotProvided:
-            body.append(self._create_patch_operation(name, "name"))
+            body.name = name
         if description != _ArgNotProvided:
-            body.append(self._create_patch_operation(description, "description"))
+            body.description = description if description else ""
         if notes != _ArgNotProvided:
-            body.append(self._create_patch_operation(notes, "notes"))
-
+            body.notes = notes if notes else ""
         updated_resource = self.list_management_api.api_v1_lists_list_list_identifier_patch(
             list_identifier=record_list.identifier, body=body
         )
@@ -565,16 +564,6 @@ class RecordListsApiClient(ApiClient):  # type: ignore[misc]
         """
         self.list_permissions_api.api_v1_lists_list_list_identifier_permissions_unsubscribe_post(
             list_identifier=record_list.identifier,
-        )
-
-    @staticmethod
-    def _create_patch_operation(
-        value: Optional[str], name: str, op: str = "replace"
-    ) -> models.JsonPatchDocument:
-        return models.JsonPatchDocument(
-            value=value,
-            path=f"/{name}",
-            op=op,
         )
 
 
