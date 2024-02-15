@@ -38,7 +38,8 @@ def admin_client(sl_url, list_admin_username, list_admin_password, list_name):
     Server API.
     On teardown, deletes all lists named using the fixture `list_name`.
     """
-    connection = Connection(sl_url).with_credentials(list_admin_username, list_admin_password)
+    # connection = Connection(sl_url).with_credentials(list_admin_username, list_admin_password)
+    connection = Connection(sl_url).with_autologon()
     client = connection.connect()
     yield client
 
@@ -98,9 +99,15 @@ def new_list(admin_client, request, list_name):
 
 
 @pytest.fixture
-def new_list_with_items(admin_client, new_list, example_item):
+def new_list_with_one_item(admin_client, new_list, example_item):
     items = [example_item]
     admin_client.add_items_to_list(new_list, items)
+    return new_list
+
+
+@pytest.fixture
+def new_list_with_many_items(admin_client, new_list, many_example_items):
+    admin_client.add_items_to_list(new_list, many_example_items)
     return new_list
 
 

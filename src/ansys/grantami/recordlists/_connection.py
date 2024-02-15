@@ -1,4 +1,5 @@
-from typing import Dict, List, Optional, Tuple, Union
+import concurrent.futures
+from typing import Dict, List, Optional, Tuple, TypeVar, Union
 
 from ansys.grantami.serverapi_openapi import api, models  # type: ignore[import]
 from ansys.openapi.common import (  # type: ignore[import]
@@ -13,7 +14,7 @@ import requests  # type: ignore[import]
 from ._logger import logger
 from ._models import BooleanCriterion, RecordList, RecordListItem, SearchCriterion, SearchResult
 
-PROXY_PATH = "/proxy/v1.svc"
+PROXY_PATH = "/proxy/v1.svc/mi"
 AUTH_PATH = "/Health/v2.svc"
 API_DEFINITION_PATH = "/swagger/v1/swagger.json"
 GRANTA_APPLICATION_NAME_HEADER = "PyGranta RecordLists"
@@ -91,7 +92,7 @@ class RecordListsApiClient(ApiClient):  # type: ignore[misc]
         """
         logger.info(f"Getting all lists available with connection {self}")
         record_lists = self.list_management_api.api_v1_lists_get()
-        return [RecordList._from_model(record_list) for record_list in record_lists]
+        return [RecordList._from_model(record_list) for record_list in record_lists.lists]
 
     def get_list(self, identifier: str) -> RecordList:
         """
@@ -155,11 +156,7 @@ class RecordListsApiClient(ApiClient):  # type: ignore[misc]
             for search_result in search_results
         ]
 
-    def get_list_items(
-        self,
-        record_list: RecordList,
-        only_include_resolvable_items: bool = False,
-    ) -> List[RecordListItem]:
+    def get_list_items(self, record_list: RecordList) -> List[RecordListItem]:
         """
         Get all items included in a record list.
 
@@ -169,9 +166,6 @@ class RecordListsApiClient(ApiClient):  # type: ignore[misc]
         ----------
         record_list : RecordList
             Record list for which items will be fetched.
-        only_include_resolvable_items : bool
-            If True, test if records can be resolved before returning. Any unresolvable records are not
-            returned.
 
         Returns
         -------
@@ -187,12 +181,29 @@ class RecordListsApiClient(ApiClient):  # type: ignore[misc]
         items_response = self.list_item_api.api_v1_lists_list_list_identifier_items_get(
             list_identifier=record_list.identifier
         )
-        all_items = [RecordListItem._from_model(item) for item in items_response.items]
-        if only_include_resolvable_items:
-            resolver = _ItemResolver(self)
-            return resolver.get_resolvable_items(all_items)
-        else:
-            return all_items
+        return [RecordListItem._from_model(item) for item in items_response.items]
+
+    def get_resolvable_list_items(self, record_list: RecordList) -> List[RecordListItem]:
+        """
+        Get all resolvable items included in a record list.
+
+        If an item cannot be resolved, it will not be returned. Performs an HTTP request against the
+        Granta MI Server API.
+
+        Parameters
+        ----------
+        record_list : RecordList
+            Record list for which items will be fetched.
+
+        Returns
+        -------
+        list of :class:`.RecordListItem`
+            List of items included in the record list.
+        """
+        all_items = self.get_list_items(record_list)
+        logger.info(f"Testing if retrieved items are resolvable")
+        resolver = _ItemResolver(self)
+        return resolver.get_resolvable_items(all_items)
 
     def add_items_to_list(
         self, record_list: RecordList, items: List[RecordListItem]
@@ -219,7 +230,7 @@ class RecordListsApiClient(ApiClient):  # type: ignore[misc]
         logger.info(f"Adding {len(items)} items to list {record_list} with connection {self}")
         response_items = self.list_item_api.api_v1_lists_list_list_identifier_items_add_post(
             list_identifier=record_list.identifier,
-            body=models.GrantaServerApiListsDtoRecordListItems(
+            body=models.GrantaServerApiListsDtoCreateRecordListItemsInfo(
                 items=[item._to_model() for item in items]
             ),
         )
@@ -286,12 +297,12 @@ class RecordListsApiClient(ApiClient):  # type: ignore[misc]
         items_string = "no items" if items is None or len(items) == 0 else f"{len(items)} items"
         logger.info(f"Creating new list {name} with {items_string} with connection {self}")
         if items is not None:
-            items = models.GrantaServerApiListsDtoRecordListItems(
+            items = models.GrantaServerApiListsDtoRecordListItemsInfo(
                 items=[list_item._to_model() for list_item in items]
             )
 
         created_list = self.list_management_api.api_v1_lists_post(
-            body=models.GrantaServerApiListsDtoRecordListCreate(
+            body=models.GrantaServerApiListsDtoCreateRecordList(
                 name=name,
                 description=description,
                 notes=notes,
@@ -567,21 +578,52 @@ class RecordListsApiClient(ApiClient):  # type: ignore[misc]
         )
 
 
+T = TypeVar("T")
+
+
 class _ItemResolver:
+    _max_requests = 5
+
     def __init__(self, client: ApiClient) -> None:
         self._record_histories_api = api.RecordsRecordHistoriesApi(client)
         self._db_schema_api = api.SchemaDatabasesApi(client)
         self._db_map: Dict[str, str] = {}
 
     def get_resolvable_items(self, all_items: List[RecordListItem]) -> List[RecordListItem]:
+        """Test all items to see if they can be resolved as the current user.
+
+        Uses concurrent.futures to handle threading, since openapi-common is currently based on
+        requests which limits asyncio options.
+
+        Parameters
+        ----------
+        all_items
+            The items for which to check resolvability.
+
+        Returns
+        -------
+        resolvable_items
+            The items which could be resolved on the server.
+        """
         self._db_map = self._get_db_map()
-        return [item for item in all_items if self._is_item_resolvable(item)]
+        with concurrent.futures.ThreadPoolExecutor(max_workers=self._max_requests) as executor:
+            resolvable_test_futures = {
+                executor.submit(self._is_item_resolvable, i): i for i in all_items
+            }
+            resolvable_items = [
+                resolvable_test_futures[f]
+                for f in concurrent.futures.as_completed(resolvable_test_futures)
+                if f.result()
+            ]
+        return resolvable_items
 
     def _get_db_map(self) -> Dict[str, str]:
         dbs = self._db_schema_api.v1alpha_databases_get()
         return {db.guid: db.key for db in dbs.databases}
 
     def _is_item_resolvable(self, item: RecordListItem) -> bool:
+        if item.database_guid not in self._db_map:
+            return False
         try:
             self._record_histories_api.v1alpha_databases_database_key_record_histories_record_history_guid_get(
                 database_key=self._db_map[item.database_guid],

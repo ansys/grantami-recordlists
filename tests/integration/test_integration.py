@@ -22,11 +22,34 @@ def test_getting_all_lists(admin_client, new_list):
     my_list = next(rl for rl in all_lists if rl.identifier == new_list.identifier)
 
 
-def test_get_list_items(admin_client, new_list_with_items):
-    record_list_items = admin_client.get_list_items(new_list_with_items)
+@pytest.mark.parametrize("resolve", [True, False])
+def test_get_list_items_one_item(admin_client, new_list_with_one_item, resolve):
+    if resolve:
+        record_list_items = admin_client.get_resolvable_list_items(new_list_with_one_item)
+    else:
+        record_list_items = admin_client.get_list_items(new_list_with_one_item)
 
     assert isinstance(record_list_items, list)
-    assert all(isinstance(item, RecordListItem) for item in record_list_items)
+    if resolve:
+        assert len(record_list_items) == 0
+    else:
+        assert len(record_list_items) == 1
+        assert all(isinstance(item, RecordListItem) for item in record_list_items)
+
+
+@pytest.mark.parametrize("resolve", [True, False])
+def test_get_list_items_many_items(admin_client, new_list_with_many_items, resolve):
+    if resolve:
+        record_list_items = admin_client.get_resolvable_list_items(new_list_with_many_items)
+    else:
+        record_list_items = admin_client.get_list_items(new_list_with_many_items)
+
+    assert isinstance(record_list_items, list)
+    if resolve:
+        assert len(record_list_items) == 0
+    else:
+        assert len(record_list_items) == 1000
+        assert all(isinstance(item, RecordListItem) for item in record_list_items)
 
 
 def test_items_management(admin_client, new_list, example_item):

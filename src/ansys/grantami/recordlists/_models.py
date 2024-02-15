@@ -277,10 +277,10 @@ class RecordListItem:
         instance._record_guid = model.record_guid
         return instance
 
-    def _to_model(self) -> models.GrantaServerApiListsDtoListItem:
+    def _to_model(self) -> models.GrantaServerApiListsDtoCreateListItem:
         """Generate the DTO for use with the auto-generated client code."""
         logger.debug("Serializing RecordListItem to API model")
-        model = models.GrantaServerApiListsDtoListItem(
+        model = models.GrantaServerApiListsDtoCreateListItem(
             database_guid=self.database_guid,
             table_guid=self.table_guid,
             record_history_guid=self.record_history_guid,

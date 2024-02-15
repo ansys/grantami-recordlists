@@ -1,4 +1,5 @@
 import json
+import uuid
 
 import pytest
 import requests_mock
@@ -46,3 +47,18 @@ def example_item():
         "81dff531-0254-4fbe-9621-174b10aaee3d",
         "3bc2b82f-0199-4f3b-a7af-8d520250b180",
     )
+
+
+@pytest.fixture(scope="session")
+def many_example_items():
+    # GUIDs need only have the correct format for record lists test to pass.
+    results = []
+    for i in range(1000):
+        results.append(
+            RecordListItem(
+                database_guid="e595fe23-b450-4d18-8c08-4a0f378ef095",
+                table_guid=str(uuid.uuid4()),
+                record_history_guid=str(uuid.uuid4()),
+            )
+        )
+    return results
