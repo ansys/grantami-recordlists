@@ -63,13 +63,13 @@ oidc = ["keyring (>=22,<25)", "requests_auth (>=6,<8)"]
 
 [[package]]
 name = "ansys-sphinx-theme"
-version = "0.13.4"
+version = "0.14.0"
 description = "A theme devised by ANSYS, Inc. for Sphinx documentation."
 optional = false
 python-versions = ">=3.9,<4"
 files = [
-    {file = "ansys_sphinx_theme-0.13.4-py3-none-any.whl", hash = "sha256:d01f289e881a91d77d0fb6c6ec31c286798b49e095f211b9b168290a238ed297"},
-    {file = "ansys_sphinx_theme-0.13.4.tar.gz", hash = "sha256:95c01dd45466f3a147f31771b4d3b8ed5495df405f2c3d2b1cd897ccef8c8b3d"},
+    {file = "ansys_sphinx_theme-0.14.0-py3-none-any.whl", hash = "sha256:3ef0dcb5f6c491c876f1e5f4ed63f7acff7b5763ffc991b7bbf9336b11c3f029"},
+    {file = "ansys_sphinx_theme-0.14.0.tar.gz", hash = "sha256:e576f1a61a660d01e186e8413ebc6bc9c6c132c66e5b626a24a8a0ba9de5e138"},
 ]
 
 [package.dependencies]
@@ -2380,4 +2380,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9,<4.0"
-content-hash = "1c1fd1c1bed9181c9b7145e6049e4c63d658365107993d5ef0071610b91f0ecc"
+content-hash = "a0a510770a25dc3346cfa68a39374d1814537c4a4674e8f0a752acead0e64e4f"
