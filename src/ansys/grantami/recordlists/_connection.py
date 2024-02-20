@@ -1,5 +1,5 @@
 import concurrent.futures
-from typing import Dict, List, Optional, Tuple, TypeVar, Union
+from typing import Dict, List, Optional, Tuple, Union
 
 from ansys.grantami.serverapi_openapi import api, models  # type: ignore[import]
 from ansys.openapi.common import (  # type: ignore[import]
@@ -565,9 +565,6 @@ class RecordListsApiClient(ApiClient):  # type: ignore[misc]
         self.list_permissions_api.api_v1_lists_list_list_identifier_permissions_unsubscribe_post(
             list_identifier=record_list.identifier,
         )
-
-
-T = TypeVar("T")
 
 
 class _ItemResolver:
