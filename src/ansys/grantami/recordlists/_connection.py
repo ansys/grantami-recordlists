@@ -6,6 +6,7 @@ from ansys.openapi.common import (  # type: ignore[import]
     ApiClientFactory,
     ApiException,
     SessionConfiguration,
+    Unset,
     generate_user_agent,
 )
 import requests  # type: ignore[import]
@@ -18,7 +19,7 @@ AUTH_PATH = "/Health/v2.svc"
 API_DEFINITION_PATH = "/swagger/v1/swagger.json"
 GRANTA_APPLICATION_NAME_HEADER = "PyGranta RecordLists"
 
-MINIMUM_GRANTA_MI_VERSION = (23, 2)
+MINIMUM_GRANTA_MI_VERSION = (24, 2)
 
 _ArgNotProvided = "_ArgNotProvided"
 
@@ -263,19 +264,22 @@ class RecordListsApiClient(ApiClient):  # type: ignore[misc]
         """
         items_string = "no items" if items is None or len(items) == 0 else f"{len(items)} items"
         logger.info(f"Creating new list {name} with {items_string} with connection {self}")
+        body_kwargs = {
+            "name": name,
+            "description": description,
+            "notes": notes,
+        }
         if items is not None:
             items = models.GrantaServerApiListsDtoCreateRecordListItemsInfo(
                 items=[list_item._to_create_list_item_model() for list_item in items]
             )
-
-        created_list = self.list_management_api.create_list(
-            body=models.GrantaServerApiListsDtoCreateRecordList(
-                name=name,
-                description=description,
-                notes=notes,
-                items=items,
-            ),
+        body = models.GrantaServerApiListsDtoCreateRecordList(
+            name=name,
+            description=description,
+            notes=notes,
+            items=items if items else Unset,
         )
+        created_list = self.list_management_api.create_list(body=body)
         return RecordList._from_model(created_list)
 
     def delete_list(self, record_list: RecordList) -> None:
@@ -660,14 +664,11 @@ class Connection(ApiClientFactory):  # type: ignore[misc]
                 f"is at least {'.'.join([str(e) for e in MINIMUM_GRANTA_MI_VERSION])}."
             ) from e
 
-        # Once there are multiple versions of this package targeting different Granta MI server
-        # versions, the error message should direct users towards the PyGranta meta-package for
-        # older versions. This is not necessary now though, because there is no support for
-        # versions older than 2023 R2.
-
         if server_version < MINIMUM_GRANTA_MI_VERSION:
             raise ConnectionError(
                 f"This package requires a more recent Granta MI version. Detected Granta MI server "
                 f"version is {'.'.join([str(e) for e in server_version])}, but this package "
-                f"requires at least {'.'.join([str(e) for e in MINIMUM_GRANTA_MI_VERSION])}."
+                f"requires at least {'.'.join([str(e) for e in MINIMUM_GRANTA_MI_VERSION])}. "
+                "Use the pygranta package to install a version compatible with your Granta MI "
+                "server, for example pip install pygranta==2024.1"
             )

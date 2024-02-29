@@ -109,11 +109,23 @@ class TestAddItems(TestClientMethod):
     )
     _existing_item = RecordListItem._from_model(_existing_dto_item)
 
+    @staticmethod
+    def _convert_create_dto_to_item_dto(
+        create_dto: GrantaServerApiListsDtoCreateListItem,
+    ) -> GrantaServerApiListsDtoListItem:
+        return GrantaServerApiListsDtoListItem(
+            database_guid=create_dto.database_guid,
+            record_history_guid=create_dto.record_history_guid,
+            table_guid=create_dto.table_guid,
+            record_version=create_dto.record_version,
+        )
+
     @pytest.fixture
     def api_method(self, monkeypatch):
         def compute_result(list_identifier, body: GrantaServerApiListsDtoCreateRecordListItemsInfo):
             return GrantaServerApiListsDtoRecordListItemsInfo(
-                items=[self._existing_dto_item] + body.items
+                items=[self._existing_dto_item]
+                + [self._convert_create_dto_to_item_dto(i) for i in body.items]
             )
 
         mocked_method = Mock(side_effect=compute_result)
@@ -156,7 +168,11 @@ class TestRemoveItems(TestClientMethod):
         record_version=None,
     )
     _table_guid = str(uuid.uuid4())
-    kwargs = _existing_dto_delete_item.to_dict() | {"table_guid": _table_guid, "record_guid": None}
+    _record_guid = str(uuid.uuid4())
+    kwargs = _existing_dto_delete_item.to_dict() | {
+        "table_guid": _table_guid,
+        "record_guid": _record_guid,
+    }
     _existing_dto_item = GrantaServerApiListsDtoListItem(**kwargs)
 
     _existing_item = RecordListItem._from_model(_existing_dto_item)
