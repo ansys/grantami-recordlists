@@ -195,7 +195,7 @@ class RecordListItem:
     database_guid : str
        GUID of the database.
     table_guid : str
-       GUID of the table.
+       GUID of the table. Will be empty if
     record_history_guid : str
        Record History GUID.
     record_version : int, optional
@@ -260,20 +260,32 @@ class RecordListItem:
         )
 
     @classmethod
-    def _from_model(cls, model: models.GrantaServerApiListsDtoListItem) -> "RecordListItem":
+    def _from_model(cls, model: Union[models.GrantaServerApiListsDtoListItem]) -> "RecordListItem":
         """Instantiate from a model defined in the auto-generated client code."""
         logger.debug("Deserializing RecordListItem from API response")
         logger.debug(model.to_str())
-        instance = cls(
-            database_guid=model.database_guid,
-            table_guid=model.table_guid,
-            record_history_guid=model.record_history_guid,
-            record_version=model.record_version,
-        )
-        instance._record_guid = model.record_guid
+        kwargs = {
+            "database_guid": model.database_guid,
+            "table_guid": model.table_guid,
+            "record_history_guid": model.record_history_guid,
+            "record_version": model.record_version if model.record_version else None,
+        }
+
+        # try:
+        #     kwargs["table_guid"] = model.table_guid if model.table_guid else None
+        # except AttributeError:
+        #     kwargs["table_guid"] = None
+
+        instance = cls(**kwargs)
+
+        try:
+            instance._record_guid = model.record_guid if model.record_guid else None
+        except AttributeError:
+            pass
+
         return instance
 
-    def _to_create_model(self) -> models.GrantaServerApiListsDtoCreateListItem:
+    def _to_create_list_item_model(self) -> models.GrantaServerApiListsDtoCreateListItem:
         """Generate the DTO for use with the auto-generated client code."""
         logger.debug("Serializing RecordListItem to API model")
         model = models.GrantaServerApiListsDtoCreateListItem(
@@ -285,7 +297,7 @@ class RecordListItem:
         logger.debug(model.to_str())
         return model
 
-    def _to_delete_model(self) -> models.GrantaServerApiListsDtoDeleteRecordListItem:
+    def _to_delete_list_item_model(self) -> models.GrantaServerApiListsDtoDeleteRecordListItem:
         """Generate the DTO for use with the auto-generated client code."""
         logger.debug("Serializing RecordListItem to API model")
         model = models.GrantaServerApiListsDtoDeleteRecordListItem(
