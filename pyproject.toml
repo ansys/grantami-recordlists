@@ -29,8 +29,8 @@ packages = [
 
 [tool.poetry.dependencies]
 python = ">=3.9,<4.0"
-ansys-openapi-common = "^1.2.2"
-ansys-grantami-serverapi-openapi = { git = "https://github.com/ansys/grantami-serverapi-openapi.git", subdirectory = "ansys-grantami-serverapi-openapi", branch = "main" }
+ansys-openapi-common = "^2.0.0"
+ansys-grantami-serverapi-openapi = "3.0.0a2"
 requests = "^2.26"
 
 # Optional documentation dependencies
@@ -40,7 +40,7 @@ optional = true
 [tool.poetry.group.doc.dependencies]
 Sphinx = "^7.0.1"
 numpydoc = "^1.4.0"
-ansys-sphinx-theme = "^0.13.0"
+ansys-sphinx-theme = "^0.14.0"
 sphinx-copybutton = "^0.5.0"
 jupytext = "^1.14.4"
 nbsphinx = "^0.9.0"
@@ -87,3 +87,7 @@ disallow_untyped_defs = true
 no_implicit_optional = true
 check_untyped_defs = true
 show_error_codes = true
+files = "src"
+explicit_package_bases = true
+mypy_path = "$MYPY_CONFIG_FILE_DIR/src"
+namespace_packages = true

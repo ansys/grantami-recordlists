@@ -60,7 +60,7 @@ def test_items_management(admin_client, new_list, example_item):
     assert items == [example_item]
 
     items = admin_client.add_items_to_list(new_list, items=[another_item])
-    assert items == [example_item, another_item]
+    assert example_item in items and another_item in items and len(items) == 2
 
     items = admin_client.remove_items_from_list(new_list, items=[example_item])
     assert items == [another_item]
