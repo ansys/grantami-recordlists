@@ -138,6 +138,7 @@ def new_list_with_many_unresolvable_items(
 
 @pytest.fixture(scope="session")
 def db_key_to_guid_map(admin_client) -> Dict[str, str]:
+    """Provides a map between database key and database guid."""
     schema_api = SchemaDatabasesApi(admin_client)
     dbs = schema_api.get_all_databases()
     return {db.key: db.guid for db in dbs.databases}
@@ -145,7 +146,8 @@ def db_key_to_guid_map(admin_client) -> Dict[str, str]:
 
 @pytest.fixture(scope="session")
 def resolvable_items(admin_client, db_key_to_guid_map) -> List[RecordListItem]:
-    """Get all records in the MI_Training database"""
+    """Get all records in the MI_Training database and use them to create
+    a list of RecordListItems which can be added to a list."""
     search_api = SearchApi(admin_client)
     search_body = GrantaServerApiSearchSearchRequest(
         criterion=GrantaServerApiSearchRecordPropertyCriterion(
@@ -192,10 +194,7 @@ def new_list_with_many_resolvable_and_unresolvable_items(
 @pytest.fixture(scope="session")
 def table_guid(admin_client) -> str:
     tables_api = SchemaTablesApi(admin_client)
-    all_tables = tables_api.get_tables(
-        database_key=DB_KEY,
-    )
-    assert all_tables is not None
+    all_tables = tables_api.get_tables(database_key=DB_KEY)
     table_guid = next(table.guid for table in all_tables.tables if table.name == TABLE_NAME)
     return table_guid
 
