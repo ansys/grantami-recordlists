@@ -174,7 +174,9 @@ class RecordListsApiClient(ApiClient):  # type: ignore[misc]
         items_response = self.list_item_api.get_list_items(list_identifier=record_list.identifier)
         return [RecordListItem._from_model(item) for item in items_response.items]
 
-    def get_resolvable_list_items(self, record_list: RecordList) -> List[RecordListItem]:
+    def get_resolvable_list_items(
+        self, record_list: RecordList, read_mode: bool = False
+    ) -> List[RecordListItem]:
         """
         Get all resolvable items included in a record list.
 
@@ -185,15 +187,46 @@ class RecordListsApiClient(ApiClient):  # type: ignore[misc]
         ----------
         record_list : RecordList
             Record list for which items will be fetched.
+        read_mode : bool
+            Whether to enable read-mode for users who ordinarily have write permissions. Has no
+            effect for read-only users.
 
         Returns
         -------
         list of :class:`.RecordListItem`
             List of items included in the record list.
+
+        Notes
+        -----
+        Whether an item can be resolved depends on the role the user has on the Granta MI server. As
+        a brief summary:
+
+        * If the item doesn't specify a version, this method tests if the user can access either the
+          record or, if in a version-controlled table, a version of the record in any state. The
+          resolution will not succeed if:
+
+          * The record has been deleted
+          * The record has been withdrawn and the user is a read user (version-controlled tables
+            only)
+          * The record only has one unreleased version and the user is a read user (version-
+            controlled tables only)
+          * The record is hidden by access control
+
+        * If the item specifies a version, this method tests if the user can access that specific
+          version of the record. This condition only applies to version-controlled tables. The
+          resolution will not succeed if:
+
+          * The record version is unreleased and the user is a read user
+          * The record version has been withdrawn and the user is a read user
+          * The record or record version is hidden by access control
+
+        Since version control and access control is intended to allow and restrict access to records
+        for certain groups of users, this method may return different results for different users
+        depending on the configuration of Granta MI.
         """
         all_items = self.get_list_items(record_list)
         logger.info("Testing if retrieved items are resolvable")
-        resolver = _ItemResolver(self)
+        resolver = _ItemResolver(self, read_mode=read_mode)
         return resolver.get_resolvable_items(all_items)
 
     def add_items_to_list(
@@ -548,10 +581,12 @@ class RecordListsApiClient(ApiClient):  # type: ignore[misc]
 class _ItemResolver:
     _max_requests = 5
 
-    def __init__(self, client: ApiClient) -> None:
+    def __init__(self, client: ApiClient, read_mode: bool) -> None:
         self._record_histories_api = api.RecordsRecordHistoriesApi(client)
+        self._record_versions_api = api.RecordsRecordVersionsApi(client)
         self._db_schema_api = api.SchemaDatabasesApi(client)
         self._db_map: Dict[str, str] = {}
+        self._read_mode = read_mode
 
     def get_resolvable_items(self, all_items: List[RecordListItem]) -> List[RecordListItem]:
         """Test all items to see if they can be resolved as the current user.
@@ -586,13 +621,43 @@ class _ItemResolver:
         return {db.guid: db.key for db in dbs.databases}
 
     def _is_item_resolvable(self, item: RecordListItem) -> bool:
+        """Test if a specific item is resolvable.
+
+        If the item has a record version and record guid, attempt to resolve the record version
+        directly.
+
+        If the item has a record version number only, check that the version number is available
+        to the user running the record.
+
+        If there is no version at all, check that the history can be resolved.
+
+        Returns
+        -------
+        bool
+            True if the item can be resolved, False otherwise.
+        """
         if item.database_guid not in self._db_map:
             return False
         try:
-            self._record_histories_api.get_record_history(
-                database_key=self._db_map[item.database_guid],
-                record_history_guid=item.record_history_guid,
-            )
+            if item.record_version is not None and item.record_guid is not None:
+                self._record_versions_api.get_record_version(
+                    database_key=self._db_map[item.database_guid],
+                    table_guid=item.table_guid,
+                    record_history_guid=item.record_history_guid,
+                    record_version_guid=item.record_guid,
+                    mode="read" if self._read_mode else None,
+                )
+            else:
+                history_info = self._record_histories_api.get_record_history(
+                    database_key=self._db_map[item.database_guid],
+                    record_history_guid=item.record_history_guid,
+                    mode="read" if self._read_mode else None,
+                )
+                if item.record_version is not None:
+                    for version in history_info.record_versions:
+                        if item.record_version == version.version_number:
+                            return True
+                    return False
         except ApiException as e:
             if e.status_code != 404:
                 raise
