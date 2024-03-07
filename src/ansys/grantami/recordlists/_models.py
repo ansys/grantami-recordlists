@@ -3,7 +3,8 @@ from datetime import datetime
 from enum import Enum
 from typing import List, Optional, Union
 
-from ansys.grantami.serverapi_openapi import models  # type: ignore
+from ansys.grantami.serverapi_openapi import models  # type: ignore[import]
+from ansys.openapi.common import Unset  # type: ignore[import]
 
 from ._logger import logger
 
@@ -160,8 +161,8 @@ class RecordList:
         instance = cls(
             name=model.name,
             identifier=model.identifier,
-            description=model.description,
-            notes=model.notes,
+            description=model.description if model.description else None,
+            notes=model.notes if model.notes else None,
             created_timestamp=model.created_timestamp,
             created_user=UserOrGroup._from_model(model.created_user),
             is_revision=model.is_revision,
@@ -268,17 +269,29 @@ class RecordListItem:
             database_guid=model.database_guid,
             table_guid=model.table_guid,
             record_history_guid=model.record_history_guid,
-            record_version=model.record_version,
+            record_version=model.record_version if model.record_version else None,
         )
-        instance._record_guid = model.record_guid
+        instance._record_guid = model.record_guid if model.record_guid else None
+
         return instance
 
-    def _to_model(self) -> models.GrantaServerApiListsDtoListItem:
-        """Generate the DTO for use with the auto-generated client code."""
+    def _to_create_list_item_model(self) -> models.GrantaServerApiListsDtoCreateListItem:
+        """Generate the Create List Item DTO for use with the auto-generated client code."""
         logger.debug("Serializing RecordListItem to API model")
-        model = models.GrantaServerApiListsDtoListItem(
+        model = models.GrantaServerApiListsDtoCreateListItem(
             database_guid=self.database_guid,
             table_guid=self.table_guid,
+            record_history_guid=self.record_history_guid,
+            record_version=self.record_version,
+        )
+        logger.debug(model.to_str())
+        return model
+
+    def _to_delete_list_item_model(self) -> models.GrantaServerApiListsDtoDeleteRecordListItem:
+        """Generate the Delete List Item DTO for use with the auto-generated client code."""
+        logger.debug("Serializing RecordListItem to API model")
+        model = models.GrantaServerApiListsDtoDeleteRecordListItem(
+            database_guid=self.database_guid,
             record_history_guid=self.record_history_guid,
             record_version=self.record_version,
         )
@@ -531,7 +544,7 @@ class SearchCriterion:
         user_role = (
             models.GrantaServerApiListsDtoUserRole(self.user_role.value)
             if self.user_role is not None
-            else None
+            else Unset
         )
         model = models.GrantaServerApiListsDtoRecordListSearchCriterion(
             name_contains=self.name_contains,
