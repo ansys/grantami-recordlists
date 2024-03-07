@@ -213,14 +213,12 @@ class RecordListItem:
         table_guid: str,
         record_history_guid: str,
         record_version: Optional[int] = None,
-        is_resolvable: Optional[bool] = None,
     ):
         self._database_guid: str = database_guid
         self._table_guid: str = table_guid
         self._record_history_guid: str = record_history_guid
         self._record_version: Optional[int] = record_version
         self._record_guid: Optional[str] = None
-        self._is_resolvable: Optional[bool] = is_resolvable
 
     @property
     def database_guid(self) -> str:
