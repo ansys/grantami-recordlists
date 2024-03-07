@@ -183,8 +183,8 @@ class RecordListsApiClient(ApiClient):  # type: ignore[misc]
         """
         Get all resolvable items included in a record list.
 
-        If an item cannot be resolved, it will not be returned. Performs an HTTP request against the
-        Granta MI Server API.
+        If an item cannot be resolved, it will not be returned. Performs multiple HTTP requests
+        against the Granta MI Server API.
 
         Parameters
         ----------

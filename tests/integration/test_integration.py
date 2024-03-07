@@ -23,46 +23,118 @@ def test_getting_all_lists(admin_client, new_list):
 
 
 @pytest.mark.parametrize("resolve", [True, False])
-def test_get_list_items_one_item(admin_client, new_list_with_one_item, resolve):
+def test_get_list_items_one_unresolvable_item(
+    admin_client,
+    new_list_with_one_unresolvable_item,
+    resolve,
+):
     if resolve:
-        record_list_items = admin_client.get_resolvable_list_items(new_list_with_one_item)
+        record_list_items = admin_client.get_resolvable_list_items(
+            new_list_with_one_unresolvable_item
+        )
     else:
-        record_list_items = admin_client.get_list_items(new_list_with_one_item)
+        record_list_items = admin_client.get_list_items(new_list_with_one_unresolvable_item)
 
     assert isinstance(record_list_items, list)
-    if resolve:
-        assert len(record_list_items) == 0
-    else:
-        assert len(record_list_items) == 1
-        assert all(isinstance(item, RecordListItem) for item in record_list_items)
+    assert all(isinstance(item, RecordListItem) for item in record_list_items)
+    assert len(record_list_items) == 0 if resolve else 1
 
 
 @pytest.mark.parametrize("resolve", [True, False])
-def test_get_list_items_many_items(admin_client, new_list_with_many_items, resolve):
+def test_get_list_items_many_unresolvable_items(
+    admin_client,
+    new_list_with_many_unresolvable_items,
+    many_unresolvable_items,
+    resolve,
+):
     if resolve:
-        record_list_items = admin_client.get_resolvable_list_items(new_list_with_many_items)
+        record_list_items = admin_client.get_resolvable_list_items(
+            new_list_with_many_unresolvable_items
+        )
     else:
-        record_list_items = admin_client.get_list_items(new_list_with_many_items)
+        record_list_items = admin_client.get_list_items(new_list_with_many_unresolvable_items)
 
     assert isinstance(record_list_items, list)
+    assert all(isinstance(item, RecordListItem) for item in record_list_items)
+    assert len(record_list_items) == 0 if resolve else len(many_unresolvable_items)
+
+
+@pytest.mark.parametrize("resolve", [True, False])
+def test_get_list_items_one_resolvable_item(
+    admin_client,
+    new_list_with_one_resolvable_item,
+    resolve,
+):
     if resolve:
-        assert len(record_list_items) == 0
+        record_list_items = admin_client.get_resolvable_list_items(
+            new_list_with_one_resolvable_item
+        )
     else:
-        assert len(record_list_items) == 1000
-        assert all(isinstance(item, RecordListItem) for item in record_list_items)
+        record_list_items = admin_client.get_list_items(new_list_with_one_resolvable_item)
+
+    assert isinstance(record_list_items, list)
+    assert all(isinstance(item, RecordListItem) for item in record_list_items)
+    assert len(record_list_items) == 1
 
 
-def test_items_management(admin_client, new_list, example_item):
-    another_item = RecordListItem(
-        example_item.database_guid, example_item.table_guid, record_history_guid=str(uuid.uuid4())
+@pytest.mark.parametrize("resolve", [True, False])
+def test_get_list_items_many_resolvable_items(
+    admin_client,
+    new_list_with_many_resolvable_items,
+    many_resolvable_items,
+    resolve,
+):
+    if resolve:
+        record_list_items = admin_client.get_resolvable_list_items(
+            new_list_with_many_resolvable_items
+        )
+    else:
+        record_list_items = admin_client.get_list_items(new_list_with_many_resolvable_items)
+
+    assert isinstance(record_list_items, list)
+    assert all(isinstance(item, RecordListItem) for item in record_list_items)
+    assert len(record_list_items) == len(many_resolvable_items)
+
+
+@pytest.mark.parametrize("resolve", [True, False])
+def test_get_list_items_many_resolvable_and_unresolvable_items(
+    admin_client,
+    new_list_with_many_resolvable_and_unresolvable_items,
+    many_resolvable_items,
+    many_unresolvable_items,
+    resolve,
+):
+    if resolve:
+        record_list_items = admin_client.get_resolvable_list_items(
+            new_list_with_many_resolvable_and_unresolvable_items
+        )
+    else:
+        record_list_items = admin_client.get_list_items(
+            new_list_with_many_resolvable_and_unresolvable_items
+        )
+
+    assert isinstance(record_list_items, list)
+    assert all(isinstance(item, RecordListItem) for item in record_list_items)
+    assert (
+        len(record_list_items) == len(many_resolvable_items)
+        if resolve
+        else len(many_resolvable_items + many_unresolvable_items)
     )
-    items = admin_client.add_items_to_list(new_list, items=[example_item])
-    assert items == [example_item]
+
+
+def test_items_management(admin_client, new_list, unresolvable_item):
+    another_item = RecordListItem(
+        unresolvable_item.database_guid,
+        unresolvable_item.table_guid,
+        record_history_guid=str(uuid.uuid4()),
+    )
+    items = admin_client.add_items_to_list(new_list, items=[unresolvable_item])
+    assert items == [unresolvable_item]
 
     items = admin_client.add_items_to_list(new_list, items=[another_item])
-    assert example_item in items and another_item in items and len(items) == 2
+    assert unresolvable_item in items and another_item in items and len(items) == 2
 
-    items = admin_client.remove_items_from_list(new_list, items=[example_item])
+    items = admin_client.remove_items_from_list(new_list, items=[unresolvable_item])
     assert items == [another_item]
 
     items = admin_client.remove_items_from_list(new_list, items=[another_item])
@@ -263,11 +335,11 @@ class TestRevisionLifeCycle(TestLifeCyclePublishedAndNotAwaitingApproval):
             admin_client.update_list(new_list, description="Updated description")
         assert e.value.status_code == 403
 
-    def test_cannot_edit_items_of_published_list(self, admin_client, new_list, example_item):
+    def test_cannot_edit_items_of_published_list(self, admin_client, new_list, unresolvable_item):
         with pytest.raises(ApiException) as e:
             admin_client.add_items_to_list(
                 new_list,
-                items=[example_item],
+                items=[unresolvable_item],
             )
         assert e.value.status_code == 403
 
@@ -329,11 +401,11 @@ class TestSearch:
         admin_client.delete_list(created_list)
 
     @pytest.fixture(scope="class")
-    def list_c(self, admin_client, list_name, list_b, example_item):
+    def list_c(self, admin_client, list_name, list_b, unresolvable_item):
         """A revision of list B with a known name and items."""
         created_list = admin_client.revise_list(list_b)
         admin_client.update_list(created_list, name=list_name + self._name_suffix_C)
-        admin_client.add_items_to_list(created_list, [example_item])
+        admin_client.add_items_to_list(created_list, [unresolvable_item])
         yield created_list
         admin_client.delete_list(created_list)
 
@@ -378,38 +450,38 @@ class TestSearch:
         assert len(results) == 1
         assert results[0].record_list.identifier == list_c.identifier
 
-    def test_search_by_database(self, admin_client, list_name, example_item, list_c):
+    def test_search_by_database(self, admin_client, list_name, unresolvable_item, list_c):
         criteria = SearchCriterion(
             name_contains=list_name,
-            contains_records_in_databases=[example_item.database_guid],
+            contains_records_in_databases=[unresolvable_item.database_guid],
         )
         results = admin_client.search_for_lists(criteria)
         assert len(results) == 1
         assert results[0].record_list.identifier == list_c.identifier
 
-    def test_search_by_multiple_databases(self, admin_client, list_name, example_item, list_c):
+    def test_search_by_multiple_databases(self, admin_client, list_name, unresolvable_item, list_c):
         # List of databases = Is in one OR the other
         criteria = SearchCriterion(
             name_contains=list_name,
-            contains_records_in_databases=[example_item.database_guid, str(uuid.uuid4())],
+            contains_records_in_databases=[unresolvable_item.database_guid, str(uuid.uuid4())],
         )
         results = admin_client.search_for_lists(criteria)
         assert len(results) == 1
         assert results[0].record_list.identifier == list_c.identifier
 
-    def test_search_by_table(self, admin_client, list_name, example_item, list_c):
+    def test_search_by_table(self, admin_client, list_name, unresolvable_item, list_c):
         criteria = SearchCriterion(
             name_contains=list_name,
-            contains_records_in_tables=[example_item.table_guid],
+            contains_records_in_tables=[unresolvable_item.table_guid],
         )
         results = admin_client.search_for_lists(criteria)
         assert len(results) == 1
         assert results[0].record_list.identifier == list_c.identifier
 
-    def test_search_by_record(self, admin_client, list_name, example_item, list_c):
+    def test_search_by_record(self, admin_client, list_name, unresolvable_item, list_c):
         criteria = SearchCriterion(
             name_contains=list_name,
-            contains_records=[example_item.record_history_guid],
+            contains_records=[unresolvable_item.record_history_guid],
         )
         results = admin_client.search_for_lists(criteria)
         assert len(results) == 1
@@ -479,7 +551,7 @@ class TestSearch:
             results = admin_client.search_for_lists(criteria)
 
     @pytest.mark.parametrize("include_items", [True, False])
-    def test_include_items_flag(self, admin_client, list_c, include_items, example_item):
+    def test_include_items_flag(self, admin_client, list_c, include_items, unresolvable_item):
         results = admin_client.search_for_lists(
             SearchCriterion(name_contains=self._name_suffix_C),
             include_items=include_items,
@@ -490,6 +562,6 @@ class TestSearch:
         assert result.record_list.identifier == list_c.identifier
         # Check the result does have the expected items
         if include_items:
-            assert result.items == [example_item]
+            assert result.items == [unresolvable_item]
         else:
             assert result.items is None

@@ -337,10 +337,10 @@ class TestCreateList(TestClientMethod):
         api_method.assert_called_once_with(body=expected_body)
         assert isinstance(returned_list, RecordList)
 
-    def test_create_list_with_items(self, client, api_method, example_item):
+    def test_create_list_with_items(self, client, api_method, unresolvable_item):
         list_name = "ListName"
 
-        returned_list = client.create_list(list_name, items=[example_item])
+        returned_list = client.create_list(list_name, items=[unresolvable_item])
 
         expected_body = GrantaServerApiListsDtoCreateRecordList(
             name=list_name,
@@ -349,9 +349,9 @@ class TestCreateList(TestClientMethod):
             items=GrantaServerApiListsDtoCreateRecordListItemsInfo(
                 items=[
                     GrantaServerApiListsDtoCreateListItem(
-                        database_guid=example_item.database_guid,
-                        record_history_guid=example_item.record_history_guid,
-                        table_guid=example_item.table_guid,
+                        database_guid=unresolvable_item.database_guid,
+                        record_history_guid=unresolvable_item.record_history_guid,
+                        table_guid=unresolvable_item.table_guid,
                         record_version=None,
                     )
                 ]
