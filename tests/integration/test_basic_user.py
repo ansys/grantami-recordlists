@@ -112,13 +112,11 @@ class TestSubscriptionLifeCycle:
         basic_client.subscribe_to_list(published_list)
 
         # Check as user with limited permissions, can only see its own permissions
-        permissions = (
-            basic_client.list_permissions_api.api_v1_lists_list_list_identifier_permissions_get(
-                published_list.identifier
-            )
+        permissions = basic_client.list_permissions_api.get_permissions(
+            list_identifier=published_list.identifier
         )
-        assert len(permissions) == 1
-        user_permissions = permissions[0]
+        assert len(permissions.user_permissions) == 1
+        user_permissions = permissions.user_permissions[0]
         assert list_username_no_permissions in user_permissions.user_or_group_name
         assert user_permissions.flags.is_subscribed is True
 
@@ -126,9 +124,7 @@ class TestSubscriptionLifeCycle:
         basic_client.unsubscribe_from_list(published_list)
 
         # Check
-        permissions = (
-            basic_client.list_permissions_api.api_v1_lists_list_list_identifier_permissions_get(
-                published_list.identifier
-            )
+        permissions = basic_client.list_permissions_api.get_permissions(
+            list_identifier=published_list.identifier
         )
-        assert len(permissions) == 0
+        assert len(permissions.user_permissions) == 0

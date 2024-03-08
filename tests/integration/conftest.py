@@ -56,7 +56,8 @@ def basic_client(sl_url, list_username_no_permissions, list_password_no_permissi
     On teardown, deletes all lists named using the fixture `list_name`.
     """
     connection = Connection(sl_url).with_credentials(
-        list_username_no_permissions, list_password_no_permissions
+        list_username_no_permissions,
+        list_password_no_permissions,
     )
     client = connection.connect()
     yield client

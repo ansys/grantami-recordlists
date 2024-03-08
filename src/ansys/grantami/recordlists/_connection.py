@@ -6,6 +6,7 @@ from ansys.openapi.common import (  # type: ignore[import]
     ApiClientFactory,
     ApiException,
     SessionConfiguration,
+    Unset,
     generate_user_agent,
 )
 import requests  # type: ignore[import]
@@ -13,12 +14,12 @@ import requests  # type: ignore[import]
 from ._logger import logger
 from ._models import BooleanCriterion, RecordList, RecordListItem, SearchCriterion, SearchResult
 
-PROXY_PATH = "/proxy/v1.svc"
+PROXY_PATH = "/proxy/v1.svc/mi"
 AUTH_PATH = "/Health/v2.svc"
 API_DEFINITION_PATH = "/swagger/v1/swagger.json"
 GRANTA_APPLICATION_NAME_HEADER = "PyGranta RecordLists"
 
-MINIMUM_GRANTA_MI_VERSION = (23, 2)
+MINIMUM_GRANTA_MI_VERSION = (24, 2)
 
 _ArgNotProvided = "_ArgNotProvided"
 
@@ -41,7 +42,7 @@ def _get_mi_server_version(client: ApiClient) -> Tuple[int, ...]:
         Granta MI version number.
     """
     schema_api = api.SchemaApi(client)
-    server_version_response = schema_api.v1alpha_schema_mi_version_get()
+    server_version_response = schema_api.get_version()
     server_version_elements = server_version_response.version.split(".")
     server_version = tuple([int(e) for e in server_version_elements])
     return server_version
@@ -90,8 +91,8 @@ class RecordListsApiClient(ApiClient):  # type: ignore[misc]
             List of available record lists.
         """
         logger.info(f"Getting all lists available with connection {self}")
-        record_lists = self.list_management_api.api_v1_lists_get()
-        return [RecordList._from_model(record_list) for record_list in record_lists]
+        record_lists = self.list_management_api.get_all_lists()
+        return [RecordList._from_model(record_list) for record_list in record_lists.lists]
 
     def get_list(self, identifier: str) -> RecordList:
         """
@@ -109,7 +110,7 @@ class RecordListsApiClient(ApiClient):  # type: ignore[misc]
         :class:`.RecordList`
         """
         logger.info(f"Getting list with identifier {identifier} with connection {self}")
-        record_list = self.list_management_api.api_v1_lists_list_list_identifier_get(identifier)
+        record_list = self.list_management_api.get_list(list_identifier=identifier)
         return RecordList._from_model(record_list)
 
     def search_for_lists(
@@ -136,21 +137,20 @@ class RecordListsApiClient(ApiClient):  # type: ignore[misc]
         response_options = models.GrantaServerApiListsDtoResponseOptions(
             include_record_list_items=include_items,
         )
-        search_info = self.list_management_api.api_v1_lists_search_post(
+        search_info = self.list_management_api.run_record_lists_search(
             body=models.GrantaServerApiListsDtoRecordListSearchRequest(
                 search_criterion=criterion._to_model(),
                 response_options=response_options,
             )
         )
 
-        search_results = (
-            self.list_management_api.api_v1_lists_search_results_result_resource_identifier_get(
-                search_info.search_result_identifier
-            )
+        search_results = self.list_management_api.get_record_list_search_results(
+            result_resource_identifier=search_info.search_result_identifier
         )
+        pass
         return [
             SearchResult._from_model(search_result, include_items)
-            for search_result in search_results
+            for search_result in search_results.search_results
         ]
 
     def get_list_items(self, record_list: RecordList) -> List[RecordListItem]:
@@ -170,9 +170,7 @@ class RecordListsApiClient(ApiClient):  # type: ignore[misc]
             List of items included in the record list.
         """
         logger.info(f"Getting items in list {record_list} with connection {self}")
-        items = self.list_item_api.api_v1_lists_list_list_identifier_items_get(
-            record_list.identifier
-        )
+        items = self.list_item_api.get_list_items(list_identifier=record_list.identifier)
         return [RecordListItem._from_model(item) for item in items.items]
 
     def add_items_to_list(
@@ -198,10 +196,10 @@ class RecordListsApiClient(ApiClient):  # type: ignore[misc]
            List of items included in the record list.
         """
         logger.info(f"Adding {len(items)} items to list {record_list} with connection {self}")
-        response_items = self.list_item_api.api_v1_lists_list_list_identifier_items_add_post(
-            record_list.identifier,
-            body=models.GrantaServerApiListsDtoRecordListItems(
-                items=[item._to_model() for item in items]
+        response_items = self.list_item_api.add_items_to_list(
+            list_identifier=record_list.identifier,
+            body=models.GrantaServerApiListsDtoCreateRecordListItemsInfo(
+                items=[item._to_create_list_item_model() for item in items]
             ),
         )
         return [RecordListItem._from_model(item) for item in response_items.items]
@@ -228,10 +226,10 @@ class RecordListsApiClient(ApiClient):  # type: ignore[misc]
            List of items included in the record list.
         """
         logger.info(f"Removing {len(items)} items from list {record_list} with connection {self}")
-        response_items = self.list_item_api.api_v1_lists_list_list_identifier_items_remove_post(
-            record_list.identifier,
-            body=models.GrantaServerApiListsDtoRecordListItems(
-                items=[item._to_model() for item in items]
+        response_items = self.list_item_api.remove_items_from_list(
+            list_identifier=record_list.identifier,
+            body=models.GrantaServerApiListsDtoDeleteRecordListItems(
+                items=[item._to_delete_list_item_model() for item in items]
             ),
         )
         return [RecordListItem._from_model(item) for item in response_items.items]
@@ -266,19 +264,22 @@ class RecordListsApiClient(ApiClient):  # type: ignore[misc]
         """
         items_string = "no items" if items is None or len(items) == 0 else f"{len(items)} items"
         logger.info(f"Creating new list {name} with {items_string} with connection {self}")
+        body_kwargs = {
+            "name": name,
+            "description": description,
+            "notes": notes,
+        }
         if items is not None:
-            items = models.GrantaServerApiListsDtoRecordListItems(
-                items=[list_item._to_model() for list_item in items]
+            items = models.GrantaServerApiListsDtoCreateRecordListItemsInfo(
+                items=[list_item._to_create_list_item_model() for list_item in items]
             )
-
-        created_list = self.list_management_api.api_v1_lists_post(
-            body=models.GrantaServerApiListsDtoRecordListCreate(
-                name=name,
-                description=description,
-                notes=notes,
-                items=items,
-            ),
+        body = models.GrantaServerApiListsDtoCreateRecordList(
+            name=name,
+            description=description,
+            notes=notes,
+            items=items if items else Unset,
         )
+        created_list = self.list_management_api.create_list(body=body)
         return RecordList._from_model(created_list)
 
     def delete_list(self, record_list: RecordList) -> None:
@@ -293,7 +294,7 @@ class RecordListsApiClient(ApiClient):  # type: ignore[misc]
             Record list to delete.
         """
         logger.info(f"Removing list {record_list} with connection {self}")
-        self.list_management_api.api_v1_lists_list_list_identifier_delete(record_list.identifier)
+        self.list_management_api.delete_list(list_identifier=record_list.identifier)
 
     def update_list(
         self,
@@ -335,16 +336,15 @@ class RecordListsApiClient(ApiClient):  # type: ignore[misc]
         if name is None:
             raise ValueError(f"If provided, argument 'name' cannot be None.")
 
-        body = []
+        body = models.GrantaServerApiListsDtoUpdateRecordListProperties()
         if name != _ArgNotProvided:
-            body.append(self._create_patch_operation(name, "name"))
+            body.name = name
         if description != _ArgNotProvided:
-            body.append(self._create_patch_operation(description, "description"))
+            body.description = description
         if notes != _ArgNotProvided:
-            body.append(self._create_patch_operation(notes, "notes"))
-
-        updated_resource = self.list_management_api.api_v1_lists_list_list_identifier_patch(
-            record_list.identifier, body=body
+            body.notes = notes
+        updated_resource = self.list_management_api.update_list(
+            list_identifier=record_list.identifier, body=body
         )
         return RecordList._from_model(updated_resource)
 
@@ -366,9 +366,7 @@ class RecordListsApiClient(ApiClient):  # type: ignore[misc]
             Record list created by the copy operation.
         """
         logger.info(f"Copying list {record_list} with connection {self}")
-        list_copy = self.list_management_api.api_v1_lists_list_list_identifier_copy_post(
-            record_list.identifier
-        )
+        list_copy = self.list_management_api.copy_list(list_identifier=record_list.identifier)
         return RecordList._from_model(list_copy)
 
     def revise_list(self, record_list: RecordList) -> RecordList:
@@ -391,8 +389,8 @@ class RecordListsApiClient(ApiClient):  # type: ignore[misc]
             Record list created by the revision operation.
         """
         logger.info(f"Creating revision of list {record_list} with connection {self}")
-        list_revision = self.list_management_api.api_v1_lists_list_list_identifier_revise_post(
-            record_list.identifier,
+        list_revision = self.list_management_api.revise_list(
+            list_identifier=record_list.identifier,
         )
         return RecordList._from_model(list_revision)
 
@@ -414,10 +412,8 @@ class RecordListsApiClient(ApiClient):  # type: ignore[misc]
             Updated representation of the record list.
         """
         logger.info(f"Requesting approval for list {record_list} with connection {self}")
-        updated_list = (
-            self.list_management_api.api_v1_lists_list_list_identifier_request_approval_post(
-                record_list.identifier
-            )
+        updated_list = self.list_management_api.request_approval(
+            list_identifier=record_list.identifier,
         )
         return RecordList._from_model(updated_list)
 
@@ -442,8 +438,8 @@ class RecordListsApiClient(ApiClient):  # type: ignore[misc]
             Updated representation of the record list.
         """
         logger.info(f"Publishing list {record_list} with connection {self}")
-        updated_list = self.list_management_api.api_v1_lists_list_list_identifier_publish_post(
-            record_list.identifier,
+        updated_list = self.list_management_api.publish_list(
+            list_identifier=record_list.identifier,
         )
         return RecordList._from_model(updated_list)
 
@@ -467,8 +463,8 @@ class RecordListsApiClient(ApiClient):  # type: ignore[misc]
             Updated representation of the record list.
         """
         logger.info(f"Withdrawing list {record_list} with connection {self}")
-        updated_list = self.list_management_api.api_v1_lists_list_list_identifier_unpublish_post(
-            record_list.identifier,
+        updated_list = self.list_management_api.unpublish_list(
+            list_identifier=record_list.identifier,
         )
         return RecordList._from_model(updated_list)
 
@@ -491,8 +487,8 @@ class RecordListsApiClient(ApiClient):  # type: ignore[misc]
             Updated representation of the record list.
         """
         logger.info(f"Cancelling request to approve list {record_list} with connection {self}")
-        updated_list = self.list_management_api.api_v1_lists_list_list_identifier_reset_post(
-            record_list.identifier,
+        updated_list = self.list_management_api.reset_awaiting_approval(
+            list_identifier=record_list.identifier,
         )
         return RecordList._from_model(updated_list)
 
@@ -512,9 +508,7 @@ class RecordListsApiClient(ApiClient):  # type: ignore[misc]
         -------
         None
         """
-        self.list_permissions_api.api_v1_lists_list_list_identifier_permissions_subscribe_post(
-            record_list.identifier
-        )
+        self.list_permissions_api.subscribe(list_identifier=record_list.identifier)
 
     def unsubscribe_from_list(self, record_list: RecordList) -> None:
         """
@@ -531,18 +525,8 @@ class RecordListsApiClient(ApiClient):  # type: ignore[misc]
         -------
         None
         """
-        self.list_permissions_api.api_v1_lists_list_list_identifier_permissions_unsubscribe_post(
-            record_list.identifier
-        )
-
-    @staticmethod
-    def _create_patch_operation(
-        value: Optional[str], name: str, op: str = "replace"
-    ) -> models.JsonPatchDocument:
-        return models.JsonPatchDocument(
-            value=value,
-            path=f"/{name}",
-            op=op,
+        self.list_permissions_api.unsubscribe(
+            list_identifier=record_list.identifier,
         )
 
 
@@ -680,14 +664,11 @@ class Connection(ApiClientFactory):  # type: ignore[misc]
                 f"is at least {'.'.join([str(e) for e in MINIMUM_GRANTA_MI_VERSION])}."
             ) from e
 
-        # Once there are multiple versions of this package targeting different Granta MI server
-        # versions, the error message should direct users towards the PyGranta meta-package for
-        # older versions. This is not necessary now though, because there is no support for
-        # versions older than 2023 R2.
-
         if server_version < MINIMUM_GRANTA_MI_VERSION:
             raise ConnectionError(
                 f"This package requires a more recent Granta MI version. Detected Granta MI server "
                 f"version is {'.'.join([str(e) for e in server_version])}, but this package "
-                f"requires at least {'.'.join([str(e) for e in MINIMUM_GRANTA_MI_VERSION])}."
+                f"requires at least {'.'.join([str(e) for e in MINIMUM_GRANTA_MI_VERSION])}. "
+                "Use the pygranta package to install a version compatible with your Granta MI "
+                "server, for example pip install pygranta==2024.1"
             )

@@ -67,16 +67,16 @@ jobs:
 
       - name: "Start VM with Azure CLI"
         id: azure_cli
-        uses: azure/CLI@v1
+        uses: azure/CLI@v2
         if:   ${{ !(inputs.skip-vm-management)}}
         with:
           azcliversion: 2.32.0
           inlineScript: |
             az login --service-principal -u ${{ secrets.AZURE_APP_ID }} -p ${{ secrets.AZURE_SECRET }} --tenant ${{ secrets.AZURE_TENANT_ID }}
-            az vm start -g ${{ secrets.AZURE_RESOURCE_GROUP }} -n ${{ secrets.AZURE_VM_NAME }}
+            az vm start -g ${{ secrets.AZURE_RESOURCE_GROUP }} -n ${{ secrets.AZURE_VM_NAME_NEXT }}
 
       - name: "Set up Python ${{ inputs.python-version }}"
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ inputs.python-version }}
 
@@ -88,7 +88,7 @@ jobs:
           pip freeze
           python .github/scripts/check_server.py
         env:
-          TEST_SL_URL: ${{secrets.TEST_SERVER_URL}}
+          TEST_SL_URL: ${{secrets.TEST_SERVER_URL_NEXT}}
           TEST_USER: ${{secrets.TEST_SERVER_ADMIN_USER}}
           TEST_PASS: ${{secrets.TEST_SERVER_ADMIN_PASS}}
 
@@ -105,7 +105,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: "Set up Python ${{ inputs.python-version }}"
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ inputs.python-version }}
 
@@ -116,14 +116,14 @@ jobs:
       - name: "Test with tox (integration tests only)"
         run: tox -e tests -- -m "integration"
         env:
-          TEST_SL_URL: ${{secrets.TEST_SERVER_URL}}
+          TEST_SL_URL: ${{secrets.TEST_SERVER_URL_NEXT}}
           TEST_LIST_ADMIN_USER: ${{secrets.TEST_SERVER_ADMIN_USER}}
           TEST_LIST_ADMIN_PASS: ${{secrets.TEST_SERVER_ADMIN_PASS}}
           TEST_LIST_USER: ${{secrets.TEST_SERVER_USER}}
           TEST_LIST_PASS: ${{secrets.TEST_SERVER_PASS}}
 
       - name: "Upload coverage artifacts"
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: ${{ matrix.os  == 'ubuntu-latest' }}
         with:
           name: coverage-html-integrationtests
@@ -147,7 +147,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: "Set up Python ${{ inputs.python-version }}"
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ inputs.python-version }}
 
@@ -165,7 +165,7 @@ jobs:
       - name: "Build HTML documentation"
         run: poetry run -- make -C doc html SPHINXOPTS="-n -W --keep-going"
         env:
-          TEST_SL_URL: ${{secrets.TEST_SERVER_URL}}
+          TEST_SL_URL: ${{secrets.TEST_SERVER_URL_NEXT}}
           TEST_USER: ${{secrets.TEST_SERVER_ADMIN_USER}}
           TEST_PASS: ${{secrets.TEST_SERVER_ADMIN_PASS}}
           BUILD_EXAMPLES: "true"
@@ -173,20 +173,20 @@ jobs:
       - name: "Build PDF documentation"
         run: poetry run -- make -C doc latexpdf
         env:
-          TEST_SL_URL: ${{secrets.TEST_SERVER_URL}}
+          TEST_SL_URL: ${{secrets.TEST_SERVER_URL_NEXT}}
           TEST_USER: ${{secrets.TEST_SERVER_ADMIN_USER}}
           TEST_PASS: ${{secrets.TEST_SERVER_ADMIN_PASS}}
           BUILD_EXAMPLES: "true"
 
       - name: "Upload HTML documentation"
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: documentation-html
           path: doc/_build/html
           retention-days: 7
 
       - name: "Upload PDF documentation"
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: documentation-pdf
           path: doc/_build/latex/*.pdf
@@ -198,9 +198,9 @@ jobs:
     needs: doc-build
     if: ${{ always() && !(inputs.skip-vm-management)}}
     steps:
-      - uses: azure/CLI@v1
+      - uses: azure/CLI@v2
         with:
           azcliversion: 2.32.0
           inlineScript: |
             az login --service-principal -u ${{ secrets.AZURE_APP_ID }} -p ${{ secrets.AZURE_SECRET }} --tenant ${{ secrets.AZURE_TENANT_ID }}
-            az vm deallocate -g ${{ secrets.AZURE_RESOURCE_GROUP }} -n ${{ secrets.AZURE_VM_NAME }} --no-wait
+            az vm deallocate -g ${{ secrets.AZURE_RESOURCE_GROUP }} -n ${{ secrets.AZURE_VM_NAME_NEXT }} --no-wait

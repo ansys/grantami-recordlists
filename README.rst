@@ -28,11 +28,13 @@
    :target: https://github.com/psf/black
    :alt: Black
 
-.. _after-badges:
-
 
 PyGranta RecordLists
 ====================
+
+..
+   _after-badges
+
 
 A Python wrapper for the Granta MI Lists API.
 
@@ -50,7 +52,7 @@ Dependencies
 
 To use the ``ansys.grantami.recordlists`` package you must have access to a Granta MI 2023 R2 deployment.
 
-The ``ansys.grantami.recordlists`` package currently supports Python from version 3.8 to version 3.11.
+The ``ansys.grantami.recordlists`` package currently supports Python from version 3.9 to version 3.12.
 
 .. readme_software_requirements_end
 
@@ -67,6 +69,12 @@ this code:
 
     pip install ansys-grantami-recordlists
 
+To install a release compatible with a specific version of Granta MI, use the
+`PyGranta <https://grantami.docs.pyansys.com/>`_ meta-package with a requirement specifier:
+
+.. code::
+
+    pip install pygranta==2023.2.0
 
 Alternatively, to install the latest from ``ansys-grantami-recordlists`` `GitHub <https://github.com/ansys/grantami-recordlists>`_,
 use this code:
