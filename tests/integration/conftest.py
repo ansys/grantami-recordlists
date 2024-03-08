@@ -2,7 +2,7 @@ import os
 from typing import Dict, List
 import uuid
 
-from ansys.grantami.serverapi_openapi.api import SchemaDatabasesApi, SchemaTablesApi, SearchApi
+from ansys.grantami.serverapi_openapi.api import SchemaDatabasesApi, SearchApi
 from ansys.grantami.serverapi_openapi.models import (
     GrantaServerApiSearchDiscreteTextValuesDatumCriterion,
     GrantaServerApiSearchRecordPropertyCriterion,
@@ -10,16 +10,7 @@ from ansys.grantami.serverapi_openapi.models import (
     GrantaServerApiSearchSearchRequest,
     GrantaServerApiVersionState,
 )
-from common import (
-    DB_KEY,
-    TABLE_NAME,
-    create_new_unreleased_version,
-    ensure_history_exists,
-    get_latest_version_info,
-    get_version_info_in_state,
-    release_version,
-    supersede_version,
-)
+from common import DB_KEY, TABLE_NAME, RecordCreator
 import pytest
 
 from ansys.grantami.recordlists import Connection, RecordList, RecordListItem, RecordListsApiClient
@@ -192,124 +183,101 @@ def new_list_with_many_resolvable_and_unresolvable_items(
 
 
 @pytest.fixture(scope="session")
-def table_guid(admin_client) -> str:
-    tables_api = SchemaTablesApi(admin_client)
-    all_tables = tables_api.get_tables(database_key=DB_KEY)
-    table_guid = next(table.guid for table in all_tables.tables if table.name == TABLE_NAME)
-    return table_guid
-
-
-@pytest.fixture(scope="session")
-def unreleased_item(admin_client, table_guid, db_key_to_guid_map) -> RecordListItem:
-    history_guid = ensure_history_exists(admin_client, table_guid, "UnreleasedRecord")
-    version_state, _, version_number = get_latest_version_info(admin_client, history_guid)
-    if version_state != GrantaServerApiVersionState.UNRELEASED:
-        # This record must contain a single unreleased version only. If the latest version
-        # is not unreleased, raise a RuntimeError
-        raise RuntimeError(f"Unexpected record version state {version_state}.")
-    return RecordListItem(db_key_to_guid_map[DB_KEY], table_guid, history_guid, version_number)
-
-
-@pytest.fixture(scope="session")
-def released_item(admin_client, table_guid, db_key_to_guid_map) -> RecordListItem:
-    history_guid = ensure_history_exists(admin_client, table_guid, "ReleasedRecord")
-    version_state, version_guid, version_number = get_latest_version_info(
-        admin_client, history_guid
+def unreleased_item(admin_client) -> RecordListItem:
+    """
+    History
+    |
+    |-- Version 1 (unreleased) *
+    """
+    record_creator = RecordCreator(admin_client, DB_KEY, TABLE_NAME, "UnreleasedRecord")
+    record_creator.get_or_create_version(GrantaServerApiVersionState.UNRELEASED, 1)
+    return RecordListItem(
+        database_guid=record_creator.database_guid,
+        table_guid=record_creator.table_guid,
+        record_history_guid=record_creator.history_guid,
+        record_version=1,
     )
-    if version_state == GrantaServerApiVersionState.UNRELEASED:
-        # If the record is unreleased, release it.
-        release_version(admin_client, table_guid, history_guid, version_guid)
-    elif version_state == GrantaServerApiVersionState.RELEASED:
-        # If the record is already released, do nothing
-        pass
-    elif version_state in [
-        GrantaServerApiVersionState.SUPERSEDED,
-        GrantaServerApiVersionState.UNVERSIONED,
-        GrantaServerApiVersionState.WITHDRAWN,
-    ]:
-        # Either the record is in an unversioned table, or has already been superseded or withdrawn. Raise exception.
-        raise RuntimeError(f"Unexpected record version state {version_state}.")
-    return RecordListItem(db_key_to_guid_map[DB_KEY], table_guid, history_guid, version_number)
 
 
 @pytest.fixture(scope="session")
-def superseded_item(admin_client, table_guid, db_key_to_guid_map) -> RecordListItem:
-    history_guid = ensure_history_exists(admin_client, table_guid, "SupersededRecord")
-    try:
-        version_state, version_guid, version_number = get_version_info_in_state(
-            admin_client, history_guid, GrantaServerApiVersionState.SUPERSEDED
-        )
-        # We have a superseded record as required
-    except ValueError:
-        version_state, version_guid, version_number = get_latest_version_info(
-            admin_client, history_guid
-        )
-        if version_state == GrantaServerApiVersionState.UNRELEASED and version_number == 2:
-            # If v2 is unreleased, release it, which will supersede v1.
-            release_version(admin_client, table_guid, history_guid, version_guid)
-            # Re-fetch the information for the newly-superseded record
-            version_state, version_guid, version_number = get_version_info_in_state(
-                admin_client, history_guid, GrantaServerApiVersionState.SUPERSEDED
-            )
-        elif version_state == GrantaServerApiVersionState.UNRELEASED and version_number == 1:
-            # If v1 is unreleased, we need to release it and then supersede it
-            release_version(admin_client, table_guid, history_guid, version_guid)
-            supersede_version(admin_client, table_guid, history_guid, version_guid)
-        elif version_state in [
-            GrantaServerApiVersionState.RELEASED,
-            GrantaServerApiVersionState.WITHDRAWN,
-        ]:
-            # If v1 is released or withdrawn, just supersede it
-            supersede_version(admin_client, table_guid, history_guid, version_guid)
-        elif version_state == GrantaServerApiVersionState.UNVERSIONED:
-            # Unversioned table
-            raise RuntimeError(f"Unexpected record version state {version_state}.")
-    return RecordListItem(db_key_to_guid_map[DB_KEY], table_guid, history_guid, version_number)
-
-
-@pytest.fixture(scope="session")
-def draft_superseded_item(admin_client, table_guid, db_key_to_guid_map) -> RecordListItem:
-    history_guid = ensure_history_exists(admin_client, table_guid, "DraftSupersededRecord")
-    try:
-        version_state, version_guid, version_number = get_version_info_in_state(
-            admin_client, history_guid, GrantaServerApiVersionState.UNRELEASED, version_number=2
-        )
-        # We have a v2 unreleased record (and a v1 released record)
-        return RecordListItem(
-            db_key_to_guid_map[DB_KEY],
-            table_guid,
-            history_guid,
-            version_number,
-        )
-    except ValueError:
-        version_state, version_guid, version_number = get_latest_version_info(
-            admin_client, history_guid
-        )
-        if version_state == GrantaServerApiVersionState.UNRELEASED:
-            # v1 unreleased only. Release v1 and then create a new unreleased v2
-            release_version(admin_client, table_guid, history_guid, version_guid)
-            create_new_unreleased_version(admin_client, table_guid, history_guid, version_guid)
-        elif version_state in [
-            GrantaServerApiVersionState.RELEASED,
-            GrantaServerApiVersionState.WITHDRAWN,
-        ]:
-            # v1 is released or withdrawn. Create a new unreleased v2
-            create_new_unreleased_version(admin_client, table_guid, history_guid, version_guid)
-        elif version_state == GrantaServerApiVersionState.UNVERSIONED:
-            # Unversioned table
-            raise RuntimeError(f"Unexpected record version state {version_state}.")
-
-    # Fetch the information for the unreleased v2 record
-    version_state, version_guid, version_number = get_version_info_in_state(
-        admin_client, history_guid, GrantaServerApiVersionState.UNRELEASED, version_number=2
+def released_item(admin_client) -> RecordListItem:
+    """
+    History
+    |
+    |-- Version 1 (released) *
+    """
+    record_creator = RecordCreator(admin_client, DB_KEY, TABLE_NAME, "ReleasedRecord")
+    record_creator.get_or_create_version(GrantaServerApiVersionState.RELEASED, 1)
+    return RecordListItem(
+        database_guid=record_creator.database_guid,
+        table_guid=record_creator.table_guid,
+        record_history_guid=record_creator.history_guid,
+        record_version=1,
     )
-    return RecordListItem(db_key_to_guid_map[DB_KEY], table_guid, history_guid, version_number)
+
+
+@pytest.fixture(scope="session")
+def superseded_item(admin_client) -> RecordListItem:
+    """
+    History
+    |
+    |-- Version 1 (superseded) *
+    |-- Version 2 (released)
+    """
+    record_creator = RecordCreator(admin_client, DB_KEY, TABLE_NAME, "SupersededRecord")
+    record_creator.get_or_create_version(GrantaServerApiVersionState.SUPERSEDED, 1)
+    return RecordListItem(
+        database_guid=record_creator.database_guid,
+        table_guid=record_creator.table_guid,
+        record_history_guid=record_creator.history_guid,
+        record_version=1,
+    )
+
+
+@pytest.fixture(scope="session")
+def draft_superseded_item(admin_client) -> RecordListItem:
+    """
+    History
+    |
+    |-- Version 1 (released) *
+    |-- Version 2 (unreleased)
+    """
+    record_creator = RecordCreator(admin_client, DB_KEY, TABLE_NAME, "DraftSupersededRecord")
+    record_creator.get_or_create_version(GrantaServerApiVersionState.RELEASED, 1)
+    return RecordListItem(
+        database_guid=record_creator.database_guid,
+        table_guid=record_creator.table_guid,
+        record_history_guid=record_creator.history_guid,
+        record_version=1,
+    )
+
+
+@pytest.fixture(scope="session")
+def draft_superseding_item(admin_client) -> RecordListItem:
+    """
+    History
+    |
+    |-- Version 1 (released)
+    |-- Version 2 (unreleased) *
+    """
+    record_creator = RecordCreator(admin_client, DB_KEY, TABLE_NAME, "DraftSupersededRecord")
+    record_creator.get_or_create_version(GrantaServerApiVersionState.UNRELEASED, 2)
+    return RecordListItem(
+        database_guid=record_creator.database_guid,
+        table_guid=record_creator.table_guid,
+        record_history_guid=record_creator.history_guid,
+        record_version=2,
+    )
 
 
 @pytest.fixture
 def new_admin_list_with_one_unreleased_item(admin_client, new_list, unreleased_item) -> RecordList:
-    items = [unreleased_item]
-    admin_client.add_items_to_list(new_list, items)
+    """
+    History
+    |
+    |-- Version 1 (unreleased) *
+    """
+    admin_client.add_items_to_list(new_list, [unreleased_item])
     return new_list
 
 
@@ -317,20 +285,28 @@ def new_admin_list_with_one_unreleased_item(admin_client, new_list, unreleased_i
 def new_admin_list_with_one_unreleased_item_by_history(
     admin_client, new_list, unreleased_item
 ) -> RecordList:
+    """
+    History
+    |
+    |-- Version 1 (unreleased) *
+    """
     item = RecordListItem(
         database_guid=unreleased_item.database_guid,
         table_guid=unreleased_item.table_guid,
         record_history_guid=unreleased_item.record_history_guid,
     )
-    items = [item]
-    admin_client.add_items_to_list(new_list, items)
+    admin_client.add_items_to_list(new_list, [item])
     return new_list
 
 
 @pytest.fixture
 def new_admin_list_with_one_released_item(admin_client, new_list, released_item) -> RecordList:
-    items = [released_item]
-    admin_client.add_items_to_list(new_list, items)
+    """
+    History
+    |
+    |-- Version 1 (released) *
+    """
+    admin_client.add_items_to_list(new_list, [released_item])
     return new_list
 
 
@@ -338,20 +314,29 @@ def new_admin_list_with_one_released_item(admin_client, new_list, released_item)
 def new_admin_list_with_one_released_item_by_history(
     admin_client, new_list, released_item
 ) -> RecordList:
+    """
+    History
+    |
+    |-- Version 1 (released) *
+    """
     item = RecordListItem(
         database_guid=released_item.database_guid,
         table_guid=released_item.table_guid,
         record_history_guid=released_item.record_history_guid,
     )
-    items = [item]
-    admin_client.add_items_to_list(new_list, items)
+    admin_client.add_items_to_list(new_list, [item])
     return new_list
 
 
 @pytest.fixture
 def new_admin_list_with_one_superseded_item(admin_client, new_list, superseded_item) -> RecordList:
-    items = [superseded_item]
-    admin_client.add_items_to_list(new_list, items)
+    """
+    History
+    |
+    |-- Version 1 (superseded) *
+    |-- Version 2 (released)
+    """
+    admin_client.add_items_to_list(new_list, [superseded_item])
     return new_list
 
 
@@ -359,13 +344,18 @@ def new_admin_list_with_one_superseded_item(admin_client, new_list, superseded_i
 def new_admin_list_with_one_superseded_item_by_history(
     admin_client, new_list, superseded_item
 ) -> RecordList:
+    """
+    History
+    |
+    |-- Version 1 (superseded) *
+    |-- Version 2 (released)
+    """
     item = RecordListItem(
         database_guid=superseded_item.database_guid,
         table_guid=superseded_item.table_guid,
         record_history_guid=superseded_item.record_history_guid,
     )
-    items = [item]
-    admin_client.add_items_to_list(new_list, items)
+    admin_client.add_items_to_list(new_list, [item])
     return new_list
 
 
@@ -373,8 +363,13 @@ def new_admin_list_with_one_superseded_item_by_history(
 def new_admin_list_with_one_draft_superseded_item(
     admin_client, new_list, draft_superseded_item
 ) -> RecordList:
-    items = [draft_superseded_item]
-    admin_client.add_items_to_list(new_list, items)
+    """
+    History
+    |
+    |-- Version 1 (released) *
+    |-- Version 2 (unreleased)
+    """
+    admin_client.add_items_to_list(new_list, [draft_superseded_item])
     return new_list
 
 
@@ -382,13 +377,51 @@ def new_admin_list_with_one_draft_superseded_item(
 def new_admin_list_with_one_draft_superseded_item_by_history(
     admin_client, new_list, draft_superseded_item
 ) -> RecordList:
+    """
+    History
+    |
+    |-- Version 1 (released) *
+    |-- Version 2 (unreleased)
+    """
     item = RecordListItem(
         database_guid=draft_superseded_item.database_guid,
         table_guid=draft_superseded_item.table_guid,
         record_history_guid=draft_superseded_item.record_history_guid,
     )
-    items = [item]
-    admin_client.add_items_to_list(new_list, items)
+    admin_client.add_items_to_list(new_list, [item])
+    return new_list
+
+
+@pytest.fixture
+def new_admin_list_with_one_draft_superseding_item(
+    admin_client, new_list, draft_superseding_item
+) -> RecordList:
+    """
+    History
+    |
+    |-- Version 1 (released)
+    |-- Version 2 (unreleased) *
+    """
+    admin_client.add_items_to_list(new_list, [draft_superseding_item])
+    return new_list
+
+
+@pytest.fixture
+def new_admin_list_with_one_draft_superseding_item_by_history(
+    admin_client, new_list, draft_superseding_item
+) -> RecordList:
+    """
+    History
+    |
+    |-- Version 1 (released)
+    |-- Version 2 (unreleased) *
+    """
+    item = RecordListItem(
+        database_guid=draft_superseding_item.database_guid,
+        table_guid=draft_superseding_item.table_guid,
+        record_history_guid=draft_superseding_item.record_history_guid,
+    )
+    admin_client.add_items_to_list(new_list, [item])
     return new_list
 
 
@@ -409,8 +442,12 @@ def new_basic_list(basic_client, request, list_name) -> RecordList:
 def new_basic_list_with_one_unreleased_item(
     basic_client, new_basic_list, unreleased_item
 ) -> RecordList:
-    items = [unreleased_item]
-    basic_client.add_items_to_list(new_basic_list, items)
+    """
+    History
+    |
+    |-- Version 1 (unreleased) *
+    """
+    basic_client.add_items_to_list(new_basic_list, [unreleased_item])
     return new_basic_list
 
 
@@ -418,13 +455,17 @@ def new_basic_list_with_one_unreleased_item(
 def new_basic_list_with_one_unreleased_item_by_history(
     basic_client, new_basic_list, unreleased_item
 ) -> RecordList:
+    """
+    History
+    |
+    |-- Version 1 (unreleased) *
+    """
     item = RecordListItem(
         database_guid=unreleased_item.database_guid,
         table_guid=unreleased_item.table_guid,
         record_history_guid=unreleased_item.record_history_guid,
     )
-    items = [item]
-    basic_client.add_items_to_list(new_basic_list, items)
+    basic_client.add_items_to_list(new_basic_list, [item])
     return new_basic_list
 
 
@@ -432,8 +473,12 @@ def new_basic_list_with_one_unreleased_item_by_history(
 def new_basic_list_with_one_released_item(
     basic_client, new_basic_list, released_item
 ) -> RecordList:
-    items = [released_item]
-    basic_client.add_items_to_list(new_basic_list, items)
+    """
+    History
+    |
+    |-- Version 1 (released) *
+    """
+    basic_client.add_items_to_list(new_basic_list, [released_item])
     return new_basic_list
 
 
@@ -441,13 +486,17 @@ def new_basic_list_with_one_released_item(
 def new_basic_list_with_one_released_item_by_history(
     basic_client, new_basic_list, released_item
 ) -> RecordList:
+    """
+    History
+    |
+    |-- Version 1 (released) *
+    """
     item = RecordListItem(
         database_guid=released_item.database_guid,
         table_guid=released_item.table_guid,
         record_history_guid=released_item.record_history_guid,
     )
-    items = [item]
-    basic_client.add_items_to_list(new_basic_list, items)
+    basic_client.add_items_to_list(new_basic_list, [item])
     return new_basic_list
 
 
@@ -455,8 +504,13 @@ def new_basic_list_with_one_released_item_by_history(
 def new_basic_list_with_one_superseded_item(
     basic_client, new_basic_list, superseded_item
 ) -> RecordList:
-    items = [superseded_item]
-    basic_client.add_items_to_list(new_basic_list, items)
+    """
+    History
+    |
+    |-- Version 1 (superseded) *
+    |-- Version 2 (released)
+    """
+    basic_client.add_items_to_list(new_basic_list, [superseded_item])
     return new_basic_list
 
 
@@ -464,13 +518,18 @@ def new_basic_list_with_one_superseded_item(
 def new_basic_list_with_one_superseded_item_by_history(
     basic_client, new_basic_list, superseded_item
 ) -> RecordList:
+    """
+    History
+    |
+    |-- Version 1 (superseded) *
+    |-- Version 2 (released)
+    """
     item = RecordListItem(
         database_guid=superseded_item.database_guid,
         table_guid=superseded_item.table_guid,
         record_history_guid=superseded_item.record_history_guid,
     )
-    items = [item]
-    basic_client.add_items_to_list(new_basic_list, items)
+    basic_client.add_items_to_list(new_basic_list, [item])
     return new_basic_list
 
 
@@ -478,8 +537,13 @@ def new_basic_list_with_one_superseded_item_by_history(
 def new_basic_list_with_one_draft_superseded_item(
     basic_client, new_basic_list, draft_superseded_item
 ) -> RecordList:
-    items = [draft_superseded_item]
-    basic_client.add_items_to_list(new_basic_list, items)
+    """
+    History
+    |
+    |-- Version 1 (released) *
+    |-- Version 2 (unreleased)
+    """
+    basic_client.add_items_to_list(new_basic_list, [draft_superseded_item])
     return new_basic_list
 
 
@@ -487,13 +551,51 @@ def new_basic_list_with_one_draft_superseded_item(
 def new_basic_list_with_one_draft_superseded_item_by_history(
     basic_client, new_basic_list, draft_superseded_item
 ) -> RecordList:
+    """
+    History
+    |
+    |-- Version 1 (released) *
+    |-- Version 2 (unreleased)
+    """
     item = RecordListItem(
         database_guid=draft_superseded_item.database_guid,
         table_guid=draft_superseded_item.table_guid,
         record_history_guid=draft_superseded_item.record_history_guid,
     )
-    items = [item]
-    basic_client.add_items_to_list(new_basic_list, items)
+    basic_client.add_items_to_list(new_basic_list, [item])
+    return new_basic_list
+
+
+@pytest.fixture
+def new_basic_list_with_one_draft_superseding_item(
+    basic_client, new_basic_list, draft_superseding_item
+) -> RecordList:
+    """
+    History
+    |
+    |-- Version 1 (released)
+    |-- Version 2 (unreleased) *
+    """
+    basic_client.add_items_to_list(new_basic_list, [draft_superseding_item])
+    return new_basic_list
+
+
+@pytest.fixture
+def new_basic_list_with_one_draft_superseding_item_by_history(
+    basic_client, new_basic_list, draft_superseding_item
+) -> RecordList:
+    """
+    History
+    |
+    |-- Version 1 (released)
+    |-- Version 2 (unreleased) *
+    """
+    item = RecordListItem(
+        database_guid=draft_superseding_item.database_guid,
+        table_guid=draft_superseding_item.table_guid,
+        record_history_guid=draft_superseding_item.record_history_guid,
+    )
+    basic_client.add_items_to_list(new_basic_list, [item])
     return new_basic_list
 
 

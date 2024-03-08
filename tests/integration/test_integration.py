@@ -142,10 +142,10 @@ class TestItemResolvability:
 
 
 class TestItemResolvabilityVersionControl:
-    """12 test cases
+    """15 test cases
 
     [Admin user, Admin user read mode, Read user] x
-    [Unreleased, Released, Draft superseded, Superseded]
+    [Unreleased, Released, Draft superseded, Draft superseding, Superseded]
     """
 
     @staticmethod
@@ -162,7 +162,7 @@ class TestItemResolvabilityVersionControl:
         assert isinstance(record_list_items, list)
         assert len(record_list_items) == 0
 
-    def test_admin_user_resolve_unreleased_item(
+    def test_admin_user_can_resolve_unreleased_item(
         self, admin_client, new_admin_list_with_one_unreleased_item
     ):
         record_list_items = admin_client.get_resolvable_list_items(
@@ -170,7 +170,7 @@ class TestItemResolvabilityVersionControl:
         )
         self.check_resolved_record(record_list_items, record_version=1, record_guid_check=False)
 
-    def test_admin_user_resolve_released_item(
+    def test_admin_user_can_resolve_released_item(
         self, admin_client, new_admin_list_with_one_released_item
     ):
         record_list_items = admin_client.get_resolvable_list_items(
@@ -178,15 +178,23 @@ class TestItemResolvabilityVersionControl:
         )
         self.check_resolved_record(record_list_items, record_version=1)
 
-    def test_admin_user_resolve_draft_superseded_item(
+    def test_admin_user_can_resolve_draft_superseded_item(
         self, admin_client, new_admin_list_with_one_draft_superseded_item
     ):
         record_list_items = admin_client.get_resolvable_list_items(
             new_admin_list_with_one_draft_superseded_item
         )
+        self.check_resolved_record(record_list_items, record_version=1)
+
+    def test_admin_user_can_resolve_draft_superseding_item(
+        self, admin_client, new_admin_list_with_one_draft_superseding_item
+    ):
+        record_list_items = admin_client.get_resolvable_list_items(
+            new_admin_list_with_one_draft_superseding_item
+        )
         self.check_resolved_record(record_list_items, record_version=2, record_guid_check=False)
 
-    def test_admin_user_resolve_superseded_item(
+    def test_admin_user_can_resolve_superseded_item(
         self, admin_client, new_admin_list_with_one_superseded_item
     ):
         record_list_items = admin_client.get_resolvable_list_items(
@@ -203,7 +211,7 @@ class TestItemResolvabilityVersionControl:
         )
         self.check_unresolved_record(record_list_items)
 
-    def test_admin_user_read_mode_resolve_released_item(
+    def test_admin_user_read_mode_can_resolve_released_item(
         self, admin_client, new_admin_list_with_one_released_item
     ):
         record_list_items = admin_client.get_resolvable_list_items(
@@ -212,17 +220,25 @@ class TestItemResolvabilityVersionControl:
         )
         self.check_resolved_record(record_list_items, record_version=1)
 
-    def test_admin_user_read_mode_cannot_resolve_draft_superseded_item(
+    def test_admin_user_read_mode_can_resolve_draft_superseded_item(
         self, admin_client, new_admin_list_with_one_draft_superseded_item
     ):
         record_list_items = admin_client.get_resolvable_list_items(
             new_admin_list_with_one_draft_superseded_item,
             read_mode=True,
         )
-        # Does not fall back to v1, since v2 was explicitly specified
+        self.check_resolved_record(record_list_items, record_version=1)
+
+    def test_admin_user_read_mode_cannot_resolve_draft_superseding_item(
+        self, admin_client, new_admin_list_with_one_draft_superseding_item
+    ):
+        record_list_items = admin_client.get_resolvable_list_items(
+            new_admin_list_with_one_draft_superseding_item,
+            read_mode=True,
+        )
         self.check_unresolved_record(record_list_items)
 
-    def test_admin_user_read_mode_resolve_superseded_item(
+    def test_admin_user_read_mode_can_resolve_superseded_item(
         self, admin_client, new_admin_list_with_one_superseded_item
     ):
         record_list_items = admin_client.get_resolvable_list_items(
@@ -239,7 +255,7 @@ class TestItemResolvabilityVersionControl:
         )
         self.check_unresolved_record(record_list_items)
 
-    def test_read_user_resolve_released_item(
+    def test_read_user_can_resolve_released_item(
         self, basic_client, new_basic_list_with_one_released_item
     ):
         record_list_items = basic_client.get_resolvable_list_items(
@@ -247,16 +263,23 @@ class TestItemResolvabilityVersionControl:
         )
         self.check_resolved_record(record_list_items, record_version=1)
 
-    def test_read_user_cannot_resolve_draft_superseded_item(
+    def test_read_user_can_resolve_draft_superseded_item(
         self, basic_client, new_basic_list_with_one_draft_superseded_item
     ):
         record_list_items = basic_client.get_resolvable_list_items(
             new_basic_list_with_one_draft_superseded_item,
         )
-        # Does not fall back to v1, since v2 was explicitly specified
+        self.check_resolved_record(record_list_items, record_version=1)
+
+    def test_read_user_cannot_resolve_draft_superseding_item(
+        self, basic_client, new_basic_list_with_one_draft_superseding_item
+    ):
+        record_list_items = basic_client.get_resolvable_list_items(
+            new_basic_list_with_one_draft_superseding_item
+        )
         self.check_unresolved_record(record_list_items)
 
-    def test_read_user_resolve_superseded_item(
+    def test_read_user_can_resolve_superseded_item(
         self, basic_client, new_basic_list_with_one_superseded_item
     ):
         record_list_items = basic_client.get_resolvable_list_items(
@@ -266,10 +289,10 @@ class TestItemResolvabilityVersionControl:
 
 
 class TestItemResolvabilityVersionControlByHistory:
-    """12 test cases
+    """15 test cases
 
     [Admin user, Admin user read mode, Read user] x
-    [Unreleased, Released, Draft superseded, Superseded]
+    [Unreleased, Released, Draft superseded, Draft superseding, Superseded]
     """
 
     @staticmethod
@@ -285,7 +308,7 @@ class TestItemResolvabilityVersionControlByHistory:
         assert isinstance(record_list_items, list)
         assert len(record_list_items) == 0
 
-    def test_admin_user_resolve_unreleased_item_by_history(
+    def test_admin_user_can_resolve_unreleased_item_by_history(
         self, admin_client, new_admin_list_with_one_unreleased_item_by_history
     ):
         record_list_items = admin_client.get_resolvable_list_items(
@@ -293,7 +316,7 @@ class TestItemResolvabilityVersionControlByHistory:
         )
         self.check_resolved_record(record_list_items)
 
-    def test_admin_user_resolve_released_item_by_history(
+    def test_admin_user_can_resolve_released_item_by_history(
         self, admin_client, new_admin_list_with_one_released_item_by_history
     ):
         record_list_items = admin_client.get_resolvable_list_items(
@@ -301,7 +324,7 @@ class TestItemResolvabilityVersionControlByHistory:
         )
         self.check_resolved_record(record_list_items)
 
-    def test_admin_user_resolve_draft_superseded_item_by_history(
+    def test_admin_user_can_resolve_draft_superseded_item_by_history(
         self, admin_client, new_admin_list_with_one_draft_superseded_item_by_history
     ):
         record_list_items = admin_client.get_resolvable_list_items(
@@ -309,7 +332,15 @@ class TestItemResolvabilityVersionControlByHistory:
         )
         self.check_resolved_record(record_list_items)
 
-    def test_admin_user_resolve_superseded_item_by_history(
+    def test_admin_user_can_resolve_draft_superseding_item_by_history(
+        self, admin_client, new_admin_list_with_one_draft_superseding_item_by_history
+    ):
+        record_list_items = admin_client.get_resolvable_list_items(
+            new_admin_list_with_one_draft_superseding_item_by_history
+        )
+        self.check_resolved_record(record_list_items)
+
+    def test_admin_user_can_resolve_superseded_item_by_history(
         self, admin_client, new_admin_list_with_one_superseded_item_by_history
     ):
         record_list_items = admin_client.get_resolvable_list_items(
@@ -326,7 +357,7 @@ class TestItemResolvabilityVersionControlByHistory:
         )
         self.check_unresolved_record(record_list_items)
 
-    def test_admin_user_read_mode_resolve_released_item_by_history(
+    def test_admin_user_read_mode_can_resolve_released_item_by_history(
         self, admin_client, new_admin_list_with_one_released_item_by_history
     ):
         record_list_items = admin_client.get_resolvable_list_items(
@@ -335,7 +366,7 @@ class TestItemResolvabilityVersionControlByHistory:
         )
         self.check_resolved_record(record_list_items)
 
-    def test_admin_user_read_mode_resolve_draft_superseded_item_by_history(
+    def test_admin_user_read_mode_can_resolve_draft_superseded_item_by_history(
         self, admin_client, new_admin_list_with_one_draft_superseded_item_by_history
     ):
         record_list_items = admin_client.get_resolvable_list_items(
@@ -345,7 +376,17 @@ class TestItemResolvabilityVersionControlByHistory:
         # Falls back to v1
         self.check_resolved_record(record_list_items)
 
-    def test_admin_user_read_mode_resolve_superseded_item_by_history(
+    def test_admin_user_read_mode_cannot_resolve_draft_superseding_item_by_history(
+        self, admin_client, new_admin_list_with_one_draft_superseding_item_by_history
+    ):
+        record_list_items = admin_client.get_resolvable_list_items(
+            new_admin_list_with_one_draft_superseding_item_by_history,
+            read_mode=True,
+        )
+        # Resolves v1
+        self.check_resolved_record(record_list_items)
+
+    def test_admin_user_read_mode_can_resolve_superseded_item_by_history(
         self, admin_client, new_admin_list_with_one_superseded_item_by_history
     ):
         record_list_items = admin_client.get_resolvable_list_items(
@@ -362,7 +403,7 @@ class TestItemResolvabilityVersionControlByHistory:
         )
         self.check_unresolved_record(record_list_items)
 
-    def test_read_user_resolve_released_item_by_history(
+    def test_read_user_can_resolve_released_item_by_history(
         self, basic_client, new_basic_list_with_one_released_item_by_history
     ):
         record_list_items = basic_client.get_resolvable_list_items(
@@ -370,7 +411,7 @@ class TestItemResolvabilityVersionControlByHistory:
         )
         self.check_resolved_record(record_list_items)
 
-    def test_read_user_resolve_draft_superseded_item_by_history(
+    def test_read_user_can_resolve_draft_superseded_item_by_history(
         self, basic_client, new_basic_list_with_one_draft_superseded_item_by_history
     ):
         record_list_items = basic_client.get_resolvable_list_items(
@@ -379,7 +420,16 @@ class TestItemResolvabilityVersionControlByHistory:
         # Falls back to v1
         self.check_resolved_record(record_list_items)
 
-    def test_read_user_resolve_superseded_item_by_history(
+    def test_read_user_cannot_resolve_draft_superseding_item_by_history(
+        self, basic_client, new_basic_list_with_one_draft_superseding_item_by_history
+    ):
+        record_list_items = basic_client.get_resolvable_list_items(
+            new_basic_list_with_one_draft_superseding_item_by_history,
+        )
+        # Resolves v1
+        self.check_resolved_record(record_list_items)
+
+    def test_read_user_can_resolve_superseded_item_by_history(
         self, basic_client, new_basic_list_with_one_superseded_item_by_history
     ):
         record_list_items = basic_client.get_resolvable_list_items(
