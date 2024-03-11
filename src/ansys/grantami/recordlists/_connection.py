@@ -208,7 +208,7 @@ class RecordListsApiClient(ApiClient):  # type: ignore[misc]
           * It has been deleted
           * It has been withdrawn and the user is a read user (version-controlled tables only)
           * It only has one unreleased version and the user is a read user (version-controlled
-          tables only)
+            tables only)
           * It is hidden by access control
 
         * If the item specifies a version, this method tests if the user can access that specific
