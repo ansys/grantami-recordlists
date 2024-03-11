@@ -202,23 +202,22 @@ class RecordListsApiClient(ApiClient):  # type: ignore[misc]
         a brief summary:
 
         * If the item doesn't specify a version, this method tests if the user can access either the
-          record or, if in a version-controlled table, a version of the record in any state. The
-          resolution will not succeed if:
+          record or, if in a version-controlled table, a version of the record in any state. A
+          record cannot be resolved if:
 
-          * The record has been deleted
-          * The record has been withdrawn and the user is a read user (version-controlled tables
-            only)
-          * The record only has one unreleased version and the user is a read user (version-
-            controlled tables only)
-          * The record is hidden by access control
+          * It has been deleted
+          * It has been withdrawn and the user is a read user (version-controlled tables only)
+          * It only has one unreleased version and the user is a read user (version-controlled
+          tables only)
+          * It is hidden by access control
 
         * If the item specifies a version, this method tests if the user can access that specific
-          version of the record. This condition only applies to version-controlled tables. The
-          resolution will not succeed if:
+          version of the record. This condition only applies to version-controlled tables. A
+          record version cannot be resolved if:
 
-          * The record version is unreleased and the user is a read user
-          * The record version has been withdrawn and the user is a read user
-          * The record or record version is hidden by access control
+          * It is unreleased and the user is a read user
+          * It has been withdrawn and the user is a read user
+          * It is hidden by access control
 
         Since version control and access control is intended to allow and restrict access to records
         for certain groups of users, this method may return different results for different users
@@ -661,9 +660,9 @@ class _ItemResolver:
         except ApiException as e:
             if e.status_code != 404:
                 raise
+            return False
         else:
             return True
-        return False
 
 
 class Connection(ApiClientFactory):  # type: ignore[misc]
