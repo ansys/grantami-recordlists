@@ -1,6 +1,4 @@
-# Authors
-
-## Project Lead or Owner
+## Project Lead
 
 * [Andy Grigg](https://github.com/Andy-Grigg)
 
