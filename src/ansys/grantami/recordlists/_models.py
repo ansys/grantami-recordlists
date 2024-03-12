@@ -188,8 +188,11 @@ class RecordListItem:
     """
     Describes a :class:`RecordList` item, generally a reference to a record in a Granta MI database.
 
-    The record is not guaranteed to exist. Care should be taken to ensure that the reference to the
-    record is valid before using it.
+    If this item was returned by the :meth:`.RecordListsApiClient.get_resolvable_list_items` method,
+    then it guaranteed to be resolvable by the current user at the time it was generated. If this
+    item was returned by the :meth:`.RecordListsApiClient.get_list_items` then it is not guaranteed
+    to be resolvable and care should be taken to ensure that the reference to the record is valid
+    before using it.
 
     Parameters
     ----------

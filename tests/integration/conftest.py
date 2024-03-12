@@ -1,38 +1,50 @@
 import os
+from typing import Dict, List
 import uuid
 
+from ansys.grantami.serverapi_openapi.api import SchemaDatabasesApi, SearchApi
+from ansys.grantami.serverapi_openapi.models import (
+    GrantaServerApiSearchDiscreteTextValuesDatumCriterion,
+    GrantaServerApiSearchRecordPropertyCriterion,
+    GrantaServerApiSearchSearchableRecordProperty,
+    GrantaServerApiSearchSearchRequest,
+    GrantaServerApiVersionState,
+)
+from common import DB_KEY, TABLE_NAME, RecordCreator
 import pytest
 
-from ansys.grantami.recordlists import Connection
+from ansys.grantami.recordlists import Connection, RecordList, RecordListItem, RecordListsApiClient
 
 
 @pytest.fixture(scope="session")
-def sl_url():
+def sl_url() -> str:
     return os.getenv("TEST_SL_URL", "http://localhost/mi_servicelayer")
 
 
 @pytest.fixture(scope="session")
-def list_admin_username():
+def list_admin_username() -> str:
     return os.getenv("TEST_LIST_ADMIN_USER")
 
 
 @pytest.fixture(scope="session")
-def list_admin_password():
+def list_admin_password() -> str:
     return os.getenv("TEST_LIST_ADMIN_PASS")
 
 
 @pytest.fixture(scope="session")
-def list_username_no_permissions():
+def list_username_no_permissions() -> str:
     return os.getenv("TEST_LIST_USER")
 
 
 @pytest.fixture(scope="session")
-def list_password_no_permissions():
+def list_password_no_permissions() -> str:
     return os.getenv("TEST_LIST_PASS")
 
 
 @pytest.fixture(scope="session")
-def admin_client(sl_url, list_admin_username, list_admin_password, list_name):
+def admin_client(
+    sl_url, list_admin_username, list_admin_password, list_name
+) -> RecordListsApiClient:
     """
     Fixture providing a real ApiClient to run integration tests against an instance of Granta MI
     Server API.
@@ -49,7 +61,9 @@ def admin_client(sl_url, list_admin_username, list_admin_password, list_name):
 
 
 @pytest.fixture(scope="session")
-def basic_client(sl_url, list_username_no_permissions, list_password_no_permissions, list_name):
+def basic_client(
+    sl_url, list_username_no_permissions, list_password_no_permissions, list_name
+) -> RecordListsApiClient:
     """
     Fixture providing a real ApiClient to run integration tests against an instance of Granta MI
     Server API.
@@ -69,14 +83,14 @@ def basic_client(sl_url, list_username_no_permissions, list_password_no_permissi
 
 
 @pytest.fixture(scope="session")
-def unique_id():
+def unique_id() -> uuid.UUID:
     """Generate a unique id for the test session. Used to keep track of record lists created
     during the session"""
     return uuid.uuid4()
 
 
 @pytest.fixture(scope="session")
-def list_name(unique_id):
+def list_name(unique_id) -> str:
     """
     Provides a name for new lists. All lists created with this name are deleted on teardown of
     `api_client`.
@@ -86,7 +100,7 @@ def list_name(unique_id):
 
 
 @pytest.fixture
-def new_list(admin_client, request, list_name):
+def new_list(admin_client, request, list_name) -> RecordList:
     """
     Provides the identifier of newly created list.
     The created list include the name of the calling test as a `description`.
@@ -99,14 +113,494 @@ def new_list(admin_client, request, list_name):
 
 
 @pytest.fixture
-def new_list_with_items(admin_client, new_list, example_item):
-    items = [example_item]
+def new_list_with_one_unresolvable_item(admin_client, new_list, unresolvable_item) -> RecordList:
+    items = [unresolvable_item]
     admin_client.add_items_to_list(new_list, items)
     return new_list
 
 
+@pytest.fixture
+def new_list_with_many_unresolvable_items(
+    admin_client, new_list, many_unresolvable_items
+) -> RecordList:
+    admin_client.add_items_to_list(new_list, many_unresolvable_items)
+    return new_list
+
+
+@pytest.fixture(scope="session")
+def db_key_to_guid_map(admin_client) -> Dict[str, str]:
+    """Provides a map between database key and database guid."""
+    schema_api = SchemaDatabasesApi(admin_client)
+    dbs = schema_api.get_all_databases()
+    return {db.key: db.guid for db in dbs.databases}
+
+
+@pytest.fixture(scope="session")
+def resolvable_items(admin_client, db_key_to_guid_map) -> List[RecordListItem]:
+    """Get all records in the MI_Training database and use them to create
+    a list of RecordListItems which can be added to a list."""
+    search_api = SearchApi(admin_client)
+    search_body = GrantaServerApiSearchSearchRequest(
+        criterion=GrantaServerApiSearchRecordPropertyCriterion(
+            _property=GrantaServerApiSearchSearchableRecordProperty.RECORDTYPE,
+            inner_criterion=GrantaServerApiSearchDiscreteTextValuesDatumCriterion(
+                any=["Record", "Generic", "Folder"],
+            ),
+        )
+    )
+    search_results = search_api.database_search(
+        database_key=DB_KEY,
+        body=search_body,
+    )
+    return [
+        RecordListItem(
+            db_key_to_guid_map[result.database_key],
+            result.table_guid,
+            result.record_history_guid,
+        )
+        for result in search_results.results
+    ]
+
+
+@pytest.fixture
+def new_list_with_one_resolvable_item(admin_client, new_list, resolvable_items) -> RecordList:
+    admin_client.add_items_to_list(new_list, [resolvable_items[0]])
+    return new_list
+
+
+@pytest.fixture
+def new_list_with_many_resolvable_items(admin_client, new_list, resolvable_items) -> RecordList:
+    admin_client.add_items_to_list(new_list, resolvable_items)
+    return new_list
+
+
+@pytest.fixture
+def new_list_with_many_resolvable_and_unresolvable_items(
+    admin_client, new_list, resolvable_items, many_unresolvable_items
+) -> RecordList:
+    admin_client.add_items_to_list(new_list, resolvable_items + many_unresolvable_items)
+    return new_list
+
+
+@pytest.fixture(scope="session")
+def unreleased_item(admin_client) -> RecordListItem:
+    """
+    History
+    |
+    |-- Version 1 (unreleased) *
+    """
+    record_creator = RecordCreator(admin_client, DB_KEY, TABLE_NAME, "UnreleasedRecord")
+    record_creator.get_or_create_version(GrantaServerApiVersionState.UNRELEASED, 1)
+    return RecordListItem(
+        database_guid=record_creator.database_guid,
+        table_guid=record_creator.table_guid,
+        record_history_guid=record_creator.history_guid,
+        record_version=1,
+    )
+
+
+@pytest.fixture(scope="session")
+def released_item(admin_client) -> RecordListItem:
+    """
+    History
+    |
+    |-- Version 1 (released) *
+    """
+    record_creator = RecordCreator(admin_client, DB_KEY, TABLE_NAME, "ReleasedRecord")
+    record_creator.get_or_create_version(GrantaServerApiVersionState.RELEASED, 1)
+    return RecordListItem(
+        database_guid=record_creator.database_guid,
+        table_guid=record_creator.table_guid,
+        record_history_guid=record_creator.history_guid,
+        record_version=1,
+    )
+
+
+@pytest.fixture(scope="session")
+def superseded_item(admin_client) -> RecordListItem:
+    """
+    History
+    |
+    |-- Version 1 (superseded) *
+    |-- Version 2 (released)
+    """
+    record_creator = RecordCreator(admin_client, DB_KEY, TABLE_NAME, "SupersededRecord")
+    record_creator.get_or_create_version(GrantaServerApiVersionState.SUPERSEDED, 1)
+    return RecordListItem(
+        database_guid=record_creator.database_guid,
+        table_guid=record_creator.table_guid,
+        record_history_guid=record_creator.history_guid,
+        record_version=1,
+    )
+
+
+@pytest.fixture(scope="session")
+def draft_superseded_item(admin_client) -> RecordListItem:
+    """
+    History
+    |
+    |-- Version 1 (released) *
+    |-- Version 2 (unreleased)
+    """
+    record_creator = RecordCreator(admin_client, DB_KEY, TABLE_NAME, "DraftSupersededRecord")
+    record_creator.get_or_create_version(GrantaServerApiVersionState.RELEASED, 1)
+    return RecordListItem(
+        database_guid=record_creator.database_guid,
+        table_guid=record_creator.table_guid,
+        record_history_guid=record_creator.history_guid,
+        record_version=1,
+    )
+
+
+@pytest.fixture(scope="session")
+def draft_superseding_item(admin_client) -> RecordListItem:
+    """
+    History
+    |
+    |-- Version 1 (released)
+    |-- Version 2 (unreleased) *
+    """
+    record_creator = RecordCreator(admin_client, DB_KEY, TABLE_NAME, "DraftSupersededRecord")
+    record_creator.get_or_create_version(GrantaServerApiVersionState.UNRELEASED, 2)
+    return RecordListItem(
+        database_guid=record_creator.database_guid,
+        table_guid=record_creator.table_guid,
+        record_history_guid=record_creator.history_guid,
+        record_version=2,
+    )
+
+
+@pytest.fixture
+def new_admin_list_with_one_unreleased_item(admin_client, new_list, unreleased_item) -> RecordList:
+    """
+    History
+    |
+    |-- Version 1 (unreleased) *
+    """
+    admin_client.add_items_to_list(new_list, [unreleased_item])
+    return new_list
+
+
+@pytest.fixture
+def new_admin_list_with_one_unreleased_item_by_history(
+    admin_client, new_list, unreleased_item
+) -> RecordList:
+    """
+    History
+    |
+    |-- Version 1 (unreleased) *
+    """
+    item = RecordListItem(
+        database_guid=unreleased_item.database_guid,
+        table_guid=unreleased_item.table_guid,
+        record_history_guid=unreleased_item.record_history_guid,
+    )
+    admin_client.add_items_to_list(new_list, [item])
+    return new_list
+
+
+@pytest.fixture
+def new_admin_list_with_one_released_item(admin_client, new_list, released_item) -> RecordList:
+    """
+    History
+    |
+    |-- Version 1 (released) *
+    """
+    admin_client.add_items_to_list(new_list, [released_item])
+    return new_list
+
+
+@pytest.fixture
+def new_admin_list_with_one_released_item_by_history(
+    admin_client, new_list, released_item
+) -> RecordList:
+    """
+    History
+    |
+    |-- Version 1 (released) *
+    """
+    item = RecordListItem(
+        database_guid=released_item.database_guid,
+        table_guid=released_item.table_guid,
+        record_history_guid=released_item.record_history_guid,
+    )
+    admin_client.add_items_to_list(new_list, [item])
+    return new_list
+
+
+@pytest.fixture
+def new_admin_list_with_one_superseded_item(admin_client, new_list, superseded_item) -> RecordList:
+    """
+    History
+    |
+    |-- Version 1 (superseded) *
+    |-- Version 2 (released)
+    """
+    admin_client.add_items_to_list(new_list, [superseded_item])
+    return new_list
+
+
+@pytest.fixture
+def new_admin_list_with_one_superseded_item_by_history(
+    admin_client, new_list, superseded_item
+) -> RecordList:
+    """
+    History
+    |
+    |-- Version 1 (superseded) *
+    |-- Version 2 (released)
+    """
+    item = RecordListItem(
+        database_guid=superseded_item.database_guid,
+        table_guid=superseded_item.table_guid,
+        record_history_guid=superseded_item.record_history_guid,
+    )
+    admin_client.add_items_to_list(new_list, [item])
+    return new_list
+
+
+@pytest.fixture
+def new_admin_list_with_one_draft_superseded_item(
+    admin_client, new_list, draft_superseded_item
+) -> RecordList:
+    """
+    History
+    |
+    |-- Version 1 (released) *
+    |-- Version 2 (unreleased)
+    """
+    admin_client.add_items_to_list(new_list, [draft_superseded_item])
+    return new_list
+
+
+@pytest.fixture
+def new_admin_list_with_one_draft_superseded_item_by_history(
+    admin_client, new_list, draft_superseded_item
+) -> RecordList:
+    """
+    History
+    |
+    |-- Version 1 (released) *
+    |-- Version 2 (unreleased)
+    """
+    item = RecordListItem(
+        database_guid=draft_superseded_item.database_guid,
+        table_guid=draft_superseded_item.table_guid,
+        record_history_guid=draft_superseded_item.record_history_guid,
+    )
+    admin_client.add_items_to_list(new_list, [item])
+    return new_list
+
+
+@pytest.fixture
+def new_admin_list_with_one_draft_superseding_item(
+    admin_client, new_list, draft_superseding_item
+) -> RecordList:
+    """
+    History
+    |
+    |-- Version 1 (released)
+    |-- Version 2 (unreleased) *
+    """
+    admin_client.add_items_to_list(new_list, [draft_superseding_item])
+    return new_list
+
+
+@pytest.fixture
+def new_admin_list_with_one_draft_superseding_item_by_history(
+    admin_client, new_list, draft_superseding_item
+) -> RecordList:
+    """
+    History
+    |
+    |-- Version 1 (released)
+    |-- Version 2 (unreleased) *
+    """
+    item = RecordListItem(
+        database_guid=draft_superseding_item.database_guid,
+        table_guid=draft_superseding_item.table_guid,
+        record_history_guid=draft_superseding_item.record_history_guid,
+    )
+    admin_client.add_items_to_list(new_list, [item])
+    return new_list
+
+
+@pytest.fixture
+def new_basic_list(basic_client, request, list_name) -> RecordList:
+    """
+    Provides the identifier of newly created list.
+    The created list include the name of the calling test as a `description`.
+    """
+    new_list = basic_client.create_list(name=list_name, description=request.node.name)
+    cleanup = getattr(request, "param", {}).get("cleanup", True)
+    yield new_list
+    if cleanup:
+        basic_client.delete_list(new_list)
+
+
+@pytest.fixture
+def new_basic_list_with_one_unreleased_item(
+    basic_client, new_basic_list, unreleased_item
+) -> RecordList:
+    """
+    History
+    |
+    |-- Version 1 (unreleased) *
+    """
+    basic_client.add_items_to_list(new_basic_list, [unreleased_item])
+    return new_basic_list
+
+
+@pytest.fixture
+def new_basic_list_with_one_unreleased_item_by_history(
+    basic_client, new_basic_list, unreleased_item
+) -> RecordList:
+    """
+    History
+    |
+    |-- Version 1 (unreleased) *
+    """
+    item = RecordListItem(
+        database_guid=unreleased_item.database_guid,
+        table_guid=unreleased_item.table_guid,
+        record_history_guid=unreleased_item.record_history_guid,
+    )
+    basic_client.add_items_to_list(new_basic_list, [item])
+    return new_basic_list
+
+
+@pytest.fixture
+def new_basic_list_with_one_released_item(
+    basic_client, new_basic_list, released_item
+) -> RecordList:
+    """
+    History
+    |
+    |-- Version 1 (released) *
+    """
+    basic_client.add_items_to_list(new_basic_list, [released_item])
+    return new_basic_list
+
+
+@pytest.fixture
+def new_basic_list_with_one_released_item_by_history(
+    basic_client, new_basic_list, released_item
+) -> RecordList:
+    """
+    History
+    |
+    |-- Version 1 (released) *
+    """
+    item = RecordListItem(
+        database_guid=released_item.database_guid,
+        table_guid=released_item.table_guid,
+        record_history_guid=released_item.record_history_guid,
+    )
+    basic_client.add_items_to_list(new_basic_list, [item])
+    return new_basic_list
+
+
+@pytest.fixture
+def new_basic_list_with_one_superseded_item(
+    basic_client, new_basic_list, superseded_item
+) -> RecordList:
+    """
+    History
+    |
+    |-- Version 1 (superseded) *
+    |-- Version 2 (released)
+    """
+    basic_client.add_items_to_list(new_basic_list, [superseded_item])
+    return new_basic_list
+
+
+@pytest.fixture
+def new_basic_list_with_one_superseded_item_by_history(
+    basic_client, new_basic_list, superseded_item
+) -> RecordList:
+    """
+    History
+    |
+    |-- Version 1 (superseded) *
+    |-- Version 2 (released)
+    """
+    item = RecordListItem(
+        database_guid=superseded_item.database_guid,
+        table_guid=superseded_item.table_guid,
+        record_history_guid=superseded_item.record_history_guid,
+    )
+    basic_client.add_items_to_list(new_basic_list, [item])
+    return new_basic_list
+
+
+@pytest.fixture
+def new_basic_list_with_one_draft_superseded_item(
+    basic_client, new_basic_list, draft_superseded_item
+) -> RecordList:
+    """
+    History
+    |
+    |-- Version 1 (released) *
+    |-- Version 2 (unreleased)
+    """
+    basic_client.add_items_to_list(new_basic_list, [draft_superseded_item])
+    return new_basic_list
+
+
+@pytest.fixture
+def new_basic_list_with_one_draft_superseded_item_by_history(
+    basic_client, new_basic_list, draft_superseded_item
+) -> RecordList:
+    """
+    History
+    |
+    |-- Version 1 (released) *
+    |-- Version 2 (unreleased)
+    """
+    item = RecordListItem(
+        database_guid=draft_superseded_item.database_guid,
+        table_guid=draft_superseded_item.table_guid,
+        record_history_guid=draft_superseded_item.record_history_guid,
+    )
+    basic_client.add_items_to_list(new_basic_list, [item])
+    return new_basic_list
+
+
+@pytest.fixture
+def new_basic_list_with_one_draft_superseding_item(
+    basic_client, new_basic_list, draft_superseding_item
+) -> RecordList:
+    """
+    History
+    |
+    |-- Version 1 (released)
+    |-- Version 2 (unreleased) *
+    """
+    basic_client.add_items_to_list(new_basic_list, [draft_superseding_item])
+    return new_basic_list
+
+
+@pytest.fixture
+def new_basic_list_with_one_draft_superseding_item_by_history(
+    basic_client, new_basic_list, draft_superseding_item
+) -> RecordList:
+    """
+    History
+    |
+    |-- Version 1 (released)
+    |-- Version 2 (unreleased) *
+    """
+    item = RecordListItem(
+        database_guid=draft_superseding_item.database_guid,
+        table_guid=draft_superseding_item.table_guid,
+        record_history_guid=draft_superseding_item.record_history_guid,
+    )
+    basic_client.add_items_to_list(new_basic_list, [item])
+    return new_basic_list
+
+
 @pytest.fixture(scope="function")
-def cleanup_admin(admin_client):
+def cleanup_admin(admin_client) -> List[RecordList]:
     to_delete = []
     yield to_delete
     for record_list in to_delete:
@@ -114,7 +608,7 @@ def cleanup_admin(admin_client):
 
 
 @pytest.fixture(scope="function")
-def cleanup_basic(basic_client):
+def cleanup_basic(basic_client) -> List[RecordList]:
     to_delete = []
     yield to_delete
     for record_list in to_delete:

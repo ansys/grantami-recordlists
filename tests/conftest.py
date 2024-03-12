@@ -1,4 +1,5 @@
 import json
+import uuid
 
 import pytest
 import requests_mock
@@ -39,10 +40,25 @@ def mock_response(request):
 
 
 @pytest.fixture(scope="session")
-def example_item():
+def unresolvable_item():
     # GUIDs need only have the correct format for record lists test to pass.
     return RecordListItem(
         "e595fe23-b450-4d18-8c08-4a0f378ef095",
         "81dff531-0254-4fbe-9621-174b10aaee3d",
         "3bc2b82f-0199-4f3b-a7af-8d520250b180",
     )
+
+
+@pytest.fixture(scope="session")
+def many_unresolvable_items():
+    # GUIDs need only have the correct format for record lists test to pass.
+    results = []
+    for i in range(5000):
+        results.append(
+            RecordListItem(
+                database_guid="e595fe23-b450-4d18-8c08-4a0f378ef095",
+                table_guid=str(uuid.uuid4()),
+                record_history_guid=str(uuid.uuid4()),
+            )
+        )
+    return results

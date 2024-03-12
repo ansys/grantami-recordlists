@@ -22,28 +22,420 @@ def test_getting_all_lists(admin_client, new_list):
     my_list = next(rl for rl in all_lists if rl.identifier == new_list.identifier)
 
 
-def test_get_list_items(admin_client, new_list_with_items):
-    record_list_items = admin_client.get_list_items(new_list_with_items)
+class TestListItems:
+    def test_get_list_items_one_unresolvable_item(
+        self,
+        admin_client,
+        new_list_with_one_unresolvable_item,
+    ):
+        record_list_items = admin_client.get_list_items(new_list_with_one_unresolvable_item)
 
-    assert isinstance(record_list_items, list)
-    assert all(isinstance(item, RecordListItem) for item in record_list_items)
+        assert isinstance(record_list_items, list)
+        assert all(isinstance(item, RecordListItem) for item in record_list_items)
+        assert len(record_list_items) == 1
+
+    def test_get_list_items_many_unresolvable_items(
+        self,
+        admin_client,
+        new_list_with_many_unresolvable_items,
+        many_unresolvable_items,
+    ):
+        record_list_items = admin_client.get_list_items(new_list_with_many_unresolvable_items)
+
+        assert isinstance(record_list_items, list)
+        assert all(isinstance(item, RecordListItem) for item in record_list_items)
+        assert len(record_list_items) == len(many_unresolvable_items)
+
+    def test_items_management(self, admin_client, new_list, unresolvable_item):
+        another_item = RecordListItem(
+            unresolvable_item.database_guid,
+            unresolvable_item.table_guid,
+            record_history_guid=str(uuid.uuid4()),
+        )
+        items = admin_client.add_items_to_list(new_list, items=[unresolvable_item])
+        assert items == [unresolvable_item]
+
+        items = admin_client.add_items_to_list(new_list, items=[another_item])
+        assert unresolvable_item in items and another_item in items and len(items) == 2
+
+        items = admin_client.remove_items_from_list(new_list, items=[unresolvable_item])
+        assert items == [another_item]
+
+        items = admin_client.remove_items_from_list(new_list, items=[another_item])
+        assert items == []
 
 
-def test_items_management(admin_client, new_list, example_item):
-    another_item = RecordListItem(
-        example_item.database_guid, example_item.table_guid, record_history_guid=str(uuid.uuid4())
-    )
-    items = admin_client.add_items_to_list(new_list, items=[example_item])
-    assert items == [example_item]
+class TestItemResolvability:
+    """5 test cases
 
-    items = admin_client.add_items_to_list(new_list, items=[another_item])
-    assert example_item in items and another_item in items and len(items) == 2
+    [Admin user] x
+    [One unresolv., Many unresolv., One resolv., Many resolv., Mixture]
+    """
 
-    items = admin_client.remove_items_from_list(new_list, items=[example_item])
-    assert items == [another_item]
+    def test_get_list_items_one_unresolvable_item(
+        self,
+        admin_client,
+        new_list_with_one_unresolvable_item,
+    ):
+        record_list_items = admin_client.get_resolvable_list_items(
+            new_list_with_one_unresolvable_item
+        )
 
-    items = admin_client.remove_items_from_list(new_list, items=[another_item])
-    assert items == []
+        assert isinstance(record_list_items, list)
+        assert all(isinstance(item, RecordListItem) for item in record_list_items)
+        assert len(record_list_items) == 0
+
+    def test_get_list_items_many_unresolvable_items(
+        self,
+        admin_client,
+        new_list_with_many_unresolvable_items,
+        many_unresolvable_items,
+    ):
+        record_list_items = admin_client.get_resolvable_list_items(
+            new_list_with_many_unresolvable_items
+        )
+
+        assert isinstance(record_list_items, list)
+        assert all(isinstance(item, RecordListItem) for item in record_list_items)
+        assert len(record_list_items) == 0
+
+    def test_get_list_items_one_resolvable_item(
+        self,
+        admin_client,
+        new_list_with_one_resolvable_item,
+    ):
+        record_list_items = admin_client.get_resolvable_list_items(
+            new_list_with_one_resolvable_item
+        )
+
+        assert isinstance(record_list_items, list)
+        assert all(isinstance(item, RecordListItem) for item in record_list_items)
+        assert len(record_list_items) == 1
+
+    def test_get_list_items_many_resolvable_items(
+        self,
+        admin_client,
+        new_list_with_many_resolvable_items,
+        resolvable_items,
+    ):
+        record_list_items = admin_client.get_resolvable_list_items(
+            new_list_with_many_resolvable_items
+        )
+
+        assert isinstance(record_list_items, list)
+        assert all(isinstance(item, RecordListItem) for item in record_list_items)
+        assert len(record_list_items) == len(resolvable_items)
+
+    def test_get_list_items_many_resolvable_and_unresolvable_items(
+        self,
+        admin_client,
+        new_list_with_many_resolvable_and_unresolvable_items,
+        resolvable_items,
+    ):
+        record_list_items = admin_client.get_resolvable_list_items(
+            new_list_with_many_resolvable_and_unresolvable_items
+        )
+
+        assert isinstance(record_list_items, list)
+        assert all(isinstance(item, RecordListItem) for item in record_list_items)
+        assert len(record_list_items) == len(resolvable_items)
+
+
+class TestItemResolvabilityVersionControl:
+    """15 test cases
+
+    [Admin user, Admin user read mode, Read user] x
+    [Unreleased, Released, Draft superseded, Draft superseding, Superseded]
+    """
+
+    @staticmethod
+    def check_resolved_record(record_list_items, record_version, record_guid_check: bool = True):
+        assert isinstance(record_list_items, list)
+        assert all(isinstance(item, RecordListItem) for item in record_list_items)
+        assert len(record_list_items) == 1
+        assert record_list_items[0].record_version == record_version
+        if record_guid_check:
+            assert record_list_items[0].record_guid is not None
+
+    @staticmethod
+    def check_unresolved_record(record_list_items):
+        assert isinstance(record_list_items, list)
+        assert len(record_list_items) == 0
+
+    def test_admin_user_can_resolve_unreleased_item(
+        self, admin_client, new_admin_list_with_one_unreleased_item
+    ):
+        record_list_items = admin_client.get_resolvable_list_items(
+            new_admin_list_with_one_unreleased_item
+        )
+        self.check_resolved_record(record_list_items, record_version=1, record_guid_check=False)
+
+    def test_admin_user_can_resolve_released_item(
+        self, admin_client, new_admin_list_with_one_released_item
+    ):
+        record_list_items = admin_client.get_resolvable_list_items(
+            new_admin_list_with_one_released_item
+        )
+        self.check_resolved_record(record_list_items, record_version=1)
+
+    def test_admin_user_can_resolve_draft_superseded_item(
+        self, admin_client, new_admin_list_with_one_draft_superseded_item
+    ):
+        record_list_items = admin_client.get_resolvable_list_items(
+            new_admin_list_with_one_draft_superseded_item
+        )
+        self.check_resolved_record(record_list_items, record_version=1)
+
+    def test_admin_user_can_resolve_draft_superseding_item(
+        self, admin_client, new_admin_list_with_one_draft_superseding_item
+    ):
+        record_list_items = admin_client.get_resolvable_list_items(
+            new_admin_list_with_one_draft_superseding_item
+        )
+        self.check_resolved_record(record_list_items, record_version=2, record_guid_check=False)
+
+    def test_admin_user_can_resolve_superseded_item(
+        self, admin_client, new_admin_list_with_one_superseded_item
+    ):
+        record_list_items = admin_client.get_resolvable_list_items(
+            new_admin_list_with_one_superseded_item
+        )
+        self.check_resolved_record(record_list_items, record_version=1)
+
+    def test_admin_user_read_mode_cannot_resolve_unreleased_item(
+        self, admin_client, new_admin_list_with_one_unreleased_item
+    ):
+        record_list_items = admin_client.get_resolvable_list_items(
+            new_admin_list_with_one_unreleased_item,
+            read_mode=True,
+        )
+        self.check_unresolved_record(record_list_items)
+
+    def test_admin_user_read_mode_can_resolve_released_item(
+        self, admin_client, new_admin_list_with_one_released_item
+    ):
+        record_list_items = admin_client.get_resolvable_list_items(
+            new_admin_list_with_one_released_item,
+            read_mode=True,
+        )
+        self.check_resolved_record(record_list_items, record_version=1)
+
+    def test_admin_user_read_mode_can_resolve_draft_superseded_item(
+        self, admin_client, new_admin_list_with_one_draft_superseded_item
+    ):
+        record_list_items = admin_client.get_resolvable_list_items(
+            new_admin_list_with_one_draft_superseded_item,
+            read_mode=True,
+        )
+        self.check_resolved_record(record_list_items, record_version=1)
+
+    def test_admin_user_read_mode_cannot_resolve_draft_superseding_item(
+        self, admin_client, new_admin_list_with_one_draft_superseding_item
+    ):
+        record_list_items = admin_client.get_resolvable_list_items(
+            new_admin_list_with_one_draft_superseding_item,
+            read_mode=True,
+        )
+        self.check_unresolved_record(record_list_items)
+
+    def test_admin_user_read_mode_can_resolve_superseded_item(
+        self, admin_client, new_admin_list_with_one_superseded_item
+    ):
+        record_list_items = admin_client.get_resolvable_list_items(
+            new_admin_list_with_one_superseded_item,
+            read_mode=True,
+        )
+        self.check_resolved_record(record_list_items, record_version=1)
+
+    def test_read_user_cannot_resolve_unreleased_item(
+        self, basic_client, new_basic_list_with_one_unreleased_item
+    ):
+        record_list_items = basic_client.get_resolvable_list_items(
+            new_basic_list_with_one_unreleased_item
+        )
+        self.check_unresolved_record(record_list_items)
+
+    def test_read_user_can_resolve_released_item(
+        self, basic_client, new_basic_list_with_one_released_item
+    ):
+        record_list_items = basic_client.get_resolvable_list_items(
+            new_basic_list_with_one_released_item
+        )
+        self.check_resolved_record(record_list_items, record_version=1)
+
+    def test_read_user_can_resolve_draft_superseded_item(
+        self, basic_client, new_basic_list_with_one_draft_superseded_item
+    ):
+        record_list_items = basic_client.get_resolvable_list_items(
+            new_basic_list_with_one_draft_superseded_item,
+        )
+        self.check_resolved_record(record_list_items, record_version=1)
+
+    def test_read_user_cannot_resolve_draft_superseding_item(
+        self, basic_client, new_basic_list_with_one_draft_superseding_item
+    ):
+        record_list_items = basic_client.get_resolvable_list_items(
+            new_basic_list_with_one_draft_superseding_item
+        )
+        self.check_unresolved_record(record_list_items)
+
+    def test_read_user_can_resolve_superseded_item(
+        self, basic_client, new_basic_list_with_one_superseded_item
+    ):
+        record_list_items = basic_client.get_resolvable_list_items(
+            new_basic_list_with_one_superseded_item
+        )
+        self.check_resolved_record(record_list_items, record_version=1)
+
+
+class TestItemResolvabilityVersionControlByHistory:
+    """15 test cases
+
+    [Admin user, Admin user read mode, Read user] x
+    [Unreleased, Released, Draft superseded, Draft superseding, Superseded]
+    """
+
+    @staticmethod
+    def check_resolved_record(record_list_items):
+        assert isinstance(record_list_items, list)
+        assert all(isinstance(item, RecordListItem) for item in record_list_items)
+        assert len(record_list_items) == 1
+        assert record_list_items[0].record_guid is None
+        assert record_list_items[0].record_version is None
+
+    @staticmethod
+    def check_unresolved_record(record_list_items):
+        assert isinstance(record_list_items, list)
+        assert len(record_list_items) == 0
+
+    def test_admin_user_can_resolve_unreleased_item_by_history(
+        self, admin_client, new_admin_list_with_one_unreleased_item_by_history
+    ):
+        record_list_items = admin_client.get_resolvable_list_items(
+            new_admin_list_with_one_unreleased_item_by_history
+        )
+        self.check_resolved_record(record_list_items)
+
+    def test_admin_user_can_resolve_released_item_by_history(
+        self, admin_client, new_admin_list_with_one_released_item_by_history
+    ):
+        record_list_items = admin_client.get_resolvable_list_items(
+            new_admin_list_with_one_released_item_by_history
+        )
+        self.check_resolved_record(record_list_items)
+
+    def test_admin_user_can_resolve_draft_superseded_item_by_history(
+        self, admin_client, new_admin_list_with_one_draft_superseded_item_by_history
+    ):
+        record_list_items = admin_client.get_resolvable_list_items(
+            new_admin_list_with_one_draft_superseded_item_by_history
+        )
+        self.check_resolved_record(record_list_items)
+
+    def test_admin_user_can_resolve_draft_superseding_item_by_history(
+        self, admin_client, new_admin_list_with_one_draft_superseding_item_by_history
+    ):
+        record_list_items = admin_client.get_resolvable_list_items(
+            new_admin_list_with_one_draft_superseding_item_by_history
+        )
+        self.check_resolved_record(record_list_items)
+
+    def test_admin_user_can_resolve_superseded_item_by_history(
+        self, admin_client, new_admin_list_with_one_superseded_item_by_history
+    ):
+        record_list_items = admin_client.get_resolvable_list_items(
+            new_admin_list_with_one_superseded_item_by_history
+        )
+        self.check_resolved_record(record_list_items)
+
+    def test_admin_user_read_mode_cannot_resolve_unreleased_item_by_history(
+        self, admin_client, new_admin_list_with_one_unreleased_item_by_history
+    ):
+        record_list_items = admin_client.get_resolvable_list_items(
+            new_admin_list_with_one_unreleased_item_by_history,
+            read_mode=True,
+        )
+        self.check_unresolved_record(record_list_items)
+
+    def test_admin_user_read_mode_can_resolve_released_item_by_history(
+        self, admin_client, new_admin_list_with_one_released_item_by_history
+    ):
+        record_list_items = admin_client.get_resolvable_list_items(
+            new_admin_list_with_one_released_item_by_history,
+            read_mode=True,
+        )
+        self.check_resolved_record(record_list_items)
+
+    def test_admin_user_read_mode_can_resolve_draft_superseded_item_by_history(
+        self, admin_client, new_admin_list_with_one_draft_superseded_item_by_history
+    ):
+        record_list_items = admin_client.get_resolvable_list_items(
+            new_admin_list_with_one_draft_superseded_item_by_history,
+            read_mode=True,
+        )
+        # Falls back to v1
+        self.check_resolved_record(record_list_items)
+
+    def test_admin_user_read_mode_cannot_resolve_draft_superseding_item_by_history(
+        self, admin_client, new_admin_list_with_one_draft_superseding_item_by_history
+    ):
+        record_list_items = admin_client.get_resolvable_list_items(
+            new_admin_list_with_one_draft_superseding_item_by_history,
+            read_mode=True,
+        )
+        # Resolves v1
+        self.check_resolved_record(record_list_items)
+
+    def test_admin_user_read_mode_can_resolve_superseded_item_by_history(
+        self, admin_client, new_admin_list_with_one_superseded_item_by_history
+    ):
+        record_list_items = admin_client.get_resolvable_list_items(
+            new_admin_list_with_one_superseded_item_by_history,
+            read_mode=True,
+        )
+        self.check_resolved_record(record_list_items)
+
+    def test_read_user_cannot_resolve_unreleased_item_by_history(
+        self, basic_client, new_basic_list_with_one_unreleased_item_by_history
+    ):
+        record_list_items = basic_client.get_resolvable_list_items(
+            new_basic_list_with_one_unreleased_item_by_history,
+        )
+        self.check_unresolved_record(record_list_items)
+
+    def test_read_user_can_resolve_released_item_by_history(
+        self, basic_client, new_basic_list_with_one_released_item_by_history
+    ):
+        record_list_items = basic_client.get_resolvable_list_items(
+            new_basic_list_with_one_released_item_by_history,
+        )
+        self.check_resolved_record(record_list_items)
+
+    def test_read_user_can_resolve_draft_superseded_item_by_history(
+        self, basic_client, new_basic_list_with_one_draft_superseded_item_by_history
+    ):
+        record_list_items = basic_client.get_resolvable_list_items(
+            new_basic_list_with_one_draft_superseded_item_by_history,
+        )
+        # Falls back to v1
+        self.check_resolved_record(record_list_items)
+
+    def test_read_user_cannot_resolve_draft_superseding_item_by_history(
+        self, basic_client, new_basic_list_with_one_draft_superseding_item_by_history
+    ):
+        record_list_items = basic_client.get_resolvable_list_items(
+            new_basic_list_with_one_draft_superseding_item_by_history,
+        )
+        # Resolves v1
+        self.check_resolved_record(record_list_items)
+
+    def test_read_user_can_resolve_superseded_item_by_history(
+        self, basic_client, new_basic_list_with_one_superseded_item_by_history
+    ):
+        record_list_items = basic_client.get_resolvable_list_items(
+            new_basic_list_with_one_superseded_item_by_history,
+        )
+        self.check_resolved_record(record_list_items)
 
 
 def test_create_minimal_list(admin_client, cleanup_admin, list_name):
@@ -240,11 +632,11 @@ class TestRevisionLifeCycle(TestLifeCyclePublishedAndNotAwaitingApproval):
             admin_client.update_list(new_list, description="Updated description")
         assert e.value.status_code == 403
 
-    def test_cannot_edit_items_of_published_list(self, admin_client, new_list, example_item):
+    def test_cannot_edit_items_of_published_list(self, admin_client, new_list, unresolvable_item):
         with pytest.raises(ApiException) as e:
             admin_client.add_items_to_list(
                 new_list,
-                items=[example_item],
+                items=[unresolvable_item],
             )
         assert e.value.status_code == 403
 
@@ -306,11 +698,11 @@ class TestSearch:
         admin_client.delete_list(created_list)
 
     @pytest.fixture(scope="class")
-    def list_c(self, admin_client, list_name, list_b, example_item):
+    def list_c(self, admin_client, list_name, list_b, unresolvable_item):
         """A revision of list B with a known name and items."""
         created_list = admin_client.revise_list(list_b)
         admin_client.update_list(created_list, name=list_name + self._name_suffix_C)
-        admin_client.add_items_to_list(created_list, [example_item])
+        admin_client.add_items_to_list(created_list, [unresolvable_item])
         yield created_list
         admin_client.delete_list(created_list)
 
@@ -355,38 +747,38 @@ class TestSearch:
         assert len(results) == 1
         assert results[0].record_list.identifier == list_c.identifier
 
-    def test_search_by_database(self, admin_client, list_name, example_item, list_c):
+    def test_search_by_database(self, admin_client, list_name, unresolvable_item, list_c):
         criteria = SearchCriterion(
             name_contains=list_name,
-            contains_records_in_databases=[example_item.database_guid],
+            contains_records_in_databases=[unresolvable_item.database_guid],
         )
         results = admin_client.search_for_lists(criteria)
         assert len(results) == 1
         assert results[0].record_list.identifier == list_c.identifier
 
-    def test_search_by_multiple_databases(self, admin_client, list_name, example_item, list_c):
+    def test_search_by_multiple_databases(self, admin_client, list_name, unresolvable_item, list_c):
         # List of databases = Is in one OR the other
         criteria = SearchCriterion(
             name_contains=list_name,
-            contains_records_in_databases=[example_item.database_guid, str(uuid.uuid4())],
+            contains_records_in_databases=[unresolvable_item.database_guid, str(uuid.uuid4())],
         )
         results = admin_client.search_for_lists(criteria)
         assert len(results) == 1
         assert results[0].record_list.identifier == list_c.identifier
 
-    def test_search_by_table(self, admin_client, list_name, example_item, list_c):
+    def test_search_by_table(self, admin_client, list_name, unresolvable_item, list_c):
         criteria = SearchCriterion(
             name_contains=list_name,
-            contains_records_in_tables=[example_item.table_guid],
+            contains_records_in_tables=[unresolvable_item.table_guid],
         )
         results = admin_client.search_for_lists(criteria)
         assert len(results) == 1
         assert results[0].record_list.identifier == list_c.identifier
 
-    def test_search_by_record(self, admin_client, list_name, example_item, list_c):
+    def test_search_by_record(self, admin_client, list_name, unresolvable_item, list_c):
         criteria = SearchCriterion(
             name_contains=list_name,
-            contains_records=[example_item.record_history_guid],
+            contains_records=[unresolvable_item.record_history_guid],
         )
         results = admin_client.search_for_lists(criteria)
         assert len(results) == 1
@@ -456,7 +848,7 @@ class TestSearch:
             results = admin_client.search_for_lists(criteria)
 
     @pytest.mark.parametrize("include_items", [True, False])
-    def test_include_items_flag(self, admin_client, list_c, include_items, example_item):
+    def test_include_items_flag(self, admin_client, list_c, include_items, unresolvable_item):
         results = admin_client.search_for_lists(
             SearchCriterion(name_contains=self._name_suffix_C),
             include_items=include_items,
@@ -467,6 +859,6 @@ class TestSearch:
         assert result.record_list.identifier == list_c.identifier
         # Check the result does have the expected items
         if include_items:
-            assert result.items == [example_item]
+            assert result.items == [unresolvable_item]
         else:
             assert result.items is None
