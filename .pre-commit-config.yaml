@@ -1,3 +1,6 @@
+ci:
+  skip: [mypy-code]
+
 repos:
 
 - repo: https://github.com/psf/black
