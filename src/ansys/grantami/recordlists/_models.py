@@ -1,4 +1,5 @@
 """Models."""
+
 from datetime import datetime
 from enum import Enum
 from typing import List, Optional, Union
@@ -172,9 +173,9 @@ class RecordList:
             last_modified_timestamp=model.last_modified_timestamp,
             last_modified_user=UserOrGroup._from_model(model.last_modified_user),
             published_timestamp=model.published_timestamp,
-            published_user=UserOrGroup._from_model(model.published_user)
-            if model.published_user
-            else None,
+            published_user=(
+                UserOrGroup._from_model(model.published_user) if model.published_user else None
+            ),
             parent_record_list_identifier=model.parent_record_list_identifier,
         )
         return instance
@@ -411,9 +412,9 @@ class SearchCriterion:
         self._is_internal_use: Optional[bool] = is_internal_use
         self._is_revision: Optional[bool] = is_revision
         self._contains_records_in_databases: Optional[List[str]] = contains_records_in_databases
-        self._contains_records_in_integration_schemas: Optional[
-            List[str]
-        ] = contains_records_in_integration_schemas
+        self._contains_records_in_integration_schemas: Optional[List[str]] = (
+            contains_records_in_integration_schemas
+        )
         self._contains_records_in_tables: Optional[List[str]] = contains_records_in_tables
         self._contains_records: Optional[List[str]] = contains_records
         self._user_can_add_or_remove_items: Optional[bool] = user_can_add_or_remove_items
@@ -650,12 +651,16 @@ class BooleanCriterion:
             raise ValueError("Cannot use `match_any` and `match_all` simultaneously.")
         logger.debug("Serializing BooleanCriterion to API model")
         model = models.GrantaServerApiListsDtoListBooleanCriterion(
-            match_any=[criteria._to_model() for criteria in self.match_any]
-            if self.match_any is not None
-            else None,
-            match_all=[criteria._to_model() for criteria in self.match_all]
-            if self.match_all is not None
-            else None,
+            match_any=(
+                [criteria._to_model() for criteria in self.match_any]
+                if self.match_any is not None
+                else None
+            ),
+            match_all=(
+                [criteria._to_model() for criteria in self.match_all]
+                if self.match_all is not None
+                else None
+            ),
         )
         logger.debug(model.to_str())
         return model
