@@ -21,6 +21,7 @@
 # SOFTWARE.
 
 """Pythonic client for GRANTA MI ServerAPI RecordLists."""
+
 import importlib.metadata as importlib_metadata
 
 from ._connection import Connection, RecordListsApiClient

@@ -4,28 +4,28 @@ ci:
 repos:
 
 - repo: https://github.com/psf/black
-  rev: 23.3.0
+  rev: 24.3.0
   hooks:
   - id: black
 
 - repo: https://github.com/pycqa/isort
-  rev: 5.12.0
+  rev: 5.13.2
   hooks:
   - id: isort
 
 - repo: https://github.com/PyCQA/flake8
-  rev: 6.0.0
+  rev: 7.0.0
   hooks:
   - id: flake8
 
 - repo: https://github.com/codespell-project/codespell
-  rev: v2.2.4
+  rev: v2.2.6
   hooks:
   - id: codespell
     args: ["--ignore-words", "doc/styles/Vocab/ANSYS/accept.txt", "--skip", "poetry.lock"]
 
 - repo: https://github.com/pre-commit/pre-commit-hooks
-  rev: v4.4.0
+  rev: v4.5.0
   hooks:
   - id: check-yaml
   - id: debug-statements

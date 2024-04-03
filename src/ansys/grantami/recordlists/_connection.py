@@ -741,9 +741,9 @@ class Connection(ApiClientFactory):  # type: ignore[misc]
         auth_url = servicelayer_url.strip("/") + AUTH_PATH
         super().__init__(auth_url, session_configuration)
         self._base_service_layer_url = servicelayer_url
-        self._session_configuration.headers[
-            "X-Granta-ApplicationName"
-        ] = GRANTA_APPLICATION_NAME_HEADER
+        self._session_configuration.headers["X-Granta-ApplicationName"] = (
+            GRANTA_APPLICATION_NAME_HEADER
+        )
         self._session_configuration.headers["User-Agent"] = generate_user_agent(
             "ansys-grantami-recordlists", __version__
         )
