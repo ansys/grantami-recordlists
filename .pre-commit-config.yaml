@@ -48,3 +48,11 @@ repos:
     require_serial: true
     files: "^(src/)"
     additional_dependencies: ["mypy==1.0.1"]
+
+- repo: https://github.com/ansys/pre-commit-hooks
+  rev: v0.2.8
+  hooks:
+    - id: add-license-headers
+      args:
+      - --start_year=2024
+      files: '(src|tests)/.*\.(py)'
