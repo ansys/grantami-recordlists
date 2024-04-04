@@ -598,8 +598,9 @@ class BooleanCriterion:
     Search criterion to use in a search operation :meth:`~.RecordListsApiClient.search_for_lists`.
 
     Use this class to combine multiple :class:`SearchCriterion` or
-    :class:`BooleanCriterion` objects together as either *AND* or *OR* searches. :attr:`.match_any`
-    and :attr:`.match_all` cannot be used together.
+    :class:`BooleanCriterion` objects together as either *AND* or *OR* searches. When both :attr:`.match_any`
+    and :attr:`.match_all` are used together, results match all criterion from ``match_all`` *AND* at least one
+    criterion from ``match_any``.
 
     Examples
     --------
@@ -667,10 +668,6 @@ class BooleanCriterion:
 
     def _to_model(self) -> models.GrantaServerApiListsDtoListBooleanCriterion:
         """Generate the DTO for use with the auto-generated client code."""
-        # Do not allow both `any` and `all` because current API behavior is not the expected
-        # behavior
-        if self.match_any is not None and self.match_all is not None:
-            raise ValueError("Cannot use `match_any` and `match_all` simultaneously.")
         logger.debug("Serializing BooleanCriterion to API model")
         model = models.GrantaServerApiListsDtoListBooleanCriterion(
             match_any=(

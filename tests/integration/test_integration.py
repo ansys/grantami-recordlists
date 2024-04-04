@@ -859,6 +859,7 @@ class TestSearch:
         self,
         admin_client,
         list_name,
+        list_a,
     ):
         criteria = BooleanCriterion(
             match_any=[
@@ -866,8 +867,9 @@ class TestSearch:
             ],
             match_all=[SearchCriterion(name_contains=list_name)],
         )
-        with pytest.raises(ValueError):
-            results = admin_client.search_for_lists(criteria)
+        results = admin_client.search_for_lists(criteria)
+        ids = {result.record_list.identifier for result in results}
+        assert list_a.identifier in ids
 
     @pytest.mark.parametrize("include_items", [True, False])
     def test_include_items_flag(self, admin_client, list_c, include_items, unresolvable_item):
