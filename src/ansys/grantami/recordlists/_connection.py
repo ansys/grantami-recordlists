@@ -205,6 +205,8 @@ class RecordListsApiClient(ApiClient):  # type: ignore[misc]
         If an item cannot be resolved, it will not be returned. Performs multiple HTTP requests
         against the Granta MI Server API.
 
+        .. versionadded:: 1.2
+
         Parameters
         ----------
         record_list : RecordList
