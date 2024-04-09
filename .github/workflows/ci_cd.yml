@@ -20,6 +20,14 @@ concurrency:
 
 jobs:
 
+  check-active-runs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: ansys/pygranta-actions/check-active-workflows@feat/add-action-to-check-workflow-runs
+        id: check-active-runs
+      - name: "Print result"
+        run: echo "${{ steps.check-active-runs.outputs.active-runs }}"
+
   code-style:
     name: "Code style"
     runs-on: ubuntu-latest
