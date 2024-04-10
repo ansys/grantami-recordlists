@@ -35,6 +35,9 @@ on:
       AZURE_VM_NAME:
         required: true
 
+      CODECOV_TOKEN:
+        required: true
+
       TEST_SERVER_URL:
         required: true
 
@@ -133,6 +136,8 @@ jobs:
       - name: "Upload coverage to Codecov"
         uses: codecov/codecov-action@v3
         if: ${{ matrix.os  == 'ubuntu-latest' }}
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         with:
           files: .cov/xml
           flags: integration
