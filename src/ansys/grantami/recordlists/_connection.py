@@ -608,7 +608,7 @@ class _ItemResolver:
         self._record_histories_api = api.RecordsRecordHistoriesApi(client)
         self._record_versions_api = api.RecordsRecordVersionsApi(client)
         self._db_schema_api = api.SchemaDatabasesApi(client)
-        self._db_map: Dict[str, str] = {}
+        self._db_map: Dict[str, List[str]] = {}
         self._read_mode = read_mode
 
     def get_resolvable_items(self, all_items: List[RecordListItem]) -> List[RecordListItem]:
@@ -639,12 +639,32 @@ class _ItemResolver:
             ]
         return resolvable_items
 
-    def _get_db_map(self) -> Dict[str, str]:
+    def _get_db_map(self) -> Dict[str, List[str]]:
         dbs = self._db_schema_api.get_all_databases()
-        return {db.guid: db.key for db in dbs.databases}
+        db_map: Dict[str, List[str]] = {}
+        for db in dbs.databases:
+            db_keys = db_map.setdefault(db.guid, list())
+            db_keys.append(db.key)
+        return db_map
 
     def _is_item_resolvable(self, item: RecordListItem) -> bool:
         """Test if a specific item is resolvable.
+
+        Returns
+        -------
+        bool
+            True if the item can be resolved in any database with the correct GUID, False otherwise.
+        """
+        if item.database_guid not in self._db_map:
+            return False
+        for db_key in self._db_map[item.database_guid]:
+            if self._is_item_resolvable_in_db(item, db_key):
+                return True
+        return False
+
+    def _is_item_resolvable_in_db(self, item: RecordListItem, db_key: str) -> bool:
+        """
+        Test if a specific item is resolvable in a database.
 
         If the item has a record version and record guid, attempt to resolve the record version
         directly.
@@ -659,12 +679,10 @@ class _ItemResolver:
         bool
             True if the item can be resolved, False otherwise.
         """
-        if item.database_guid not in self._db_map:
-            return False
         try:
             if item.record_version is not None and item.record_guid is not None:
                 self._record_versions_api.get_record_version(
-                    database_key=self._db_map[item.database_guid],
+                    database_key=db_key,
                     table_guid=item.table_guid,
                     record_history_guid=item.record_history_guid,
                     record_version_guid=item.record_guid,
@@ -672,7 +690,7 @@ class _ItemResolver:
                 )
             else:
                 history_info = self._record_histories_api.get_record_history(
-                    database_key=self._db_map[item.database_guid],
+                    database_key=db_key,
                     record_history_guid=item.record_history_guid,
                     mode="read" if self._read_mode else None,
                 )
