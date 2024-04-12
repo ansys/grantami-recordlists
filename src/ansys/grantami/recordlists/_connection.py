@@ -20,8 +20,9 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+from collections import defaultdict
 import concurrent.futures
-from typing import Dict, List, Optional, Tuple, Union
+from typing import List, Optional, Tuple, Union
 
 from ansys.grantami.serverapi_openapi import api, models  # type: ignore[import]
 from ansys.openapi.common import (  # type: ignore[import]
@@ -608,7 +609,6 @@ class _ItemResolver:
         self._record_histories_api = api.RecordsRecordHistoriesApi(client)
         self._record_versions_api = api.RecordsRecordVersionsApi(client)
         self._db_schema_api = api.SchemaDatabasesApi(client)
-        self._db_map: Dict[str, List[str]] = {}
         self._read_mode = read_mode
 
     def get_resolvable_items(self, all_items: List[RecordListItem]) -> List[RecordListItem]:
@@ -627,10 +627,10 @@ class _ItemResolver:
         resolvable_items
             The items which could be resolved on the server.
         """
-        self._db_map = self._get_db_map()
+        db_map = self._get_db_map()
         with concurrent.futures.ThreadPoolExecutor(max_workers=self._max_requests) as executor:
             resolvable_test_futures = {
-                executor.submit(self._is_item_resolvable, i): i for i in all_items
+                executor.submit(self._is_item_resolvable, i, db_map): i for i in all_items
             }
             resolvable_items = [
                 resolvable_test_futures[f]
@@ -639,15 +639,16 @@ class _ItemResolver:
             ]
         return resolvable_items
 
-    def _get_db_map(self) -> Dict[str, List[str]]:
+    def _get_db_map(self) -> defaultdict[str, List[str]]:
         dbs = self._db_schema_api.get_all_databases()
-        db_map: Dict[str, List[str]] = {}
+        db_map: defaultdict[str, List[str]] = defaultdict(list)
         for db in dbs.databases:
-            db_keys = db_map.setdefault(db.guid, list())
-            db_keys.append(db.key)
+            db_map[db.guid].append(db.key)
         return db_map
 
-    def _is_item_resolvable(self, item: RecordListItem) -> bool:
+    def _is_item_resolvable(
+        self, item: RecordListItem, db_map: defaultdict[str, List[str]]
+    ) -> bool:
         """Test if a specific item is resolvable.
 
         Returns
@@ -655,9 +656,9 @@ class _ItemResolver:
         bool
             True if the item can be resolved in any database with the correct GUID, False otherwise.
         """
-        if item.database_guid not in self._db_map:
+        if item.database_guid not in db_map:
             return False
-        for db_key in self._db_map[item.database_guid]:
+        for db_key in db_map[item.database_guid]:
             if self._is_item_resolvable_in_db(item, db_key):
                 return True
         return False
