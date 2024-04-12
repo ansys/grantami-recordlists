@@ -1,14 +1,38 @@
+# Copyright (C) 2023 - 2024 ANSYS, Inc. and/or its affiliates.
+# SPDX-License-Identifier: MIT
+#
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
 from unittest.mock import Mock
 from uuid import uuid4
-import pytest
-from ansys.openapi.common import ApiClient
-from ansys.grantami.recordlists import RecordListItem
-from ansys.grantami.recordlists._connection import _ItemResolver
+
 from ansys.grantami.serverapi_openapi import (
+    GrantaServerApiDatabaseStatus,
     GrantaServerApiSchemaDatabasesInfo,
     GrantaServerApiSchemaSlimEntitiesSlimDatabase,
-    GrantaServerApiDatabaseStatus,
 )
+from ansys.openapi.common import ApiClient
+import pytest
+
+from ansys.grantami.recordlists import RecordListItem
+from ansys.grantami.recordlists._connection import _ItemResolver
 
 
 @pytest.fixture
@@ -25,8 +49,10 @@ def item_resolver(client):
 def test_map_lists_dbs_with_identical_guids(item_resolver, monkeypatch, client):
     duplicate_guid = uuid4().hex
     database_api = item_resolver._db_schema_api
-    monkeypatch.setattr(database_api, "get_all_databases", lambda:
-        GrantaServerApiSchemaDatabasesInfo(
+    monkeypatch.setattr(
+        database_api,
+        "get_all_databases",
+        lambda: GrantaServerApiSchemaDatabasesInfo(
             databases=[
                 GrantaServerApiSchemaSlimEntitiesSlimDatabase(
                     guid=duplicate_guid,
@@ -43,9 +69,9 @@ def test_map_lists_dbs_with_identical_guids(item_resolver, monkeypatch, client):
                     key="DB_KEY_2",
                     name="DB_2",
                     status=GrantaServerApiDatabaseStatus.OK,
-                )
+                ),
             ]
-        )
+        ),
     )
     db_map = item_resolver._get_db_map()
     assert duplicate_guid in db_map
@@ -70,7 +96,9 @@ def item_2():
     )
 
 
-def test_items_are_resolved_in_all_dbs_with_matched_guid(item_resolver, monkeypatch, item_1, item_2):
+def test_items_are_resolved_in_all_dbs_with_matched_guid(
+    item_resolver, monkeypatch, item_1, item_2
+):
     monkeypatch.setattr(item_resolver, "_get_db_map", lambda: {"DB_GUID": ["DB_KEY_1", "DB_KEY_2"]})
     mock_resolve_item_in_db = Mock(return_value=False)
     monkeypatch.setattr(item_resolver, "_is_item_resolvable_in_db", mock_resolve_item_in_db)
