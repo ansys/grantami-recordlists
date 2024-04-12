@@ -25,7 +25,7 @@ repos:
     args: ["--ignore-words", "doc/styles/Vocab/ANSYS/accept.txt", "--skip", "poetry.lock"]
 
 - repo: https://github.com/pre-commit/pre-commit-hooks
-  rev: v4.5.0
+  rev: v4.6.0
   hooks:
   - id: check-yaml
   - id: debug-statements
@@ -50,7 +50,7 @@ repos:
     additional_dependencies: ["mypy==1.0.1"]
 
 - repo: https://github.com/ansys/pre-commit-hooks
-  rev: v0.2.8
+  rev: v0.2.9
   hooks:
     - id: add-license-headers
       args:
