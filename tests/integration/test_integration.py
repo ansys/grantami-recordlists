@@ -784,7 +784,7 @@ class TestSearch:
             contains_records_in_databases=[training_database_guid],
         )
         results = admin_client.search_for_lists(criteria, include_items=include_items)
-        assert len(results) == 2
+        assert len(results) == 1
         for result in results:
             assert result.record_list.identifier == list_c.identifier
             if include_items:
@@ -808,7 +808,7 @@ class TestSearch:
             contains_records_in_databases=[training_database_guid, str(uuid.uuid4())],
         )
         results = admin_client.search_for_lists(criteria, include_items=include_items)
-        assert len(results) == 2
+        assert len(results) == 1
         for result in results:
             assert result.record_list.identifier == list_c.identifier
             if include_items:
@@ -831,7 +831,7 @@ class TestSearch:
             contains_records_in_tables=[design_data_table_guid],
         )
         results = admin_client.search_for_lists(criteria, include_items=include_items)
-        assert len(results) == 2
+        assert len(results) == 1
         for result in results:
             assert result.record_list.identifier == list_c.identifier
             if include_items:
