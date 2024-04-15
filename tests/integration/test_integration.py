@@ -843,7 +843,7 @@ class TestSearch:
     def test_search_by_record(
         self, include_items, admin_client, list_name, resolvable_items, list_c
     ):
-        record_history_guid = two_resolvable_items_in_table[0].record_history_guid
+        record_history_guid = resolvable_items[0].record_history_guid
         criteria = SearchCriterion(
             name_contains=list_name,
             contains_records=[record_history_guid],
