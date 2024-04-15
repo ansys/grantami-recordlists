@@ -164,36 +164,6 @@ def design_data_table_guid(admin_client) -> str:
 
 
 @pytest.fixture(scope="session")
-def two_resolvable_items_in_table(
-    admin_client, training_database_guid, design_data_table_guid
-) -> List[RecordListItem]:
-    """Get two records in the Design Data table and use them to create
-    a list of RecordListItems which can be added to a list."""
-    search_api = SearchApi(admin_client)
-    search_body = GrantaServerApiSearchSearchRequest(
-        criterion=GrantaServerApiSearchRecordPropertyCriterion(
-            _property=GrantaServerApiSearchSearchableRecordProperty.RECORDTYPE,
-            inner_criterion=GrantaServerApiSearchDiscreteTextValuesDatumCriterion(
-                any=["Record"],
-            ),
-        )
-    )
-    search_results = search_api.database_search_in_table_with_guid(
-        database_key=DB_KEY,
-        table_guid=design_data_table_guid,
-        body=search_body,
-    )
-    return [
-        RecordListItem(
-            training_database_guid,
-            result.table_guid,
-            result.record_history_guid,
-        )
-        for result in search_results.results[:2]
-    ]
-
-
-@pytest.fixture(scope="session")
 def resolvable_items(admin_client, training_database_guid) -> List[RecordListItem]:
     """Get all records in the MI_Training database and use them to create
     a list of RecordListItems which can be added to a list."""

@@ -720,11 +720,11 @@ class TestSearch:
         admin_client.delete_list(created_list)
 
     @pytest.fixture(scope="class")
-    def list_c(self, admin_client, list_name, list_b, two_resolvable_items_in_table):
+    def list_c(self, admin_client, list_name, list_b, resolvable_items):
         """A revision of list B with a known name and items."""
         created_list = admin_client.revise_list(list_b)
         admin_client.update_list(created_list, name=list_name + self._name_suffix_C)
-        admin_client.add_items_to_list(created_list, two_resolvable_items_in_table)
+        admin_client.add_items_to_list(created_list, resolvable_items)
         yield created_list
         admin_client.delete_list(created_list)
 
@@ -775,7 +775,7 @@ class TestSearch:
         include_items,
         admin_client,
         list_name,
-        two_resolvable_items_in_table,
+        resolvable_items,
         list_c,
         training_database_guid,
     ):
@@ -788,7 +788,7 @@ class TestSearch:
         for result in results:
             assert result.record_list.identifier == list_c.identifier
             if include_items:
-                assert len(result.items) == 2
+                assert len(result.items) == len(resolvable_items)
             else:
                 assert result.items is None
 
@@ -798,7 +798,7 @@ class TestSearch:
         include_items,
         admin_client,
         list_name,
-        two_resolvable_items_in_table,
+        resolvable_items,
         list_c,
         training_database_guid,
     ):
@@ -812,7 +812,7 @@ class TestSearch:
         for result in results:
             assert result.record_list.identifier == list_c.identifier
             if include_items:
-                assert len(result.items) == 2
+                assert len(result.items) == len(resolvable_items)
             else:
                 assert result.items is None
 
@@ -822,7 +822,7 @@ class TestSearch:
         include_items,
         admin_client,
         list_name,
-        two_resolvable_items_in_table,
+        resolvable_items,
         list_c,
         design_data_table_guid,
     ):
@@ -835,13 +835,13 @@ class TestSearch:
         for result in results:
             assert result.record_list.identifier == list_c.identifier
             if include_items:
-                assert len(result.items) == 2
+                assert len(result.items) == len(resolvable_items)
             else:
                 assert result.items is None
 
     @pytest.mark.parametrize("include_items", [True, False])
     def test_search_by_record(
-        self, include_items, admin_client, list_name, two_resolvable_items_in_table, list_c
+        self, include_items, admin_client, list_name, resolvable_items, list_c
     ):
         record_history_guid = two_resolvable_items_in_table[0].record_history_guid
         criteria = SearchCriterion(
@@ -852,7 +852,7 @@ class TestSearch:
         assert len(results) == 1
         assert results[0].record_list.identifier == list_c.identifier
         if include_items:
-            assert len(results[0].items) == 2
+            assert len(results[0].items) == len(resolvable_items)
         else:
             assert results[0].items is None
 
@@ -923,7 +923,7 @@ class TestSearch:
         ids = {result.record_list.identifier for result in results}
         assert {list_a.identifier, list_b.identifier} == ids
 
-    def test_include_items_flag(self, admin_client, list_c, two_resolvable_items_in_table):
+    def test_include_items_flag(self, admin_client, list_c, resolvable_items):
         results = admin_client.search_for_lists(
             SearchCriterion(name_contains=self._name_suffix_C),
             include_items=True,
@@ -934,11 +934,11 @@ class TestSearch:
         # Check the result does have the expected items
         check_count = 0
         for result_item in result.items:
-            for input_item in two_resolvable_items_in_table:
+            for input_item in resolvable_items:
                 if result_item.record_history_guid == input_item.record_history_guid:
                     assert result_item.database_guid == input_item.database_guid
                     assert result_item.table_guid == input_item.table_guid
                     assert result_item.record_guid == input_item.record_guid
                     assert result_item.record_version == input_item.record_version
                     check_count += 1
-        assert check_count == len(result.items) == len(two_resolvable_items_in_table)
+        assert check_count == len(result.items) == len(resolvable_items)
