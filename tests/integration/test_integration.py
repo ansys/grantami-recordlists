@@ -923,7 +923,7 @@ class TestSearch:
         ids = {result.record_list.identifier for result in results}
         assert {list_a.identifier, list_b.identifier} == ids
 
-    def test_include_items_flag(self, admin_client, list_c, resolvable_items):
+    def test_search_result_contains_correct_items(self, admin_client, list_c, resolvable_items):
         results = admin_client.search_for_lists(
             SearchCriterion(name_contains=self._name_suffix_C),
             include_items=True,
