@@ -720,11 +720,11 @@ class TestSearch:
         admin_client.delete_list(created_list)
 
     @pytest.fixture(scope="class")
-    def list_c(self, admin_client, list_name, list_b, unresolvable_item):
+    def list_c(self, admin_client, list_name, list_b, two_resolvable_items_in_table):
         """A revision of list B with a known name and items."""
         created_list = admin_client.revise_list(list_b)
         admin_client.update_list(created_list, name=list_name + self._name_suffix_C)
-        admin_client.add_items_to_list(created_list, [unresolvable_item])
+        admin_client.add_items_to_list(created_list, two_resolvable_items_in_table)
         yield created_list
         admin_client.delete_list(created_list)
 
@@ -769,42 +769,92 @@ class TestSearch:
         assert len(results) == 1
         assert results[0].record_list.identifier == list_c.identifier
 
-    def test_search_by_database(self, admin_client, list_name, unresolvable_item, list_c):
+    @pytest.mark.parametrize("include_items", [True, False])
+    def test_search_by_database(
+        self,
+        include_items,
+        admin_client,
+        list_name,
+        two_resolvable_items_in_table,
+        list_c,
+        training_database_guid,
+    ):
         criteria = SearchCriterion(
             name_contains=list_name,
-            contains_records_in_databases=[unresolvable_item.database_guid],
+            contains_records_in_databases=[training_database_guid],
         )
-        results = admin_client.search_for_lists(criteria)
-        assert len(results) == 1
-        assert results[0].record_list.identifier == list_c.identifier
+        results = admin_client.search_for_lists(criteria, include_items=include_items)
+        assert len(results) == 2
+        for result in results:
+            assert result.record_list.identifier == list_c.identifier
+            if include_items:
+                assert len(result.items) == 2
+            else:
+                assert result.items is None
 
-    def test_search_by_multiple_databases(self, admin_client, list_name, unresolvable_item, list_c):
+    @pytest.mark.parametrize("include_items", [True, False])
+    def test_search_by_multiple_databases(
+        self,
+        include_items,
+        admin_client,
+        list_name,
+        two_resolvable_items_in_table,
+        list_c,
+        training_database_guid,
+    ):
         # List of databases = Is in one OR the other
         criteria = SearchCriterion(
             name_contains=list_name,
-            contains_records_in_databases=[unresolvable_item.database_guid, str(uuid.uuid4())],
+            contains_records_in_databases=[training_database_guid, str(uuid.uuid4())],
         )
-        results = admin_client.search_for_lists(criteria)
-        assert len(results) == 1
-        assert results[0].record_list.identifier == list_c.identifier
+        results = admin_client.search_for_lists(criteria, include_items=include_items)
+        assert len(results) == 2
+        for result in results:
+            assert result.record_list.identifier == list_c.identifier
+            if include_items:
+                assert len(result.items) == 2
+            else:
+                assert result.items is None
 
-    def test_search_by_table(self, admin_client, list_name, unresolvable_item, list_c):
+    @pytest.mark.parametrize("include_items", [True, False])
+    def test_search_by_table(
+        self,
+        include_items,
+        admin_client,
+        list_name,
+        two_resolvable_items_in_table,
+        list_c,
+        design_data_table_guid,
+    ):
         criteria = SearchCriterion(
             name_contains=list_name,
-            contains_records_in_tables=[unresolvable_item.table_guid],
+            contains_records_in_tables=[design_data_table_guid],
         )
-        results = admin_client.search_for_lists(criteria)
-        assert len(results) == 1
-        assert results[0].record_list.identifier == list_c.identifier
+        results = admin_client.search_for_lists(criteria, include_items=include_items)
+        assert len(results) == 2
+        for result in results:
+            assert result.record_list.identifier == list_c.identifier
+            if include_items:
+                assert len(result.items) == 2
+            else:
+                assert result.items is None
 
-    def test_search_by_record(self, admin_client, list_name, unresolvable_item, list_c):
+    @pytest.mark.parametrize("include_items", [True, False])
+    def test_search_by_record(
+        self, include_items, admin_client, list_name, two_resolvable_items_in_table, list_c
+    ):
+        record_history_guid = two_resolvable_items_in_table[0].record_history_guid
         criteria = SearchCriterion(
             name_contains=list_name,
-            contains_records=[unresolvable_item.record_history_guid],
+            contains_records=[record_history_guid],
         )
-        results = admin_client.search_for_lists(criteria)
+        results = admin_client.search_for_lists(criteria, include_items=include_items)
         assert len(results) == 1
         assert results[0].record_list.identifier == list_c.identifier
+        if include_items:
+            assert len(results[0].items) == 1
+        else:
+            assert results[0].items is None
 
     def test_search_role_is_none(self, admin_client, list_name):
         criteria = SearchCriterion(user_role=UserRole.NONE)
@@ -873,18 +923,22 @@ class TestSearch:
         ids = {result.record_list.identifier for result in results}
         assert {list_a.identifier, list_b.identifier} == ids
 
-    @pytest.mark.parametrize("include_items", [True, False])
-    def test_include_items_flag(self, admin_client, list_c, include_items, unresolvable_item):
+    def test_include_items_flag(self, admin_client, list_c, two_resolvable_items_in_table):
         results = admin_client.search_for_lists(
             SearchCriterion(name_contains=self._name_suffix_C),
-            include_items=include_items,
+            include_items=True,
         )
-        # First check we got the expected result
         assert len(results) == 1
         result = results[0]
         assert result.record_list.identifier == list_c.identifier
         # Check the result does have the expected items
-        if include_items:
-            assert result.items == [unresolvable_item]
-        else:
-            assert result.items is None
+        check_count = 0
+        for result_item in result.items:
+            for input_item in two_resolvable_items_in_table:
+                if result_item.record_history_guid == input_item.record_history_guid:
+                    assert result_item.database_guid == input_item.database_guid
+                    assert result_item.table_guid == input_item.table_guid
+                    assert result_item.record_guid == input_item.record_guid
+                    assert result_item.record_version == input_item.record_version
+                    check_count += 1
+        assert check_count == len(result.items) == len(two_resolvable_items_in_table)

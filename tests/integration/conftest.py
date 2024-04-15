@@ -21,10 +21,10 @@
 # SOFTWARE.
 
 import os
-from typing import Dict, List
+from typing import List
 import uuid
 
-from ansys.grantami.serverapi_openapi.api import SchemaDatabasesApi, SearchApi
+from ansys.grantami.serverapi_openapi.api import SchemaDatabasesApi, SchemaTablesApi, SearchApi
 from ansys.grantami.serverapi_openapi.models import (
     GrantaServerApiSearchDiscreteTextValuesDatumCriterion,
     GrantaServerApiSearchRecordPropertyCriterion,
@@ -150,15 +150,51 @@ def new_list_with_many_unresolvable_items(
 
 
 @pytest.fixture(scope="session")
-def db_key_to_guid_map(admin_client) -> Dict[str, str]:
-    """Provides a map between database key and database guid."""
+def training_database_guid(admin_client) -> str:
     schema_api = SchemaDatabasesApi(admin_client)
     dbs = schema_api.get_all_databases()
-    return {db.key: db.guid for db in dbs.databases}
+    return next(db.guid for db in dbs.databases if db.key == DB_KEY)
 
 
 @pytest.fixture(scope="session")
-def resolvable_items(admin_client, db_key_to_guid_map) -> List[RecordListItem]:
+def design_data_table_guid(admin_client) -> str:
+    table_api = SchemaTablesApi(admin_client)
+    table_response = table_api.get_tables(database_key=DB_KEY)
+    return next(table.guid for table in table_response.tables if table.name == TABLE_NAME)
+
+
+@pytest.fixture(scope="session")
+def two_resolvable_items_in_table(
+    admin_client, training_database_guid, design_data_table_guid
+) -> List[RecordListItem]:
+    """Get two records in the Design Data table and use them to create
+    a list of RecordListItems which can be added to a list."""
+    search_api = SearchApi(admin_client)
+    search_body = GrantaServerApiSearchSearchRequest(
+        criterion=GrantaServerApiSearchRecordPropertyCriterion(
+            _property=GrantaServerApiSearchSearchableRecordProperty.RECORDTYPE,
+            inner_criterion=GrantaServerApiSearchDiscreteTextValuesDatumCriterion(
+                any=["Record"],
+            ),
+        )
+    )
+    search_results = search_api.database_search_in_table_with_guid(
+        database_key=DB_KEY,
+        table_guid=design_data_table_guid,
+        body=search_body,
+    )
+    return [
+        RecordListItem(
+            training_database_guid,
+            result.table_guid,
+            result.record_history_guid,
+        )
+        for result in search_results.results[:2]
+    ]
+
+
+@pytest.fixture(scope="session")
+def resolvable_items(admin_client, training_database_guid) -> List[RecordListItem]:
     """Get all records in the MI_Training database and use them to create
     a list of RecordListItems which can be added to a list."""
     search_api = SearchApi(admin_client)
@@ -176,7 +212,7 @@ def resolvable_items(admin_client, db_key_to_guid_map) -> List[RecordListItem]:
     )
     return [
         RecordListItem(
-            db_key_to_guid_map[result.database_key],
+            training_database_guid,
             result.table_guid,
             result.record_history_guid,
         )
