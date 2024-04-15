@@ -852,7 +852,7 @@ class TestSearch:
         assert len(results) == 1
         assert results[0].record_list.identifier == list_c.identifier
         if include_items:
-            assert len(results[0].items) == 1
+            assert len(results[0].items) == 2
         else:
             assert results[0].items is None
 
