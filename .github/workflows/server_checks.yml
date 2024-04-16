@@ -197,11 +197,15 @@ jobs:
           path: doc/_build/latex/*.pdf
           retention-days: 7
 
+  check_workflow_runs:
+    needs: doc-build
+    uses: ansys/grantami-bomanalytics/.github/workflows/check-concurrent-workflows.yml
+
   stop-vm:
     name: "Stop Azure VM"
     runs-on: ubuntu-latest
-    needs: doc-build
-    if: ${{ always() && !(inputs.skip-vm-management)}}
+    needs: check_workflow_runs
+    if: always() && !cancelled() && !(inputs.skip-vm-management) && needs.check_workflow_runs.outputs.active-runs != 'true'
     steps:
       - uses: azure/CLI@v2
         with:
