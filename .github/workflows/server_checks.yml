@@ -198,6 +198,7 @@ jobs:
           retention-days: 7
 
   check_workflow_runs:
+    name: Check if there are active workflow runs
     needs: doc-build
     uses: ansys/pygranta/.github/workflows/check-concurrent-workflows.yml@main
 
