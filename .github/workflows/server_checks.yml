@@ -199,7 +199,7 @@ jobs:
 
   check_workflow_runs:
     needs: doc-build
-    uses: ansys/grantami-bomanalytics/.github/workflows/check-concurrent-workflows.yml@main
+    uses: ansys/pygranta/.github/workflows/check-concurrent-workflows.yml@main
 
   stop-vm:
     name: "Stop Azure VM"
