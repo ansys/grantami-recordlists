@@ -20,6 +20,9 @@ concurrency:
 
 jobs:
 
+  check_workflow_runs:
+    uses: ansys/pygranta/.github/workflows/check-concurrent-workflows.yml@maint/add-reusable-workflow
+
   code-style:
     name: "Code style"
     runs-on: ubuntu-latest
