@@ -5,7 +5,7 @@ build-backend = "poetry.core.masonry.api"
 [tool.poetry]
 # Check https://python-poetry.org/docs/pyproject/ for all available sections
 name = "ansys-grantami-recordlists"
-version = "1.2.0a0"
+version = "1.2.0b0"
 description = "A python wrapper for the Granta MI RecordLists API"
 license = "MIT"
 authors = ["ANSYS, Inc. <pyansys.core@ansys.com>"]
@@ -14,7 +14,7 @@ readme = "README.rst"
 repository = "https://github.com/ansys/grantami-recordlists"
 documentation = "https://recordlists.grantami.docs.pyansys.com"
 classifiers = [
-    "Development Status :: 3 - Alpha",
+    "Development Status :: 4 - Beta",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
@@ -30,7 +30,7 @@ packages = [
 [tool.poetry.dependencies]
 python = ">=3.9,<4.0"
 ansys-openapi-common = "^2.0.0"
-ansys-grantami-serverapi-openapi = "3.0.0a3"
+ansys-grantami-serverapi-openapi = "3.0.0b0"
 requests = "^2.26"
 
 # Optional documentation dependencies
