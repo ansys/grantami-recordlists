@@ -1,5 +1,26 @@
 # Changelog
 
+This project uses [towncrier](https://towncrier.readthedocs.io/) and the
+changes for the upcoming release can be found in
+<https://github.com/ansys/grantami-recordlists/tree/main/doc/changelog.d/>.
+
+<!-- towncrier release notes start -->
+
+## grantami-recordlists 1.2.0, TBD
+
+### New features
+
+* [Issue #165](https://github.com/ansys/grantami-recordlists/issues/165),
+  [Pull request #166](https://github.com/ansys/grantami-recordlists/pull/166): Add `get_resolvable_list_items` method.
+* [Issue #195](https://github.com/ansys/grantami-recordlists/issues/195),
+  [Pull request #207](https://github.com/ansys/grantami-recordlists/pull/207): Allow `match_all` and `match_any` in boolean criteria.
+
+### Contributors
+
+* Andy Grigg (Ansys)
+* Ludovic Steinbach (Ansys)
+* Doug Addy (Ansys)
+
 ## grantami-recordlists 1.1.0, 2024-01-17
 
 ### New features
