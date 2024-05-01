@@ -91,3 +91,38 @@ files = "src"
 explicit_package_bases = true
 mypy_path = "$MYPY_CONFIG_FILE_DIR/src"
 namespace_packages = true
+
+[tool.towncrier]
+package = "ansys.grantami.recordlists"
+directory = "doc/changelog.d"
+filename = "CHANGELOG.md"
+start_string = "<!-- towncrier release notes start -->\n"
+underlines = ["", "", ""]
+template = "doc/changelog.d/changelog_template.jinja"
+title_format = "## [{version}](https://github.com/ansys/grantami-recordlists/releases/tag/v{version}) - {project_date}"
+issue_format = "[#{issue}](https://github.com/ansys/grantami-recordlists/pull/{issue})"
+
+[[tool.towncrier.type]]
+directory = "added"
+name = "Added"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "changed"
+name = "Changed"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "fixed"
+name = "Fixed"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "dependencies"
+name = "Dependencies"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "miscellaneous"
+name = "Miscellaneous"
+showcontent = true
