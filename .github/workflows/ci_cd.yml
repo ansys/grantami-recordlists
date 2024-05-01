@@ -168,7 +168,7 @@ jobs:
     steps:
       - uses: ansys/actions/doc-deploy-changelog@v6
         with:
-          token: ${{ '{{ secrets.PYANSYS_CI_BOT_TOKEN }}' }}
+          token: ${{ secrets.PYANSYS_CI_BOT_TOKEN }}
 
   release:
     name: "Release"
