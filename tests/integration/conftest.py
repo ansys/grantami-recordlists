@@ -26,10 +26,13 @@ import uuid
 
 from ansys.grantami.serverapi_openapi.api import SchemaDatabasesApi, SchemaTablesApi, SearchApi
 from ansys.grantami.serverapi_openapi.models import (
+    GrantaServerApiSearchBooleanCriterion,
     GrantaServerApiSearchDiscreteTextValuesDatumCriterion,
     GrantaServerApiSearchRecordPropertyCriterion,
     GrantaServerApiSearchSearchableRecordProperty,
     GrantaServerApiSearchSearchRequest,
+    GrantaServerApiSearchShortTextDatumCriterion,
+    GrantaServerApiSearchTextMatchBehavior,
     GrantaServerApiVersionState,
 )
 from common import DB_KEY, TABLE_NAME, RecordCreator
@@ -166,14 +169,32 @@ def design_data_table_guid(admin_client) -> str:
 @pytest.fixture(scope="session")
 def resolvable_items(admin_client, training_database_guid) -> List[RecordListItem]:
     """Get all records in the MI_Training database and use them to create
-    a list of RecordListItems which can be added to a list."""
+    a list of RecordListItems which can be added to a list.
+
+    Exclude records in the 'Tensile Test Data' table, since this is used in the
+    grantami-jobqueue integration tests, and the changing contents of the table
+    can cause test failures.
+    """
     search_api = SearchApi(admin_client)
+
+    is_any_record_type = GrantaServerApiSearchRecordPropertyCriterion(
+        _property=GrantaServerApiSearchSearchableRecordProperty.RECORDTYPE,
+        inner_criterion=GrantaServerApiSearchDiscreteTextValuesDatumCriterion(
+            any=["Record", "Generic", "Folder"],
+        ),
+    )
+    is_in_tensile_test_data_table = GrantaServerApiSearchRecordPropertyCriterion(
+        _property=GrantaServerApiSearchSearchableRecordProperty.TABLENAME,
+        inner_criterion=GrantaServerApiSearchShortTextDatumCriterion(
+            text_match_behavior=GrantaServerApiSearchTextMatchBehavior.EXACTMATCH,
+            value="Tensile Test Data",
+        ),
+    )
+
     search_body = GrantaServerApiSearchSearchRequest(
-        criterion=GrantaServerApiSearchRecordPropertyCriterion(
-            _property=GrantaServerApiSearchSearchableRecordProperty.RECORDTYPE,
-            inner_criterion=GrantaServerApiSearchDiscreteTextValuesDatumCriterion(
-                any=["Record", "Generic", "Folder"],
-            ),
+        criterion=GrantaServerApiSearchBooleanCriterion(
+            all=[is_any_record_type],
+            _none=[is_in_tensile_test_data_table],
         )
     )
     search_results = search_api.database_search(
