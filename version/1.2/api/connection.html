@@ -1,0 +1,1245 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Granta MI connection &#8212; PyGranta RecordLists</title>
+
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=5b4479735964841361fd" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/ansys_sphinx_theme.css?v=35e44410" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.23/css/jquery.dataTables.min.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=5b4479735964841361fd" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd" />
+  <script src="../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=5b4479735964841361fd"></script>
+ 
+<link href="../_static/css/breadcrumbs.css" rel="stylesheet" />
+
+    <script src="../_static/documentation_options.js?v=872021ae"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/js/table.js?v=b64f5182"></script>
+    <script src="https://cdn.datatables.net/1.10.23/js/jquery.dataTables.min.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'api/connection';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.14.4';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://recordlists.grantami.docs.pyansys.com/versions.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '1.2';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner = false;
+        </script>
+    <link rel="icon" href="../_static/ansys-favicon.png"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Models" href="models.html" />
+    <link rel="prev" title="API reference" href="index.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <link rel="canonical" href="https://recordlists.grantami.docs.pyansys.com/version/stable/api/connection.html" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container"><!-- Debugging: html_theme_options =  -->
+
+<!-- If there is no MiliSearch enabled, use the PyData search -->
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+   
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/pyansys-logo-black-cropped.png" class="logo__image only-light" alt="PyGranta RecordLists - Home"/>
+    <script>document.write(`<img src="../_static/pyansys-logo-black-cropped.png" class="logo__image only-dark" alt="PyGranta RecordLists - Home"/>`);</script>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../getting_started/index.html">
+                        Getting started
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="index.html">
+                        API reference
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../examples/index.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../contributing.html">
+                        Contributing
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item">
+<script>
+document.write(`
+  <div class="version-switcher__container dropdown">
+    <button id="pst-version-switcher-button-2"
+      type="button"
+      class="version-switcher__button btn btn-sm navbar-btn dropdown-toggle"
+      data-bs-toggle="dropdown"
+      aria-haspopup="listbox"
+      aria-controls="pst-version-switcher-list-2"
+      aria-label="Version switcher list"
+    >
+      Choose version  <!-- this text may get changed later by javascript -->
+      <span class="caret"></span>
+    </button>
+    <div id="pst-version-switcher-list-2"
+      class="version-switcher__menu dropdown-menu list-group-flush py-0"
+      role="listbox" aria-labelledby="pst-version-switcher-button-2">
+      <!-- dropdown will be populated by javascript on page load -->
+    </div>
+  </div>
+`);
+</script></div>
+      
+        <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/ansys/grantami-recordlists" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+    <label class="sidebar-toggle secondary-toggle" for="__secondary" tabindex="0">
+      <span class="fa-solid fa-outdent"></span>
+    </label>
+  
+</div>
+
+    </nav>
+    <div id="announcement_msg"></div>
+<script>
+  fetch("announcement.html")
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`HTTP error: ${response.status}`);
+      }
+      return response.text();
+    })
+    .then(
+      (text) => (document.getElementById("announcement_msg").innerHTML = text),
+    )
+    .catch((error) => console.error(`Fetch problem: ${error.message}`));
+</script>  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item">
+<nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../getting_started/index.html">
+                        Getting started
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="index.html">
+                        API reference
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../examples/index.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../contributing.html">
+                        Contributing
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+<script>
+document.write(`
+  <div class="version-switcher__container dropdown">
+    <button id="pst-version-switcher-button-3"
+      type="button"
+      class="version-switcher__button btn btn-sm navbar-btn dropdown-toggle"
+      data-bs-toggle="dropdown"
+      aria-haspopup="listbox"
+      aria-controls="pst-version-switcher-list-3"
+      aria-label="Version switcher list"
+    >
+      Choose version  <!-- this text may get changed later by javascript -->
+      <span class="caret"></span>
+    </button>
+    <div id="pst-version-switcher-list-3"
+      class="version-switcher__menu dropdown-menu list-group-flush py-0"
+      role="listbox" aria-labelledby="pst-version-switcher-button-3">
+      <!-- dropdown will be populated by javascript on page load -->
+    </div>
+  </div>
+`);
+</script></div>
+        
+          <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/ansys/grantami-recordlists" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Granta MI connection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="models.html">Models</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+<nav aria-label="Breadcrumb">
+  <ul class="bd-breadcrumbs">
+         
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="https://docs.pyansys.com/" class="nav-link">PyAnsys</a>
+    </li>
+       
+    <li class="breadcrumb-item">
+      <a href="https://grantami.docs.pyansys.com/" class="nav-link">PyGranta</a>
+    </li>
+     
+    <li class="breadcrumb-item">
+      <a
+        href="../index.html"
+        class="nav-link"
+        aria-label="Home"
+      >
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+     
+    <li class="breadcrumb-item">
+      <a href="index.html" class="nav-link">API reference</a>
+    </li>
+      
+    <li class="breadcrumb-item active" aria-current="page">Granta MI connection</li>
+    
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <section id="granta-mi-connection">
+<span id="ref-grantami-recordlists-connection"></span><h1>Granta MI connection<a class="headerlink" href="#granta-mi-connection" title="Link to this heading">#</a></h1>
+<section id="connection-builder">
+<h2>Connection builder<a class="headerlink" href="#connection-builder" title="Link to this heading">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.Connection">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Connection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">servicelayer_url</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">session_configuration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ansys.grantami.recordlists.Connection" title="Link to this definition">#</a></dt>
+<dd><p>Connects to a Granta MI ServerAPI instance.</p>
+<p>This is a subclass of the <a class="reference external" href="https://openapi.docs.pyansys.com/api/_autosummary/ansys.openapi.common.ApiClientFactory.html#ansys.openapi.common.ApiClientFactory" title="(in ansys.openapi.common v2.0.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ansys.openapi.common.ApiClientFactory</span></code></a> class. All methods in
+this class are documented as returning <a class="reference external" href="https://openapi.docs.pyansys.com/api/_autosummary/ansys.openapi.common.ApiClientFactory.html#ansys.openapi.common.ApiClientFactory" title="(in ansys.openapi.common v2.0.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ApiClientFactory</span></code></a> class
+instances of the <a class="reference internal" href="#ansys.grantami.recordlists.Connection" title="ansys.grantami.recordlists.Connection"><code class="xref py py-class docutils literal notranslate"><span class="pre">ansys.grantami.recordlists.Connection</span></code></a> class instead.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>servicelayer_url</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a></span></dt><dd><p>Base URL of the Granta MI Service Layer application.</p>
+</dd>
+<dt><strong>session_configuration</strong><span class="classifier"><a class="reference external" href="https://openapi.docs.pyansys.com/api/_autosummary/ansys.openapi.common.SessionConfiguration.html#ansys.openapi.common.SessionConfiguration" title="(in ansys.openapi.common v2.0.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">SessionConfiguration</span></code></a>, optional</span></dt><dd><p>Additional configuration settings for the requests session. The default is <code class="docutils literal notranslate"><span class="pre">None</span></code>, in which
+case the <a class="reference external" href="https://openapi.docs.pyansys.com/api/_autosummary/ansys.openapi.common.SessionConfiguration.html#ansys.openapi.common.SessionConfiguration" title="(in ansys.openapi.common v2.0.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">SessionConfiguration</span></code></a> class with default parameters
+is used.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>For advanced usage, including configuring session-specific properties and timeouts, see the
+<a class="reference external" href="https://openapi.docs.pyansys.com/api/index.html" title="(in ansys.openapi.common v2.0.1)"><span class="xref std std-doc">ansys-openapi-common API reference</span></a>. Specifically, see
+the documentation for the <a class="reference external" href="https://openapi.docs.pyansys.com/api/_autosummary/ansys.openapi.common.ApiClientFactory.html#ansys.openapi.common.ApiClientFactory" title="(in ansys.openapi.common v2.0.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ApiClientFactory</span></code></a> base class and the
+<a class="reference external" href="https://openapi.docs.pyansys.com/api/_autosummary/ansys.openapi.common.SessionConfiguration.html#ansys.openapi.common.SessionConfiguration" title="(in ansys.openapi.common v2.0.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">SessionConfiguration</span></code></a> class</p>
+<ol class="arabic simple">
+<li><p>Create the connection builder object and specify the server to connect to.</p></li>
+<li><p>Specify the authentication method to use for the connection and provide credentials if
+required.</p></li>
+<li><p>Connect to the server, which returns the client object.</p></li>
+</ol>
+<p>The examples show this process for different authentication methods.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">client</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="s2">&quot;http://my_mi_server/mi_servicelayer&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">with_autologon</span><span class="p">()</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">client</span>
+<span class="go">&lt;RecordListsApiClient: url=http://my_mi_server/mi_servicelayer&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">client</span> <span class="o">=</span> <span class="p">(</span>
+<span class="gp">... </span>    <span class="n">Connection</span><span class="p">(</span><span class="s2">&quot;http://my_mi_server/mi_servicelayer&quot;</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="o">.</span><span class="n">with_credentials</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="s2">&quot;my_username&quot;</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s2">&quot;my_password&quot;</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">client</span>
+<span class="go">&lt;RecordListsApiClient: url: http://my_mi_server/mi_servicelayer&gt;</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.Connection.with_autologon">
+<span class="sig-name descname"><span class="pre">with_autologon</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ansys.grantami.recordlists.Connection.with_autologon" title="Link to this definition">#</a></dt>
+<dd><p>Set up client authentication for use with Kerberos (also known as integrated Windows authentication).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><a class="reference external" href="https://openapi.docs.pyansys.com/api/_autosummary/ansys.openapi.common.ApiClientFactory.html#ansys.openapi.common.ApiClientFactory" title="(in ansys.openapi.common v2.0.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ApiClientFactory</span></code></a></dt><dd><p>Current client factory object.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>Requires the user to have a valid Kerberos Ticket-Granting-Ticket (TGT).</p>
+<ul class="simple">
+<li><p>On Windows, this is provided by default.</p></li>
+<li><p>On Linux, this requires the <code class="docutils literal notranslate"><span class="pre">[linux-kerberos]</span></code> extension to be installed and your Kerberos installation
+to be configured correctly.</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.Connection.with_credentials">
+<span class="sig-name descname"><span class="pre">with_credentials</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">username</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">password</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">domain</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ansys.grantami.recordlists.Connection.with_credentials" title="Link to this definition">#</a></dt>
+<dd><p>Set up client authentication for use with provided credentials.</p>
+<p>This method will attempt to connect to the API and uses the provided <code class="docutils literal notranslate"><span class="pre">WWW-Authenticate</span></code> header to determine
+whether Negotiate, NTLM, or Basic Authentication should be used. The selected authentication method will then be
+configured for use.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>username</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a></span></dt><dd><p>Username for the connection.</p>
+</dd>
+<dt><strong>password</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a></span></dt><dd><p>Password for the connection.</p>
+</dd>
+<dt><strong>domain</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a>, optional</span></dt><dd><p>Domain to use for connection if required. The default is <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><a class="reference external" href="https://openapi.docs.pyansys.com/api/_autosummary/ansys.openapi.common.ApiClientFactory.html#ansys.openapi.common.ApiClientFactory" title="(in ansys.openapi.common v2.0.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ApiClientFactory</span></code></a></dt><dd><p>Original client factory object.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>NTLM authentication is not currently supported on Linux.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.Connection.with_oidc">
+<span class="sig-name descname"><span class="pre">with_oidc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">idp_session_configuration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ansys.grantami.recordlists.Connection.with_oidc" title="Link to this definition">#</a></dt>
+<dd><p>Set up client authentication for use with OpenID Connect.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>idp_session_configuration</strong><span class="classifier"><a class="reference external" href="https://openapi.docs.pyansys.com/api/_autosummary/ansys.openapi.common.SessionConfiguration.html#ansys.openapi.common.SessionConfiguration" title="(in ansys.openapi.common v2.0.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">SessionConfiguration</span></code></a>, optional</span></dt><dd><p>Additional configuration settings for the requests session when connected to the OpenID identity provider.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><a class="reference external" href="https://openapi.docs.pyansys.com/api/_autosummary/ansys.openapi.common.OIDCSessionBuilder.html#ansys.openapi.common.OIDCSessionBuilder" title="(in ansys.openapi.common v2.0.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">OIDCSessionBuilder</span></code></a></dt><dd><p>Builder object to authenticate via OIDC.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>OIDC Authentication requires the <code class="docutils literal notranslate"><span class="pre">[oidc]</span></code> extra to be installed.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.Connection.with_anonymous">
+<span class="sig-name descname"><span class="pre">with_anonymous</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ansys.grantami.recordlists.Connection.with_anonymous" title="Link to this definition">#</a></dt>
+<dd><p>Set up client authentication for anonymous use.</p>
+<p>This does not configure any authentication or authorization headers. Users must provide any
+authentication information required themselves.</p>
+<p>Clients relying on custom authentication such as client certificates or non-standard tokens
+should use this method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><a class="reference external" href="https://openapi.docs.pyansys.com/api/_autosummary/ansys.openapi.common.ApiClientFactory.html#ansys.openapi.common.ApiClientFactory" title="(in ansys.openapi.common v2.0.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ApiClientFactory</span></code></a></dt><dd><p>Original client factory object.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.Connection.connect">
+<span class="sig-name descname"><span class="pre">connect</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ansys.grantami.recordlists.Connection.connect" title="Link to this definition">#</a></dt>
+<dd><p>Finalize the <a class="reference internal" href="#ansys.grantami.recordlists.RecordListsApiClient" title="ansys.grantami.recordlists.RecordListsApiClient"><code class="xref py py-class docutils literal notranslate"><span class="pre">RecordListsApiClient</span></code></a> client and return it for use.</p>
+<p>Authentication must be configured for this method to succeed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><a class="reference internal" href="#ansys.grantami.recordlists.RecordListsApiClient" title="ansys.grantami.recordlists.RecordListsApiClient"><code class="xref py py-class docutils literal notranslate"><span class="pre">RecordListsApiClient</span></code></a></dt><dd><p>Client object that can be used to connect to Granta MI and interact with the record
+list API.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="recordlists-client">
+<h2>RecordLists client<a class="headerlink" href="#recordlists-client" title="Link to this heading">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.RecordListsApiClient">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">RecordListsApiClient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">service_layer_url</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">configuration</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ansys.grantami.recordlists.RecordListsApiClient" title="Link to this definition">#</a></dt>
+<dd><p>Communicates with Granta MI.</p>
+<p>This class is instantiated by the
+<a class="reference internal" href="#ansys.grantami.recordlists.Connection" title="ansys.grantami.recordlists.Connection"><code class="xref py py-class docutils literal notranslate"><span class="pre">Connection</span></code></a> class and should not be instantiated
+directly.</p>
+<dl class="field-list simple">
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.RecordListsApiClient.get_all_lists">
+<span class="sig-name descname"><span class="pre">get_all_lists</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ansys.grantami.recordlists.RecordListsApiClient.get_all_lists" title="Link to this definition">#</a></dt>
+<dd><p>Get the details of all record lists available for the current user.</p>
+<p>Performs an HTTP request against the Granta MI Server API.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">list</span></code></a> of <a class="reference internal" href="models.html#ansys.grantami.recordlists.RecordList" title="ansys.grantami.recordlists.RecordList"><code class="xref py py-class docutils literal notranslate"><span class="pre">RecordList</span></code></a></dt><dd><p>List of available record lists.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.RecordListsApiClient.get_list">
+<span class="sig-name descname"><span class="pre">get_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">identifier</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ansys.grantami.recordlists.RecordListsApiClient.get_list" title="Link to this definition">#</a></dt>
+<dd><p>Get the details of a record list.</p>
+<p>Performs an HTTP request against the Granta MI Server API.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>identifier</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a></span></dt><dd><p>Unique identifier of the record list.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><a class="reference internal" href="models.html#ansys.grantami.recordlists.RecordList" title="ansys.grantami.recordlists.RecordList"><code class="xref py py-class docutils literal notranslate"><span class="pre">RecordList</span></code></a></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.RecordListsApiClient.search_for_lists">
+<span class="sig-name descname"><span class="pre">search_for_lists</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">criterion</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_items</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ansys.grantami.recordlists.RecordListsApiClient.search_for_lists" title="Link to this definition">#</a></dt>
+<dd><p>Search for record lists matching the provided criteria.</p>
+<p>Performs multiple HTTP requests against the Server API.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>criterion</strong><span class="classifier"><a class="reference internal" href="models.html#ansys.grantami.recordlists.SearchCriterion" title="ansys.grantami.recordlists.SearchCriterion"><code class="xref py py-class docutils literal notranslate"><span class="pre">SearchCriterion</span></code></a> | <a class="reference internal" href="models.html#ansys.grantami.recordlists.BooleanCriterion" title="ansys.grantami.recordlists.BooleanCriterion"><code class="xref py py-class docutils literal notranslate"><span class="pre">BooleanCriterion</span></code></a></span></dt><dd><p>Criterion to use to filter lists.</p>
+</dd>
+<dt><strong>include_items: bool</strong></dt><dd><p>Whether the search results should include record list items.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">list</span></code></a> of <a class="reference internal" href="models.html#ansys.grantami.recordlists.SearchResult" title="ansys.grantami.recordlists.SearchResult"><code class="xref py py-class docutils literal notranslate"><span class="pre">SearchResult</span></code></a></dt><dd><p>List of record lists matching the provided criterion.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.RecordListsApiClient.get_list_items">
+<span class="sig-name descname"><span class="pre">get_list_items</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">record_list</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ansys.grantami.recordlists.RecordListsApiClient.get_list_items" title="Link to this definition">#</a></dt>
+<dd><p>Get all items included in a record list.</p>
+<p>Performs an HTTP request against the Granta MI Server API.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>record_list</strong><span class="classifier"><a class="reference internal" href="models.html#ansys.grantami.recordlists.RecordList" title="ansys.grantami.recordlists.RecordList"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RecordList</span></code></a></span></dt><dd><p>Record list for which items will be fetched.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">list</span></code></a> of <a class="reference internal" href="models.html#ansys.grantami.recordlists.RecordListItem" title="ansys.grantami.recordlists.RecordListItem"><code class="xref py py-class docutils literal notranslate"><span class="pre">RecordListItem</span></code></a></dt><dd><p>List of items included in the record list.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.RecordListsApiClient.get_resolvable_list_items">
+<span class="sig-name descname"><span class="pre">get_resolvable_list_items</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">record_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">read_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ansys.grantami.recordlists.RecordListsApiClient.get_resolvable_list_items" title="Link to this definition">#</a></dt>
+<dd><p>Get all resolvable items included in a record list.</p>
+<p>If an item cannot be resolved, it will not be returned. Performs multiple HTTP requests
+against the Granta MI Server API.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 1.2.</span></p>
+</div>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>record_list</strong><span class="classifier"><a class="reference internal" href="models.html#ansys.grantami.recordlists.RecordList" title="ansys.grantami.recordlists.RecordList"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RecordList</span></code></a></span></dt><dd><p>Record list for which items will be fetched.</p>
+</dd>
+<dt><strong>read_mode</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bltin-boolean-values" title="(in Python v3.12)"><span class="xref std std-ref">bool</span></a></span></dt><dd><p>Whether to enable read-mode for users who ordinarily have write permissions. Has no
+effect for read-only users.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">list</span></code></a> of <a class="reference internal" href="models.html#ansys.grantami.recordlists.RecordListItem" title="ansys.grantami.recordlists.RecordListItem"><code class="xref py py-class docutils literal notranslate"><span class="pre">RecordListItem</span></code></a></dt><dd><p>List of items included in the record list.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>Whether an item can be resolved depends on the role the user has on the Granta MI server. As
+a brief summary:</p>
+<ul class="simple">
+<li><p>If the item doesn’t specify a version, this method tests if the user can access either the
+record or, if in a version-controlled table, a version of the record in any state. A
+record cannot be resolved if:</p>
+<ul>
+<li><p>It has been deleted</p></li>
+<li><p>It has been withdrawn and the user is a read user (version-controlled tables only)</p></li>
+<li><p>It only has one unreleased version and the user is a read user (version-controlled
+tables only)</p></li>
+<li><p>It is hidden by access control</p></li>
+</ul>
+</li>
+<li><p>If the item specifies a version, this method tests if the user can access that specific
+version of the record. This condition only applies to version-controlled tables. A
+record version cannot be resolved if:</p>
+<ul>
+<li><p>It is unreleased and the user is a read user</p></li>
+<li><p>It has been withdrawn and the user is a read user</p></li>
+<li><p>It is hidden by access control</p></li>
+</ul>
+</li>
+</ul>
+<p>Since version control and access control is intended to allow and restrict access to records
+for certain groups of users, this method may return different results for different users
+depending on the configuration of Granta MI.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.RecordListsApiClient.add_items_to_list">
+<span class="sig-name descname"><span class="pre">add_items_to_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">record_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">items</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ansys.grantami.recordlists.RecordListsApiClient.add_items_to_list" title="Link to this definition">#</a></dt>
+<dd><p>Add items to a record list.</p>
+<p>Performs an HTTP request against the Granta MI Server API.
+Items are not validated against existing records on the server or existing items in the
+list.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>record_list</strong><span class="classifier"><a class="reference internal" href="models.html#ansys.grantami.recordlists.RecordList" title="ansys.grantami.recordlists.RecordList"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RecordList</span></code></a></span></dt><dd><p>Record list in which items will be added.</p>
+</dd>
+<dt><strong>items</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">list</span></code></a> of <a class="reference internal" href="models.html#ansys.grantami.recordlists.RecordListItem" title="ansys.grantami.recordlists.RecordListItem"><code class="xref py py-class docutils literal notranslate"><span class="pre">RecordListItem</span></code></a></span></dt><dd><p>List of items to add to the record list.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">list</span></code></a> of <a class="reference internal" href="models.html#ansys.grantami.recordlists.RecordListItem" title="ansys.grantami.recordlists.RecordListItem"><code class="xref py py-class docutils literal notranslate"><span class="pre">RecordListItem</span></code></a></dt><dd><p>List of items included in the record list.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.RecordListsApiClient.remove_items_from_list">
+<span class="sig-name descname"><span class="pre">remove_items_from_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">record_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">items</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ansys.grantami.recordlists.RecordListsApiClient.remove_items_from_list" title="Link to this definition">#</a></dt>
+<dd><p>Remove items from a record list.</p>
+<p>Performs an HTTP request against the Granta MI Server API.
+Attempting to remove items that are not in the list will not result in an error.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>record_list</strong><span class="classifier"><a class="reference internal" href="models.html#ansys.grantami.recordlists.RecordList" title="ansys.grantami.recordlists.RecordList"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RecordList</span></code></a></span></dt><dd><p>Record list from which items will be removed.</p>
+</dd>
+<dt><strong>items</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">list</span></code></a> of <a class="reference internal" href="models.html#ansys.grantami.recordlists.RecordListItem" title="ansys.grantami.recordlists.RecordListItem"><code class="xref py py-class docutils literal notranslate"><span class="pre">RecordListItem</span></code></a></span></dt><dd><p>List of items to remove from the record list.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">list</span></code></a> of <a class="reference internal" href="models.html#ansys.grantami.recordlists.RecordListItem" title="ansys.grantami.recordlists.RecordListItem"><code class="xref py py-class docutils literal notranslate"><span class="pre">RecordListItem</span></code></a></dt><dd><p>List of items included in the record list.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.RecordListsApiClient.create_list">
+<span class="sig-name descname"><span class="pre">create_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">notes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">items</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ansys.grantami.recordlists.RecordListsApiClient.create_list" title="Link to this definition">#</a></dt>
+<dd><p>Create a new record list with the provided arguments.</p>
+<p>Performs an HTTP request against the Granta MI Server API.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>name</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a></span></dt><dd><p>Name of the record list.</p>
+</dd>
+<dt><strong>description</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">None</span></code></a></span></dt><dd><p>Description of the record list.</p>
+</dd>
+<dt><strong>notes</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">None</span></code></a></span></dt><dd><p>Notes of the record list.</p>
+</dd>
+<dt><strong>items</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">list</span></code></a> of <a class="reference internal" href="models.html#ansys.grantami.recordlists.RecordListItem" title="ansys.grantami.recordlists.RecordListItem"><code class="xref py py-class docutils literal notranslate"><span class="pre">RecordListItem</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">None</span></code></a></span></dt><dd><p>List of items to add to the record list.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><a class="reference internal" href="models.html#ansys.grantami.recordlists.RecordList" title="ansys.grantami.recordlists.RecordList"><code class="xref py py-class docutils literal notranslate"><span class="pre">RecordList</span></code></a></dt><dd><p>Created record list details.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.RecordListsApiClient.delete_list">
+<span class="sig-name descname"><span class="pre">delete_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">record_list</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ansys.grantami.recordlists.RecordListsApiClient.delete_list" title="Link to this definition">#</a></dt>
+<dd><p>Delete a record list.</p>
+<p>Performs an HTTP request against the Granta MI Server API.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>record_list</strong><span class="classifier"><a class="reference internal" href="models.html#ansys.grantami.recordlists.RecordList" title="ansys.grantami.recordlists.RecordList"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RecordList</span></code></a></span></dt><dd><p>Record list to delete.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.RecordListsApiClient.update_list">
+<span class="sig-name descname"><span class="pre">update_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">record_list</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'_ArgNotProvided'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'_ArgNotProvided'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">notes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'_ArgNotProvided'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ansys.grantami.recordlists.RecordListsApiClient.update_list" title="Link to this definition">#</a></dt>
+<dd><p>Update a record list with the provided arguments.</p>
+<p>Performs an HTTP request against the Granta MI Server API.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>record_list</strong><span class="classifier"><a class="reference internal" href="models.html#ansys.grantami.recordlists.RecordList" title="ansys.grantami.recordlists.RecordList"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RecordList</span></code></a></span></dt><dd><p>Record list to update.</p>
+</dd>
+<dt><strong>name</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a>, optional</span></dt><dd><p>New value for the name of the record list.</p>
+</dd>
+<dt><strong>description</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">None</span></code></a>, optional</span></dt><dd><p>New value for the description of the record list. Set to None to delete an existing
+value.</p>
+</dd>
+<dt><strong>notes</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">None</span></code></a>, optional</span></dt><dd><p>New value for the notes of the record list. Set to None to delete an existing value.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><a class="reference internal" href="models.html#ansys.grantami.recordlists.RecordList" title="ansys.grantami.recordlists.RecordList"><code class="xref py py-class docutils literal notranslate"><span class="pre">RecordList</span></code></a></dt><dd><p>Updated representation of the record list.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.RecordListsApiClient.copy_list">
+<span class="sig-name descname"><span class="pre">copy_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">record_list</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ansys.grantami.recordlists.RecordListsApiClient.copy_list" title="Link to this definition">#</a></dt>
+<dd><p>Create a copy of a record list.</p>
+<p>Performs an HTTP request against the Granta MI Server API. The resulting list has a name
+prefixed by the original list name.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>record_list</strong><span class="classifier"><a class="reference internal" href="models.html#ansys.grantami.recordlists.RecordList" title="ansys.grantami.recordlists.RecordList"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RecordList</span></code></a></span></dt><dd><p>Record list to copy.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><a class="reference internal" href="models.html#ansys.grantami.recordlists.RecordList" title="ansys.grantami.recordlists.RecordList"><code class="xref py py-class docutils literal notranslate"><span class="pre">RecordList</span></code></a></dt><dd><p>Record list created by the copy operation.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.RecordListsApiClient.revise_list">
+<span class="sig-name descname"><span class="pre">revise_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">record_list</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ansys.grantami.recordlists.RecordListsApiClient.revise_list" title="Link to this definition">#</a></dt>
+<dd><p>Revise a record list.</p>
+<p>Performs an HTTP request against the Granta MI Server API.
+Revising a list allows a user to create a personal copy of a published list and to modify
+its items or details. When the ‘in-revision’ list is published, it overwrites the original
+list.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>record_list</strong><span class="classifier"><a class="reference internal" href="models.html#ansys.grantami.recordlists.RecordList" title="ansys.grantami.recordlists.RecordList"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RecordList</span></code></a></span></dt><dd><p>Record list to revise.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><a class="reference internal" href="models.html#ansys.grantami.recordlists.RecordList" title="ansys.grantami.recordlists.RecordList"><code class="xref py py-class docutils literal notranslate"><span class="pre">RecordList</span></code></a></dt><dd><p>Record list created by the revision operation.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.RecordListsApiClient.request_list_approval">
+<span class="sig-name descname"><span class="pre">request_list_approval</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">record_list</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ansys.grantami.recordlists.RecordListsApiClient.request_list_approval" title="Link to this definition">#</a></dt>
+<dd><p>Request approval for a record list.</p>
+<p>Performs an HTTP request against the Granta MI Server API.
+Requesting approval updates the <code class="docutils literal notranslate"><span class="pre">awaiting</span> <span class="pre">approval</span></code> status of the record list to <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>record_list</strong><span class="classifier"><a class="reference internal" href="models.html#ansys.grantami.recordlists.RecordList" title="ansys.grantami.recordlists.RecordList"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RecordList</span></code></a></span></dt><dd><p>Record list for which approval is requested.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><a class="reference internal" href="models.html#ansys.grantami.recordlists.RecordList" title="ansys.grantami.recordlists.RecordList"><code class="xref py py-class docutils literal notranslate"><span class="pre">RecordList</span></code></a></dt><dd><p>Updated representation of the record list.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.RecordListsApiClient.publish_list">
+<span class="sig-name descname"><span class="pre">publish_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">record_list</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ansys.grantami.recordlists.RecordListsApiClient.publish_list" title="Link to this definition">#</a></dt>
+<dd><p>Publish a record list.</p>
+<p>Performs an HTTP request against the Granta MI Server API.
+The list must be awaiting approval and not published already. Publishing the list updates
+the status to <em>published</em> and resets the awaiting approval status.
+Published lists can be viewed by all users and cannot be modified. To modify a published
+list, use <a class="reference internal" href="#ansys.grantami.recordlists.RecordListsApiClient.revise_list" title="ansys.grantami.recordlists.RecordListsApiClient.revise_list"><code class="xref py py-meth docutils literal notranslate"><span class="pre">revise_list()</span></code></a>.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>record_list</strong><span class="classifier"><a class="reference internal" href="models.html#ansys.grantami.recordlists.RecordList" title="ansys.grantami.recordlists.RecordList"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RecordList</span></code></a></span></dt><dd><p>Record list to publish.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><a class="reference internal" href="models.html#ansys.grantami.recordlists.RecordList" title="ansys.grantami.recordlists.RecordList"><code class="xref py py-class docutils literal notranslate"><span class="pre">RecordList</span></code></a></dt><dd><p>Updated representation of the record list.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.RecordListsApiClient.unpublish_list">
+<span class="sig-name descname"><span class="pre">unpublish_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">record_list</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ansys.grantami.recordlists.RecordListsApiClient.unpublish_list" title="Link to this definition">#</a></dt>
+<dd><p>Withdraw a record list.</p>
+<p>Performs an HTTP request against the Granta MI Server API.
+The list must be published and awaiting approval. Withdrawing the list updates
+the <em>published</em> status to False and resets the awaiting approval status.
+All existing subscriptions will be lost on withdrawal.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>record_list</strong><span class="classifier"><a class="reference internal" href="models.html#ansys.grantami.recordlists.RecordList" title="ansys.grantami.recordlists.RecordList"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RecordList</span></code></a></span></dt><dd><p>Record list to unpublish.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><a class="reference internal" href="models.html#ansys.grantami.recordlists.RecordList" title="ansys.grantami.recordlists.RecordList"><code class="xref py py-class docutils literal notranslate"><span class="pre">RecordList</span></code></a></dt><dd><p>Updated representation of the record list.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.RecordListsApiClient.cancel_list_approval_request">
+<span class="sig-name descname"><span class="pre">cancel_list_approval_request</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">record_list</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ansys.grantami.recordlists.RecordListsApiClient.cancel_list_approval_request" title="Link to this definition">#</a></dt>
+<dd><p>Cancel a pending request for approval on a record list.</p>
+<p>Performs an HTTP request against the Granta MI Server API.
+The list must be awaiting approval. Cancelling the approval request resets the awaiting
+approval status to False.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>record_list</strong><span class="classifier"><a class="reference internal" href="models.html#ansys.grantami.recordlists.RecordList" title="ansys.grantami.recordlists.RecordList"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RecordList</span></code></a></span></dt><dd><p>Record list for which to cancel the approval request.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><a class="reference internal" href="models.html#ansys.grantami.recordlists.RecordList" title="ansys.grantami.recordlists.RecordList"><code class="xref py py-class docutils literal notranslate"><span class="pre">RecordList</span></code></a></dt><dd><p>Updated representation of the record list.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.RecordListsApiClient.subscribe_to_list">
+<span class="sig-name descname"><span class="pre">subscribe_to_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">record_list</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ansys.grantami.recordlists.RecordListsApiClient.subscribe_to_list" title="Link to this definition">#</a></dt>
+<dd><p>Subscribe the current user to a record list.</p>
+<p>Performs an HTTP request against the Granta MI Server API.
+The list must be published.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>record_list</strong><span class="classifier"><a class="reference internal" href="models.html#ansys.grantami.recordlists.RecordList" title="ansys.grantami.recordlists.RecordList"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RecordList</span></code></a></span></dt><dd><p>Record list to subscribe to.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">None</span></code></a></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.RecordListsApiClient.unsubscribe_from_list">
+<span class="sig-name descname"><span class="pre">unsubscribe_from_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">record_list</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ansys.grantami.recordlists.RecordListsApiClient.unsubscribe_from_list" title="Link to this definition">#</a></dt>
+<dd><p>Unsubscribe the current user from a record list.</p>
+<p>Performs an HTTP request against the Granta MI Server API.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>record_list</strong><span class="classifier"><a class="reference internal" href="models.html#ansys.grantami.recordlists.RecordList" title="ansys.grantami.recordlists.RecordList"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RecordList</span></code></a></span></dt><dd><p>Record list to unsubscribe from.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><code class="docutils literal notranslate"><span class="pre">None</span></code></a></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#connection-builder">Connection builder</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.Connection"><code class="docutils literal notranslate"><span class="pre">Connection</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.Connection.with_autologon"><code class="docutils literal notranslate"><span class="pre">Connection.with_autologon()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.Connection.with_credentials"><code class="docutils literal notranslate"><span class="pre">Connection.with_credentials()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.Connection.with_oidc"><code class="docutils literal notranslate"><span class="pre">Connection.with_oidc()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.Connection.with_anonymous"><code class="docutils literal notranslate"><span class="pre">Connection.with_anonymous()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.Connection.connect"><code class="docutils literal notranslate"><span class="pre">Connection.connect()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#recordlists-client">RecordLists client</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.RecordListsApiClient"><code class="docutils literal notranslate"><span class="pre">RecordListsApiClient</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.RecordListsApiClient.get_all_lists"><code class="docutils literal notranslate"><span class="pre">RecordListsApiClient.get_all_lists()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.RecordListsApiClient.get_list"><code class="docutils literal notranslate"><span class="pre">RecordListsApiClient.get_list()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.RecordListsApiClient.search_for_lists"><code class="docutils literal notranslate"><span class="pre">RecordListsApiClient.search_for_lists()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.RecordListsApiClient.get_list_items"><code class="docutils literal notranslate"><span class="pre">RecordListsApiClient.get_list_items()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.RecordListsApiClient.get_resolvable_list_items"><code class="docutils literal notranslate"><span class="pre">RecordListsApiClient.get_resolvable_list_items()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.RecordListsApiClient.add_items_to_list"><code class="docutils literal notranslate"><span class="pre">RecordListsApiClient.add_items_to_list()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.RecordListsApiClient.remove_items_from_list"><code class="docutils literal notranslate"><span class="pre">RecordListsApiClient.remove_items_from_list()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.RecordListsApiClient.create_list"><code class="docutils literal notranslate"><span class="pre">RecordListsApiClient.create_list()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.RecordListsApiClient.delete_list"><code class="docutils literal notranslate"><span class="pre">RecordListsApiClient.delete_list()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.RecordListsApiClient.update_list"><code class="docutils literal notranslate"><span class="pre">RecordListsApiClient.update_list()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.RecordListsApiClient.copy_list"><code class="docutils literal notranslate"><span class="pre">RecordListsApiClient.copy_list()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.RecordListsApiClient.revise_list"><code class="docutils literal notranslate"><span class="pre">RecordListsApiClient.revise_list()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.RecordListsApiClient.request_list_approval"><code class="docutils literal notranslate"><span class="pre">RecordListsApiClient.request_list_approval()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.RecordListsApiClient.publish_list"><code class="docutils literal notranslate"><span class="pre">RecordListsApiClient.publish_list()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.RecordListsApiClient.unpublish_list"><code class="docutils literal notranslate"><span class="pre">RecordListsApiClient.unpublish_list()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.RecordListsApiClient.cancel_list_approval_request"><code class="docutils literal notranslate"><span class="pre">RecordListsApiClient.cancel_list_approval_request()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.RecordListsApiClient.subscribe_to_list"><code class="docutils literal notranslate"><span class="pre">RecordListsApiClient.subscribe_to_list()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.RecordListsApiClient.unsubscribe_from_list"><code class="docutils literal notranslate"><span class="pre">RecordListsApiClient.unsubscribe_from_list()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+<!-- If there is no fix edit button function, use the PyData edit-this-button-->
+</div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../_sources/api/connection.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=5b4479735964841361fd"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright (c) 2024 ANSYS, Inc. All rights reserved.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item"><p class="theme-version">
+  Built with the
+  <a href="https://sphinxdocs.ansys.com/version/stable/index.html"
+    >Ansys Sphinx Theme</a
+  >
+  0.15.2. <br />Last updated on
+  <span id="date"></span>
+</p>
+<script>
+  var options = { day: "numeric", month: "long", year: "numeric" };
+  var lastModifiedDate = new Date(document.lastModified);
+  var date = lastModifiedDate.toLocaleDateString("en-US", options);
+  document.getElementById("date").innerHTML = date;
+</script></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>
