@@ -1,6 +1,6 @@
 # Changelog
 
-## grantami-recordlists 1.2.0, TBD
+## grantami-recordlists 1.2.0, 2024-05-02
 
 ### New features
 
