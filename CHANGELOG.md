@@ -1,5 +1,18 @@
 # Changelog
 
+## grantami-recordlists 1.2.1, 2024-05-07
+
+### Changed
+
+* [Pull request #249](https://github.com/ansys/grantami-recordlists/pull/249): Update grantami-serverapi-openapi to 3.0.0.
+
+### Contributors
+
+* Andy Grigg (Ansys)
+* Ludovic Steinbach (Ansys)
+* Doug Addy (Ansys)
+
+
 ## grantami-recordlists 1.2.0, 2024-05-02
 
 ### New features
