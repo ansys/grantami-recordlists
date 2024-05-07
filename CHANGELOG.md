@@ -2,7 +2,7 @@
 
 ## grantami-recordlists 1.2.1, 2024-05-07
 
-### Changed
+### Dependencies
 
 * [Pull request #249](https://github.com/ansys/grantami-recordlists/pull/249): Update grantami-serverapi-openapi to 3.0.0.
 
