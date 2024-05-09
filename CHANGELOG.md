@@ -6,7 +6,20 @@ changes for the upcoming release can be found in
 
 <!-- towncrier release notes start -->
 
-## grantami-recordlists 1.2.0, TBD
+## grantami-recordlists 1.2.1, 2024-05-07
+
+### Dependencies
+
+* Update granta-serverapi-openapi to 3.0.0
+
+### Contributors
+
+* Andy Grigg (Ansys)
+* Ludovic Steinbach (Ansys)
+* Doug Addy (Ansys)
+
+
+## grantami-recordlists 1.2.0, 2024-05-02
 
 ### New features
 
