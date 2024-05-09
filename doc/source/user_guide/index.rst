@@ -1,0 +1,54 @@
+.. _ref_user_guide:
+
+User guide
+##########
+
+What is a Granta MI record list?
+--------------------------------
+
+Record lists are collections of records, and can be used in any situation where it is useful to have
+a persistent, server-side list of records. Records are explicitly added to a list by a user, and so
+do not need to have anything in common (as would be typical for a set of search results), and do not
+necessarily need be in the same table or database. The user has complete flexibility in deciding
+which records to add to a list.
+
+The basic functionality of managing lists of records is provided by the Granta MI Lists API.
+This functionality is made available to users in the following front-end tools:
+
+* The One MI Favorites app, as 'Favorites lists'
+* The MI Materials Gateway, as 'Favorites lists'
+* This package, as 'Record lists' (to avoid ambiguity with Python ``list`` objects)
+
+However, since these front-ends all share a common implementation in Granta MI, they can be created,
+accessed, and modified in any front-end with full interoperability. The documentation in this
+package is only concerned with record lists, for more information on the other front-ends described
+above consult the :MI_docs:`Granta MI Favorites <One_MI_Favorites>` and
+:MI_docs:`Granta MI Materials Gateway for Ansys Workbench <Granta_MI_MG_Help_AWB>` documentation.
+Documentation is available for other Gateway applications within the help site.
+
+
+What can I do with a record list?
+---------------------------------
+
+This package provides access to the following record list operations:
+
+* Record list management, including creating, deleting, and modifying record lists
+* Modifying the contents of a record list
+* Searching for record lists based on their properties and contents
+* Managing the record list lifecycle, including publishing, revising, and un-publishing record lists
+* Subscribing and unsubscribing the current user to published record lists
+
+Note that only the current user can be subscribed and unsubscribed to record lists. It is currently
+not possible to subscribe users to a list other than the user used to establish the connection to
+Granta MI.
+
+For examples that illustrate these operations, see :ref:`ref_grantami_recordlists_examples`. For
+comprehensive information on the API, see :ref:`ref_grantami_recordlists_api_reference`.
+
+
+Granta MI configuration
+-----------------------
+
+Any use of Granta MI requires the user to have necessary permissions on the Granta MI Server. Some
+record lists operations require additional permissions specific to record lists. For more
+information, see the :MI_docs:`Granta MI Favorites <One_MI_Favorites>` documentation.
