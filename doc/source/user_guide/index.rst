@@ -3,8 +3,8 @@
 User guide
 ##########
 
-What is a Granta MI record list?
---------------------------------
+Granta MI record lists
+----------------------
 
 Record lists are collections of records, and can be used in any situation where it is useful to have
 a persistent, server-side list of records. Records are explicitly added to a list by a user, and so
@@ -27,8 +27,8 @@ above consult the :MI_docs:`Granta MI Favorites <One_MI_Favorites>` and
 Documentation is available for other Gateway applications within the help site.
 
 
-What can I do with a record list?
----------------------------------
+Record list operations
+----------------------
 
 This package provides access to the following record list operations:
 
