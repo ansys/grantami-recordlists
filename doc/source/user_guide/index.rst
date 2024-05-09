@@ -12,19 +12,18 @@ do not need to have anything in common (as would be typical for a set of search 
 necessarily need be in the same table or database. The user has complete flexibility in deciding
 which records to add to a list.
 
-The basic functionality of managing lists of records is provided by the Granta MI Lists API.
-This functionality is made available to users in the following front-end tools:
+The record list management capability is available to users in the following front-end tools:
 
 * The One MI Favorites app, as 'Favorites lists'
 * The MI Materials Gateway, as 'Favorites lists'
-* This package, as 'Record lists' (to avoid ambiguity with Python ``list`` objects)
+* This package
 
-However, since these front-ends all share a common implementation in Granta MI, they can be created,
-accessed, and modified in any front-end with full interoperability. The documentation in this
-package is only concerned with record lists, for more information on the other front-ends described
-above consult the :MI_docs:`Granta MI Favorites <One_MI_Favorites>` and
-:MI_docs:`Granta MI Materials Gateway for Ansys Workbench <Granta_MI_MG_Help_AWB>` documentation.
-Documentation is available for other Gateway applications within the help site.
+However, since these front-ends all share a common implementation in Granta MI, record lists can be
+created, accessed, and modified in any front-end with full interoperability. The documentation in
+this package is only concerned with this package, for more information about the other
+tools mentioned in the preceding list consult the :MI_docs:`Granta MI Favorites <One_MI_Favorites>`
+and :MI_docs:`Granta MI Materials Gateway for Ansys Workbench <Granta_MI_MG_Help_AWB>`
+documentation. Documentation is available for other Gateway applications within the help site.
 
 
 Record list operations
