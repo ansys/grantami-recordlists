@@ -29,6 +29,7 @@ jobs:
       contents: read
       pull-requests: write
     runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
     steps:
 
     - name: Label based on changed files and branch name
@@ -59,6 +60,7 @@ jobs:
         contents: write
         pull-requests: write
       runs-on: ubuntu-latest
+      if: ${{ !startsWith( github.event.pull_request.head.ref, 'dependabot/') }}
       steps:
       - uses: ansys/actions/doc-changelog@v6
         with:
