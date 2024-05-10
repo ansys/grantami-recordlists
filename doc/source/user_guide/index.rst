@@ -37,9 +37,8 @@ This package provides access to the following record list operations:
 * Managing the record list lifecycle, including publishing, revising, and un-publishing record lists
 * Subscribing and unsubscribing the current user to published record lists
 
-Note that only the current user can be subscribed and unsubscribed to record lists. It is currently
-not possible to subscribe users to a list other than the user used to establish the connection to
-Granta MI.
+Note that only the authenticated user can be subscribed and unsubscribed to record lists. A user
+cannot subscribe or unsubscribe other users to a list on their behalf.
 
 For examples that illustrate these operations, see :ref:`ref_grantami_recordlists_examples`. For
 comprehensive information on the API, see :ref:`ref_grantami_recordlists_api_reference`.
