@@ -48,6 +48,6 @@ comprehensive information on the API, see :ref:`ref_grantami_recordlists_api_ref
 Granta MI configuration
 -----------------------
 
-Any use of Granta MI requires the user to have necessary permissions on the Granta MI Server. Some
+Any use of Granta MI requires the user to have permission to access the Granta MI Server. Some
 record lists operations require additional permissions specific to record lists. For more
 information, see the :MI_docs:`Granta MI Favorites <One_MI_Favorites>` documentation.
