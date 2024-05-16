@@ -14,7 +14,7 @@ in deciding which records to add to a list.
 
 The record list management capability is available to users in the following front-end tools:
 
-* The One MI Favorites app, as **Favorites**
+* One MI, as **Favorites**
 * The MI Materials Gateway, as **Favorites**
 * This package
 
