@@ -32,6 +32,6 @@ Check that you can start the PyGranta RecordLists client from Python by running 
     <RecordListsApiClient url: http://my.server.name/mi_servicelayer>
 
 If you see a response from the server, you have successfully installed PyGranta RecordLists and
-you can start using the RecordLists client. For more examples, see
+can start using the RecordLists client. For more examples, see
 :ref:`ref_grantami_recordlists_examples`. For comprehensive information on the API, see
 :ref:`ref_grantami_recordlists_api_reference`.

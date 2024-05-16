@@ -78,7 +78,7 @@ Server access
 As indicated in :ref:`ref_software_requirements`, running integration tests and building the examples
 requires access to a valid Granta MI instance.
 
-External contributors may not have an instance of Granta MI at their disposal. Prior to creating a
+External contributors might not have an instance of Granta MI at their disposal. Prior to creating a
 pull request with the desired changes, they should make sure that unit tests pass (:ref:`ref_tox`),
 static code validation and styling pass (:ref:`pre-commit <ref_precommit>`), and that the
 documentation can be generated successfully without the examples
