@@ -42,13 +42,6 @@ PyGranta RecordLists
 
 A Python wrapper for the Granta MI Lists API.
 
-To avoid ambiguity with the Python object ``list``, lists available via the Granta MI Lists API are referred to as
-``record lists``. Granta MI users might also know the feature as ``Favorites Lists``.
-
-Using the Granta MI Lists API requires the user to have necessary permissions on the Granta MI Server. Some
-operations on record lists require additional permissions, specific to record lists. For more information,
-see the Help for the Favorites app in Granta MI.
-
 
 Dependencies
 ------------

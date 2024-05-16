@@ -49,6 +49,8 @@ extensions = [
     "sphinx_copybutton",
     "sphinx_jinja",
     "nbsphinx",
+    "sphinx_design",
+    "sphinx.ext.extlinks",
 ]
 
 # sphinx
@@ -89,6 +91,12 @@ numpydoc_validation_checks = {
     # type, unless multiple values are being returned"
 }
 
+extlinks = {
+    "MI_docs": (
+        "https://ansyshelp.ansys.com/account/secured?returnurl=/Views/Secured/Granta/v241/en/%s",
+        None,
+    )
+}
 
 # static path
 html_static_path = ["_static"]

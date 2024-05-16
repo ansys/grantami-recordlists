@@ -5,8 +5,8 @@ Getting started
 
 .. _ref_software_requirements:
 
-Ansys software requirements
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Software requirements
+~~~~~~~~~~~~~~~~~~~~~
 .. include:: ../../../README.rst
       :start-after: readme_software_requirements
       :end-before: readme_software_requirements_end
@@ -21,7 +21,7 @@ Installation
 
 Verify your installation
 ~~~~~~~~~~~~~~~~~~~~~~~~
-Check that you can start the RecordLists client from Python by running this code:
+Check that you can start the PyGranta RecordLists client from Python by running this code:
 
 .. code:: python
 
@@ -31,6 +31,7 @@ Check that you can start the RecordLists client from Python by running this code
 
     <RecordListsApiClient url: http://my.server.name/mi_servicelayer>
 
-If you see a response from the server, you have successfully installed the RecordLists package and
-you can start using the RecordLists client. See :ref:`ref_grantami_recordlists_examples` for more
-examples and :ref:`ref_grantami_recordlists_api_reference` for a full description of the API.
+If you see a response from the server, you have successfully installed PyGranta RecordLists and
+can start using the RecordLists client. For more examples, see
+:ref:`ref_grantami_recordlists_examples`. For comprehensive information on the API, see
+:ref:`ref_grantami_recordlists_api_reference`.
