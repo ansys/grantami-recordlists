@@ -30,7 +30,7 @@ packages = [
 [tool.poetry.dependencies]
 python = ">=3.9,<4.0"
 ansys-openapi-common = "^2.0.0"
-ansys-grantami-serverapi-openapi = "3.0.0"
+ansys-grantami-serverapi-openapi = { version = ">=3.0.0, <5.0", allow-prereleases = true, source = "private-pipy"}
 requests = "^2.26"
 
 # Optional documentation dependencies
@@ -53,6 +53,11 @@ pytest = "^8.0.0"
 pytest-cov = "^5.0.0"
 requests-mock = "^1.10.0"
 pre-commit = "^3.2.2"
+
+[[tool.poetry.source]]
+name = "private-pipy"
+url = "https://pkgs.dev.azure.com/pyansys/_packaging/pyansys/pypi/simple/"
+priority = "explicit"
 
 [tool.black]
 line-length = 100
