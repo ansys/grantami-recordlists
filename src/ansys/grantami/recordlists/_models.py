@@ -568,9 +568,7 @@ class SearchCriterion:
         """Generate the DTO for use with the auto-generated client code."""
         logger.debug("Serializing SearchCriterion to API model")
         user_role = (
-            models.GsaUserRole(self.user_role.value)
-            if self.user_role is not None
-            else Unset
+            models.GsaUserRole(self.user_role.value) if self.user_role is not None else Unset
         )
         model = models.GsaRecordListSearchCriterion(
             name_contains=self.name_contains,

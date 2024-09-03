@@ -23,11 +23,7 @@
 from unittest.mock import Mock
 from uuid import uuid4
 
-from ansys.grantami.serverapi_openapi import (
-    GsaDatabaseStatus,
-    GsaDatabasesInfo,
-    GsaSlimDatabase,
-)
+from ansys.grantami.serverapi_openapi import GsaDatabasesInfo, GsaDatabaseStatus, GsaSlimDatabase
 from ansys.openapi.common import ApiClient
 import pytest
 

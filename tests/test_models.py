@@ -27,10 +27,10 @@ import uuid
 from ansys.grantami.serverapi_openapi.models import (
     GsaListBooleanCriterion,
     GsaListItem,
+    GsaListsUserOrGroup,
     GsaRecordListHeader,
     GsaRecordListSearchCriterion,
     GsaRecordListSearchResult,
-    GsaListsUserOrGroup,
     GsaUserRole,
 )
 import pytest
@@ -158,9 +158,7 @@ class TestUserOrGroup:
     user_id = str(uuid.uuid4())
     username = "domain\\username"
     display_name = "domain\\displayname"
-    dto_user = GsaListsUserOrGroup(
-        identifier=user_id, display_name=display_name, name=username
-    )
+    dto_user = GsaListsUserOrGroup(identifier=user_id, display_name=display_name, name=username)
 
     def test_user_dto_mapping(self):
         user = UserOrGroup._from_model(self.dto_user)

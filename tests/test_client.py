@@ -421,9 +421,7 @@ class TestSearch:
 
     @pytest.fixture
     def mock_search_result_get(self, monkeypatch):
-        mock_search_result_info = Mock(
-            spec=models.GsaRecordListSearchResultsInfo
-        )
+        mock_search_result_info = Mock(spec=models.GsaRecordListSearchResultsInfo)
         mock_search_result = Mock(spec=models.GsaRecordListSearchResult)
         mock_search_result_info.search_results = [mock_search_result]
         mock_search_result.items = [Mock(spec=models.GsaListItem)]
