@@ -44,7 +44,7 @@ requests = ">=2.26.0,<3.0.0"
 [package.source]
 type = "legacy"
 url = "https://pkgs.dev.azure.com/pyansys/_packaging/pyansys/pypi/simple"
-reference = "private-pipy"
+reference = "private-pypi"
 
 [[package]]
 name = "ansys-openapi-common"
@@ -2512,4 +2512,4 @@ test = ["big-O", "jaraco.functools", "jaraco.itertools", "jaraco.test", "more-it
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9,<4.0"
-content-hash = "bfcf6940cef9cb7dc3fac4f836e78780142e541f87b64d99df7d028c6fce76a9"
+content-hash = "1f3dbf6bfe785b2bc7646942af12993fcc1fd5f2537edbd5b6f8121f185d909e"
