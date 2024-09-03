@@ -24,9 +24,9 @@ from unittest.mock import Mock
 from uuid import uuid4
 
 from ansys.grantami.serverapi_openapi import (
-    GrantaServerApiDatabaseStatus,
-    GrantaServerApiSchemaDatabasesInfo,
-    GrantaServerApiSchemaSlimEntitiesSlimDatabase,
+    GsaDatabaseStatus,
+    GsaDatabasesInfo,
+    GsaSlimDatabase,
 )
 from ansys.openapi.common import ApiClient
 import pytest
@@ -52,23 +52,23 @@ def test_map_lists_dbs_with_identical_guids(item_resolver, monkeypatch, client):
     monkeypatch.setattr(
         database_api,
         "get_all_databases",
-        lambda: GrantaServerApiSchemaDatabasesInfo(
+        lambda: GsaDatabasesInfo(
             databases=[
-                GrantaServerApiSchemaSlimEntitiesSlimDatabase(
+                GsaSlimDatabase(
                     guid=duplicate_guid,
                     is_locked=False,
                     is_read_only=False,
                     key="DB_KEY_1",
                     name="DB_1",
-                    status=GrantaServerApiDatabaseStatus.OK,
+                    status=GsaDatabaseStatus.OK,
                 ),
-                GrantaServerApiSchemaSlimEntitiesSlimDatabase(
+                GsaSlimDatabase(
                     guid=duplicate_guid,
                     is_locked=False,
                     is_read_only=False,
                     key="DB_KEY_2",
                     name="DB_2",
-                    status=GrantaServerApiDatabaseStatus.OK,
+                    status=GsaDatabaseStatus.OK,
                 ),
             ]
         ),

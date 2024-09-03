@@ -176,7 +176,7 @@ class RecordList:
     @classmethod
     def _from_model(
         cls,
-        model: models.GrantaServerApiListsDtoRecordListHeader,
+        model: models.GsaRecordListHeader,
     ) -> "RecordList":
         """Instantiate from a model defined in the auto-generated client code."""
         logger.debug("Deserializing RecordList from API response")
@@ -287,7 +287,7 @@ class RecordListItem:
         )
 
     @classmethod
-    def _from_model(cls, model: models.GrantaServerApiListsDtoListItem) -> "RecordListItem":
+    def _from_model(cls, model: models.GsaListItem) -> "RecordListItem":
         """Instantiate from a model defined in the auto-generated client code."""
         logger.debug("Deserializing RecordListItem from API response")
         logger.debug(model.to_str())
@@ -301,10 +301,10 @@ class RecordListItem:
 
         return instance
 
-    def _to_create_list_item_model(self) -> models.GrantaServerApiListsDtoCreateListItem:
+    def _to_create_list_item_model(self) -> models.GsaCreateListItem:
         """Generate the Create List Item DTO for use with the auto-generated client code."""
         logger.debug("Serializing RecordListItem to API model")
-        model = models.GrantaServerApiListsDtoCreateListItem(
+        model = models.GsaCreateListItem(
             database_guid=self.database_guid,
             table_guid=self.table_guid,
             record_history_guid=self.record_history_guid,
@@ -313,10 +313,10 @@ class RecordListItem:
         logger.debug(model.to_str())
         return model
 
-    def _to_delete_list_item_model(self) -> models.GrantaServerApiListsDtoDeleteRecordListItem:
+    def _to_delete_list_item_model(self) -> models.GsaDeleteRecordListItem:
         """Generate the Delete List Item DTO for use with the auto-generated client code."""
         logger.debug("Serializing RecordListItem to API model")
-        model = models.GrantaServerApiListsDtoDeleteRecordListItem(
+        model = models.GsaDeleteRecordListItem(
             database_guid=self.database_guid,
             record_history_guid=self.record_history_guid,
             record_version=self.record_version,
@@ -363,7 +363,7 @@ class UserOrGroup:
         return self._name
 
     @classmethod
-    def _from_model(cls, dto_user: models.GrantaServerApiListsDtoUserOrGroup) -> "UserOrGroup":
+    def _from_model(cls, dto_user: models.GsaListsUserOrGroup) -> "UserOrGroup":
         """Instantiate from a model defined in the auto-generated client code."""
         logger.debug("Deserializing UserOrGroup from API response")
         logger.debug(dto_user.to_str())
@@ -564,15 +564,15 @@ class SearchCriterion:
     def user_can_add_or_remove_items(self, value: Optional[bool]) -> None:
         self._user_can_add_or_remove_items = value
 
-    def _to_model(self) -> models.GrantaServerApiListsDtoRecordListSearchCriterion:
+    def _to_model(self) -> models.GsaRecordListSearchCriterion:
         """Generate the DTO for use with the auto-generated client code."""
         logger.debug("Serializing SearchCriterion to API model")
         user_role = (
-            models.GrantaServerApiListsDtoUserRole(self.user_role.value)
+            models.GsaUserRole(self.user_role.value)
             if self.user_role is not None
             else Unset
         )
-        model = models.GrantaServerApiListsDtoRecordListSearchCriterion(
+        model = models.GsaRecordListSearchCriterion(
             name_contains=self.name_contains,
             user_role=user_role,
             is_published=self.is_published,
@@ -666,10 +666,10 @@ class BooleanCriterion:
     ) -> None:
         self._match_all = value
 
-    def _to_model(self) -> models.GrantaServerApiListsDtoListBooleanCriterion:
+    def _to_model(self) -> models.GsaListBooleanCriterion:
         """Generate the DTO for use with the auto-generated client code."""
         logger.debug("Serializing BooleanCriterion to API model")
-        model = models.GrantaServerApiListsDtoListBooleanCriterion(
+        model = models.GsaListBooleanCriterion(
             match_any=(
                 [criteria._to_model() for criteria in self.match_any]
                 if self.match_any is not None
@@ -695,14 +695,14 @@ class UserRole(str, Enum):
     Can be used in :attr:`SearchCriterion.user_role`.
     """
 
-    NONE = models.GrantaServerApiListsDtoUserRole.NONE.value
+    NONE = models.GsaUserRole.NONE.value
     """:class:`UserRole` is currently only supported in searches. Searching for lists with user
     role = :attr:`.NONE` as criteria would exclude all lists from the results."""
-    OWNER = models.GrantaServerApiListsDtoUserRole.OWNER.value
-    SUBSCRIBER = models.GrantaServerApiListsDtoUserRole.SUBSCRIBER.value
-    CURATOR = models.GrantaServerApiListsDtoUserRole.CURATOR.value
-    ADMINISTRATOR = models.GrantaServerApiListsDtoUserRole.ADMINISTRATOR.value
-    PUBLISHER = models.GrantaServerApiListsDtoUserRole.PUBLISHER.value
+    OWNER = models.GsaUserRole.OWNER.value
+    SUBSCRIBER = models.GsaUserRole.SUBSCRIBER.value
+    CURATOR = models.GsaUserRole.CURATOR.value
+    ADMINISTRATOR = models.GsaUserRole.ADMINISTRATOR.value
+    PUBLISHER = models.GsaUserRole.PUBLISHER.value
 
 
 class SearchResult:
@@ -737,7 +737,7 @@ class SearchResult:
     @classmethod
     def _from_model(
         cls,
-        model: models.GrantaServerApiListsDtoRecordListSearchResult,
+        model: models.GsaRecordListSearchResult,
         includes_items: bool,
     ) -> "SearchResult":
         """

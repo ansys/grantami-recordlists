@@ -30,13 +30,13 @@ from ansys.grantami.serverapi_openapi.api import (
     SearchApi,
 )
 from ansys.grantami.serverapi_openapi.models import (
-    GrantaServerApiRecordsRecordHistoriesCreateRecordHistory,
-    GrantaServerApiRecordType,
-    GrantaServerApiSearchRecordPropertyCriterion,
-    GrantaServerApiSearchSearchableRecordProperty,
-    GrantaServerApiSearchSearchRequest,
-    GrantaServerApiSearchShortTextDatumCriterion,
-    GrantaServerApiVersionState,
+    GsaCreateRecordHistory,
+    GsaRecordType,
+    GsaRecordPropertyCriterion,
+    GsaSearchableRecordProperty,
+    GsaSearchRequest,
+    GsaShortTextDatumCriterion,
+    GsaVersionState,
 )
 from ansys.openapi.common import ApiClient
 
@@ -146,7 +146,7 @@ class RecordCreator:
         return self._database_guid
 
     @property
-    def latest_state(self) -> GrantaServerApiVersionState:
+    def latest_state(self) -> GsaVersionState:
         if not self._latest_state:
             self._get_latest_version_info()
         return self._latest_state
@@ -188,10 +188,10 @@ class RecordCreator:
 
         # First check if we can find the record
         search_api = SearchApi(self.admin_client)
-        search_body = GrantaServerApiSearchSearchRequest(
-            criterion=GrantaServerApiSearchRecordPropertyCriterion(
-                _property=GrantaServerApiSearchSearchableRecordProperty.RECORDNAME,
-                inner_criterion=GrantaServerApiSearchShortTextDatumCriterion(
+        search_body = GsaSearchRequest(
+            criterion=GsaRecordPropertyCriterion(
+                _property=GsaSearchableRecordProperty.RECORDNAME,
+                inner_criterion=GsaShortTextDatumCriterion(
                     value=self.history_name,
                 ),
             )
@@ -214,14 +214,14 @@ class RecordCreator:
         response = history_api.create_record_history(
             database_key=DB_KEY,
             table_guid=self._table_guid,
-            body=GrantaServerApiRecordsRecordHistoriesCreateRecordHistory(
-                name=self.history_name, record_type=GrantaServerApiRecordType.RECORD
+            body=GsaCreateRecordHistory(
+                name=self.history_name, record_type=GsaRecordType.RECORD
             ),
         )
         return response.guid
 
     def get_or_create_version(
-        self, required_state: GrantaServerApiVersionState, required_version: int
+        self, required_state: GsaVersionState, required_version: int
     ) -> str:
         """Get the GUID for the record version in the specified state, with the specified version.
 
@@ -243,42 +243,42 @@ class RecordCreator:
             return version_guid
 
         # We need a released v1 record
-        if required_state == GrantaServerApiVersionState.RELEASED and required_version == 1:
+        if required_state == GsaVersionState.RELEASED and required_version == 1:
             if (
-                self.latest_state == GrantaServerApiVersionState.UNRELEASED
+                self.latest_state == GsaVersionState.UNRELEASED
                 and self.latest_version == 1
             ):
                 self._release()
                 return self.latest_version_guid
 
         # We need an unreleased version 2 record
-        if required_state == GrantaServerApiVersionState.UNRELEASED and required_version == 2:
+        if required_state == GsaVersionState.UNRELEASED and required_version == 2:
             if (
                 self.latest_version == 1
-                and self.latest_state == GrantaServerApiVersionState.UNRELEASED
+                and self.latest_state == GsaVersionState.UNRELEASED
             ):
                 # Release v1 and create new unreleased v2
                 self._release()
                 self._create_new_unreleased()
             elif (
                 self.latest_version == 1
-                and self.latest_state == GrantaServerApiVersionState.RELEASED
+                and self.latest_state == GsaVersionState.RELEASED
             ):
                 # Just create new unreleased v2
                 self._create_new_unreleased()
             return self._get_version_guid_in_state(required_state, required_version)
 
         # We need a superseded version 1 record
-        if required_state == GrantaServerApiVersionState.SUPERSEDED and required_version == 1:
+        if required_state == GsaVersionState.SUPERSEDED and required_version == 1:
             if (
-                self.latest_state == GrantaServerApiVersionState.UNRELEASED
+                self.latest_state == GsaVersionState.UNRELEASED
                 and self.latest_version == 2
             ):
                 # If latest version is unreleased v2 is unreleased, release it.
                 self._release()
                 # Re-fetch the information for the newly-superseded record
             elif (
-                self.latest_state == GrantaServerApiVersionState.UNRELEASED
+                self.latest_state == GsaVersionState.UNRELEASED
                 and self.latest_version == 1
             ):
                 # If v1 is unreleased, we need to release it, then create a new version,
@@ -287,8 +287,8 @@ class RecordCreator:
                 self._create_new_unreleased()
                 self._release()
             elif self.latest_state in [
-                GrantaServerApiVersionState.RELEASED,
-                GrantaServerApiVersionState.WITHDRAWN,
+                GsaVersionState.RELEASED,
+                GsaVersionState.WITHDRAWN,
             ]:
                 # If v1 is released or withdrawn, then create a new version and then release it
                 self._create_new_unreleased()
@@ -306,7 +306,7 @@ class RecordCreator:
         )
 
     def _get_version_guid_in_state(
-        self, version_state: GrantaServerApiVersionState, version_number: int
+        self, version_state: GsaVersionState, version_number: int
     ) -> Optional[str]:
         """Get information about a specific version of a record history.
 
