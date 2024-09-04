@@ -158,11 +158,11 @@ class RecordListsApiClient(ApiClient):  # type: ignore[misc]
             List of record lists matching the provided criterion.
         """
         logger.info(f"Searching for lists with connection {self}")
-        response_options = models.GrantaServerApiListsDtoResponseOptions(
+        response_options = models.GsaResponseOptions(
             include_record_list_items=include_items,
         )
         search_info = self.list_management_api.run_record_lists_search(
-            body=models.GrantaServerApiListsDtoRecordListSearchRequest(
+            body=models.GsaRecordListSearchRequest(
                 search_criterion=criterion._to_model(),
                 response_options=response_options,
             )
@@ -278,7 +278,7 @@ class RecordListsApiClient(ApiClient):  # type: ignore[misc]
         logger.info(f"Adding {len(items)} items to list {record_list} with connection {self}")
         response_items = self.list_item_api.add_items_to_list(
             list_identifier=record_list.identifier,
-            body=models.GrantaServerApiListsDtoCreateRecordListItemsInfo(
+            body=models.GsaCreateRecordListItemsInfo(
                 items=[item._to_create_list_item_model() for item in items]
             ),
         )
@@ -308,7 +308,7 @@ class RecordListsApiClient(ApiClient):  # type: ignore[misc]
         logger.info(f"Removing {len(items)} items from list {record_list} with connection {self}")
         response_items = self.list_item_api.remove_items_from_list(
             list_identifier=record_list.identifier,
-            body=models.GrantaServerApiListsDtoDeleteRecordListItems(
+            body=models.GsaDeleteRecordListItems(
                 items=[item._to_delete_list_item_model() for item in items]
             ),
         )
@@ -345,10 +345,10 @@ class RecordListsApiClient(ApiClient):  # type: ignore[misc]
         items_string = "no items" if items is None or len(items) == 0 else f"{len(items)} items"
         logger.info(f"Creating new list {name} with {items_string} with connection {self}")
         if items is not None:
-            items = models.GrantaServerApiListsDtoCreateRecordListItemsInfo(
+            items = models.GsaCreateRecordListItemsInfo(
                 items=[list_item._to_create_list_item_model() for list_item in items]
             )
-        body = models.GrantaServerApiListsDtoCreateRecordList(
+        body = models.GsaCreateRecordList(
             name=name, description=description, notes=notes, items=items if items else Unset
         )
         created_list = self.list_management_api.create_list(body=body)
@@ -408,7 +408,7 @@ class RecordListsApiClient(ApiClient):  # type: ignore[misc]
         if name is None:
             raise ValueError(f"If provided, argument 'name' cannot be None.")
 
-        body = models.GrantaServerApiListsDtoUpdateRecordListProperties()
+        body = models.GsaUpdateRecordListProperties()
         if name != _ArgNotProvided:
             body.name = name
         if description != _ArgNotProvided:
