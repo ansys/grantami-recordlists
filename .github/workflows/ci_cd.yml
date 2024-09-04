@@ -7,6 +7,14 @@ on:
     branches:
       - main
   workflow_dispatch:
+    inputs:
+      publish-to-private-pypi:
+        description: Whether to publish the build to the private PyPI
+        type: choice
+        options:
+          - 'true'
+          - 'false'
+        default: 'false'
 
 env:
   MAIN_PYTHON_VERSION: '3.9'
@@ -147,6 +155,19 @@ jobs:
           cname: ${{ env.DOCUMENTATION_CNAME }}
           token: ${{ secrets.GITHUB_TOKEN }}
           doc-artifact-name: documentation-html
+
+  release-private-pypi:
+    name: "Publish dev build to private PyPI"
+    runs-on: ubuntu-latest
+    needs: [ server-checks ]
+    if: (github.event_name == 'workflow_dispatch') && (github.ref == 'refs/heads/main') && (inputs.publish-to-private-pypi == 'true')
+    steps:
+      - name: "Release to private PyPI"
+        uses: ansys/actions/release-pypi-private@v7
+        with:
+          library-name: ${{ env.LIBRARY_NAME }}
+          twine-username: "__token__"
+          twine-token: ${{ secrets.PYANSYS_PYPI_PRIVATE_PAT }}
 
   update-changelog:
     name: "Update CHANGELOG for new tag"
