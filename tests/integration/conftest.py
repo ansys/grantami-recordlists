@@ -26,14 +26,14 @@ import uuid
 
 from ansys.grantami.serverapi_openapi.api import SchemaDatabasesApi, SchemaTablesApi, SearchApi
 from ansys.grantami.serverapi_openapi.models import (
-    GrantaServerApiSearchBooleanCriterion,
-    GrantaServerApiSearchDiscreteTextValuesDatumCriterion,
-    GrantaServerApiSearchRecordPropertyCriterion,
-    GrantaServerApiSearchSearchableRecordProperty,
-    GrantaServerApiSearchSearchRequest,
-    GrantaServerApiSearchShortTextDatumCriterion,
-    GrantaServerApiSearchTextMatchBehavior,
-    GrantaServerApiVersionState,
+    GsaBooleanCriterion,
+    GsaDiscreteTextValuesDatumCriterion,
+    GsaRecordPropertyCriterion,
+    GsaSearchableRecordProperty,
+    GsaSearchRequest,
+    GsaShortTextDatumCriterion,
+    GsaTextMatchBehavior,
+    GsaVersionState,
 )
 from common import DB_KEY, TABLE_NAME, RecordCreator
 import pytest
@@ -177,22 +177,22 @@ def resolvable_items(admin_client, training_database_guid) -> List[RecordListIte
     """
     search_api = SearchApi(admin_client)
 
-    is_any_record_type = GrantaServerApiSearchRecordPropertyCriterion(
-        _property=GrantaServerApiSearchSearchableRecordProperty.RECORDTYPE,
-        inner_criterion=GrantaServerApiSearchDiscreteTextValuesDatumCriterion(
+    is_any_record_type = GsaRecordPropertyCriterion(
+        _property=GsaSearchableRecordProperty.RECORDTYPE,
+        inner_criterion=GsaDiscreteTextValuesDatumCriterion(
             any=["Record", "Generic", "Folder"],
         ),
     )
-    is_in_tensile_test_data_table = GrantaServerApiSearchRecordPropertyCriterion(
-        _property=GrantaServerApiSearchSearchableRecordProperty.TABLENAME,
-        inner_criterion=GrantaServerApiSearchShortTextDatumCriterion(
-            text_match_behavior=GrantaServerApiSearchTextMatchBehavior.EXACTMATCH,
+    is_in_tensile_test_data_table = GsaRecordPropertyCriterion(
+        _property=GsaSearchableRecordProperty.TABLENAME,
+        inner_criterion=GsaShortTextDatumCriterion(
+            text_match_behavior=GsaTextMatchBehavior.EXACTMATCH,
             value="Tensile Test Data",
         ),
     )
 
-    search_body = GrantaServerApiSearchSearchRequest(
-        criterion=GrantaServerApiSearchBooleanCriterion(
+    search_body = GsaSearchRequest(
+        criterion=GsaBooleanCriterion(
             all=[is_any_record_type],
             _none=[is_in_tensile_test_data_table],
         )
@@ -239,7 +239,7 @@ def unreleased_item(admin_client) -> RecordListItem:
     |-- Version 1 (unreleased) *
     """
     record_creator = RecordCreator(admin_client, DB_KEY, TABLE_NAME, "UnreleasedRecord")
-    record_creator.get_or_create_version(GrantaServerApiVersionState.UNRELEASED, 1)
+    record_creator.get_or_create_version(GsaVersionState.UNRELEASED, 1)
     return RecordListItem(
         database_guid=record_creator.database_guid,
         table_guid=record_creator.table_guid,
@@ -256,7 +256,7 @@ def released_item(admin_client) -> RecordListItem:
     |-- Version 1 (released) *
     """
     record_creator = RecordCreator(admin_client, DB_KEY, TABLE_NAME, "ReleasedRecord")
-    record_creator.get_or_create_version(GrantaServerApiVersionState.RELEASED, 1)
+    record_creator.get_or_create_version(GsaVersionState.RELEASED, 1)
     return RecordListItem(
         database_guid=record_creator.database_guid,
         table_guid=record_creator.table_guid,
@@ -274,7 +274,7 @@ def superseded_item(admin_client) -> RecordListItem:
     |-- Version 2 (released)
     """
     record_creator = RecordCreator(admin_client, DB_KEY, TABLE_NAME, "SupersededRecord")
-    record_creator.get_or_create_version(GrantaServerApiVersionState.SUPERSEDED, 1)
+    record_creator.get_or_create_version(GsaVersionState.SUPERSEDED, 1)
     return RecordListItem(
         database_guid=record_creator.database_guid,
         table_guid=record_creator.table_guid,
@@ -292,7 +292,7 @@ def draft_superseded_item(admin_client) -> RecordListItem:
     |-- Version 2 (unreleased)
     """
     record_creator = RecordCreator(admin_client, DB_KEY, TABLE_NAME, "DraftSupersededRecord")
-    record_creator.get_or_create_version(GrantaServerApiVersionState.RELEASED, 1)
+    record_creator.get_or_create_version(GsaVersionState.RELEASED, 1)
     return RecordListItem(
         database_guid=record_creator.database_guid,
         table_guid=record_creator.table_guid,
@@ -310,7 +310,7 @@ def draft_superseding_item(admin_client) -> RecordListItem:
     |-- Version 2 (unreleased) *
     """
     record_creator = RecordCreator(admin_client, DB_KEY, TABLE_NAME, "DraftSupersededRecord")
-    record_creator.get_or_create_version(GrantaServerApiVersionState.UNRELEASED, 2)
+    record_creator.get_or_create_version(GsaVersionState.UNRELEASED, 2)
     return RecordListItem(
         database_guid=record_creator.database_guid,
         table_guid=record_creator.table_guid,
