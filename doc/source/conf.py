@@ -6,6 +6,7 @@ from pathlib import Path
 import re
 import shutil
 
+from ansys.openapi.common import __version__ as openapi_common_version
 from ansys_sphinx_theme import ansys_favicon, get_version_match, pyansys_logo_black
 import jupytext
 
@@ -61,11 +62,31 @@ autodoc_typehints = "description"  # Remove typehints from signatures in docs
 autodoc_typehints_description_target = "documented"
 autodoc_member_order = "bysource"
 
+from packaging.version import parse as parse_version
+
+openapi_common_version = parse_version(openapi_common_version)
+OPENAPI_COMMON_DOCS_BASE_URL = "https://openapi.docs.pyansys.com/version/"
+if openapi_common_version.is_prerelease:
+    OPENAPI_COMMON_DOCS_URL = OPENAPI_COMMON_DOCS_BASE_URL + "dev"
+else:
+    OPENAPI_COMMON_DOCS_URL = (
+        OPENAPI_COMMON_DOCS_BASE_URL
+        + f"{openapi_common_version.major}.{openapi_common_version.minor}"
+    )
+
 # Intersphinx mapping
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3", None),
-    "openapi-common": ("https://openapi.docs.pyansys.com/version/stable", None),
+    "openapi-common": (OPENAPI_COMMON_DOCS_URL, None),
     "requests": ("https://requests.readthedocs.io/en/latest/", None),
+}
+
+extlinks = {
+    "MI_docs": (
+        "https://ansyshelp.ansys.com/account/secured?returnurl=/Views/Secured/Granta/v241/en/%s",
+        None,
+    ),
+    "OpenAPI-Common": (f"{OPENAPI_COMMON_DOCS_URL}/%s", None),
 }
 
 # numpydoc configuration
@@ -89,14 +110,6 @@ numpydoc_validation_checks = {
     # "SS05", # Summary must start with infinitive verb, not third person
     "RT02",  # The first line of the Returns section should contain only the
     # type, unless multiple values are being returned"
-}
-
-extlinks = {
-    "MI_docs": (
-        "https://ansyshelp.ansys.com/account/secured?returnurl=/Views/Secured/Granta/v241/en/%s",
-        None,
-    ),
-    "OpenAPI-Common": ("https://openapi.docs.pyansys.com/version/stable/%s", None)
 }
 
 # static path
