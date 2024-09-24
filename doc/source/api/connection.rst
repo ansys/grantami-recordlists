@@ -3,8 +3,6 @@
 Granta MI connection
 ====================
 
-The OpenAPI-Common documentation lists supported `Authentication schemes <https://openapi.docs.pyansys.com/version/stable/index.html#authentication-schemes>`_.
-
 Connection builder
 ~~~~~~~~~~~~~~~~~~
 

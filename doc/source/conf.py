@@ -95,7 +95,8 @@ extlinks = {
     "MI_docs": (
         "https://ansyshelp.ansys.com/account/secured?returnurl=/Views/Secured/Granta/v241/en/%s",
         None,
-    )
+    ),
+    "OpenAPI-Common": ("https://openapi.docs.pyansys.com/version/stable/%s", None)
 }
 
 # static path

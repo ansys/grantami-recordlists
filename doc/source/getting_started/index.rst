@@ -31,6 +31,8 @@ Check that you can start the PyGranta RecordLists client from Python by running 
 
     <RecordListsApiClient url: http://my.server.name/mi_servicelayer>
 
+See the OpenAPI-Common documentation for supported :OpenAPI-Common:`Authentication schemes <index.html#authentication-schemes>`.
+
 If you see a response from the server, you have successfully installed PyGranta RecordLists and
 can start using the RecordLists client. For more examples, see
 :ref:`ref_grantami_recordlists_examples`. For comprehensive information on the API, see
