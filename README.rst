@@ -73,12 +73,12 @@ To install a release compatible with a specific version of Granta MI, use the
 
     pip install pygranta==2023.2.0
 
-Alternatively, to install the latest from ``ansys-grantami-recordlists`` `GitHub <https://github.com/ansys/grantami-recordlists>`_,
+Alternatively, to install the latest development version from ``ansys-grantami-recordlists`` `GitHub <https://github.com/ansys/grantami-recordlists>`_,
 use this code:
 
 .. code::
 
-    pip install git:https://github.com/ansys/grantami-recordlists.git
+    pip install git+https://github.com/ansys/grantami-recordlists.git
 
 
 To install a local *development* version with Git and Poetry, use this code:
