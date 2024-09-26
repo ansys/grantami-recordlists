@@ -6,3 +6,4 @@ Makefile
 jupytext
 (?i)ansys
 THIRDPARTY
+autologon
