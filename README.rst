@@ -73,6 +73,10 @@ To install a release compatible with a specific version of Granta MI, use the
 
     pip install pygranta==2023.2.0
 
+To see which individual PyGranta package versions are installed with each version of the PyGranta metapackage, consult
+the `Package versions <https://grantami.docs.pyansys.com/version/dev/package_versions.html>`_ section of the PyGranta
+documentation.
+
 Alternatively, to install the latest development version from ``ansys-grantami-recordlists`` `GitHub <https://github.com/ansys/grantami-recordlists>`_,
 use this code:
 
