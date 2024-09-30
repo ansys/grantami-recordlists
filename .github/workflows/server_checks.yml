@@ -169,6 +169,7 @@ jobs:
           sphinxopts: "-n -W --keep-going"
 
   check_workflow_runs:
+    if: ${{ !cancelled() }}
     name: Check if there are active workflow runs
     needs: doc-build
     uses: ansys/pygranta/.github/workflows/check-concurrent-workflows.yml@main
@@ -177,7 +178,7 @@ jobs:
     name: "Stop Azure VM"
     runs-on: ubuntu-latest
     needs: check_workflow_runs
-    if: always() && !cancelled() && !(inputs.skip-vm-management) && needs.check_workflow_runs.outputs.active-runs != 'true'
+    if: ${{ !cancelled() && !(inputs.skip-vm-management) && needs.check_workflow_runs.outputs.active-runs != 'true' }}
     steps:
       - uses: azure/CLI@v2
         with:
