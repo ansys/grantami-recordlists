@@ -35,7 +35,7 @@ jobs:
     name: "Code style"
     runs-on: ubuntu-latest
     steps:
-      - uses: ansys/actions/code-style@v7
+      - uses: ansys/actions/code-style@v8
         with:
           python-version: ${{ env.MAIN_PYTHON_VERSION }}
 
@@ -43,7 +43,7 @@ jobs:
     name: "Documentation style"
     runs-on: ubuntu-latest
     steps:
-      - uses: ansys/actions/doc-style@v7
+      - uses: ansys/actions/doc-style@v8
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -52,7 +52,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: "Run Ansys documentation building action"
-      uses: ansys/actions/doc-build@v7
+      uses: ansys/actions/doc-build@v8
       with:
         check-links: false
         dependencies: "pandoc"
@@ -75,7 +75,7 @@ jobs:
            os: [ubuntu-latest, windows-latest]
            python-version: ['3.9', '3.10', '3.11', '3.12']
     steps:
-      - uses: ansys/actions/build-wheelhouse@v7
+      - uses: ansys/actions/build-wheelhouse@v8
         with:
           library-name: ${{ env.LIBRARY_NAME }}
           operating-system: ${{ matrix.os }}
@@ -129,7 +129,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [ doc-build, tests ]
     steps:
-      - uses: ansys/actions/build-library@v7
+      - uses: ansys/actions/build-library@v8
         with:
           library-name: ${{ env.LIBRARY_NAME }}
           python-version: ${{ env.MAIN_PYTHON_VERSION }}
@@ -150,7 +150,7 @@ jobs:
     needs: [server-checks]
     if: github.event_name == 'push' && !contains(github.ref, 'refs/tags')
     steps:
-      - uses: ansys/actions/doc-deploy-dev@v7
+      - uses: ansys/actions/doc-deploy-dev@v8
         with:
           cname: ${{ env.DOCUMENTATION_CNAME }}
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -163,7 +163,7 @@ jobs:
     if: (github.event_name == 'workflow_dispatch') && (github.ref == 'refs/heads/main') && (inputs.publish-to-private-pypi == 'true')
     steps:
       - name: "Release to private PyPI"
-        uses: ansys/actions/release-pypi-private@v7
+        uses: ansys/actions/release-pypi-private@v8
         with:
           library-name: ${{ env.LIBRARY_NAME }}
           twine-username: "__token__"
@@ -177,7 +177,7 @@ jobs:
       contents: write
       pull-requests: write
     steps:
-      - uses: ansys/actions/doc-deploy-changelog@v7
+      - uses: ansys/actions/doc-deploy-changelog@v8
         with:
           token: ${{ secrets.PYANSYS_CI_BOT_TOKEN }}
 
@@ -191,13 +191,13 @@ jobs:
       id-token: write
       contents: write
     steps:
-      - uses: ansys/actions/release-pypi-public@v7
+      - uses: ansys/actions/release-pypi-public@v8
         name: "Release to public PyPI"
         with:
           library-name: ${{ env.LIBRARY_NAME }}
           use-trusted-publisher: true
 
-      - uses: ansys/actions/release-github@v7
+      - uses: ansys/actions/release-github@v8
         name: "Release to GitHub"
         with:
           library-name: ${{ env.LIBRARY_NAME }}
@@ -208,7 +208,7 @@ jobs:
     needs: release
     if: github.event_name == 'push' && contains(github.ref, 'refs/tags')
     steps:
-      - uses: ansys/actions/doc-deploy-stable@v7
+      - uses: ansys/actions/doc-deploy-stable@v8
         with:
           cname: ${{ env.DOCUMENTATION_CNAME }}
           token: ${{ secrets.GITHUB_TOKEN }}
