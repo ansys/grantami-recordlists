@@ -47,9 +47,9 @@ Dependencies
 ------------
 .. readme_software_requirements
 
-To use this version of the ``ansys.grantami.recordlists`` package you must have access to a Granta MI 2024 R2 deployment.
+To use this version of the ``ansys.grantami.recordlists`` package you must have access to a Granta MI 2025 R1 deployment.
 
-The ``ansys.grantami.recordlists`` package currently supports Python from version 3.9 to version 3.12.
+The ``ansys.grantami.recordlists`` package currently supports Python from version 3.10 to version 3.13.
 
 .. readme_software_requirements_end
 
