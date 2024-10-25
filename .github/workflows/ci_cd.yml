@@ -17,13 +17,13 @@ on:
         default: 'false'
 
 env:
-  MAIN_PYTHON_VERSION: '3.9'
+  MAIN_PYTHON_VERSION: '3.12'
   DOCUMENTATION_CNAME: 'recordlists.grantami.docs.pyansys.com'
   LIBRARY_NAME: 'ansys-grantami-recordlists'
   LIBRARY_NAMESPACE: 'ansys.grantami.recordlists'
-  PIP_INDEX_URL: "https://${{ secrets.PYANSYS_PYPI_PRIVATE_PAT }}@pkgs.dev.azure.com/pyansys/_packaging/pyansys/pypi/simple/"
-  POETRY_HTTP_BASIC_PRIVATE_PYPI_USERNAME: "PAT"
-  POETRY_HTTP_BASIC_PRIVATE_PYPI_PASSWORD: ${{ secrets.PYANSYS_PYPI_PRIVATE_PAT }}
+  # PIP_INDEX_URL: "https://${{ secrets.PYANSYS_PYPI_PRIVATE_PAT }}@pkgs.dev.azure.com/pyansys/_packaging/pyansys/pypi/simple/"
+  # POETRY_HTTP_BASIC_PRIVATE_PYPI_USERNAME: "PAT"
+  # POETRY_HTTP_BASIC_PRIVATE_PYPI_PASSWORD: ${{ secrets.PYANSYS_PYPI_PRIVATE_PAT }}
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -73,7 +73,7 @@ jobs:
     strategy:
        matrix:
            os: [ubuntu-latest, windows-latest]
-           python-version: ['3.9', '3.10', '3.11', '3.12']
+           python-version: ['3.10', '3.11', '3.12', '3.13']
     steps:
       - uses: ansys/actions/build-wheelhouse@v8
         with:
@@ -88,7 +88,7 @@ jobs:
     strategy:
       matrix:
        os: [ubuntu-latest, windows-latest]
-       python-version: ['3.9', '3.10', '3.11', '3.12']
+       python-version: ['3.10', '3.11', '3.12', '3.13']
       fail-fast: false
     steps:
       - name: "Checkout the repository"

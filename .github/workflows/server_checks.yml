@@ -6,7 +6,7 @@ on:
       python-version:
         description: >
           Python version used for installing and running ``pre-commit``.
-        default: '3.10'
+        default: '3.12'
         required: false
         type: string
 
@@ -62,10 +62,10 @@ concurrency:
   group: integration-server
   cancel-in-progress: false
 
-env:
-  PIP_INDEX_URL: "https://${{ secrets.PYANSYS_PYPI_PRIVATE_PAT }}@pkgs.dev.azure.com/pyansys/_packaging/pyansys/pypi/simple/"
-  POETRY_HTTP_BASIC_PRIVATE_PYPI_USERNAME: "PAT"
-  POETRY_HTTP_BASIC_PRIVATE_PYPI_PASSWORD: ${{ secrets.PYANSYS_PYPI_PRIVATE_PAT }}
+# env:
+#   PIP_INDEX_URL: "https://${{ secrets.PYANSYS_PYPI_PRIVATE_PAT }}@pkgs.dev.azure.com/pyansys/_packaging/pyansys/pypi/simple/"
+#   POETRY_HTTP_BASIC_PRIVATE_PYPI_USERNAME: "PAT"
+#   POETRY_HTTP_BASIC_PRIVATE_PYPI_PASSWORD: ${{ secrets.PYANSYS_PYPI_PRIVATE_PAT }}
 
 jobs:
 
