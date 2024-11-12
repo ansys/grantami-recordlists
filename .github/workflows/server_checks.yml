@@ -32,7 +32,7 @@ on:
       AZURE_RESOURCE_GROUP:
         required: true
 
-      AZURE_VM:
+      AZURE_VM_NAME:
         required: true
 
       CODECOV_TOKEN:
