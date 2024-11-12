@@ -84,7 +84,7 @@ jobs:
           azcliversion: 2.32.0
           inlineScript: |
             az login --service-principal -u ${{ secrets.AZURE_APP_ID }} -p ${{ secrets.AZURE_SECRET }} --tenant ${{ secrets.AZURE_TENANT_ID }}
-            az vm start -g ${{ secrets.AZURE_RESOURCE_GROUP }} -n ${{ secrets.AZURE_VM_NAME_NEXT }}
+            az vm start -g ${{ secrets.AZURE_RESOURCE_GROUP }} -n ${{ secrets.AZURE_VM_NAME }}
 
       - name: "Set up Python ${{ inputs.python-version }}"
         uses: actions/setup-python@v5
@@ -99,7 +99,7 @@ jobs:
           pip freeze
           python .github/scripts/check_server.py
         env:
-          TEST_SL_URL: ${{secrets.TEST_SERVER_URL_NEXT}}
+          TEST_SL_URL: ${{secrets.TEST_SERVER_URL}}
           TEST_USER: ${{secrets.TEST_SERVER_ADMIN_USER}}
           TEST_PASS: ${{secrets.TEST_SERVER_ADMIN_PASS}}
 
@@ -127,7 +127,7 @@ jobs:
       - name: "Test with tox (integration tests only)"
         run: tox -e tests -- -m "integration"
         env:
-          TEST_SL_URL: ${{secrets.TEST_SERVER_URL_NEXT}}
+          TEST_SL_URL: ${{secrets.TEST_SERVER_URL}}
           TEST_LIST_ADMIN_USER: ${{secrets.TEST_SERVER_ADMIN_USER}}
           TEST_LIST_ADMIN_PASS: ${{secrets.TEST_SERVER_ADMIN_PASS}}
           TEST_LIST_USER: ${{secrets.TEST_SERVER_USER}}
@@ -159,7 +159,7 @@ jobs:
       - name: "Run Ansys documentation building action"
         uses: ansys/actions/doc-build@v8
         env:
-          TEST_SL_URL: ${{secrets.TEST_SERVER_URL_NEXT}}
+          TEST_SL_URL: ${{secrets.TEST_SERVER_URL}}
           TEST_USER: ${{secrets.TEST_SERVER_ADMIN_USER}}
           TEST_PASS: ${{secrets.TEST_SERVER_ADMIN_PASS}}
           BUILD_EXAMPLES: "true"
@@ -185,4 +185,4 @@ jobs:
           azcliversion: 2.32.0
           inlineScript: |
             az login --service-principal -u ${{ secrets.AZURE_APP_ID }} -p ${{ secrets.AZURE_SECRET }} --tenant ${{ secrets.AZURE_TENANT_ID }}
-            az vm deallocate -g ${{ secrets.AZURE_RESOURCE_GROUP }} -n ${{ secrets.AZURE_VM_NAME_NEXT }} --no-wait
+            az vm deallocate -g ${{ secrets.AZURE_RESOURCE_GROUP }} -n ${{ secrets.AZURE_VM_NAME }} --no-wait
