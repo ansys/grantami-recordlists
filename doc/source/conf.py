@@ -93,7 +93,7 @@ numpydoc_validation_checks = {
 
 extlinks = {
     "MI_docs": (
-        "https://ansyshelp.ansys.com/account/secured?returnurl=/Views/Secured/Granta/v241/en/%s",
+        "https://ansyshelp.ansys.com/account/secured?returnurl=/Views/Secured/Granta/v251/en/%s",
         None,
     ),
     "OpenAPI-Common": ("https://openapi.docs.pyansys.com/version/stable/%s", None),
