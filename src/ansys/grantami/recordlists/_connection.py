@@ -1,4 +1,4 @@
-# Copyright (C) 2023 - 2024 ANSYS, Inc. and/or its affiliates.
+# Copyright (C) 2023 - 2025 ANSYS, Inc. and/or its affiliates.
 # SPDX-License-Identifier: MIT
 #
 #
@@ -36,7 +36,15 @@ from ansys.openapi.common import (  # type: ignore[import]
 import requests  # type: ignore[import]
 
 from ._logger import logger
-from ._models import BooleanCriterion, RecordList, RecordListItem, SearchCriterion, SearchResult
+from ._models import (
+    AuditLogItem,
+    AuditLogSearchCriterion,
+    BooleanCriterion,
+    RecordList,
+    RecordListItem,
+    SearchCriterion,
+    SearchResult,
+)
 
 PROXY_PATH = "/proxy/v1.svc/mi"
 AUTH_PATH = "/Health/v2.svc"
@@ -98,6 +106,7 @@ class RecordListsApiClient(ApiClient):  # type: ignore[misc]
         self.list_management_api = api.ListManagementApi(self)
         self.list_item_api = api.ListItemApi(self)
         self.list_permissions_api = api.ListPermissionsApi(self)
+        self.list_audit_log_api = api.ListAuditLogApi(self)
 
     def __repr__(self) -> str:
         """Printable representation of the object."""
@@ -600,6 +609,48 @@ class RecordListsApiClient(ApiClient):  # type: ignore[misc]
         self.list_permissions_api.unsubscribe(
             list_identifier=record_list.identifier,
         )
+
+    def get_all_audit_log_entries(self) -> List[AuditLogItem]:
+        """
+        Fetch all audit log entries that are visible to the current user.
+
+        Performs an HTTP request against the Granta MI Server API.
+
+        Returns
+        -------
+        list of :class:`.AuditLogItem`
+            Audit log entries.
+        """
+        criterion = AuditLogSearchCriterion()
+        return self.search_for_audit_log_entries(criterion=criterion)
+
+    def search_for_audit_log_entries(
+        self, criterion: AuditLogSearchCriterion
+    ) -> List[AuditLogItem]:
+        """
+        Fetch audit log entries, filtered by a search criterion.
+
+        Performs an HTTP request against the Granta MI Server API.
+
+        Parameters
+        ----------
+        criterion : AuditLogSearchCriterion
+            Criterion by which to filter audit log entries.
+
+        Returns
+        -------
+        list of :class:`.AuditLogItem`
+            Audit log entries.
+        """
+        response = self.list_audit_log_api.run_list_audit_log_search(body=criterion._to_model())
+        result_id = response.search_result_identifier
+        print(result_id)
+
+        search_result = self.list_audit_log_api.get_list_audit_log_search_results(
+            result_resource_identifier=result_id
+        )
+        results = [AuditLogItem._from_model(item) for item in search_result]
+        return sorted(results, key=lambda item: item.timestamp)
 
 
 class _ItemResolver:

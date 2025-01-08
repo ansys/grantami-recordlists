@@ -1,4 +1,4 @@
-# Copyright (C) 2023 - 2024 ANSYS, Inc. and/or its affiliates.
+# Copyright (C) 2023 - 2025 ANSYS, Inc. and/or its affiliates.
 # SPDX-License-Identifier: MIT
 #
 #
@@ -26,6 +26,9 @@ import importlib.metadata as importlib_metadata
 
 from ._connection import Connection, RecordListsApiClient
 from ._models import (
+    AuditLogAction,
+    AuditLogItem,
+    AuditLogSearchCriterion,
     BooleanCriterion,
     RecordList,
     RecordListItem,
@@ -36,6 +39,8 @@ from ._models import (
 )
 
 __all__ = [
+    "AuditLogAction",
+    "AuditLogSearchCriterion" "AuditLogItem",
     "Connection",
     "RecordListsApiClient",
     "BooleanCriterion",
