@@ -616,6 +616,8 @@ class RecordListsApiClient(ApiClient):  # type: ignore[misc]
 
         Performs an HTTP request against the Granta MI Server API.
 
+        .. versionadded:: 1.2
+
         Returns
         -------
         list of :class:`.AuditLogItem`
@@ -631,6 +633,8 @@ class RecordListsApiClient(ApiClient):  # type: ignore[misc]
         Fetch audit log entries, filtered by a search criterion.
 
         Performs an HTTP request against the Granta MI Server API.
+
+        .. versionadded:: 1.4
 
         Parameters
         ----------
