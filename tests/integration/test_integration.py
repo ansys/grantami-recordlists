@@ -1,4 +1,4 @@
-# Copyright (C) 2023 - 2024 ANSYS, Inc. and/or its affiliates.
+# Copyright (C) 2023 - 2025 ANSYS, Inc. and/or its affiliates.
 # SPDX-License-Identifier: MIT
 #
 #
@@ -20,16 +20,22 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+from datetime import datetime
+from enum import Enum
 import uuid
 
 from ansys.openapi.common import ApiException
 import pytest
 
 from ansys.grantami.recordlists import (
+    AuditLogAction,
+    AuditLogSearchCriterion,
     BooleanCriterion,
     RecordList,
     RecordListItem,
+    RecordListsApiClient,
     SearchCriterion,
+    UserOrGroup,
     UserRole,
 )
 
@@ -942,3 +948,70 @@ class TestSearch:
                     assert result_item.record_version == input_item.record_version
                     check_count += 1
         assert check_count == len(result.items) == len(resolvable_items)
+
+
+class TestAuditLogging:
+    _name_suffix_A = "_ListA"
+    _name_suffix_B = "_ListB"
+    _log_entries = None
+
+    @pytest.fixture(scope="class")
+    def list_a(self, admin_client, list_name):
+        """A personal list with a known name."""
+        created_list = admin_client.create_list(list_name + self._name_suffix_A)
+        yield created_list
+        admin_client.delete_list(created_list)
+
+    @pytest.fixture(scope="class")
+    def list_b(self, admin_client, list_name):
+        """A published list with a known name."""
+        created_list = admin_client.create_list(list_name + self._name_suffix_B)
+        requested_list = admin_client.request_list_approval(created_list)
+        published_list = admin_client.publish_list(requested_list)
+        yield published_list
+        requested_list = admin_client.request_list_approval(published_list)
+        unpublished_list = admin_client.unpublish_list(requested_list)
+        admin_client.delete_list(unpublished_list)
+
+    def _get_all_log_entries(self, client: RecordListsApiClient):
+        if self._log_entries is None:
+            self._log_entries = client.get_all_audit_log_entries()
+        return self._log_entries
+
+    def test_get_all_log_entries(self, admin_client, list_a, list_b):
+        results = self._get_all_log_entries(admin_client)
+        for result in results:
+            assert isinstance(result.action, Enum)
+            assert isinstance(result.list_identifier, str)
+            _ = uuid.UUID(result.list_identifier)
+            assert isinstance(result.timestamp, datetime)
+            assert isinstance(result.initiating_user, UserOrGroup)
+            _ = uuid.UUID(result.initiating_user.identifier)
+
+    def test_all_log_entries_contains_current_lists(self, admin_client, list_a, list_b):
+        results = self._get_all_log_entries(admin_client)
+        observed_list_identifiers = {item.list_identifier for item in results}
+        assert list_a.identifier in observed_list_identifiers
+        assert list_b.identifier in observed_list_identifiers
+
+    def test_filter_log_entries_by_list(self, admin_client, list_a, list_b):
+        criterion = AuditLogSearchCriterion(filter_record_lists=[list_a.identifier])
+        results = admin_client.search_for_audit_log_entries(criterion)
+        assert len(results) == 1
+        assert results[0].list_identifier == list_a.identifier
+        assert results[0].action == AuditLogAction.LISTCREATED
+
+    def test_filter_log_entries_by_list_is_ordered(self, admin_client, list_a, list_b):
+        criterion = AuditLogSearchCriterion(filter_record_lists=[list_b.identifier])
+        results = admin_client.search_for_audit_log_entries(criterion)
+        assert len(results) == 3
+        for event in results:
+            assert event.list_identifier == list_b.identifier
+        expected_actions = [
+            AuditLogAction.LISTCREATED,
+            AuditLogAction.LISTSETTOAWAITINGAPPROVAL,
+            AuditLogAction.LISTPUBLISHED,
+        ]
+        for event, action in zip(results, expected_actions):
+            assert event.action == action
+        assert results == sorted(results, key=lambda result: result.timestamp)

@@ -1,4 +1,4 @@
-# Copyright (C) 2023 - 2024 ANSYS, Inc. and/or its affiliates.
+# Copyright (C) 2023 - 2025 ANSYS, Inc. and/or its affiliates.
 # SPDX-License-Identifier: MIT
 #
 #
@@ -19,8 +19,12 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+import json
 
 from requests_mock import ANY
+
+from ansys.grantami.recordlists import AuditLogAction
+from tests.inputs.examples import examples_as_strings
 
 
 def test_get_all_lists(mock_client, mocker, mock_response):
@@ -40,3 +44,25 @@ def test_get_single_list(mock_client, mocker, mock_response):
         response = mock_client.get_list("bffba6ef-b85a-4b26-932b-00875b74ca2e")
 
     assert response.name == "Test List"
+
+
+def test_get_all_audit_log_entries(api_url, mock_client, mocker):
+    with mocker:
+        response_id = "766b96c2-9b91-4625-a271-46b1da89eb55"
+        response = {"searchResultIdentifier": f"{response_id}"}
+        mocker.post(
+            f"{api_url}/proxy/v1.svc/mi/api/v1/lists/audit/search", status_code=201, json=response
+        )
+        mocker.get(
+            f"{api_url}/proxy/v1.svc/mi/api/v1/lists/audit/search/results/{response_id}",
+            status_code=200,
+            json=json.loads(examples_as_strings["test_get_all_audit_log_entries"]),
+        )
+
+        log_entries = mock_client.get_all_audit_log_entries()
+
+        assert len(log_entries) == 2
+        assert log_entries[0].list_identifier == "f235a25c-4deb-45cf-b6fd-c4fbaca3cbd0"
+        assert log_entries[0].action == AuditLogAction.LISTCREATED
+        assert log_entries[1].list_identifier == "f235a25c-4deb-45cf-b6fd-c4fbaca3cbd0"
+        assert log_entries[1].action == AuditLogAction.LISTSETTOAWAITINGAPPROVAL
