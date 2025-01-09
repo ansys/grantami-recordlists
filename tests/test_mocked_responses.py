@@ -24,7 +24,7 @@ import json
 from requests_mock import ANY
 
 from ansys.grantami.recordlists import AuditLogAction
-from tests.inputs.examples import examples_as_strings
+from inputs.examples import examples_as_strings
 
 
 def test_get_all_lists(mock_client, mocker, mock_response):
