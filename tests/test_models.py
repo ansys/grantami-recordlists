@@ -512,7 +512,7 @@ class TestAuditLogItem:
 
         assert (
             log_item.__repr__()
-            == f"<AuditLogItem list_identifier={log_item.list_identifier}, action=ListUnpublished>"
+            == f"<AuditLogItem list_identifier={log_item.list_identifier}, action=AuditLogAction.LISTUNPUBLISHED>"
         )
 
 
