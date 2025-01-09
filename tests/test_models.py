@@ -492,7 +492,7 @@ class TestAuditLogItem:
         )
 
         item = AuditLogItem._from_model(log_item_dto)
-        assert isinstance(item, GsaListAuditLogItem)
+        assert isinstance(item, AuditLogItem)
         assert item.list_identifier == self.list_identifier
         assert item.action == AuditLogAction.LISTMADEINTERNAL
         assert item.initiating_user == UserOrGroup._from_model(self.dto_admin_user)
@@ -512,7 +512,7 @@ class TestAuditLogItem:
 
         assert (
             log_item.__repr__()
-            == f"<AuditLogItem list_identifier={log_item.list_identifier}, action=AuditLogAction.LISTUNPUBLISHED>"
+            == f"<AuditLogItem list_identifier={log_item.list_identifier}, action=ListUnpublished>"
         )
 
 
