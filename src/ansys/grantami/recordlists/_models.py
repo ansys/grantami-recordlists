@@ -917,12 +917,7 @@ class AuditLogItem:
 
     def __repr__(self) -> str:
         """Printable representation of the object."""
-        renderable_properties = ("list_identifier", "action")
-        formatted_properties = ", ".join(
-            f"{property_name}={getattr(self, property_name)}"
-            for property_name in renderable_properties
-        )
-        return f"<{self.__class__.__name__} {formatted_properties}>"
+        return f"<{self.__class__.__name__} list_identifier={self.list_identifier}, action=AuditLogAction.{self.action.name}>"
 
     @classmethod
     def _from_model(
