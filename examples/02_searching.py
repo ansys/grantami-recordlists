@@ -55,15 +55,14 @@ list_a = client.request_list_approval(list_a)
 list_a = client.publish_list(list_a)
 
 list_b = client.create_list(name="Approved materials - Ceramics")
+list_b_item = RecordListItem(
+    "9716c5a3-da85-4126-a922-3fbb854656d8",
+    "d352fd12-c342-41c1-9da7-dac0dac1c6d9",
+    "c61e8f3a-d7e1-4b7f-8232-b2495eae6c15",
+)
 client.add_items_to_list(
     list_b,
-    items=[
-        RecordListItem(
-            "9716c5a3-da85-4126-a922-3fbb854656d8",
-            "d352fd12-c342-41c1-9da7-dac0dac1c6d9",
-            "c61e8f3a-d7e1-4b7f-8232-b2495eae6c15",
-        )
-    ],
+    items=[list_b_item],
 )
 list_b = client.request_list_approval(list_b)
 list_b = client.publish_list(list_b)
@@ -110,7 +109,7 @@ results
 # the results.
 
 # + tags=[]
-criterion = SearchCriterion(contains_records=["c61e8f3a-d7e1-4b7f-8232-b2495eae6c15"])
+criterion = SearchCriterion(contains_records=[list_b_item])
 results = client.search_for_lists(criterion, include_items=True)
 results
 # -

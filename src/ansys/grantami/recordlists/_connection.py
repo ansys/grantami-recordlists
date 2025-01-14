@@ -43,7 +43,7 @@ AUTH_PATH = "/Health/v2.svc"
 API_DEFINITION_PATH = "/swagger/v1/swagger.json"
 GRANTA_APPLICATION_NAME_HEADER = "PyGranta RecordLists"
 
-MINIMUM_GRANTA_MI_VERSION = (24, 2)
+MINIMUM_GRANTA_MI_VERSION = (25, 2)
 
 _ArgNotProvided = "_ArgNotProvided"
 
