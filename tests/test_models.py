@@ -307,7 +307,7 @@ class TestSearchCriterion:
             is criterion.contains_records_in_integration_schemas
         )
         assert dto.contains_records_in_tables is criterion.contains_records_in_tables
-        assert dto.contains_records == Unset
+        assert dto.contains_records is Unset
         assert dto.user_can_add_or_remove_items is criterion.user_can_add_or_remove_items
 
     def test_search_criterion_contains_records_dto_mapping(self):
