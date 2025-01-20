@@ -24,6 +24,7 @@ from datetime import datetime, timedelta
 from unittest.mock import Mock, call, patch
 import uuid
 
+from ansys.grantami.serverapi_openapi import GsaListItemRecordReference
 from ansys.grantami.serverapi_openapi.models import (
     GsaListBooleanCriterion,
     GsaListItem,
@@ -33,6 +34,7 @@ from ansys.grantami.serverapi_openapi.models import (
     GsaRecordListSearchResult,
     GsaUserRole,
 )
+from ansys.openapi.common import Unset
 import pytest
 
 from ansys.grantami.recordlists import (
@@ -212,7 +214,12 @@ class TestRecordListItem:
         assert item.record_guid == record_guid
 
     @pytest.mark.parametrize(
-        "serialization_method", ["_to_create_list_item_model", "_to_delete_list_item_model"]
+        "serialization_method",
+        [
+            "_to_create_list_item_model",
+            "_to_delete_list_item_model",
+            "_to_contains_search_item_model",
+        ],
     )
     def test_record_list_item_to_dto_mapping(self, serialization_method):
         item = RecordListItem(
@@ -283,7 +290,7 @@ class TestItemEquality:
 class TestSearchCriterion:
     def test_search_criterion_dto_mapping(self):
         # Check one to one mapping between idiomatic class and DTO using ids of mock attributes
-        criterion = Mock(spec=SearchCriterion, user_role=UserRole.CURATOR)
+        criterion = Mock(spec=SearchCriterion, user_role=UserRole.CURATOR, contains_records=None)
 
         dto = SearchCriterion._to_model(criterion)
 
@@ -300,8 +307,32 @@ class TestSearchCriterion:
             is criterion.contains_records_in_integration_schemas
         )
         assert dto.contains_records_in_tables is criterion.contains_records_in_tables
-        assert dto.contains_records is criterion.contains_records
+        assert dto.contains_records is Unset
         assert dto.user_can_add_or_remove_items is criterion.user_can_add_or_remove_items
+
+    def test_search_criterion_contains_records_dto_mapping(self):
+        record_item = RecordListItem(
+            database_guid=str(uuid.uuid4()),
+            table_guid=str(uuid.uuid4()),
+            record_history_guid=str(uuid.uuid4()),
+            record_version=4,
+        )
+
+        # Check one to one mapping between idiomatic class and DTO using ids of mock attributes
+        criterion = Mock(
+            spec=SearchCriterion, user_role=UserRole.CURATOR, contains_records=[record_item]
+        )
+
+        dto = SearchCriterion._to_model(criterion)
+
+        assert isinstance(dto, GsaRecordListSearchCriterion)
+        assert isinstance(dto.contains_records, list)
+        assert len(dto.contains_records) == 1
+        record_dto = dto.contains_records[0]
+        assert isinstance(record_dto, GsaListItemRecordReference)
+        assert record_dto.database_guid == record_item.database_guid
+        assert record_dto.record_history_guid == record_item.record_history_guid
+        assert record_dto.record_version == record_item.record_version
 
     @pytest.mark.parametrize("prop_name", ["match_all", "match_any"])
     def test_simple_boolean_criterion_dto_mapping(self, prop_name):
@@ -358,7 +389,17 @@ class TestSearchCriterion:
             ("contains_records_in_databases", [str(uuid.uuid4())]),
             ("contains_records_in_integration_schemas", [str(uuid.uuid4())]),
             ("contains_records_in_tables", [str(uuid.uuid4())]),
-            ("contains_records", [str(uuid.uuid4())]),
+            (
+                "contains_records",
+                [
+                    RecordListItem(
+                        database_guid=str(uuid.uuid4()),
+                        table_guid=str(uuid.uuid4()),
+                        record_history_guid=str(uuid.uuid4()),
+                        record_version=1,
+                    )
+                ],
+            ),
             ("user_can_add_or_remove_items", True),
         ],
     )

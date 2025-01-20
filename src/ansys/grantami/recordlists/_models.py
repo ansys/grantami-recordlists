@@ -303,7 +303,7 @@ class RecordListItem:
 
     def _to_create_list_item_model(self) -> models.GsaCreateListItem:
         """Generate the Create List Item DTO for use with the auto-generated client code."""
-        logger.debug("Serializing RecordListItem to API model")
+        logger.debug("Serializing RecordListItem to GsaCreateListItem API model")
         model = models.GsaCreateListItem(
             database_guid=self.database_guid,
             table_guid=self.table_guid,
@@ -315,8 +315,18 @@ class RecordListItem:
 
     def _to_delete_list_item_model(self) -> models.GsaDeleteRecordListItem:
         """Generate the Delete List Item DTO for use with the auto-generated client code."""
-        logger.debug("Serializing RecordListItem to API model")
+        logger.debug("Serializing RecordListItem to GsaDeleteRecordListItem API model")
         model = models.GsaDeleteRecordListItem(
+            database_guid=self.database_guid,
+            record_history_guid=self.record_history_guid,
+            record_version=self.record_version,
+        )
+        logger.debug(model.to_str())
+        return model
+
+    def _to_contains_search_item_model(self) -> models.GsaListItemRecordReference:
+        logger.debug("Serializing RecordListItem to GsaListItemRecordReference API model")
+        model = models.GsaListItemRecordReference(
             database_guid=self.database_guid,
             record_history_guid=self.record_history_guid,
             record_version=self.record_version,
@@ -424,7 +434,7 @@ class SearchCriterion:
         contains_records_in_databases: Optional[List[str]] = None,
         contains_records_in_integration_schemas: Optional[List[str]] = None,
         contains_records_in_tables: Optional[List[str]] = None,
-        contains_records: Optional[List[str]] = None,
+        contains_records: Optional[List["RecordListItem"]] = None,
         user_can_add_or_remove_items: Optional[bool] = None,
     ):
         self._name_contains: Optional[str] = name_contains
@@ -438,7 +448,7 @@ class SearchCriterion:
             contains_records_in_integration_schemas
         )
         self._contains_records_in_tables: Optional[List[str]] = contains_records_in_tables
-        self._contains_records: Optional[List[str]] = contains_records
+        self._contains_records: Optional[List["RecordListItem"]] = contains_records
         self._user_can_add_or_remove_items: Optional[bool] = user_can_add_or_remove_items
 
     @property
@@ -547,12 +557,12 @@ class SearchCriterion:
         self._contains_records_in_tables = value
 
     @property
-    def contains_records(self) -> Optional[List[str]]:
-        """Limits results to lists containing records specified by their history GUIDs."""
+    def contains_records(self) -> Optional[List["RecordListItem"]]:
+        """Limits results to lists containing specific records."""
         return self._contains_records
 
     @contains_records.setter
-    def contains_records(self, value: Optional[List[str]]) -> None:
+    def contains_records(self, value: Optional[List["RecordListItem"]]) -> None:
         self._contains_records = value
 
     @property
@@ -570,6 +580,11 @@ class SearchCriterion:
         user_role = (
             models.GsaUserRole(self.user_role.value) if self.user_role is not None else Unset
         )
+        record_references = (
+            [RecordListItem._to_contains_search_item_model(item) for item in self.contains_records]
+            if self.contains_records is not None
+            else Unset
+        )
         model = models.GsaRecordListSearchCriterion(
             name_contains=self.name_contains,
             user_role=user_role,
@@ -580,7 +595,7 @@ class SearchCriterion:
             contains_records_in_databases=self.contains_records_in_databases,
             contains_records_in_integration_schemas=self.contains_records_in_integration_schemas,
             contains_records_in_tables=self.contains_records_in_tables,
-            contains_records=self.contains_records,
+            contains_records=record_references,
             user_can_add_or_remove_items=self.user_can_add_or_remove_items,
         )
         logger.debug(model.to_str())
