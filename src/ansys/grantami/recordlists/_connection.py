@@ -616,7 +616,7 @@ class RecordListsApiClient(ApiClient):  # type: ignore[misc]
 
         Performs an HTTP request against the Granta MI Server API.
 
-        .. versionadded:: 1.2
+        .. versionadded:: 2.0
 
         Returns
         -------
@@ -634,7 +634,7 @@ class RecordListsApiClient(ApiClient):  # type: ignore[misc]
 
         Performs an HTTP request against the Granta MI Server API.
 
-        .. versionadded:: 1.4
+        .. versionadded:: 2.0
 
         Parameters
         ----------
