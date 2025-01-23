@@ -75,9 +75,9 @@ def test_500_on_test_connection_is_handled(sl_url, successful_auth, mocker):
 
 def test_new_server_version(sl_url, successful_auth, mocker):
     mi_version_response = {
-        "binary_compatibility_version": "24.2.0.0",
-        "version": "24.2.820.0",
-        "major_minor_version": "24.2",
+        "binary_compatibility_version": "25.2.0.0",
+        "version": "25.2.820.0",
+        "major_minor_version": "25.2",
     }
 
     with mocker:
@@ -98,7 +98,7 @@ def test_old_server_version_is_handled(sl_url, successful_auth, mocker):
         mocker.get(requests_mock.ANY, status_code=200, json=mi_version_response)
         with pytest.raises(
             ConnectionError,
-            match=r"This package requires a more recent Granta MI version.*12\.1\.2\.3.*24\.2",
+            match=r"This package requires a more recent Granta MI version.*12\.1\.2\.3.*25\.2",
         ):
             connection.connect()
 
@@ -111,6 +111,6 @@ def test_server_version_error_is_handled(sl_url, successful_auth, mocker):
         mocker.get(version_path, status_code=404)
         with pytest.raises(
             ConnectionError,
-            match=r"Cannot check the Granta MI server version.*24\.2",
+            match=r"Cannot check the Granta MI server version.*25\.2",
         ):
             connection.connect()

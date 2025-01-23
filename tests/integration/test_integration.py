@@ -849,10 +849,10 @@ class TestSearch:
     def test_search_by_record(
         self, include_items, admin_client, list_name, resolvable_items, list_c
     ):
-        record_history_guid = resolvable_items[0].record_history_guid
+        record_reference = resolvable_items[0]
         criteria = SearchCriterion(
             name_contains=list_name,
-            contains_records=[record_history_guid],
+            contains_records=[record_reference],
         )
         results = admin_client.search_for_lists(criteria, include_items=include_items)
         assert len(results) == 1
