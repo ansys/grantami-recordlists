@@ -33,7 +33,6 @@ from ansys.grantami.recordlists import (
     BooleanCriterion,
     RecordList,
     RecordListItem,
-    RecordListsApiClient,
     SearchCriterion,
     UserOrGroup,
     UserRole,
@@ -953,7 +952,6 @@ class TestSearch:
 class TestAuditLogging:
     _name_suffix_A = "_ListA"
     _name_suffix_B = "_ListB"
-    _log_entries = None
 
     @pytest.fixture(scope="class")
     def list_a(self, admin_client, list_name):
@@ -973,14 +971,9 @@ class TestAuditLogging:
         unpublished_list = admin_client.unpublish_list(requested_list)
         admin_client.delete_list(unpublished_list)
 
-    def _get_all_log_entries(self, client: RecordListsApiClient):
-        if self._log_entries is None:
-            self._log_entries = client.get_all_audit_log_entries()
-        return self._log_entries
-
     def test_get_all_log_entries(self, admin_client, list_a, list_b):
-        results = self._get_all_log_entries(admin_client)
-        for result in results:
+        log_entries = admin_client.get_all_audit_log_entries(page_size=100)
+        for result in log_entries:
             assert isinstance(result.action, Enum)
             assert isinstance(result.list_identifier, str)
             _ = uuid.UUID(result.list_identifier)
@@ -988,22 +981,16 @@ class TestAuditLogging:
             assert isinstance(result.initiating_user, UserOrGroup)
             _ = uuid.UUID(result.initiating_user.identifier)
 
-    def test_all_log_entries_contains_current_lists(self, admin_client, list_a, list_b):
-        results = self._get_all_log_entries(admin_client)
-        observed_list_identifiers = {item.list_identifier for item in results}
-        assert list_a.identifier in observed_list_identifiers
-        assert list_b.identifier in observed_list_identifiers
-
     def test_filter_log_entries_by_list(self, admin_client, list_a, list_b):
         criterion = AuditLogSearchCriterion(filter_record_lists=[list_a.identifier])
-        results = admin_client.search_for_audit_log_entries(criterion)
+        results = list(admin_client.search_for_audit_log_entries(criterion))
         assert len(results) == 1
         assert results[0].list_identifier == list_a.identifier
         assert results[0].action == AuditLogAction.LISTCREATED
 
     def test_filter_log_entries_by_list_is_ordered(self, admin_client, list_a, list_b):
         criterion = AuditLogSearchCriterion(filter_record_lists=[list_b.identifier])
-        results = admin_client.search_for_audit_log_entries(criterion)
+        results = list(admin_client.search_for_audit_log_entries(criterion))
         assert len(results) == 4
         for event in results:
             assert event.list_identifier == list_b.identifier

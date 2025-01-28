@@ -22,7 +22,9 @@
 
 from collections import defaultdict
 import concurrent.futures
-from typing import List, Optional, Tuple, Union
+import functools
+import time
+from typing import Iterator, List, Optional, Tuple, Union
 
 from ansys.grantami.serverapi_openapi import api, models  # type: ignore[import]
 from ansys.openapi.common import (  # type: ignore[import]
@@ -40,6 +42,7 @@ from ._models import (
     AuditLogItem,
     AuditLogSearchCriterion,
     BooleanCriterion,
+    PagedResult,
     RecordList,
     RecordListItem,
     SearchCriterion,
@@ -610,7 +613,7 @@ class RecordListsApiClient(ApiClient):  # type: ignore[misc]
             list_identifier=record_list.identifier,
         )
 
-    def get_all_audit_log_entries(self) -> List[AuditLogItem]:
+    def get_all_audit_log_entries(self, page_size: Optional[int] = 100) -> Iterator[AuditLogItem]:
         """
         Fetch all audit log entries that are visible to the current user.
 
@@ -618,17 +621,23 @@ class RecordListsApiClient(ApiClient):  # type: ignore[misc]
 
         .. versionadded:: 2.0
 
+        Parameters
+        ----------
+        page_size : int, optional (default: 100)
+            If None then all results will be fetched in one request, this may be a slow operation. If set to
+            an int value then the results will be fetched in batches of size `page_size`.
+
         Returns
         -------
-        list of :class:`.AuditLogItem`
+        Iterator of :class:`.AuditLogItem`
             Audit log entries.
         """
         criterion = AuditLogSearchCriterion()
-        return self.search_for_audit_log_entries(criterion=criterion)
+        return self.search_for_audit_log_entries(criterion=criterion, page_size=page_size)
 
     def search_for_audit_log_entries(
-        self, criterion: AuditLogSearchCriterion
-    ) -> List[AuditLogItem]:
+        self, criterion: AuditLogSearchCriterion, page_size: Optional[int] = 100
+    ) -> Iterator[AuditLogItem]:
         """
         Fetch audit log entries, filtered by a search criterion.
 
@@ -640,21 +649,60 @@ class RecordListsApiClient(ApiClient):  # type: ignore[misc]
         ----------
         criterion : AuditLogSearchCriterion
             Criterion by which to filter audit log entries.
+        page_size : int, optional (default: 100)
+            If None then all results will be fetched in one request, this may be a slow operation. If set to
+            an int value then the results will be fetched in batches of size `page_size`.
 
         Returns
         -------
-        list of :class:`.AuditLogItem`
+        Iterator of :class:`.AuditLogItem`
             Audit log entries.
         """
-        response = self.list_audit_log_api.run_list_audit_log_search(body=criterion._to_model())
+        logger.info("Fetching list audit log entries...")
+
+        if page_size is not None:
+            logger.info(
+                f"Paging options were specified, fetching in batches of size {page_size}..."
+            )
+
+            def get_next_page(
+                client: "RecordListsApiClient",
+                criterion: models.GsaListAuditLogSearchRequest,
+                page_size: int,
+                start_index: int,
+            ) -> List[AuditLogItem]:
+                paging_options = models.GsaListsPagingOptions(
+                    page_size=page_size, start_index=start_index
+                )
+                criterion.paging_options = paging_options
+
+                start_time = time.perf_counter()
+                response = client.list_audit_log_api.run_list_audit_log_search(body=criterion)
+                page_id = response.search_result_identifier
+                time_delta = time.perf_counter() - start_time
+                logger.info(f"Received page with id {page_id}")
+                logger.info(f"    Running search took {time_delta}s")
+
+                start_time = time.perf_counter()
+                results = client.list_audit_log_api.get_list_audit_log_search_results(
+                    result_resource_identifier=page_id,
+                )
+                time_delta = time.perf_counter() - start_time
+                logger.info(f"    Fetching batch took {time_delta}s")
+                return [AuditLogItem._from_model(item) for item in results]
+
+            partial_func = functools.partial(get_next_page, self, criterion._to_model())
+            return PagedResult(partial_func, AuditLogItem, page_size)
+
+        logger.info("No paging options were specified, fetching all results...")
+        gsa_criterion = criterion._to_model()
+        response = self.list_audit_log_api.run_list_audit_log_search(body=gsa_criterion)
         result_id = response.search_result_identifier
-        print(result_id)
 
         search_result = self.list_audit_log_api.get_list_audit_log_search_results(
             result_resource_identifier=result_id
         )
-        results = [AuditLogItem._from_model(item) for item in search_result]
-        return sorted(results, key=lambda item: item.timestamp)
+        return iter(AuditLogItem._from_model(item) for item in search_result)
 
 
 class _ItemResolver:

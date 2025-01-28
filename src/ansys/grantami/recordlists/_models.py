@@ -21,10 +21,9 @@
 # SOFTWARE.
 
 """Models."""
-
 from datetime import datetime
 from enum import Enum
-from typing import List, Optional, Set, Union
+from typing import Callable, Iterator, List, Optional, Set, Type, TypeVar, Union
 
 from ansys.grantami.serverapi_openapi import models  # type: ignore[import]
 from ansys.openapi.common import Unset  # type: ignore[import]
@@ -968,3 +967,52 @@ class AuditLogItem:
             action=AuditLogAction(model.action.value),
             timestamp=model.timestamp,
         )
+
+
+T = TypeVar("T")
+
+
+class PagedResult(Iterator[T]):
+    """
+    Object representing the result of a search.
+
+    The individual results are obtained by iterating over this object. The results will be
+    fetched from the API as and when they are needed.
+
+    To fetch all the results, run ``list(PagedResult)``.
+    """
+
+    def __init__(
+        self, next_func: Callable[[int, int], List[T]], iterator_type: Type[T], page_size: int
+    ) -> None:
+        self._next_func = next_func
+        self._page_size = page_size
+        self._current_page: Iterator[T] = iter([])
+        self._page_index = 0
+        self._iterator_type = iterator_type
+
+    def __repr__(self) -> str:
+        """Printable representation of the object."""
+        return f"<{self.__class__.__name__}[{self._iterator_type.__name__}] page_size={self._page_size}>"
+
+    def __iter__(self) -> Iterator[T]:
+        """Return the iterator associated with this object."""
+        return self
+
+    def __next__(self) -> T:
+        """
+        Return the next result from the iterator associated with this object.
+
+        Raises
+        ------
+        StopIteration
+          If there are no more elements
+        """
+        try:
+            return next(self._current_page)
+        except StopIteration:
+            next_page = self._next_func(self._page_size, self._page_index * self._page_size)
+            self._page_index += 1
+            self._current_page = iter(next_page)
+
+        return next(self._current_page)

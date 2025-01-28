@@ -40,7 +40,8 @@ from ._models import (
 
 __all__ = [
     "AuditLogAction",
-    "AuditLogSearchCriterion" "AuditLogItem",
+    "AuditLogSearchCriterion",
+    "AuditLogItem",
     "Connection",
     "RecordListsApiClient",
     "BooleanCriterion",
