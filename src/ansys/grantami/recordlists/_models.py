@@ -979,7 +979,7 @@ class PagedResult(Iterator[T]):
     The individual results are obtained by iterating over this object. The results will be
     fetched from the API as and when they are needed.
 
-    To fetch all the results, run ``list(PagedResult)``.
+    To fetch all the results, execute ``list(PagedResult)``.
     """
 
     def __init__(

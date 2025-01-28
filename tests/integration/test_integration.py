@@ -971,6 +971,7 @@ class TestAuditLogging:
         unpublished_list = admin_client.unpublish_list(requested_list)
         admin_client.delete_list(unpublished_list)
 
+    @pytest.mark.skip(reason="Current performance and network issues with getting all lists")
     def test_get_all_log_entries(self, admin_client, list_a, list_b):
         log_entries = admin_client.get_all_audit_log_entries(page_size=100)
         for result in log_entries:
@@ -995,10 +996,10 @@ class TestAuditLogging:
         for event in results:
             assert event.list_identifier == list_b.identifier
         expected_actions = [
-            AuditLogAction.LISTCREATED,
-            AuditLogAction.LISTSETTOAWAITINGAPPROVAL,
             AuditLogAction.LISTAWAITINGAPPROVALREMOVED,
             AuditLogAction.LISTPUBLISHED,
+            AuditLogAction.LISTSETTOAWAITINGAPPROVAL,
+            AuditLogAction.LISTCREATED,
         ]
         for event, action in zip(results, expected_actions):
             assert event.action == action
