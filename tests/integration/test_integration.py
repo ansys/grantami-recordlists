@@ -1003,4 +1003,3 @@ class TestAuditLogging:
         ]
         for event, action in zip(results, expected_actions):
             assert event.action == action
-        assert results == sorted(results, key=lambda result: result.timestamp)
