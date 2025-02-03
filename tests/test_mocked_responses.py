@@ -59,7 +59,7 @@ def test_get_all_audit_log_entries(api_url, mock_client, mocker):
             json=json.loads(examples_as_strings["test_get_all_audit_log_entries"]),
         )
 
-        log_entries = mock_client.get_all_audit_log_entries()
+        log_entries = list(mock_client.get_all_audit_log_entries())
 
         assert len(log_entries) == 2
         assert log_entries[0].list_identifier == "f235a25c-4deb-45cf-b6fd-c4fbaca3cbd0"
