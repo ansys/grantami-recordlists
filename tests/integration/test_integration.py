@@ -982,9 +982,14 @@ class TestAuditLogging:
             assert isinstance(result.initiating_user, UserOrGroup)
             _ = uuid.UUID(result.initiating_user.identifier)
 
-    def test_filter_log_entries_by_list(self, admin_client, list_a, list_b):
+    @pytest.mark.parametrize("paged", (True, False))
+    def test_filter_log_entries_by_list(self, admin_client, list_a, list_b, paged):
         criterion = AuditLogSearchCriterion(filter_record_lists=[list_a.identifier])
-        results = list(admin_client.search_for_audit_log_entries(criterion))
+        if paged:
+            page_size = 100
+        else:
+            page_size = None
+        results = list(admin_client.search_for_audit_log_entries(criterion, page_size=page_size))
         assert len(results) == 1
         assert results[0].list_identifier == list_a.identifier
         assert results[0].action == AuditLogAction.LISTCREATED

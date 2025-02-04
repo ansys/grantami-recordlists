@@ -20,14 +20,35 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from typing import Iterator, List
+from typing import Any, Iterator, List, Type
 
 import pytest
 
-from ansys.grantami.recordlists._models import PagedResult
+from ansys.grantami.recordlists._models import AuditLogItem, PagedResult
 
 
 class TestPagedResult:
+    @pytest.mark.parametrize(
+        ("item_type", "expected_type_string"),
+        [
+            (int, "int"),
+            (str, "str"),
+            (bool, "bool"),
+            (float, "float"),
+            (AuditLogItem, "AuditLogItem"),
+        ],
+    )
+    @pytest.mark.parametrize("page_size", [1, 10, 100, 1000])
+    def test_repr(self, item_type: Type, expected_type_string: str, page_size: int):
+        def next_func(page_size: int, start_index: int) -> List[Any]:
+            raise NotImplementedError()
+
+        paged_result = PagedResult(next_func, item_type, page_size=page_size)
+        assert (
+            paged_result.__repr__()
+            == f"<PagedResult[{expected_type_string}] page_size={page_size}>"
+        )
+
     def test_no_results_raises_stop_iteration(self):
         call_count = 0
 
