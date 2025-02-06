@@ -23,7 +23,6 @@
 from collections import defaultdict
 import concurrent.futures
 import functools
-import time
 from typing import Iterator, List, Optional, Tuple, Union
 
 from ansys.grantami.serverapi_openapi import api, models  # type: ignore[import]
@@ -676,19 +675,13 @@ class RecordListsApiClient(ApiClient):  # type: ignore[misc]
                 )
                 criterion.paging_options = paging_options
 
-                start_time = time.perf_counter()
                 response = client.list_audit_log_api.run_list_audit_log_search(body=criterion)
                 page_id = response.search_result_identifier
-                time_delta = time.perf_counter() - start_time
                 logger.info(f"Received page with id {page_id}")
-                logger.info(f"    Running search took {time_delta}s")
 
-                start_time = time.perf_counter()
                 results = client.list_audit_log_api.get_list_audit_log_search_results(
                     result_resource_identifier=page_id,
                 )
-                time_delta = time.perf_counter() - start_time
-                logger.info(f"    Fetching batch took {time_delta}s")
                 return [AuditLogItem._from_model(item) for item in results]
 
             partial_func = functools.partial(get_next_page, self, criterion._to_model())
@@ -696,19 +689,13 @@ class RecordListsApiClient(ApiClient):  # type: ignore[misc]
 
         logger.info("No paging options were specified, fetching all results...")
         gsa_criterion = criterion._to_model()
-        start_time = time.perf_counter()
         response = self.list_audit_log_api.run_list_audit_log_search(body=gsa_criterion)
         result_id = response.search_result_identifier
-        time_delta = time.perf_counter() - start_time
         logger.info(f"Received result with id {result_id}")
-        logger.info(f"    Running search took {time_delta}s")
 
-        start_time = time.perf_counter()
         search_result = self.list_audit_log_api.get_list_audit_log_search_results(
             result_resource_identifier=result_id
         )
-        time_delta = time.perf_counter() - start_time
-        logger.info(f"    Fetching results took {time_delta}s")
         return iter(AuditLogItem._from_model(item) for item in search_result)
 
 

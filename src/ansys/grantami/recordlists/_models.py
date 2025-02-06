@@ -837,7 +837,7 @@ class AuditLogSearchCriterion:
 
     @property
     def filter_record_lists(self) -> Optional[List[str]]:
-        """Filter audit log entries for only the specified record lists.
+        """Filter audit log entries for only the specified record list identifiers.
 
         If None then log entries for all record lists will be included.
         """
