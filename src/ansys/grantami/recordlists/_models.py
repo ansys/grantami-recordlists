@@ -972,7 +972,7 @@ class AuditLogItem:
 T = TypeVar("T")
 
 
-class PagedResult(Iterator[T]):
+class _PagedResult(Iterator[T]):
     """
     Object representing the result of a search.
 

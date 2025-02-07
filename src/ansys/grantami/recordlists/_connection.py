@@ -41,11 +41,11 @@ from ._models import (
     AuditLogItem,
     AuditLogSearchCriterion,
     BooleanCriterion,
-    PagedResult,
     RecordList,
     RecordListItem,
     SearchCriterion,
     SearchResult,
+    _PagedResult,
 )
 
 PROXY_PATH = "/proxy/v1.svc/mi"
@@ -685,7 +685,7 @@ class RecordListsApiClient(ApiClient):  # type: ignore[misc]
                 return [AuditLogItem._from_model(item) for item in results]
 
             partial_func = functools.partial(get_next_page, self, criterion._to_model())
-            return PagedResult(partial_func, AuditLogItem, page_size)
+            return _PagedResult(partial_func, AuditLogItem, page_size)
 
         logger.info("No paging options were specified, fetching all results...")
         gsa_criterion = criterion._to_model()

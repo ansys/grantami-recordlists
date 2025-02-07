@@ -24,7 +24,7 @@ from typing import Any, Iterator, List, Type
 
 import pytest
 
-from ansys.grantami.recordlists._models import AuditLogItem, PagedResult
+from ansys.grantami.recordlists._models import AuditLogItem, _PagedResult
 
 
 class TestPagedResult:
@@ -43,7 +43,7 @@ class TestPagedResult:
         def next_func(page_size: int, start_index: int) -> List[Any]:
             raise NotImplementedError()
 
-        paged_result = PagedResult(next_func, item_type, page_size=page_size)
+        paged_result = _PagedResult(next_func, item_type, page_size=page_size)
         assert (
             paged_result.__repr__()
             == f"<PagedResult[{expected_type_string}] page_size={page_size}>"
@@ -57,7 +57,7 @@ class TestPagedResult:
             call_count += 1
             return []
 
-        paged_result = PagedResult(next_func, int, 10)
+        paged_result = _PagedResult(next_func, int, 10)
 
         with pytest.raises(StopIteration):
             next(paged_result)
@@ -67,7 +67,7 @@ class TestPagedResult:
         def next_func(page_size: int, start_index: int) -> List[int]:
             raise NotImplementedError()
 
-        paged_result = PagedResult(next_func, int, 10)
+        paged_result = _PagedResult(next_func, int, 10)
 
         with pytest.raises(NotImplementedError):
             next(paged_result)
@@ -82,7 +82,7 @@ class TestPagedResult:
                 return [1, 2, 3]
             return []
 
-        paged_result = PagedResult(next_func, int, 10)
+        paged_result = _PagedResult(next_func, int, 10)
         list_result = list(paged_result)
 
         assert (
@@ -102,7 +102,7 @@ class TestPagedResult:
                 return [4, 5]
             return []
 
-        paged_result = PagedResult(next_func, int, 3)
+        paged_result = _PagedResult(next_func, int, 3)
         list_result = list(paged_result)
 
         assert (
@@ -114,7 +114,7 @@ class TestPagedResult:
         def next_func(page_size: int, start_index: int) -> List[int]:
             raise NotImplementedError()
 
-        paged_result = PagedResult(next_func, int, 10)
+        paged_result = _PagedResult(next_func, int, 10)
 
         iterator = iter(paged_result)
         assert isinstance(iterator, Iterator)
@@ -131,7 +131,7 @@ class TestPagedResult:
                 return [4, 5]
             return []
 
-        paged_result = PagedResult(next_func, int, 3)
+        paged_result = _PagedResult(next_func, int, 3)
 
         result = []
         for value in paged_result:
