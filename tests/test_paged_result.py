@@ -46,7 +46,7 @@ class TestPagedResult:
         paged_result = _PagedResult(next_func, item_type, page_size=page_size)
         assert (
             paged_result.__repr__()
-            == f"<PagedResult[{expected_type_string}] page_size={page_size}>"
+            == f"<_PagedResult[{expected_type_string}] page_size={page_size}>"
         )
 
     def test_no_results_raises_stop_iteration(self):
