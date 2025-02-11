@@ -44,3 +44,18 @@ Search results
 
 .. autoclass:: ansys.grantami.recordlists.SearchResult
    :members:
+
+
+Audit log entries
+~~~~~~~~~~~~~~~~~
+
+.. autoclass:: ansys.grantami.recordlists.AuditLogSearchCriterion
+   :members:
+
+
+.. autoclass:: ansys.grantami.recordlists.AuditLogItem
+   :members:
+
+.. autoclass:: ansys.grantami.recordlists.AuditLogAction
+   :members:
+   :undoc-members:

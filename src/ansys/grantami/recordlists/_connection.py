@@ -22,7 +22,8 @@
 
 from collections import defaultdict
 import concurrent.futures
-from typing import List, Optional, Tuple, Union
+import functools
+from typing import Iterator, List, Optional, Tuple, Union
 
 from ansys.grantami.serverapi_openapi import api, models  # type: ignore[import]
 from ansys.openapi.common import (  # type: ignore[import]
@@ -36,7 +37,16 @@ from ansys.openapi.common import (  # type: ignore[import]
 import requests  # type: ignore[import]
 
 from ._logger import logger
-from ._models import BooleanCriterion, RecordList, RecordListItem, SearchCriterion, SearchResult
+from ._models import (
+    AuditLogItem,
+    AuditLogSearchCriterion,
+    BooleanCriterion,
+    RecordList,
+    RecordListItem,
+    SearchCriterion,
+    SearchResult,
+    _PagedResult,
+)
 
 PROXY_PATH = "/proxy/v1.svc/mi"
 AUTH_PATH = "/Health/v2.svc"
@@ -98,6 +108,7 @@ class RecordListsApiClient(ApiClient):  # type: ignore[misc]
         self.list_management_api = api.ListManagementApi(self)
         self.list_item_api = api.ListItemApi(self)
         self.list_permissions_api = api.ListPermissionsApi(self)
+        self.list_audit_log_api = api.ListAuditLogApi(self)
 
     def __repr__(self) -> str:
         """Printable representation of the object."""
@@ -600,6 +611,92 @@ class RecordListsApiClient(ApiClient):  # type: ignore[misc]
         self.list_permissions_api.unsubscribe(
             list_identifier=record_list.identifier,
         )
+
+    def get_all_audit_log_entries(self, page_size: Optional[int] = 100) -> Iterator[AuditLogItem]:
+        """
+        Fetch all audit log entries that are visible to the current user.
+
+        Performs an HTTP request against the Granta MI Server API.
+
+        .. versionadded:: 2.0
+
+        Parameters
+        ----------
+        page_size : int, optional (default: 100)
+            If None then all results will be fetched in one request, this may be a slow operation. If set to
+            an int value then the results will be fetched in batches of size `page_size`.
+
+        Returns
+        -------
+        Iterator of :class:`.AuditLogItem`
+            Audit log entries.
+        """
+        criterion = AuditLogSearchCriterion()
+        return self.search_for_audit_log_entries(criterion=criterion, page_size=page_size)
+
+    def search_for_audit_log_entries(
+        self, criterion: AuditLogSearchCriterion, page_size: Optional[int] = 100
+    ) -> Iterator[AuditLogItem]:
+        """
+        Fetch audit log entries, filtered by a search criterion.
+
+        Performs an HTTP request against the Granta MI Server API.
+
+        .. versionadded:: 2.0
+
+        Parameters
+        ----------
+        criterion : AuditLogSearchCriterion
+            Criterion by which to filter audit log entries.
+        page_size : int, optional (default: 100)
+            If None then all results will be fetched in one request, this may be a slow operation. If set to
+            an int value then the results will be fetched in batches of size `page_size`.
+
+        Returns
+        -------
+        Iterator of :class:`.AuditLogItem`
+            Audit log entries.
+        """
+        logger.info("Fetching list audit log entries...")
+
+        if page_size is not None:
+            logger.info(
+                f"Paging options were specified, fetching in batches of size {page_size}..."
+            )
+
+            def get_next_page(
+                client: "RecordListsApiClient",
+                criterion: models.GsaListAuditLogSearchRequest,
+                page_size: int,
+                start_index: int,
+            ) -> List[AuditLogItem]:
+                paging_options = models.GsaListsPagingOptions(
+                    page_size=page_size, start_index=start_index
+                )
+                criterion.paging_options = paging_options
+
+                response = client.list_audit_log_api.run_list_audit_log_search(body=criterion)
+                page_id = response.search_result_identifier
+                logger.info(f"Received page with id {page_id}")
+
+                results = client.list_audit_log_api.get_list_audit_log_search_results(
+                    result_resource_identifier=page_id,
+                )
+                return [AuditLogItem._from_model(item) for item in results]
+
+            partial_func = functools.partial(get_next_page, self, criterion._to_model())
+            return _PagedResult(partial_func, AuditLogItem, page_size)
+
+        logger.info("No paging options were specified, fetching all results...")
+        gsa_criterion = criterion._to_model()
+        response = self.list_audit_log_api.run_list_audit_log_search(body=gsa_criterion)
+        result_id = response.search_result_identifier
+        logger.info(f"Received result with id {result_id}")
+
+        search_result = self.list_audit_log_api.get_list_audit_log_search_results(
+            result_resource_identifier=result_id
+        )
+        return iter(AuditLogItem._from_model(item) for item in search_result)
 
 
 class _ItemResolver:

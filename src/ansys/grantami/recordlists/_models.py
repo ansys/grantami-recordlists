@@ -21,10 +21,9 @@
 # SOFTWARE.
 
 """Models."""
-
 from datetime import datetime
 from enum import Enum
-from typing import List, Optional, Union
+from typing import Callable, Iterator, List, Optional, Set, Type, TypeVar, Union
 
 from ansys.grantami.serverapi_openapi import models  # type: ignore[import]
 from ansys.openapi.common import Unset  # type: ignore[import]
@@ -777,3 +776,243 @@ class SearchResult:
             record_list=RecordList._from_model(model.header),
             items=items,
         )
+
+
+class AuditLogAction(str, Enum):
+    """Action logged involving a specific record list.
+
+    Can be used in :attr:`AuditLogSearchCriterion.filter_actions`.
+    """
+
+    LISTCREATED = models.GsaListAction.LISTCREATED.value
+    LISTDELETED = models.GsaListAction.LISTDELETED.value
+    ITEMADDED = models.GsaListAction.ITEMADDED.value
+    ITEMREMOVED = models.GsaListAction.ITEMREMOVED.value
+    LISTNAMECHANGED = models.GsaListAction.LISTNAMECHANGED.value
+    LISTDESCRIPTIONCHANGED = models.GsaListAction.LISTDESCRIPTIONCHANGED.value
+    LISTNOTESCHANGED = models.GsaListAction.LISTNOTESCHANGED.value
+    LISTSETTOAWAITINGAPPROVAL = models.GsaListAction.LISTSETTOAWAITINGAPPROVAL.value
+    LISTAWAITINGAPPROVALREMOVED = models.GsaListAction.LISTAWAITINGAPPROVALREMOVED.value
+    LISTPUBLISHED = models.GsaListAction.LISTPUBLISHED.value
+    LISTUNPUBLISHED = models.GsaListAction.LISTUNPUBLISHED.value
+    LISTREVISIONCREATED = models.GsaListAction.LISTREVISIONCREATED.value
+    USERSUBSCRIBED = models.GsaListAction.USERSUBSCRIBED.value
+    USERUNSUBSCRIBED = models.GsaListAction.USERUNSUBSCRIBED.value
+    LISTCURATORADDED = models.GsaListAction.LISTCURATORADDED.value
+    LISTCURATORREMOVED = models.GsaListAction.LISTCURATORREMOVED.value
+    LISTADMINADDED = models.GsaListAction.LISTADMINADDED.value
+    LISTADMINREMOVED = models.GsaListAction.LISTADMINREMOVED.value
+    LISTPUBLISHERADDED = models.GsaListAction.LISTPUBLISHERADDED.value
+    LISTPUBLISHERREMOVED = models.GsaListAction.LISTPUBLISHERREMOVED.value
+    LISTMADEINTERNAL = models.GsaListAction.LISTMADEINTERNAL.value
+    LISTMADENOTINTERNAL = models.GsaListAction.LISTMADENOTINTERNAL.value
+
+
+class AuditLogSearchCriterion:
+    """
+    Search criterion to use in a search operation :meth:`~.RecordListsApiClient.search_for_lists`.
+
+    Examples
+    --------
+    Search audit log entries for a given record list.
+
+    >>> criterion = AuditLogSearchCriterion(
+    ...    filter_record_lists = []
+    ... )
+
+    Search audit log entries for all record lists published or made not internal.
+
+    >>> criterion = AuditLogSearchCriterion(
+    ...    filter_actions = {AuditLogAction.LISTPUBLISHED, AuditLogAction.LISTMADENOTINTERNAL}
+    ... )
+    """
+
+    def __init__(
+        self,
+        filter_record_lists: Optional[List[str]] = None,
+        filter_actions: Optional[Set[AuditLogAction]] = None,
+    ):
+        self._filter_record_lists = filter_record_lists
+        self._filter_actions = filter_actions
+
+    @property
+    def filter_record_lists(self) -> Optional[List[str]]:
+        """Filter audit log entries for only the specified record list identifiers.
+
+        If None then log entries for all record lists will be included.
+        """
+        return self._filter_record_lists
+
+    @filter_record_lists.setter
+    def filter_record_lists(self, filter_record_lists: Optional[List[str]]) -> None:
+        self._filter_record_lists = filter_record_lists
+
+    @property
+    def filter_actions(self) -> Optional[Set[AuditLogAction]]:
+        """Filter audit log entries for only the specified actions.
+
+        If None then log entries for all actions will be included.
+        """
+        return self._filter_actions
+
+    @filter_actions.setter
+    def filter_actions(self, filter_actions: Optional[Set[AuditLogAction]]) -> None:
+        self._filter_actions = filter_actions
+
+    def __repr__(self) -> str:
+        """Printable representation of the object."""
+        return f"<{self.__class__.__name__} ...>"
+
+    def _to_model(self) -> models.GsaListAuditLogSearchRequest:
+        """Generate the DTO for use with the auto-generated client code."""
+        logger.debug("Serializing AuditLogSearchCriterion to API model")
+        model = models.GsaListAuditLogSearchRequest(
+            list_actions_to_include=(
+                [item.value for item in self.filter_actions] if self.filter_actions else None
+            ),
+            list_identifiers=self.filter_record_lists,
+        )
+        logger.debug(model.to_str())
+        return model
+
+
+class AuditLogItem:
+    """
+    A log entry representing a single action affecting a record list.
+
+    Read-only - do not directly instantiate or modify instances of this class.
+    """
+
+    def __init__(
+        self,
+        list_identifier: str,
+        initiating_user: UserOrGroup,
+        user_or_group_affected: Optional[UserOrGroup],
+        list_item_affected: Optional[RecordListItem],
+        action: AuditLogAction,
+        timestamp: datetime,
+    ) -> None:
+        self._list_identifier = list_identifier
+        self._initiating_user = initiating_user
+        self._user_or_group_affected = user_or_group_affected
+        self._list_item_affected = list_item_affected
+        self._action = action
+        self._timestamp = timestamp
+
+    @property
+    def list_identifier(self) -> str:
+        """Identifier of the record list affected by the action that triggered this audit log entry."""
+        return self._list_identifier
+
+    @property
+    def initiating_user(self) -> UserOrGroup:
+        """User or Group that initiated the action that triggered this audit log entry."""
+        return self._initiating_user
+
+    @property
+    def user_or_group_affected(self) -> Optional[UserOrGroup]:
+        """User or group affected by the action that triggered this audit log entry, if applicable."""
+        return self._user_or_group_affected
+
+    @property
+    def list_item_affected(self) -> Optional[RecordListItem]:
+        """Record list item affected by the action that triggered this audit log entry, if applicable."""
+        return self._list_item_affected
+
+    @property
+    def action(self) -> AuditLogAction:
+        """Type of action that triggered this audit log entry."""
+        return self._action
+
+    @property
+    def timestamp(self) -> datetime:
+        """Timestamp of the event that triggered this audit log entry."""
+        return self._timestamp
+
+    def __repr__(self) -> str:
+        """Printable representation of the object."""
+        return f"<{self.__class__.__name__} list_identifier={self.list_identifier}, action=AuditLogAction.{self.action.name}>"
+
+    @classmethod
+    def _from_model(
+        cls,
+        model: models.GsaListAuditLogItem,
+    ) -> "AuditLogItem":
+        """
+        Instantiate from a model defined in the auto-generated client code.
+
+        Parameters
+        ----------
+        model:
+            DTO object to parse
+        """
+        logger.debug("Deserializing AuditLogItem from API response")
+        logger.debug(model.to_str())
+
+        assert model.timestamp, "GsaListAuditLogItem must have populated timestamp attribute"
+
+        return cls(
+            list_identifier=model.list_identifier,
+            initiating_user=UserOrGroup._from_model(model.initiating_user),
+            user_or_group_affected=(
+                None
+                if not model.user_or_group_affected
+                else UserOrGroup._from_model(model.user_or_group_affected)
+            ),
+            list_item_affected=(
+                None
+                if not model.list_item_affected
+                else RecordListItem._from_model(model.list_item_affected)
+            ),
+            action=AuditLogAction(model.action.value),
+            timestamp=model.timestamp,
+        )
+
+
+T = TypeVar("T")
+
+
+class _PagedResult(Iterator[T]):
+    """
+    Object representing the result of a search.
+
+    The individual results are obtained by iterating over this object. The results will be
+    fetched from the API as and when they are needed.
+
+    To fetch all the results, execute ``list(PagedResult)``.
+    """
+
+    def __init__(
+        self, next_func: Callable[[int, int], List[T]], iterator_type: Type[T], page_size: int
+    ) -> None:
+        self._next_func = next_func
+        self._page_size = page_size
+        self._current_page: Iterator[T] = iter([])
+        self._page_index = 0
+        self._iterator_type = iterator_type
+
+    def __repr__(self) -> str:
+        """Printable representation of the object."""
+        return f"<{self.__class__.__name__}[{self._iterator_type.__name__}] page_size={self._page_size}>"
+
+    def __iter__(self) -> Iterator[T]:
+        """Return the iterator associated with this object."""
+        return self
+
+    def __next__(self) -> T:
+        """
+        Return the next result from the iterator associated with this object.
+
+        Raises
+        ------
+        StopIteration
+          If there are no more elements
+        """
+        try:
+            return next(self._current_page)
+        except StopIteration:
+            next_page = self._next_func(self._page_size, self._page_index * self._page_size)
+            self._page_index += 1
+            self._current_page = iter(next_page)
+
+        return next(self._current_page)

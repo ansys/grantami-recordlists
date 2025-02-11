@@ -20,16 +20,21 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+from datetime import datetime
+from enum import Enum
 import uuid
 
 from ansys.openapi.common import ApiException
 import pytest
 
 from ansys.grantami.recordlists import (
+    AuditLogAction,
+    AuditLogSearchCriterion,
     BooleanCriterion,
     RecordList,
     RecordListItem,
     SearchCriterion,
+    UserOrGroup,
     UserRole,
 )
 
@@ -942,3 +947,64 @@ class TestSearch:
                     assert result_item.record_version == input_item.record_version
                     check_count += 1
         assert check_count == len(result.items) == len(resolvable_items)
+
+
+class TestAuditLogging:
+    _name_suffix_A = "_ListA"
+    _name_suffix_B = "_ListB"
+
+    @pytest.fixture(scope="class")
+    def list_a(self, admin_client, list_name):
+        """A personal list with a known name."""
+        created_list = admin_client.create_list(list_name + self._name_suffix_A)
+        yield created_list
+        admin_client.delete_list(created_list)
+
+    @pytest.fixture(scope="class")
+    def list_b(self, admin_client, list_name):
+        """A published list with a known name."""
+        created_list = admin_client.create_list(list_name + self._name_suffix_B)
+        requested_list = admin_client.request_list_approval(created_list)
+        published_list = admin_client.publish_list(requested_list)
+        yield published_list
+        requested_list = admin_client.request_list_approval(published_list)
+        unpublished_list = admin_client.unpublish_list(requested_list)
+        admin_client.delete_list(unpublished_list)
+
+    @pytest.mark.skip(reason="Current performance and network issues with getting all lists")
+    def test_get_all_log_entries(self, admin_client, list_a, list_b):
+        log_entries = admin_client.get_all_audit_log_entries(page_size=100)
+        for result in log_entries:
+            assert isinstance(result.action, Enum)
+            assert isinstance(result.list_identifier, str)
+            _ = uuid.UUID(result.list_identifier)
+            assert isinstance(result.timestamp, datetime)
+            assert isinstance(result.initiating_user, UserOrGroup)
+            _ = uuid.UUID(result.initiating_user.identifier)
+
+    @pytest.mark.parametrize("paged", (True, False))
+    def test_filter_log_entries_by_list(self, admin_client, list_a, list_b, paged):
+        criterion = AuditLogSearchCriterion(filter_record_lists=[list_a.identifier])
+        if paged:
+            page_size = 100
+        else:
+            page_size = None
+        results = list(admin_client.search_for_audit_log_entries(criterion, page_size=page_size))
+        assert len(results) == 1
+        assert results[0].list_identifier == list_a.identifier
+        assert results[0].action == AuditLogAction.LISTCREATED
+
+    def test_filter_log_entries_by_list_is_ordered(self, admin_client, list_a, list_b):
+        criterion = AuditLogSearchCriterion(filter_record_lists=[list_b.identifier])
+        results = list(admin_client.search_for_audit_log_entries(criterion))
+        assert len(results) == 4
+        for event in results:
+            assert event.list_identifier == list_b.identifier
+        expected_actions = [
+            AuditLogAction.LISTAWAITINGAPPROVALREMOVED,
+            AuditLogAction.LISTPUBLISHED,
+            AuditLogAction.LISTSETTOAWAITINGAPPROVAL,
+            AuditLogAction.LISTCREATED,
+        ]
+        for event, action in zip(results, expected_actions):
+            assert event.action == action
