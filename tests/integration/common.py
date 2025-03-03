@@ -25,10 +25,10 @@ from typing import Optional, cast
 from ansys.grantami.serverapi_openapi.api import (
     RecordsRecordHistoriesApi,
     RecordsRecordVersionsApi,
+    SchemaApi,
     SchemaDatabasesApi,
     SchemaTablesApi,
     SearchApi,
-    SchemaApi,
 )
 from ansys.grantami.serverapi_openapi.models import (
     GsaCreateRecordHistory,
