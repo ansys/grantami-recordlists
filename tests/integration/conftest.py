@@ -680,7 +680,7 @@ def mi_version(request) -> tuple[int, int] | None:
     """
     if os.getenv("CI") and not os.getenv("TEST_SL_URL"):
         return None
-    client = request.getfixturevalue("job_queue_api_client")
+    client = request.getfixturevalue("admin_client")
     return get_granta_mi_version(client)
 
 
