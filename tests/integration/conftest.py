@@ -35,7 +35,7 @@ from ansys.grantami.serverapi_openapi.models import (
     GsaTextMatchBehavior,
     GsaVersionState,
 )
-from common import DB_KEY, TABLE_NAME, RecordCreator
+from common import DB_KEY, TABLE_NAME, RecordCreator, get_granta_mi_version
 import pytest
 
 from ansys.grantami.recordlists import Connection, RecordList, RecordListItem, RecordListsApiClient
@@ -662,3 +662,61 @@ def cleanup_basic(basic_client) -> List[RecordList]:
     yield to_delete
     for record_list in to_delete:
         basic_client.delete_list(record_list)
+
+
+@pytest.fixture(scope="session")
+def mi_version(request) -> tuple[int, int] | None:
+    """The version of MI referenced by the test url.
+
+    Returns
+    -------
+    tuple[int, int] | None
+        A 2-tuple containing the (MAJOR, MINOR) Granta MI release version, or None if a test URL is not available.
+
+    Notes
+    -----
+    This fixture returns None if the ``sl_url`` variable is not available. This is typically because the tests are
+    running in CI and the TEST_SL_URL environment variable was not populated.
+    """
+    if os.getenv("CI") and not os.getenv("TEST_SL_URL"):
+        return None
+    client = request.getfixturevalue("job_queue_api_client")
+    return get_granta_mi_version(client)
+
+
+@pytest.fixture(autouse=True)
+def process_integration_marks(request, mi_version):
+    """Processes the arguments provided to the integration mark.
+
+    If the mark is initialized with the kwarg ``mi_versions``, the value must be of type list[tuple[int, int]], where
+    the tuples contain compatible major and minor release versions of Granta MI. If the version is specified for a test
+    case and the Granta MI version being tested against is not in the provided list, the test case is skipped.
+
+    Also handles test-specific behavior, for example if a certain Granta MI version and test are incompatible and need
+    to be skipped or xfailed.
+    """
+
+    # Argument validation
+    if not request.node.get_closest_marker("integration"):
+        # No integration marker anywhere in the stack
+        return
+    if mi_version is None:
+        # We didn't get an MI version
+        # Unlikely to occur, since if we didn't get an MI version we don't have a URL, so we can't run integration
+        # tests anyway
+        return
+
+    # Process integration mark arguments
+    mark: pytest.Mark = request.node.get_closest_marker("integration")
+    if not mark.kwargs:
+        # Mark not initialized with any keyword arguments
+        return
+    allowed_versions = mark.kwargs.get("mi_versions")
+    if allowed_versions is None:
+        return
+    if not isinstance(allowed_versions, list):
+        raise TypeError("mi_versions argument type must be of type 'list'")
+    if mi_version not in allowed_versions:
+        formatted_version = ".".join(str(x) for x in mi_version)
+        skip_message = f'Test skipped for Granta MI release version "{formatted_version}"'
+        pytest.skip(skip_message)

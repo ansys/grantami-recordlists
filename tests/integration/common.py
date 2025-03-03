@@ -20,7 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from typing import Optional
+from typing import Optional, cast
 
 from ansys.grantami.serverapi_openapi.api import (
     RecordsRecordHistoriesApi,
@@ -28,6 +28,7 @@ from ansys.grantami.serverapi_openapi.api import (
     SchemaDatabasesApi,
     SchemaTablesApi,
     SearchApi,
+    SchemaApi,
 )
 from ansys.grantami.serverapi_openapi.models import (
     GsaCreateRecordHistory,
@@ -354,3 +355,11 @@ class RecordCreator:
         except AttributeError:
             pass
         self._get_latest_version_info()
+
+
+def get_granta_mi_version(client: ApiClient) -> tuple[int, int] | None:
+    schema_api = SchemaApi(client)
+    version = schema_api.get_version()
+    parsed_version = [int(v) for v in version.major_minor_version.split(".")]
+    assert len(parsed_version) == 2
+    return cast(tuple[int, int], tuple(parsed_version))

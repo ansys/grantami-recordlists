@@ -844,8 +844,27 @@ class TestSearch:
             else:
                 assert result.items is None
 
+    @pytest.mark.integration(mi_versions=[(25, 1), (24, 2), (24, 1)])
     @pytest.mark.parametrize("include_items", [True, False])
-    def test_search_by_record(
+    def test_search_by_record_25_1_and_earlier(
+        self, include_items, admin_client, list_name, resolvable_items, list_c
+    ):
+        record_history_guid = resolvable_items[0].record_history_guid
+        criteria = SearchCriterion(
+            name_contains=list_name,
+            contains_records=[record_history_guid],
+        )
+        results = admin_client.search_for_lists(criteria, include_items=include_items)
+        assert len(results) == 1
+        assert results[0].record_list.identifier == list_c.identifier
+        if include_items:
+            assert len(results[0].items) == len(resolvable_items)
+        else:
+            assert results[0].items is None
+
+    @pytest.mark.integration(mi_versions=[(25, 2)])
+    @pytest.mark.parametrize("include_items", [True, False])
+    def test_search_by_record_25_2(
         self, include_items, admin_client, list_name, resolvable_items, list_c
     ):
         record_reference = resolvable_items[0]
@@ -949,6 +968,7 @@ class TestSearch:
         assert check_count == len(result.items) == len(resolvable_items)
 
 
+@pytest.mark.integration(mi_versions=[(25, 2)])
 class TestAuditLogging:
     _name_suffix_A = "_ListA"
     _name_suffix_B = "_ListB"
