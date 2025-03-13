@@ -25,9 +25,13 @@ from typing import Any, Type
 from unittest.mock import Mock
 import uuid
 
-from ansys.grantami.serverapi_openapi import models
-from ansys.grantami.serverapi_openapi.api import ListItemApi, ListManagementApi, ListPermissionsApi
-from ansys.grantami.serverapi_openapi.models import (
+from ansys.grantami.serverapi_openapi.v2025r2 import models
+from ansys.grantami.serverapi_openapi.v2025r2.api import (
+    ListItemApi,
+    ListManagementApi,
+    ListPermissionsApi,
+)
+from ansys.grantami.serverapi_openapi.v2025r2.models import (
     GsaCreateListItem,
     GsaCreateRecordList,
     GsaCreateRecordListItemsInfo,
@@ -56,7 +60,6 @@ def client():
         session=Mock(),
         service_layer_url="http://server_name/mi_servicelayer",
         configuration=Mock(),
-        proxy_path=PROXY_PATH,
     )
     client.setup_client(models)
     return client

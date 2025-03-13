@@ -25,8 +25,8 @@ from typing import Any
 from unittest.mock import Mock, call, patch
 import uuid
 
-from ansys.grantami.serverapi_openapi import GsaListItemRecordReference
-from ansys.grantami.serverapi_openapi.models import (
+from ansys.grantami.serverapi_openapi.v2025r2 import GsaListItemRecordReference
+from ansys.grantami.serverapi_openapi.v2025r2.models import (
     GsaListAction,
     GsaListAuditLogItem,
     GsaListAuditLogSearchRequest,

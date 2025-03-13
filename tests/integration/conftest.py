@@ -24,8 +24,12 @@ import os
 from typing import List
 import uuid
 
-from ansys.grantami.serverapi_openapi.api import SchemaDatabasesApi, SchemaTablesApi, SearchApi
-from ansys.grantami.serverapi_openapi.models import (
+from ansys.grantami.serverapi_openapi.v2025r2.api import (
+    SchemaDatabasesApi,
+    SchemaTablesApi,
+    SearchApi,
+)
+from ansys.grantami.serverapi_openapi.v2025r2.models import (
     GsaBooleanCriterion,
     GsaDiscreteTextValuesDatumCriterion,
     GsaRecordPropertyCriterion,
@@ -35,7 +39,7 @@ from ansys.grantami.serverapi_openapi.models import (
     GsaTextMatchBehavior,
     GsaVersionState,
 )
-from common import DB_KEY, TABLE_NAME, RecordCreator, get_granta_mi_version
+from common import DB_KEY, TABLE_NAME, RecordCreator
 import pytest
 
 from ansys.grantami.recordlists import Connection, RecordList, RecordListItem, RecordListsApiClient
@@ -239,7 +243,7 @@ def unreleased_item(admin_client) -> RecordListItem:
     |-- Version 1 (unreleased) *
     """
     record_creator = RecordCreator(admin_client, DB_KEY, TABLE_NAME, "UnreleasedRecord")
-    record_creator.get_or_create_version(GsaVersionState.UNRELEASED, 1)
+    record_creator.get_or_create_version(GsaVersionState.UNRELEASED.name, 1)
     return RecordListItem(
         database_guid=record_creator.database_guid,
         table_guid=record_creator.table_guid,
@@ -256,7 +260,7 @@ def released_item(admin_client) -> RecordListItem:
     |-- Version 1 (released) *
     """
     record_creator = RecordCreator(admin_client, DB_KEY, TABLE_NAME, "ReleasedRecord")
-    record_creator.get_or_create_version(GsaVersionState.RELEASED, 1)
+    record_creator.get_or_create_version(GsaVersionState.RELEASED.name, 1)
     return RecordListItem(
         database_guid=record_creator.database_guid,
         table_guid=record_creator.table_guid,
@@ -274,7 +278,7 @@ def superseded_item(admin_client) -> RecordListItem:
     |-- Version 2 (released)
     """
     record_creator = RecordCreator(admin_client, DB_KEY, TABLE_NAME, "SupersededRecord")
-    record_creator.get_or_create_version(GsaVersionState.SUPERSEDED, 1)
+    record_creator.get_or_create_version(GsaVersionState.SUPERSEDED.name, 1)
     return RecordListItem(
         database_guid=record_creator.database_guid,
         table_guid=record_creator.table_guid,
@@ -292,7 +296,7 @@ def draft_superseded_item(admin_client) -> RecordListItem:
     |-- Version 2 (unreleased)
     """
     record_creator = RecordCreator(admin_client, DB_KEY, TABLE_NAME, "DraftSupersededRecord")
-    record_creator.get_or_create_version(GsaVersionState.RELEASED, 1)
+    record_creator.get_or_create_version(GsaVersionState.RELEASED.name, 1)
     return RecordListItem(
         database_guid=record_creator.database_guid,
         table_guid=record_creator.table_guid,
@@ -310,7 +314,7 @@ def draft_superseding_item(admin_client) -> RecordListItem:
     |-- Version 2 (unreleased) *
     """
     record_creator = RecordCreator(admin_client, DB_KEY, TABLE_NAME, "DraftSupersededRecord")
-    record_creator.get_or_create_version(GsaVersionState.UNRELEASED, 2)
+    record_creator.get_or_create_version(GsaVersionState.UNRELEASED.name, 2)
     return RecordListItem(
         database_guid=record_creator.database_guid,
         table_guid=record_creator.table_guid,
@@ -681,7 +685,8 @@ def mi_version(request) -> tuple[int, int] | None:
     if os.getenv("CI") and not os.getenv("TEST_SL_URL"):
         return None
     client = request.getfixturevalue("admin_client")
-    return get_granta_mi_version(client)
+    full_version = client._get_mi_server_version()
+    return full_version[0], full_version[1]
 
 
 @pytest.fixture(autouse=True)

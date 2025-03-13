@@ -23,10 +23,11 @@
 """Models."""
 from datetime import datetime
 from enum import Enum
-from typing import Callable, Iterator, List, Optional, Set, Type, TypeVar, Union
+from typing import Callable, Iterator, List, Optional, Set, Type, TypeVar, Union, cast
 
-from ansys.grantami.serverapi_openapi import models  # type: ignore[import]
-from ansys.openapi.common import Unset  # type: ignore[import]
+from ansys.grantami.serverapi_openapi.v2025r1 import models as models2025r1
+from ansys.grantami.serverapi_openapi.v2025r2 import models
+from ansys.openapi.common import Unset, Unset_Type
 
 from ._logger import logger
 
@@ -193,11 +194,11 @@ class RecordList:
             internal_use=model.internal_use,
             last_modified_timestamp=model.last_modified_timestamp,
             last_modified_user=UserOrGroup._from_model(model.last_modified_user),
-            published_timestamp=model.published_timestamp,
+            published_timestamp=cast(datetime | None, model.published_timestamp),
             published_user=(
                 UserOrGroup._from_model(model.published_user) if model.published_user else None
             ),
-            parent_record_list_identifier=model.parent_record_list_identifier,
+            parent_record_list_identifier=cast(str | None, model.parent_record_list_identifier),
         )
         return instance
 
@@ -433,7 +434,7 @@ class SearchCriterion:
         contains_records_in_databases: Optional[List[str]] = None,
         contains_records_in_integration_schemas: Optional[List[str]] = None,
         contains_records_in_tables: Optional[List[str]] = None,
-        contains_records: Optional[List["RecordListItem"]] = None,
+        contains_records: Optional[Union[List["RecordListItem"], List[str]]] = None,
         user_can_add_or_remove_items: Optional[bool] = None,
     ):
         self._name_contains: Optional[str] = name_contains
@@ -447,7 +448,9 @@ class SearchCriterion:
             contains_records_in_integration_schemas
         )
         self._contains_records_in_tables: Optional[List[str]] = contains_records_in_tables
-        self._contains_records: Optional[List["RecordListItem"]] = contains_records
+        self._contains_records: Optional[Union[List["RecordListItem"], List[str]]] = (
+            contains_records
+        )
         self._user_can_add_or_remove_items: Optional[bool] = user_can_add_or_remove_items
 
     @property
@@ -556,12 +559,12 @@ class SearchCriterion:
         self._contains_records_in_tables = value
 
     @property
-    def contains_records(self) -> Optional[List["RecordListItem"]]:
+    def contains_records(self) -> Optional[Union[List["RecordListItem"], List[str]]]:
         """Limits results to lists containing specific records."""
         return self._contains_records
 
     @contains_records.setter
-    def contains_records(self, value: Optional[List["RecordListItem"]]) -> None:
+    def contains_records(self, value: Optional[Union[List["RecordListItem"], List[str]]]) -> None:
         self._contains_records = value
 
     @property
@@ -576,14 +579,27 @@ class SearchCriterion:
     def _to_model(self) -> models.GsaRecordListSearchCriterion:
         """Generate the DTO for use with the auto-generated client code."""
         logger.debug("Serializing SearchCriterion to API model")
-        user_role = (
-            models.GsaUserRole(self.user_role.value) if self.user_role is not None else Unset
-        )
-        record_references = (
-            [RecordListItem._to_contains_search_item_model(item) for item in self.contains_records]
-            if self.contains_records is not None
-            else Unset
-        )
+
+        user_role: models.GsaUserRole | Unset_Type
+        if self.user_role is not None:
+            user_role = models.GsaUserRole(self.user_role.value)
+        else:
+            user_role = Unset
+
+        if self.contains_records is not None and not all(
+            isinstance(r, RecordListItem) for r in self.contains_records
+        ):
+            raise TypeError
+
+        record_references: List[models.GsaListItemRecordReference] | Unset_Type
+        if self.contains_records is not None:
+            record_references = [
+                RecordListItem._to_contains_search_item_model(cast(RecordListItem, item))
+                for item in self.contains_records
+            ]
+        else:
+            record_references = Unset
+
         model = models.GsaRecordListSearchCriterion(
             name_contains=self.name_contains,
             user_role=user_role,
@@ -595,6 +611,41 @@ class SearchCriterion:
             contains_records_in_integration_schemas=self.contains_records_in_integration_schemas,
             contains_records_in_tables=self.contains_records_in_tables,
             contains_records=record_references,
+            user_can_add_or_remove_items=self.user_can_add_or_remove_items,
+        )
+        logger.debug(model.to_str())
+        return model
+
+    def _to_2025r1_model(self) -> models2025r1.GsaRecordListSearchCriterion:
+        """
+        Generate the DTO for use with the auto-generated client code.
+
+        Compatibility version of this method for older Server API versions.
+        """
+        logger.debug("Serializing SearchCriterion to API model")
+
+        user_role: models2025r1.GsaUserRole | Unset_Type
+        if self.user_role is not None:
+            user_role = models2025r1.GsaUserRole(self.user_role.value)
+        else:
+            user_role = Unset
+
+        if self.contains_records is not None and not all(
+            isinstance(r, str) for r in self.contains_records
+        ):
+            raise TypeError
+
+        model = models2025r1.GsaRecordListSearchCriterion(
+            name_contains=self.name_contains,
+            user_role=user_role,
+            is_published=self.is_published,
+            is_awaiting_approval=self.is_awaiting_approval,
+            is_internal_use=self.is_internal_use,
+            is_revision=self.is_revision,
+            contains_records_in_databases=self.contains_records_in_databases,
+            contains_records_in_integration_schemas=self.contains_records_in_integration_schemas,
+            contains_records_in_tables=self.contains_records_in_tables,
+            contains_records=cast(List[str] | None, self.contains_records),
             user_can_add_or_remove_items=self.user_can_add_or_remove_items,
         )
         logger.debug(model.to_str())
@@ -689,6 +740,28 @@ class BooleanCriterion:
             ),
             match_all=(
                 [criteria._to_model() for criteria in self.match_all]
+                if self.match_all is not None
+                else None
+            ),
+        )
+        logger.debug(model.to_str())
+        return model
+
+    def _to_2025r1_model(self) -> models2025r1.GsaListBooleanCriterion:
+        """
+        Generate the DTO for use with the auto-generated client code.
+
+        Compatibility version of this method for older Server API versions.
+        """
+        logger.debug("Serializing BooleanCriterion to API model")
+        model = models2025r1.GsaListBooleanCriterion(
+            match_any=(
+                [criteria._to_2025r1_model() for criteria in self.match_any]
+                if self.match_any is not None
+                else None
+            ),
+            match_all=(
+                [criteria._to_2025r1_model() for criteria in self.match_all]
                 if self.match_all is not None
                 else None
             ),
@@ -791,8 +864,18 @@ class AuditLogAction(str, Enum):
     LISTNAMECHANGED = models.GsaListAction.LISTNAMECHANGED.value
     LISTDESCRIPTIONCHANGED = models.GsaListAction.LISTDESCRIPTIONCHANGED.value
     LISTNOTESCHANGED = models.GsaListAction.LISTNOTESCHANGED.value
-    LISTSETTOAWAITINGAPPROVAL = models.GsaListAction.LISTSETTOAWAITINGAPPROVAL.value
-    LISTAWAITINGAPPROVALREMOVED = models.GsaListAction.LISTAWAITINGAPPROVALREMOVED.value
+    LISTSETTOAWAITINGAPPROVALFORPUBLISHING = (
+        models.GsaListAction.LISTSETTOAWAITINGAPPROVALFORPUBLISHING.value
+    )
+    LISTSETTOAWAITINGAPPROVALFORWITHDRAWAL = (
+        models.GsaListAction.LISTSETTOAWAITINGAPPROVALFORWITHDRAWAL.value
+    )
+    LISTAWAITINGAPPROVALFORPUBLISHINGREMOVED = (
+        models.GsaListAction.LISTAWAITINGAPPROVALFORPUBLISHINGREMOVED.value
+    )
+    LISTAWAITINGAPPROVALFORWITHDRAWALREMOVED = (
+        models.GsaListAction.LISTAWAITINGAPPROVALFORWITHDRAWALREMOVED.value
+    )
     LISTPUBLISHED = models.GsaListAction.LISTPUBLISHED.value
     LISTUNPUBLISHED = models.GsaListAction.LISTUNPUBLISHED.value
     LISTREVISIONCREATED = models.GsaListAction.LISTREVISIONCREATED.value
@@ -868,7 +951,9 @@ class AuditLogSearchCriterion:
         logger.debug("Serializing AuditLogSearchCriterion to API model")
         model = models.GsaListAuditLogSearchRequest(
             list_actions_to_include=(
-                [item.value for item in self.filter_actions] if self.filter_actions else None
+                [models.GsaListAction(item.value) for item in self.filter_actions]
+                if self.filter_actions
+                else None
             ),
             list_identifiers=self.filter_record_lists,
         )
@@ -950,6 +1035,13 @@ class AuditLogItem:
         logger.debug(model.to_str())
 
         assert model.timestamp, "GsaListAuditLogItem must have populated timestamp attribute"
+        assert model.action, "GsaListAuditLogItem must have populated action attribute"
+        assert (
+            model.initiating_user
+        ), "GsaListAuditLogItem must have populated initiating_user attribute"
+        assert (
+            model.list_identifier
+        ), "GsaListAuditLogItem must have populated list_identifier attribute"
 
         return cls(
             list_identifier=model.list_identifier,

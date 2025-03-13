@@ -20,17 +20,16 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from typing import Optional, cast
+from typing import Optional
 
-from ansys.grantami.serverapi_openapi.api import (
+from ansys.grantami.serverapi_openapi.v2025r2.api import (
     RecordsRecordHistoriesApi,
     RecordsRecordVersionsApi,
-    SchemaApi,
     SchemaDatabasesApi,
     SchemaTablesApi,
     SearchApi,
 )
-from ansys.grantami.serverapi_openapi.models import (
+from ansys.grantami.serverapi_openapi.v2025r2.models import (
     GsaCreateRecordHistory,
     GsaRecordPropertyCriterion,
     GsaRecordType,
@@ -219,7 +218,7 @@ class RecordCreator:
         )
         return response.guid
 
-    def get_or_create_version(self, required_state: GsaVersionState, required_version: int) -> str:
+    def get_or_create_version(self, required_state: str, required_version: int) -> str:
         """Get the GUID for the record version in the specified state, with the specified version.
 
         If the version already exists, just return it. If not, attempt to create it first.
@@ -240,37 +239,37 @@ class RecordCreator:
             return version_guid
 
         # We need a released v1 record
-        if required_state == GsaVersionState.RELEASED and required_version == 1:
-            if self.latest_state == GsaVersionState.UNRELEASED and self.latest_version == 1:
+        if required_state == GsaVersionState.RELEASED.name and required_version == 1:
+            if self.latest_state == GsaVersionState.UNRELEASED.name and self.latest_version == 1:
                 self._release()
                 return self.latest_version_guid
 
         # We need an unreleased version 2 record
-        if required_state == GsaVersionState.UNRELEASED and required_version == 2:
-            if self.latest_version == 1 and self.latest_state == GsaVersionState.UNRELEASED:
+        if required_state == GsaVersionState.UNRELEASED.name and required_version == 2:
+            if self.latest_version == 1 and self.latest_state == GsaVersionState.UNRELEASED.name:
                 # Release v1 and create new unreleased v2
                 self._release()
                 self._create_new_unreleased()
-            elif self.latest_version == 1 and self.latest_state == GsaVersionState.RELEASED:
+            elif self.latest_version == 1 and self.latest_state == GsaVersionState.RELEASED.name:
                 # Just create new unreleased v2
                 self._create_new_unreleased()
             return self._get_version_guid_in_state(required_state, required_version)
 
         # We need a superseded version 1 record
-        if required_state == GsaVersionState.SUPERSEDED and required_version == 1:
-            if self.latest_state == GsaVersionState.UNRELEASED and self.latest_version == 2:
+        if required_state == GsaVersionState.SUPERSEDED.name and required_version == 1:
+            if self.latest_state == GsaVersionState.UNRELEASED.name and self.latest_version == 2:
                 # If latest version is unreleased v2 is unreleased, release it.
                 self._release()
                 # Re-fetch the information for the newly-superseded record
-            elif self.latest_state == GsaVersionState.UNRELEASED and self.latest_version == 1:
+            elif self.latest_state == GsaVersionState.UNRELEASED.name and self.latest_version == 1:
                 # If v1 is unreleased, we need to release it, then create a new version,
                 # and then release that
                 self._release()
                 self._create_new_unreleased()
                 self._release()
             elif self.latest_state in [
-                GsaVersionState.RELEASED,
-                GsaVersionState.WITHDRAWN,
+                GsaVersionState.RELEASED.name,
+                GsaVersionState.WITHDRAWN.name,
             ]:
                 # If v1 is released or withdrawn, then create a new version and then release it
                 self._create_new_unreleased()
@@ -287,15 +286,13 @@ class RecordCreator:
             current_version_state=self.latest_state,
         )
 
-    def _get_version_guid_in_state(
-        self, version_state: GsaVersionState, version_number: int
-    ) -> Optional[str]:
+    def _get_version_guid_in_state(self, version_state: str, version_number: int) -> Optional[str]:
         """Get information about a specific version of a record history.
 
         Parameters
         ----------
-        version_state : RecordVersionState
-            The state of the required version
+        version_state : str
+            The state of the required version. Name of the corresponding Server API enum.
         version_number : int
             The version number of the required version
 
@@ -311,7 +308,10 @@ class RecordCreator:
             record_history_guid=self.history_guid,
         )
         for version in history_details.record_versions:
-            if version.version_state == version_state and version_number == version.version_number:
+            if (
+                version.version_state.name == version_state
+                and version_number == version.version_number
+            ):
                 return version.guid
 
     def _release(self) -> None:
@@ -355,11 +355,3 @@ class RecordCreator:
         except AttributeError:
             pass
         self._get_latest_version_info()
-
-
-def get_granta_mi_version(client: ApiClient) -> tuple[int, int] | None:
-    schema_api = SchemaApi(client)
-    version = schema_api.get_version()
-    parsed_version = [int(v) for v in version.major_minor_version.split(".")]
-    assert len(parsed_version) == 2
-    return cast(tuple[int, int], tuple(parsed_version))
