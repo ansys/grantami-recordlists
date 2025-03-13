@@ -736,6 +736,7 @@ class RecordLists2025R12024R2ApiClient(RecordListsApiClient):
     :class:`Connection` class and should not be instantiated
     directly.
     """
+
     def __init__(
         self,
         session: requests.Session,
