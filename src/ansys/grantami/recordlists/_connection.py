@@ -48,12 +48,13 @@ from ._models import (
     _PagedResult,
 )
 
+PROXY_PATH_24R1 = "/proxy/v1.svc"
 PROXY_PATH = "/proxy/v1.svc/mi"
 AUTH_PATH = "/Health/v2.svc"
 API_DEFINITION_PATH = "/swagger/v1/swagger.json"
 GRANTA_APPLICATION_NAME_HEADER = "PyGranta RecordLists"
 
-MINIMUM_GRANTA_MI_VERSION = (25, 2)
+MINIMUM_GRANTA_MI_VERSION = (24, 1)
 
 _ArgNotProvided = "_ArgNotProvided"
 
@@ -96,9 +97,10 @@ class RecordListsApiClient(ApiClient):  # type: ignore[misc]
         session: requests.Session,
         service_layer_url: str,
         configuration: SessionConfiguration,
+        proxy_path: str,
     ):
         self._service_layer_url = service_layer_url
-        api_url = service_layer_url + PROXY_PATH
+        api_url = service_layer_url + proxy_path
 
         logger.debug("Creating RecordListsApiClient")
         logger.debug(f"Base Service Layer URL: {self._service_layer_url}")
@@ -883,10 +885,30 @@ class Connection(ApiClientFactory):  # type: ignore[misc]
             self._session,
             self._base_service_layer_url,
             self._session_configuration,
+            PROXY_PATH,
         )
         client.setup_client(models)
-        self._test_connection(client)
-        return client
+
+        client_24r1 = RecordListsApiClient(
+            self._session,
+            self._base_service_layer_url,
+            self._session_configuration,
+            PROXY_PATH_24R1,
+        )
+        client_24r1.setup_client(models)
+
+        try:
+            self._test_connection(client)
+            return client
+        except _InvalidProxyPath:
+            try:
+                self._test_connection(client_24r1)
+                return client_24r1
+            except _InvalidProxyPath:
+                raise ConnectionError(
+                    "Cannot find the Server API definition in Granta MI Service Layer. Ensure a "
+                    "compatible version of Granta MI is available try again."
+                )
 
     @staticmethod
     def _test_connection(client: RecordListsApiClient) -> None:
@@ -914,10 +936,7 @@ class Connection(ApiClientFactory):  # type: ignore[misc]
             client.call_api(resource_path=API_DEFINITION_PATH, method="GET")
         except ApiException as e:
             if e.status_code == 404:
-                raise ConnectionError(
-                    "Cannot find the Server API definition in Granta MI Service Layer. Ensure a "
-                    "compatible version of Granta MI is available try again."
-                ) from e
+                raise _InvalidProxyPath
             else:
                 raise ConnectionError(
                     "An unexpected error occurred when trying to connect Server API in Granta MI "
@@ -947,3 +966,6 @@ class Connection(ApiClientFactory):  # type: ignore[misc]
                 "Use the pygranta package to install a version compatible with your Granta MI "
                 "server, for example pip install pygranta==2024.1"
             )
+
+
+class _InvalidProxyPath(Exception): ...
