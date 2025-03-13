@@ -27,7 +27,7 @@ import requests.exceptions
 import requests_mock
 
 from ansys.grantami.recordlists import Connection
-from ansys.grantami.recordlists._connection import AUTH_PATH, PROXY_PATH
+from ansys.grantami.recordlists._connection import AUTH_PATH, PROXY_PATH, PROXY_PATH_24R1
 
 
 @pytest.fixture
@@ -44,7 +44,7 @@ def successful_auth(mocker, sl_url):
 
 def test_missing_api_definition_raises_informative_error(sl_url, successful_auth, mocker):
     with mocker:
-        service_matcher = re.compile(f"{sl_url}{PROXY_PATH}.*")
+        service_matcher = re.compile(f"{sl_url}({PROXY_PATH}|{PROXY_PATH_24R1}).*")
         mocker.get(service_matcher, status_code=404)
         with pytest.raises(
             ConnectionError,
@@ -57,7 +57,7 @@ def test_unhandled_test_connection_response_raises_informative_error(
     sl_url, successful_auth, mocker
 ):
     with mocker:
-        service_matcher = re.compile(f"{sl_url}{PROXY_PATH}.*")
+        service_matcher = re.compile(f"{sl_url}({PROXY_PATH}|{PROXY_PATH_24R1}).*")
         mocker.get(service_matcher, status_code=500)
         with pytest.raises(ConnectionError, match="An unexpected error occurred"):
             Connection(sl_url).with_anonymous().connect()
@@ -98,7 +98,7 @@ def test_old_server_version_is_handled(sl_url, successful_auth, mocker):
         mocker.get(requests_mock.ANY, status_code=200, json=mi_version_response)
         with pytest.raises(
             ConnectionError,
-            match=r"This package requires a more recent Granta MI version.*12\.1\.2\.3.*25\.2",
+            match=r"This package requires a more recent Granta MI version.*12\.1\.2\.3.*24\.1",
         ):
             connection.connect()
 
@@ -111,6 +111,6 @@ def test_server_version_error_is_handled(sl_url, successful_auth, mocker):
         mocker.get(version_path, status_code=404)
         with pytest.raises(
             ConnectionError,
-            match=r"Cannot check the Granta MI server version.*25\.2",
+            match=r"Cannot check the Granta MI server version.*24\.1",
         ):
             connection.connect()

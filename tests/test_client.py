@@ -47,11 +47,17 @@ from ansys.grantami.recordlists import (
     RecordListsApiClient,
     SearchResult,
 )
+from ansys.grantami.recordlists._connection import PROXY_PATH
 
 
 @pytest.fixture
 def client():
-    client = RecordListsApiClient(Mock(), "http://server_name/mi_servicelayer", Mock())
+    client = RecordListsApiClient(
+        session=Mock(),
+        service_layer_url="http://server_name/mi_servicelayer",
+        configuration=Mock(),
+        proxy_path=PROXY_PATH,
+    )
     client.setup_client(models)
     return client
 
@@ -64,7 +70,7 @@ def mock_list():
 
 
 def test_client_has_expected_api_url(client):
-    assert client.api_url == "http://server_name/mi_servicelayer/proxy/v1.svc/mi"
+    assert client.api_url == "http://server_name/mi_servicelayer" + PROXY_PATH
 
 
 def test_client_repr(client):
