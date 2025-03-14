@@ -51,5 +51,18 @@ __all__ = [
     "SearchResult",
     "UserOrGroup",
     "UserRole",
+    "MINIMUM_GRANTA_MI_VERSION",
+    "CURRENT_GRANTA_MI_VERSION",
 ]
 __version__ = importlib_metadata.version(__name__.replace(".", "-"))
+
+MINIMUM_GRANTA_MI_VERSION = (24, 2)
+"""
+The minimum version of Granta MI supported by this package expressed as a 2-tuple. For example, (24, 2) corresponds
+to 2024 R2.
+"""
+
+CURRENT_GRANTA_MI_VERSION = (25, 2)
+"""
+The most recent version of Granta MI expressed as a 2-tuple. For example, (25, 2) corresponds to 2025 R2.
+"""

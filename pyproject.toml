@@ -81,7 +81,7 @@ markers = [
     """integration(*, mi_versions: None | list[tuple[int, int]] = None): The test requires a real database.
     The optional keyword-only argument \"mi_versions\" represents a MAJOR, MINOR version of Granta MI. The test will \
     be skipped if run against an incompatible Granta MI version. Deselect all integration tests with \
-    'pytest -m \"not integration\"'""",
+    'pytest -m \"not integration\"'. Specify MI version with '--mi-version MAJOR.MINOR'.""",
 ]
 
 [tool.pydocstyle]

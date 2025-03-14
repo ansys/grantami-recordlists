@@ -23,16 +23,15 @@
 from collections import defaultdict
 import concurrent.futures
 import functools
-from typing import Iterator, List, Optional, Tuple, Union
+from typing import Iterable, Iterator, List, Optional, Tuple, Union, cast
 
-from ansys.grantami.serverapi_openapi.v2025r2 import api, models
-from ansys.openapi.common import (
+from ansys.grantami.serverapi_openapi.v2025r2 import api, models  # type: ignore[import-not-found]
+from ansys.openapi.common import (  # type: ignore[import-not-found]
     ApiClient,
     ApiClientFactory,
     ApiException,
     SessionConfiguration,
     Unset,
-    Unset_Type,
     generate_user_agent,
 )
 import requests  # type: ignore[import-untyped]
@@ -49,18 +48,163 @@ from ._models import (
     _PagedResult,
 )
 
+from ansys.grantami.serverapi_openapi.v2025r1 import (  # type: ignore[import-not-found] # isort: skip
+    api as v2025r1api,
+    models as v2025r1models,
+)
+
+
 PROXY_PATH = "/proxy/v1.svc/mi"
 AUTH_PATH = "/Health/v2.svc"
 API_DEFINITION_PATH = "/swagger/v1/swagger.json"
 GRANTA_APPLICATION_NAME_HEADER = "PyGranta RecordLists"
 
-MINIMUM_GRANTA_MI_VERSION = (24, 2)
-CURRENT_GRANTA_MI_VERSION = (25, 2)
-
 _ArgNotProvided = "_ArgNotProvided"
 
 
-class RecordListsApiClient(ApiClient):
+class _ClientFactory:
+    def __init__(self, client_builder: "Connection"):
+        self._client_builder = client_builder
+
+        self._client_map = {
+            # 2025 R2 bindings introduce new audit log and record-based searching
+            (25, 2): (RecordListsApiClient, None),
+            # No breaking changes between Server API 2025 R1 and 2024 R2. Use the same client for both.
+            (25, 1): (RecordLists2025R12024R2ApiClient, v2025r1models),
+            (24, 2): (RecordLists2025R12024R2ApiClient, v2025r1models),
+        }
+
+    def get_client(self) -> "RecordListsApiClient":
+        clients = self._create_clients()
+        server_version = self._get_server_version(clients)
+
+        try:
+            return clients[server_version]
+        except KeyError:
+            # Forward compatibility
+            if server_version > self._highest_mi_version:
+                return clients[self._highest_mi_version]
+
+            raise ConnectionError(
+                f"This package does not support the detected Granta MI version. Detected Granta MI server "
+                f"version is {'.'.join([str(e) for e in server_version])}, but this package supports "
+                f"{self._all_mi_versions_formatted}. Use the pygranta package to install a version compatible "
+                "with your Granta MI server, for example pip install pygranta==2024.1"
+            )
+
+    def _create_clients(self) -> dict[tuple[int, int], "RecordListsApiClient"]:
+        """
+        Generate all clients for all supported versions of Granta MI.
+
+        Returns
+        -------
+        dict of int 2-tuple, RecordListsApiClient
+            A dictionary that maps the Granta MI version number for each client to the client object
+        """
+        clients = {}
+        for version, (client_class, models_override) in self._client_map.items():
+            client = client_class(
+                self._client_builder._session,
+                self._client_builder._base_service_layer_url,
+                self._client_builder._session_configuration,
+            )
+            client.setup_client(models_override if models_override else models)
+            clients[version] = client
+        return clients
+
+    def _get_server_version(
+        self, clients: dict[tuple[int, int], "RecordListsApiClient"]
+    ) -> tuple[int, int]:
+        """
+        Get the Granta MI server version.
+
+        Returns
+        -------
+        2-tuple of int
+            The Granta MI server major.minor version number.
+
+        Raises
+        ------
+        ConnectionError
+            If the version number could not be retrieved.
+        """
+        status_codes = set()
+        for client_version, client in clients.items():
+            try:
+                server_version = client._get_mi_server_major_minor_version()
+                if server_version:
+                    return server_version
+
+            except KeyError:  # Deserialization error, raised if a model has changed name
+                pass
+
+            except requests.exceptions.RequestException:
+                raise ConnectionError(
+                    "An unexpected error occurred when trying to connect Granta MI Server API. Check "
+                    "that SSL certificates have been configured for communications between Granta MI "
+                    "Server and client Granta MI applications."
+                )
+
+            except ApiException as e:
+                status_codes.add(e.status_code)
+
+        if status_codes == {404}:
+            # No client version could get the version.
+            raise ConnectionError(
+                "Cannot find the Server API definition in Granta MI Service Layer. Ensure a compatible version of "
+                "Granta MI is available try again. This package supports Granta MI versions "
+                f"{self._all_mi_versions_formatted}."
+            )
+        else:
+            # At least one client version found the resource, but the version number was still not returned.
+            raise ConnectionError(
+                "An unexpected error occurred when trying to connect Server API in Granta MI Service Layer. Check "
+                "the Service Layer logs for more information, and that a compatible version of Granta MI is available "
+                f"and try again. This package supports Granta MI versions {self._all_mi_versions_formatted}."
+            )
+
+    @property
+    def _all_mi_versions(self) -> Iterable[tuple[int, int]]:
+        """All Granta MI versions supported by this package.
+
+        Returns
+        -------
+        list of 2-tuple of int
+            List of major.minor version numbers.
+        """
+        return self._client_map.keys()
+
+    @property
+    def _all_mi_versions_formatted(self) -> str:
+        """All Granta MI versions supported by this package, formatted as a string.
+
+        Returns
+        -------
+        str
+            A formatted string of all versions supported by this package.
+        """
+        formatted_versions = [
+            ".".join(str(e) for e in version) for version in self._all_mi_versions
+        ]
+        return ",".join(formatted_versions)
+
+    @property
+    def _highest_mi_version(self) -> tuple[int, int]:
+        """The highest Granta MI version supported by this package.
+
+        Returns
+        -------
+        2-tuple of int
+            major.minor version number.
+        """
+        result = (0, 0)
+        for version in self._client_map.keys():
+            if version > result:
+                result = version
+        return result
+
+
+class RecordListsApiClient(ApiClient):  # type: ignore[misc]
     """
     Communicates with Granta MI.
 
@@ -88,23 +232,13 @@ class RecordListsApiClient(ApiClient):
         self.list_permissions_api = api.ListPermissionsApi(self)
         self.list_audit_log_api = api.ListAuditLogApi(self)
         self.schema_api = api.SchemaApi(self)
-        self._models = models
 
     def __repr__(self) -> str:
         """Printable representation of the object."""
         return f"<{self.__class__.__name__} url: {self._service_layer_url}>"
 
-    def _get_mi_server_version(self) -> Tuple[int, ...]:
-        """Get the Granta MI version as a tuple.
-
-        Makes direct use of the underlying serverapi-openapi package. The API methods
-        in this package may change over time, and so it is expected that this method
-        will grow to support multiple versions of the serverapi-openapi package.
-
-        Parameters
-        ----------
-        client : :class:`~.RecordListApiClient`
-            Client object.
+    def _get_mi_server_major_minor_version(self) -> Tuple[int, int]:
+        """Get the Granta MI major.minor version as a 2-tuple.
 
         Returns
         -------
@@ -112,14 +246,9 @@ class RecordListsApiClient(ApiClient):
             Granta MI version number.
         """
         server_version_response = self.schema_api.get_version()
-        server_version = server_version_response.version
-        assert server_version
+        server_version = server_version_response.major_minor_version
         parsed_version = tuple([int(e) for e in server_version.split(".")])
-        return parsed_version
-
-    def _get_mi_compatibility_version(self) -> Tuple[int, int]:
-        full_version = self._get_mi_server_version()
-        return full_version[0], full_version[1]
+        return cast(tuple[int, int], parsed_version)
 
     def get_all_lists(self) -> List[RecordList]:
         """
@@ -134,7 +263,6 @@ class RecordListsApiClient(ApiClient):
         """
         logger.info(f"Getting all lists available with connection {self}")
         record_lists = self.list_management_api.get_all_lists()
-        assert record_lists is not None
         return [RecordList._from_model(record_list) for record_list in record_lists.lists]
 
     def get_list(self, identifier: str) -> RecordList:
@@ -154,7 +282,6 @@ class RecordListsApiClient(ApiClient):
         """
         logger.info(f"Getting list with identifier {identifier} with connection {self}")
         record_list = self.list_management_api.get_list(list_identifier=identifier)
-        assert record_list is not None
         return RecordList._from_model(record_list)
 
     def search_for_lists(
@@ -178,20 +305,19 @@ class RecordListsApiClient(ApiClient):
             List of record lists matching the provided criterion.
         """
         logger.info(f"Searching for lists with connection {self}")
-        response_options = self._models.GsaResponseOptions(
+        response_options = models.GsaResponseOptions(
             include_record_list_items=include_items,
         )
         search_info = self.list_management_api.run_record_lists_search(
-            body=self._models.GsaRecordListSearchRequest(
+            body=models.GsaRecordListSearchRequest(
                 search_criterion=criterion._to_model(),
                 response_options=response_options,
             )
         )
-        assert search_info is not None
+
         search_results = self.list_management_api.get_record_list_search_results(
             result_resource_identifier=search_info.search_result_identifier
         )
-        assert search_results is not None
         return [
             SearchResult._from_model(search_result, include_items)
             for search_result in search_results.search_results
@@ -215,7 +341,6 @@ class RecordListsApiClient(ApiClient):
         """
         logger.info(f"Getting items in list {record_list} with connection {self}")
         items_response = self.list_item_api.get_list_items(list_identifier=record_list.identifier)
-        assert items_response is not None
         return [RecordListItem._from_model(item) for item in items_response.items]
 
     def get_resolvable_list_items(
@@ -299,11 +424,10 @@ class RecordListsApiClient(ApiClient):
         logger.info(f"Adding {len(items)} items to list {record_list} with connection {self}")
         response_items = self.list_item_api.add_items_to_list(
             list_identifier=record_list.identifier,
-            body=self._models.GsaCreateRecordListItemsInfo(
+            body=models.GsaCreateRecordListItemsInfo(
                 items=[item._to_create_list_item_model() for item in items]
             ),
         )
-        assert response_items is not None
         return [RecordListItem._from_model(item) for item in response_items.items]
 
     def remove_items_from_list(
@@ -330,11 +454,10 @@ class RecordListsApiClient(ApiClient):
         logger.info(f"Removing {len(items)} items from list {record_list} with connection {self}")
         response_items = self.list_item_api.remove_items_from_list(
             list_identifier=record_list.identifier,
-            body=self._models.GsaDeleteRecordListItems(
+            body=models.GsaDeleteRecordListItems(
                 items=[item._to_delete_list_item_model() for item in items]
             ),
         )
-        assert response_items is not None
         return [RecordListItem._from_model(item) for item in response_items.items]
 
     def create_list(
@@ -367,18 +490,14 @@ class RecordListsApiClient(ApiClient):
         """
         items_string = "no items" if items is None or len(items) == 0 else f"{len(items)} items"
         logger.info(f"Creating new list {name} with {items_string} with connection {self}")
-        _items: models.GsaCreateRecordListItemsInfo | Unset_Type
         if items is not None:
-            _items = self._models.GsaCreateRecordListItemsInfo(
+            items = models.GsaCreateRecordListItemsInfo(
                 items=[list_item._to_create_list_item_model() for list_item in items]
             )
-        else:
-            _items = Unset
-        body = self._models.GsaCreateRecordList(
-            name=name, description=description, notes=notes, items=_items
+        body = models.GsaCreateRecordList(
+            name=name, description=description, notes=notes, items=items if items else Unset
         )
         created_list = self.list_management_api.create_list(body=body)
-        assert created_list is not None
         return RecordList._from_model(created_list)
 
     def delete_list(self, record_list: RecordList) -> None:
@@ -435,7 +554,7 @@ class RecordListsApiClient(ApiClient):
         if name is None:
             raise ValueError(f"If provided, argument 'name' cannot be None.")
 
-        body = self._models.GsaUpdateRecordListProperties()
+        body = models.GsaUpdateRecordListProperties()
         if name != _ArgNotProvided:
             body.name = name
         if description != _ArgNotProvided:
@@ -445,7 +564,6 @@ class RecordListsApiClient(ApiClient):
         updated_resource = self.list_management_api.update_list(
             list_identifier=record_list.identifier, body=body
         )
-        assert updated_resource is not None
         return RecordList._from_model(updated_resource)
 
     def copy_list(self, record_list: RecordList) -> RecordList:
@@ -467,7 +585,6 @@ class RecordListsApiClient(ApiClient):
         """
         logger.info(f"Copying list {record_list} with connection {self}")
         list_copy = self.list_management_api.copy_list(list_identifier=record_list.identifier)
-        assert list_copy is not None
         return RecordList._from_model(list_copy)
 
     def revise_list(self, record_list: RecordList) -> RecordList:
@@ -493,7 +610,6 @@ class RecordListsApiClient(ApiClient):
         list_revision = self.list_management_api.revise_list(
             list_identifier=record_list.identifier,
         )
-        assert list_revision is not None
         return RecordList._from_model(list_revision)
 
     def request_list_approval(self, record_list: RecordList) -> RecordList:
@@ -517,7 +633,6 @@ class RecordListsApiClient(ApiClient):
         updated_list = self.list_management_api.request_approval(
             list_identifier=record_list.identifier,
         )
-        assert updated_list is not None
         return RecordList._from_model(updated_list)
 
     def publish_list(self, record_list: RecordList) -> RecordList:
@@ -544,7 +659,6 @@ class RecordListsApiClient(ApiClient):
         updated_list = self.list_management_api.publish_list(
             list_identifier=record_list.identifier,
         )
-        assert updated_list is not None
         return RecordList._from_model(updated_list)
 
     def unpublish_list(self, record_list: RecordList) -> RecordList:
@@ -570,7 +684,6 @@ class RecordListsApiClient(ApiClient):
         updated_list = self.list_management_api.unpublish_list(
             list_identifier=record_list.identifier,
         )
-        assert updated_list is not None
         return RecordList._from_model(updated_list)
 
     def cancel_list_approval_request(self, record_list: RecordList) -> RecordList:
@@ -595,7 +708,6 @@ class RecordListsApiClient(ApiClient):
         updated_list = self.list_management_api.reset_awaiting_approval(
             list_identifier=record_list.identifier,
         )
-        assert updated_list is not None
         return RecordList._from_model(updated_list)
 
     def subscribe_to_list(self, record_list: RecordList) -> None:
@@ -693,20 +805,18 @@ class RecordListsApiClient(ApiClient):
                 page_size: int,
                 start_index: int,
             ) -> List[AuditLogItem]:
-                paging_options = self._models.GsaListsPagingOptions(
+                paging_options = models.GsaListsPagingOptions(
                     page_size=page_size, start_index=start_index
                 )
                 criterion.paging_options = paging_options
 
                 response = client.list_audit_log_api.run_list_audit_log_search(body=criterion)
-                assert response is not None
                 page_id = response.search_result_identifier
                 logger.info(f"Received page with id {page_id}")
 
                 results = client.list_audit_log_api.get_list_audit_log_search_results(
                     result_resource_identifier=page_id,
                 )
-                assert results is not None
                 return [AuditLogItem._from_model(item) for item in results]
 
             partial_func = functools.partial(get_next_page, self, criterion._to_model())
@@ -715,14 +825,12 @@ class RecordListsApiClient(ApiClient):
         logger.info("No paging options were specified, fetching all results...")
         gsa_criterion = criterion._to_model()
         response = self.list_audit_log_api.run_list_audit_log_search(body=gsa_criterion)
-        assert response is not None
         result_id = response.search_result_identifier
         logger.info(f"Received result with id {result_id}")
 
         search_result = self.list_audit_log_api.get_list_audit_log_search_results(
             result_resource_identifier=result_id
         )
-        assert search_result is not None
         return iter(AuditLogItem._from_model(item) for item in search_result)
 
 
@@ -736,6 +844,7 @@ class RecordLists2025R12024R2ApiClient(RecordListsApiClient):
     :class:`Connection` class and should not be instantiated
     directly.
     """
+
     def __init__(
         self,
         session: requests.Session,
@@ -744,14 +853,10 @@ class RecordLists2025R12024R2ApiClient(RecordListsApiClient):
     ):
         super().__init__(session, service_layer_url, configuration)
 
-        from ansys.grantami.serverapi_openapi.v2025r1 import api, models
-
-        # Type ignore statements below essentially disable type checking across Server API versions
-        self.list_management_api = api.ListManagementApi(self)  # type: ignore[assignment]
-        self.list_item_api = api.ListItemApi(self)  # type: ignore[assignment]
-        self.list_permissions_api = api.ListPermissionsApi(self)  # type: ignore[assignment]
-        self.list_audit_log_api = None  # type: ignore[assignment]
-        self._models = models
+        self.list_management_api = v2025r1api.ListManagementApi(self)
+        self.list_item_api = v2025r1api.ListItemApi(self)
+        self.list_permissions_api = v2025r1api.ListPermissionsApi(self)
+        self.list_audit_log_api = None
 
     def search_for_lists(
         self, criterion: Union[BooleanCriterion, SearchCriterion], include_items: bool = False
@@ -778,7 +883,7 @@ class RecordLists2025R12024R2ApiClient(RecordListsApiClient):
             include_record_list_items=include_items,
         )
         search_info = self.list_management_api.run_record_lists_search(
-            body=self._models.GsaRecordListSearchRequest(
+            body=v2025r1models.GsaRecordListSearchRequest(
                 search_criterion=criterion._to_2025r1_model(),
                 response_options=response_options,
             )
@@ -835,10 +940,7 @@ class _ItemResolver:
     def _get_db_map(self) -> defaultdict[str, List[str]]:
         dbs = self._db_schema_api.get_all_databases()
         db_map: defaultdict[str, List[str]] = defaultdict(list)
-        if not dbs.databases:
-            return db_map
         for db in dbs.databases:
-            assert db.guid
             db_map[db.guid].append(db.key)
         return db_map
 
@@ -891,7 +993,7 @@ class _ItemResolver:
                     record_history_guid=item.record_history_guid,
                     mode="read" if self._read_mode else None,
                 )
-                if item.record_version is not None and history_info is not None:
+                if item.record_version is not None:
                     for version in history_info.record_versions:
                         if item.record_version == version.version_number:
                             return True
@@ -904,7 +1006,7 @@ class _ItemResolver:
             return True
 
 
-class Connection(ApiClientFactory):
+class Connection(ApiClientFactory):  # type: ignore[misc]
     """
     Connects to a Granta MI ServerAPI instance.
 
@@ -978,110 +1080,6 @@ class Connection(ApiClientFactory):
             list API.
         """
         self._validate_builder()
-        # 2025 R2 bindings introduce new audit log and record-based searching
-        client_25r2 = RecordListsApiClient(
-            self._session,
-            self._base_service_layer_url,
-            self._session_configuration,
-        )
-        client_25r2.setup_client(models)
-
-        # No breaking changes between Server API 2025 R1 and 2024 R2. Use the same client for both.
-        client_25r1_24r2 = RecordLists2025R12024R2ApiClient(
-            self._session,
-            self._base_service_layer_url,
-            self._session_configuration,
-        )
-        from ansys.grantami.serverapi_openapi.v2025r1 import models as v2025r1models
-
-        client_25r1_24r2.setup_client(v2025r1models)
-
-        mi_version_map = {
-            (25, 2): client_25r2,
-            (25, 1): client_25r1_24r2,
-            (24, 2): client_25r1_24r2,
-        }
-
-        server_version = None
-        for client in mi_version_map.values():
-            try:
-                server_version = client._get_mi_compatibility_version()
-                break
-            except KeyError:
-                pass
-            except ApiException as e:
-                self._process_api_exception(e)
-            except requests.exceptions.RetryError as e:
-                self._process_retry_error(e)
-
-        if server_version is None:
-            raise ConnectionError(
-                "Cannot check the Granta MI server version. Ensure the Granta MI server version "
-                f"is at least {'.'.join([str(e) for e in MINIMUM_GRANTA_MI_VERSION])}."
-            )
-
-        try:
-            client = mi_version_map[server_version]
-        except KeyError:
-            if server_version > CURRENT_GRANTA_MI_VERSION:
-                client = mi_version_map[CURRENT_GRANTA_MI_VERSION]
-            else:
-                raise ConnectionError(
-                    f"This package requires a more recent Granta MI version. Detected Granta MI server "
-                    f"version is {'.'.join([str(e) for e in server_version])}, but this package "
-                    f"requires at least {'.'.join([str(e) for e in MINIMUM_GRANTA_MI_VERSION])}. "
-                    "Use the pygranta package to install a version compatible with your Granta MI "
-                    "server, for example pip install pygranta==2024.1"
-                )
-        self._test_connection(client)
+        client_factory = _ClientFactory(self)
+        client = client_factory.get_client()
         return client
-
-    def _test_connection(self, client: RecordListsApiClient) -> None:
-        """Check if the created client can be used to perform a request.
-
-        This method tests both that the API definition can be accessed and that the Granta MI
-        version is compatible with this package.
-
-        The first checks ensures that the Server API exists and is functional. The second check
-        ensures that the Granta MI server version is compatible with this version of the package.
-
-        A failure at any point raises a ConnectionError.
-
-        Parameters
-        ----------
-        client : :class:`~.RecordListsApiClient`
-            Client object to test.
-
-        Raises
-        ------
-        ConnectionError
-            Error raised if the connection test fails.
-        """
-        try:
-            client.call_api(resource_path=API_DEFINITION_PATH, method="GET")
-        except ApiException as e:
-            self._process_api_exception(e)
-        except requests.exceptions.RetryError as e:
-            self._process_retry_error(e)
-
-    @staticmethod
-    def _process_api_exception(exception: ApiException) -> None:
-        if exception.status_code == 404:
-            raise ConnectionError(
-                "Cannot find the Server API definition in Granta MI Service Layer. Ensure a "
-                "compatible version of Granta MI is available try again."
-            ) from exception
-        else:
-            raise ConnectionError(
-                "An unexpected error occurred when trying to connect Server API in Granta MI "
-                "Service Layer. Check the Service Layer logs for more information and try "
-                "again."
-            ) from exception
-
-    @staticmethod
-    def _process_retry_error(exception: requests.exceptions.RetryError) -> None:
-        raise ConnectionError(
-            "An unexpected error occurred when trying to connect Granta MI Server API. Check "
-            "that SSL certificates have been configured for communications between Granta MI "
-            "Server and client Granta MI applications."
-        ) from exception

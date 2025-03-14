@@ -668,27 +668,6 @@ def cleanup_basic(basic_client) -> List[RecordList]:
         basic_client.delete_list(record_list)
 
 
-@pytest.fixture(scope="session")
-def mi_version(request) -> tuple[int, int] | None:
-    """The version of MI referenced by the test url.
-
-    Returns
-    -------
-    tuple[int, int] | None
-        A 2-tuple containing the (MAJOR, MINOR) Granta MI release version, or None if a test URL is not available.
-
-    Notes
-    -----
-    This fixture returns None if the ``sl_url`` variable is not available. This is typically because the tests are
-    running in CI and the TEST_SL_URL environment variable was not populated.
-    """
-    if os.getenv("CI") and not os.getenv("TEST_SL_URL"):
-        return None
-    client = request.getfixturevalue("admin_client")
-    full_version = client._get_mi_server_version()
-    return full_version[0], full_version[1]
-
-
 @pytest.fixture(autouse=True)
 def process_integration_marks(request, mi_version):
     """Processes the arguments provided to the integration mark.
@@ -705,10 +684,9 @@ def process_integration_marks(request, mi_version):
     if not request.node.get_closest_marker("integration"):
         # No integration marker anywhere in the stack
         return
+
     if mi_version is None:
-        # We didn't get an MI version
-        # Unlikely to occur, since if we didn't get an MI version we don't have a URL, so we can't run integration
-        # tests anyway
+        # An MI version number was not provided
         return
 
     # Process integration mark arguments

@@ -131,12 +131,14 @@ jobs:
           - "ubuntu-latest"
           - "windows-latest"
         server:
-          - "TEST_SERVER_DEV_URL"
-          - "TEST_SERVER_25R1_URL"
-          - "TEST_SERVER_24R2_URL"
-          - "TEST_SERVER_24R1_URL"
+          - url: "TEST_SERVER_DEV_URL"
+            version: "25.2"
+          - url: "TEST_SERVER_25R1_URL"
+            version: "25.1"
+          - url: "TEST_SERVER_24R2_URL"
+            version: "24.2"
     concurrency:
-      group: ${{ matrix.server }}
+      group: ${{ matrix.server.url }}
       cancel-in-progress: false
     steps:
       - name: "Checkout the repository"
@@ -152,9 +154,9 @@ jobs:
           pip install poetry 'tox<4' --disable-pip-version-check
 
       - name: "Test with tox (integration tests only)"
-        run: tox -e tests -- -m "integration"
+        run: tox -e tests -- -m "integration" --mi-version ${{ matrix.server.version }}
         env:
-          TEST_SL_URL: ${{ secrets[matrix.server] }}
+          TEST_SL_URL: ${{ secrets[matrix.server.url] }}
           TEST_LIST_ADMIN_USER: ${{secrets.TEST_SERVER_ADMIN_USER}}
           TEST_LIST_ADMIN_PASS: ${{secrets.TEST_SERVER_ADMIN_PASS}}
           TEST_LIST_USER: ${{secrets.TEST_SERVER_USER}}
@@ -167,7 +169,7 @@ jobs:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         with:
           files: .cov/xml
-          flags: integration-${{ matrix.os }}-${{ matrix.server }}
+          flags: integration-${{ matrix.os }}-${{ matrix.server.version }}
           fail_ci_if_error: true
 
   doc-build:
