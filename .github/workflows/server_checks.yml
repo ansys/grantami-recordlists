@@ -120,7 +120,7 @@ jobs:
           TEST_PASS: ${{secrets.TEST_SERVER_ADMIN_PASS}}
 
   integration-tests:
-    name: "Integration tests: ${{ matrix.os }}, ${{ matrix.server }}"
+    name: "Integration tests: ${{ matrix.os }}, v${{ matrix.server.version }}"
     runs-on: ${{ matrix.os }}
     needs: start-vm
     strategy:
