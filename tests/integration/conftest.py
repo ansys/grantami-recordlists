@@ -243,7 +243,7 @@ def unreleased_item(admin_client) -> RecordListItem:
     |-- Version 1 (unreleased) *
     """
     record_creator = RecordCreator(admin_client, DB_KEY, TABLE_NAME, "UnreleasedRecord")
-    record_creator.get_or_create_version(GsaVersionState.UNRELEASED.name, 1)
+    record_creator.get_or_create_version(GsaVersionState.UNRELEASED, 1)
     return RecordListItem(
         database_guid=record_creator.database_guid,
         table_guid=record_creator.table_guid,
@@ -260,7 +260,7 @@ def released_item(admin_client) -> RecordListItem:
     |-- Version 1 (released) *
     """
     record_creator = RecordCreator(admin_client, DB_KEY, TABLE_NAME, "ReleasedRecord")
-    record_creator.get_or_create_version(GsaVersionState.RELEASED.name, 1)
+    record_creator.get_or_create_version(GsaVersionState.RELEASED, 1)
     return RecordListItem(
         database_guid=record_creator.database_guid,
         table_guid=record_creator.table_guid,
@@ -278,7 +278,7 @@ def superseded_item(admin_client) -> RecordListItem:
     |-- Version 2 (released)
     """
     record_creator = RecordCreator(admin_client, DB_KEY, TABLE_NAME, "SupersededRecord")
-    record_creator.get_or_create_version(GsaVersionState.SUPERSEDED.name, 1)
+    record_creator.get_or_create_version(GsaVersionState.SUPERSEDED, 1)
     return RecordListItem(
         database_guid=record_creator.database_guid,
         table_guid=record_creator.table_guid,
@@ -296,7 +296,7 @@ def draft_superseded_item(admin_client) -> RecordListItem:
     |-- Version 2 (unreleased)
     """
     record_creator = RecordCreator(admin_client, DB_KEY, TABLE_NAME, "DraftSupersededRecord")
-    record_creator.get_or_create_version(GsaVersionState.RELEASED.name, 1)
+    record_creator.get_or_create_version(GsaVersionState.RELEASED, 1)
     return RecordListItem(
         database_guid=record_creator.database_guid,
         table_guid=record_creator.table_guid,
@@ -314,7 +314,7 @@ def draft_superseding_item(admin_client) -> RecordListItem:
     |-- Version 2 (unreleased) *
     """
     record_creator = RecordCreator(admin_client, DB_KEY, TABLE_NAME, "DraftSupersededRecord")
-    record_creator.get_or_create_version(GsaVersionState.UNRELEASED.name, 2)
+    record_creator.get_or_create_version(GsaVersionState.UNRELEASED, 2)
     return RecordListItem(
         database_guid=record_creator.database_guid,
         table_guid=record_creator.table_guid,
