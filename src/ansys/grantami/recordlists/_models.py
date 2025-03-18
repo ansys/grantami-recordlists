@@ -23,7 +23,7 @@
 """Models."""
 from datetime import datetime
 from enum import Enum
-from typing import Callable, Iterator, List, Optional, Set, Type, TypeVar, Union, cast
+from typing import Callable, Iterator, List, Optional, Set, Type, TypeVar, Union
 
 from ansys.grantami.serverapi_openapi.v2025r2 import models  # type: ignore[import-not-found]
 from ansys.openapi.common import Unset  # type: ignore[import-not-found]
@@ -437,7 +437,7 @@ class SearchCriterion:
         contains_records_in_databases: Optional[List[str]] = None,
         contains_records_in_integration_schemas: Optional[List[str]] = None,
         contains_records_in_tables: Optional[List[str]] = None,
-        contains_records: Optional[Union[List["RecordListItem"], List[str]]] = None,
+        contains_records: Optional[List["RecordListItem"]] = None,
         user_can_add_or_remove_items: Optional[bool] = None,
     ):
         self._name_contains: Optional[str] = name_contains
@@ -451,9 +451,7 @@ class SearchCriterion:
             contains_records_in_integration_schemas
         )
         self._contains_records_in_tables: Optional[List[str]] = contains_records_in_tables
-        self._contains_records: Optional[Union[List["RecordListItem"], List[str]]] = (
-            contains_records
-        )
+        self._contains_records: Optional[List["RecordListItem"]] = contains_records
         self._user_can_add_or_remove_items: Optional[bool] = user_can_add_or_remove_items
 
     @property
@@ -562,18 +560,20 @@ class SearchCriterion:
         self._contains_records_in_tables = value
 
     @property
-    def contains_records(self) -> Optional[Union[List["RecordListItem"], List[str]]]:
+    def contains_records(self) -> Optional[List["RecordListItem"]]:
         """Limits results to lists containing specific records.
 
-        When using Granta MI 2025 R2 and later, this property must be set to a list of :class:`.RecordListItem` objects.
-        When using Granta MI 2025 R1 and earlier, this property be set to a list of strings.
+        When interacting with Granta MI 2025 R1 and earlier, all :class:`.RecordListItem` objects provided to this
+        property must contain the same database GUID. To search for lists that contain records in multiple databases,
+        use a :class:`.BooleanCriterion` to combine multiple ``SearchCriterion`` objects.
 
-        .. versionchanged:: 1.4
+        .. versionchanged:: 2.0
+           Changed argument type
         """
         return self._contains_records
 
     @contains_records.setter
-    def contains_records(self, value: Optional[Union[List["RecordListItem"], List[str]]]) -> None:
+    def contains_records(self, value: Optional[List["RecordListItem"]]) -> None:
         self._contains_records = value
 
     @property
@@ -593,18 +593,10 @@ class SearchCriterion:
             models.GsaUserRole(self.user_role.value) if self.user_role is not None else Unset
         )
 
-        if self.contains_records is not None and not all(
-            isinstance(r, RecordListItem) for r in self.contains_records
-        ):
-            raise TypeError(
-                "One or more values in the 'contains_records' property were not of type 'RecordListItem'. Only values "
-                "of type 'RecordListItem' are allowed when using Granta MI 2025 R2 or later."
-            )
-
         record_references: List[models.GsaListItemRecordReference] | None
         if self.contains_records is not None:
             record_references = [
-                RecordListItem._to_contains_search_item_model(cast(RecordListItem, item))
+                RecordListItem._to_contains_search_item_model(item)
                 for item in self.contains_records
             ]
         else:
@@ -638,13 +630,29 @@ class SearchCriterion:
             models2025r1.GsaUserRole(self.user_role.value) if self.user_role is not None else Unset
         )
 
-        if self.contains_records is not None and not all(
-            isinstance(r, str) for r in self.contains_records
-        ):
-            raise TypeError(
-                "One or more values in the 'contains_records' property were not of type 'str'. Only 'str' type"
-                "values are allowed when using Granta MI 2025 R1 or earlier."
+        record_history_guids: List[str] | None
+        database_guids: List[str] | None
+        if self.contains_records_in_databases and self.contains_records:
+            raise ValueError(
+                "When interacting with Granta MI 2025 R1 and earlier, both 'contains_records_in_database' and "
+                "'contains_records' cannot be specified for the same criterion."
             )
+        elif self.contains_records:
+            record_history_guids = [r.record_history_guid for r in self.contains_records]
+            _unique_database_guids = {r.database_guid for r in self.contains_records}
+            if len(_unique_database_guids) != 1:
+                raise ValueError(
+                    "When interacting with Granta MI 2025 R1 and earlier, all RecordListItem objects provided to the "
+                    "'contains_records' property must contain the same database GUID. To search for lists that contain "
+                    "records in multiple databases, use a BooleanCriterion to combine multiple SearchCriterion objects."
+                )
+            database_guids = list(_unique_database_guids)
+        elif self.contains_records_in_databases:
+            record_history_guids = None
+            database_guids = self.contains_records_in_databases
+        else:
+            record_history_guids = None
+            database_guids = None
 
         model = models2025r1.GsaRecordListSearchCriterion(
             name_contains=self.name_contains,
@@ -653,10 +661,10 @@ class SearchCriterion:
             is_awaiting_approval=self.is_awaiting_approval,
             is_internal_use=self.is_internal_use,
             is_revision=self.is_revision,
-            contains_records_in_databases=self.contains_records_in_databases,
+            contains_records_in_databases=database_guids,
             contains_records_in_integration_schemas=self.contains_records_in_integration_schemas,
             contains_records_in_tables=self.contains_records_in_tables,
-            contains_records=self.contains_records,
+            contains_records=record_history_guids,
             user_can_add_or_remove_items=self.user_can_add_or_remove_items,
         )
         logger.debug(model.to_str())
