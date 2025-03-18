@@ -1017,13 +1017,12 @@ class TestAuditLogging:
     def test_filter_log_entries_by_list_is_ordered(self, admin_client, list_a, list_b):
         criterion = AuditLogSearchCriterion(filter_record_lists=[list_b.identifier])
         results = list(admin_client.search_for_audit_log_entries(criterion))
-        assert len(results) == 4
+        assert len(results) == 3
         for event in results:
             assert event.list_identifier == list_b.identifier
         expected_actions = [
-            AuditLogAction.LISTAWAITINGAPPROVALREMOVED,
             AuditLogAction.LISTPUBLISHED,
-            AuditLogAction.LISTSETTOAWAITINGAPPROVAL,
+            AuditLogAction.LISTSETTOAWAITINGAPPROVALFORPUBLISHING,
             AuditLogAction.LISTCREATED,
         ]
         for event, action in zip(results, expected_actions):
