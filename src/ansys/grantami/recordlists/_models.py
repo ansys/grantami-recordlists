@@ -568,7 +568,7 @@ class SearchCriterion:
         When using Granta MI 2025 R2 and later, this property must be set to a list of :class:`.RecordListItem` objects.
         When using Granta MI 2025 R1 and earlier, this property be set to a list of strings.
 
-        .. versionchanged 1.4
+        .. versionchanged:: 1.4
         """
         return self._contains_records
 
