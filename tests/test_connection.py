@@ -26,8 +26,12 @@ import pytest
 import requests.exceptions
 import requests_mock
 
-from ansys.grantami.recordlists import Connection
-from ansys.grantami.recordlists._connection import AUTH_PATH, PROXY_PATH
+from ansys.grantami.recordlists import Connection, RecordListsApiClient
+from ansys.grantami.recordlists._connection import (
+    AUTH_PATH,
+    PROXY_PATH,
+    RecordLists2025R12024R2ApiClient,
+)
 
 
 @pytest.fixture
@@ -83,10 +87,27 @@ def test_new_server_version(sl_url, successful_auth, mocker):
     with mocker:
         connection = Connection(sl_url).with_anonymous()
         mocker.get(requests_mock.ANY, status_code=200, json=mi_version_response)
-        connection.connect()
+        client = connection.connect()
+    assert isinstance(client, RecordListsApiClient)
+    assert not isinstance(client, RecordLists2025R12024R2ApiClient)
 
 
-def test_old_server_version_is_handled(sl_url, successful_auth, mocker):
+def test_old_supported_server_version(sl_url, successful_auth, mocker):
+    mi_version_response = {
+        "binaryCompatibilityVersion": "25.1.0.0",
+        "version": "25.1.820.0",
+        "majorMinorVersion": "25.1",
+    }
+
+    with mocker:
+        connection = Connection(sl_url).with_anonymous()
+        mocker.get(requests_mock.ANY, status_code=200, json=mi_version_response)
+        client = connection.connect()
+    assert isinstance(client, RecordListsApiClient)
+    assert isinstance(client, RecordLists2025R12024R2ApiClient)
+
+
+def test_old_unsupported_server_version_is_handled(sl_url, successful_auth, mocker):
     mi_version_response = {
         "binaryCompatibilityVersion": "12.0.0.0",
         "version": "12.1.2.3",

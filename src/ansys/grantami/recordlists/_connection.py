@@ -135,9 +135,6 @@ class _ClientFactory:
                 if server_version:
                     return server_version
 
-            except KeyError:  # Deserialization error, raised if a model has changed name
-                pass
-
             except requests.exceptions.RequestException:
                 raise ConnectionError(
                     "An unexpected error occurred when trying to connect Granta MI Server API. Check "
@@ -892,8 +889,6 @@ class RecordLists2025R12024R2ApiClient(RecordListsApiClient):
         search_results = self.list_management_api.get_record_list_search_results(
             result_resource_identifier=search_info.search_result_identifier
         )
-        if not search_results:
-            return []
         return [
             SearchResult._from_model(search_result, include_items)
             for search_result in search_results.search_results
