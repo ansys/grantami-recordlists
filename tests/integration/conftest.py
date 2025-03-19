@@ -39,7 +39,13 @@ from ansys.grantami.serverapi_openapi.v2025r2.models import (
     GsaTextMatchBehavior,
     GsaVersionState,
 )
-from common import DB_KEY, TABLE_NAME, RecordCreator
+from common import (
+    DB_KEY,
+    DB_KEY_RS,
+    DEISGN_DATA_TABLE_NAME,
+    TENSILE_STATISTICAL_DATA_TABLE_NAME,
+    RecordCreator,
+)
 import pytest
 
 from ansys.grantami.recordlists import Connection, RecordList, RecordListItem, RecordListsApiClient
@@ -167,7 +173,20 @@ def training_database_guid(admin_client) -> str:
 def design_data_table_guid(admin_client) -> str:
     table_api = SchemaTablesApi(admin_client)
     table_response = table_api.get_tables(database_key=DB_KEY)
-    return next(table.guid for table in table_response.tables if table.name == TABLE_NAME)
+    return next(
+        table.guid for table in table_response.tables if table.name == DEISGN_DATA_TABLE_NAME
+    )
+
+
+@pytest.fixture(scope="session")
+def tensile_statistical_data_table_guid(admin_client) -> str:
+    table_api = SchemaTablesApi(admin_client)
+    table_response = table_api.get_tables(database_key=DB_KEY)
+    return next(
+        table.guid
+        for table in table_response.tables
+        if table.name == TENSILE_STATISTICAL_DATA_TABLE_NAME
+    )
 
 
 @pytest.fixture(scope="session")
@@ -215,6 +234,46 @@ def resolvable_items(admin_client, training_database_guid) -> List[RecordListIte
     ]
 
 
+@pytest.fixture(scope="session")
+def rs_database_guid(admin_client) -> str:
+    schema_api = SchemaDatabasesApi(admin_client)
+    dbs = schema_api.get_all_databases()
+    return next(db.guid for db in dbs.databases if db.key == DB_KEY_RS)
+
+
+@pytest.fixture(scope="session")
+def resolvable_rs_items(admin_client, rs_database_guid) -> List[RecordListItem]:
+    """Get all records in the MI_Restricted_Substances database and use them to create
+    a list of RecordListItems which can be added to a list.
+    """
+    search_api = SearchApi(admin_client)
+
+    is_any_record_type = GsaRecordPropertyCriterion(
+        _property=GsaSearchableRecordProperty.RECORDTYPE,
+        inner_criterion=GsaDiscreteTextValuesDatumCriterion(
+            any=["Record", "Generic", "Folder"],
+        ),
+    )
+    search_body = GsaSearchRequest(
+        criterion=GsaBooleanCriterion(
+            all=[is_any_record_type],
+        )
+    )
+    search_results = search_api.database_search(
+        database_key=DB_KEY_RS,
+        body=search_body,
+    )
+    return [
+        RecordListItem(
+            rs_database_guid,
+            result.table_guid,
+            result.record_history_guid,
+        )
+        for result in search_results.results
+        if result.database_key == DB_KEY_RS
+    ]
+
+
 @pytest.fixture
 def new_list_with_one_resolvable_item(admin_client, new_list, resolvable_items) -> RecordList:
     admin_client.add_items_to_list(new_list, [resolvable_items[0]])
@@ -242,7 +301,7 @@ def unreleased_item(admin_client) -> RecordListItem:
     |
     |-- Version 1 (unreleased) *
     """
-    record_creator = RecordCreator(admin_client, DB_KEY, TABLE_NAME, "UnreleasedRecord")
+    record_creator = RecordCreator(admin_client, DB_KEY, DEISGN_DATA_TABLE_NAME, "UnreleasedRecord")
     record_creator.get_or_create_version(GsaVersionState.UNRELEASED, 1)
     return RecordListItem(
         database_guid=record_creator.database_guid,
@@ -259,7 +318,7 @@ def released_item(admin_client) -> RecordListItem:
     |
     |-- Version 1 (released) *
     """
-    record_creator = RecordCreator(admin_client, DB_KEY, TABLE_NAME, "ReleasedRecord")
+    record_creator = RecordCreator(admin_client, DB_KEY, DEISGN_DATA_TABLE_NAME, "ReleasedRecord")
     record_creator.get_or_create_version(GsaVersionState.RELEASED, 1)
     return RecordListItem(
         database_guid=record_creator.database_guid,
@@ -277,7 +336,7 @@ def superseded_item(admin_client) -> RecordListItem:
     |-- Version 1 (superseded) *
     |-- Version 2 (released)
     """
-    record_creator = RecordCreator(admin_client, DB_KEY, TABLE_NAME, "SupersededRecord")
+    record_creator = RecordCreator(admin_client, DB_KEY, DEISGN_DATA_TABLE_NAME, "SupersededRecord")
     record_creator.get_or_create_version(GsaVersionState.SUPERSEDED, 1)
     return RecordListItem(
         database_guid=record_creator.database_guid,
@@ -295,7 +354,9 @@ def draft_superseded_item(admin_client) -> RecordListItem:
     |-- Version 1 (released) *
     |-- Version 2 (unreleased)
     """
-    record_creator = RecordCreator(admin_client, DB_KEY, TABLE_NAME, "DraftSupersededRecord")
+    record_creator = RecordCreator(
+        admin_client, DB_KEY, DEISGN_DATA_TABLE_NAME, "DraftSupersededRecord"
+    )
     record_creator.get_or_create_version(GsaVersionState.RELEASED, 1)
     return RecordListItem(
         database_guid=record_creator.database_guid,
@@ -313,7 +374,9 @@ def draft_superseding_item(admin_client) -> RecordListItem:
     |-- Version 1 (released)
     |-- Version 2 (unreleased) *
     """
-    record_creator = RecordCreator(admin_client, DB_KEY, TABLE_NAME, "DraftSupersededRecord")
+    record_creator = RecordCreator(
+        admin_client, DB_KEY, DEISGN_DATA_TABLE_NAME, "DraftSupersededRecord"
+    )
     record_creator.get_or_create_version(GsaVersionState.UNRELEASED, 2)
     return RecordListItem(
         database_guid=record_creator.database_guid,

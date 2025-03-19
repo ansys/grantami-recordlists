@@ -41,7 +41,9 @@ from ansys.grantami.serverapi_openapi.v2025r2.models import (
 from ansys.openapi.common import ApiClient
 
 DB_KEY = "MI_Training"
-TABLE_NAME = "Design Data"
+DEISGN_DATA_TABLE_NAME = "Design Data"
+TENSILE_STATISTICAL_DATA_TABLE_NAME = "Tensile Statistical Data"
+DB_KEY_RS = "MI_Restricted_Substances"
 
 
 class VersionControlError(Exception):
