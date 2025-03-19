@@ -586,7 +586,11 @@ class SearchCriterion:
         self._user_can_add_or_remove_items = value
 
     def _to_model(self) -> models.GsaRecordListSearchCriterion:
-        """Generate the DTO for use with the auto-generated client code for Granta MI 2025 R2 and later."""
+        """
+        Generate the DTO for use with the auto-generated client code.
+
+        Generated DTO compatible with Granta MI 2025 R2 and later.
+        """
         logger.debug("Serializing SearchCriterion to API model")
 
         user_role = (
@@ -622,7 +626,7 @@ class SearchCriterion:
         """
         Generate the DTO for use with the auto-generated client code.
 
-        Compatibility version of this method for older Granta MI 2025 R1 and earlier.
+        Generated DTO compatible with Granta MI 2021 R1 and earlier.
         """
         logger.debug("Serializing SearchCriterion to API model")
 
@@ -749,7 +753,11 @@ class BooleanCriterion:
         self._match_all = value
 
     def _to_model(self) -> models.GsaListBooleanCriterion:
-        """Generate the DTO for use with the auto-generated client code."""
+        """
+        Generate the DTO for use with the auto-generated client code.
+
+        Generated DTO compatible with Granta MI 2025 R2 and later.
+        """
         logger.debug("Serializing BooleanCriterion to API model")
         model = models.GsaListBooleanCriterion(
             match_any=(
@@ -770,7 +778,7 @@ class BooleanCriterion:
         """
         Generate the DTO for use with the auto-generated client code.
 
-        Compatibility version of this method for older Server API versions.
+        Generated DTO compatible with Granta MI 2021 R1 and earlier.
         """
         logger.debug("Serializing BooleanCriterion to API model")
         model = models2025r1.GsaListBooleanCriterion(
