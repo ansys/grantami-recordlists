@@ -31,15 +31,45 @@ from ansys.grantami.recordlists import (
     AuditLogAction,
     AuditLogSearchCriterion,
     BooleanCriterion,
+    Connection,
     RecordList,
     RecordListItem,
+    RecordListsApiClient,
     SearchCriterion,
     SearchResult,
     UserOrGroup,
     UserRole,
 )
+from ansys.grantami.recordlists._connection import RecordLists2025R12024R2ApiClient
 
-pytestmark = pytest.mark.integration
+pytestmark = pytest.mark.integration(mi_versions=[(25, 2), (25, 1), (24, 2)])
+
+
+class TestConnection:
+    @pytest.mark.integration(mi_versions=[(25, 2)])
+    def test_latest_mi_version(self, sl_url, list_admin_username, list_admin_password):
+        connection = Connection(sl_url).with_credentials(list_admin_username, list_admin_password)
+        client = connection.connect()
+        assert isinstance(client, RecordListsApiClient)
+        assert not isinstance(client, RecordLists2025R12024R2ApiClient)
+
+    @pytest.mark.integration(mi_versions=[(25, 1), (24, 2)])
+    def test_older_supported_mi_version(self, sl_url, list_admin_username, list_admin_password):
+        connection = Connection(sl_url).with_credentials(list_admin_username, list_admin_password)
+        client = connection.connect()
+        assert isinstance(client, RecordListsApiClient)
+        assert isinstance(client, RecordLists2025R12024R2ApiClient)
+
+    @pytest.mark.integration(mi_versions=[(24, 1)])
+    def test_unsupported_mi_version(self, sl_url, list_admin_username, list_admin_password):
+        # We don't raise the expected version-specific error message because the Server API location has moved since
+        # 2024 R1 was released.
+        connection = Connection(sl_url).with_credentials(list_admin_username, list_admin_password)
+        with pytest.raises(
+            ConnectionError,
+            match=r"Cannot find the Server API definition in Granta MI Service Layer",
+        ):
+            connection.connect()
 
 
 def test_getting_all_lists(admin_client, new_list):

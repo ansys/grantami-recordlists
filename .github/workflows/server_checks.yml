@@ -135,6 +135,8 @@ jobs:
             version: "25.1"
           - url: "TEST_SERVER_24R2_URL"
             version: "24.2"
+          - url: "TEST_SERVER_24R1_URL"
+            version: "24.1"
     concurrency:
       group: ${{ matrix.server.url }}
       cancel-in-progress: false

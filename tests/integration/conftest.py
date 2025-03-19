@@ -22,6 +22,7 @@
 
 import os
 from typing import List
+from unittest.mock import Mock
 import uuid
 
 from ansys.grantami.serverapi_openapi.v2025r2.api import (
@@ -49,6 +50,7 @@ from common import (
 import pytest
 
 from ansys.grantami.recordlists import Connection, RecordList, RecordListItem, RecordListsApiClient
+from ansys.grantami.recordlists._connection import _ClientFactory
 
 
 @pytest.fixture(scope="session")
@@ -78,7 +80,7 @@ def list_password_no_permissions() -> str:
 
 @pytest.fixture(scope="session")
 def admin_client(
-    sl_url, list_admin_username, list_admin_password, list_name
+    sl_url, list_admin_username, list_admin_password, list_name, mi_version
 ) -> RecordListsApiClient:
     """
     Fixture providing a real ApiClient to run integration tests against an instance of Granta MI
@@ -86,7 +88,16 @@ def admin_client(
     On teardown, deletes all lists named using the fixture `list_name`.
     """
     connection = Connection(sl_url).with_credentials(list_admin_username, list_admin_password)
-    client = connection.connect()
+    try:
+        client = connection.connect()
+    except ConnectionError as e:
+        if mi_version not in _ClientFactory(Mock(spec=Connection))._client_map:
+            pytest.skip(
+                f"Client not available for Granta MI v{'.'.join(str(v) for v in mi_version)}"
+            )
+        else:
+            raise e
+
     yield client
 
     all_lists = client.get_all_lists()
@@ -97,7 +108,7 @@ def admin_client(
 
 @pytest.fixture(scope="session")
 def basic_client(
-    sl_url, list_username_no_permissions, list_password_no_permissions, list_name
+    sl_url, list_username_no_permissions, list_password_no_permissions, list_name, mi_version
 ) -> RecordListsApiClient:
     """
     Fixture providing a real ApiClient to run integration tests against an instance of Granta MI
@@ -108,7 +119,16 @@ def basic_client(
         list_username_no_permissions,
         list_password_no_permissions,
     )
-    client = connection.connect()
+    try:
+        client = connection.connect()
+    except ConnectionError as e:
+        if mi_version not in _ClientFactory(Mock(spec=Connection))._client_map:
+            pytest.skip(
+                f"Client not available for Granta MI v{'.'.join(str(v) for v in mi_version)}"
+            )
+        else:
+            raise e
+
     yield client
 
     all_lists = client.get_all_lists()
