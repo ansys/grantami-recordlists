@@ -626,7 +626,7 @@ class SearchCriterion:
         """
         Generate the DTO for use with the auto-generated client code.
 
-        Generated DTO compatible with Granta MI 2021 R1 and earlier.
+        Generated DTO compatible with Granta MI 2025 R1 and earlier.
         """
         logger.debug("Serializing SearchCriterion to API model")
 
@@ -778,7 +778,7 @@ class BooleanCriterion:
         """
         Generate the DTO for use with the auto-generated client code.
 
-        Generated DTO compatible with Granta MI 2021 R1 and earlier.
+        Generated DTO compatible with Granta MI 2025 R1 and earlier.
         """
         logger.debug("Serializing BooleanCriterion to API model")
         model = models2025r1.GsaListBooleanCriterion(
