@@ -74,7 +74,7 @@ def test_get_all_audit_log_entries_paged(api_url, mock_client, mocker):
         assert log_entries[1].list_identifier == "f235a25c-4deb-45cf-b6fd-c4fbaca3cbd0"
         assert log_entries[1].action == AuditLogAction.LISTCREATED
         assert log_entries[0].list_identifier == "f235a25c-4deb-45cf-b6fd-c4fbaca3cbd0"
-        assert log_entries[0].action == AuditLogAction.LISTSETTOAWAITINGAPPROVAL
+        assert log_entries[0].action == AuditLogAction.LISTSETTOAWAITINGAPPROVALFORWITHDRAWAL
 
 
 def test_get_all_audit_log_entries_not_paged(api_url, mock_client, mocker):
@@ -97,4 +97,4 @@ def test_get_all_audit_log_entries_not_paged(api_url, mock_client, mocker):
         assert log_entries[1].list_identifier == "f235a25c-4deb-45cf-b6fd-c4fbaca3cbd0"
         assert log_entries[1].action == AuditLogAction.LISTCREATED
         assert log_entries[0].list_identifier == "f235a25c-4deb-45cf-b6fd-c4fbaca3cbd0"
-        assert log_entries[0].action == AuditLogAction.LISTSETTOAWAITINGAPPROVAL
+        assert log_entries[0].action == AuditLogAction.LISTSETTOAWAITINGAPPROVALFORWITHDRAWAL

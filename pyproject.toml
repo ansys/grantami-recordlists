@@ -31,7 +31,7 @@ packages = [
 python = ">=3.10,<4.0"
 ansys-openapi-common = "^2.0.0"
 # Ensure PIP_INDEX_URL is not set in CI when reverting to a public version of the package.
-ansys-grantami-serverapi-openapi = { version = ">=5.0.0.dev396, <6.0", allow-prereleases = true, source = "private-pypi" }
+ansys-grantami-serverapi-openapi = { version = ">=5.0.0.dev460, <6.0", allow-prereleases = true, source = "private-pypi" }
 requests = "^2.26"
 
 # Optional documentation dependencies
@@ -78,7 +78,10 @@ show_missing = true
 
 [tool.pytest.ini_options]
 markers = [
-    """integration: test requires a real database (deselect with '-m \"not integration\"')"""
+    """integration(*, mi_versions: None | list[tuple[int, int]] = None): The test requires a real database.
+    The optional keyword-only argument \"mi_versions\" represents a MAJOR, MINOR version of Granta MI. The test will \
+    be skipped if run against an incompatible Granta MI version. Deselect all integration tests with \
+    'pytest -m \"not integration\"'. Specify MI version with '--mi-version MAJOR.MINOR'.""",
 ]
 
 [tool.pydocstyle]

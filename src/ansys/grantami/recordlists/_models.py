@@ -25,10 +25,14 @@ from datetime import datetime
 from enum import Enum
 from typing import Callable, Iterator, List, Optional, Set, Type, TypeVar, Union
 
-from ansys.grantami.serverapi_openapi import models  # type: ignore[import]
-from ansys.openapi.common import Unset  # type: ignore[import]
+from ansys.grantami.serverapi_openapi.v2025r2 import models  # type: ignore[import-not-found]
+from ansys.openapi.common import Unset  # type: ignore[import-not-found]
 
 from ._logger import logger
+
+from ansys.grantami.serverapi_openapi.v2025r1 import (  # type: ignore[import-not-found] # isort: skip
+    models as models2025r1,
+)
 
 
 class RecordList:
@@ -557,7 +561,15 @@ class SearchCriterion:
 
     @property
     def contains_records(self) -> Optional[List["RecordListItem"]]:
-        """Limits results to lists containing specific records."""
+        """Limits results to lists containing specific records.
+
+        When interacting with Granta MI 2025 R1 and earlier, all :class:`.RecordListItem` objects provided to this
+        property must contain the same database GUID. To search for lists that contain records in multiple databases,
+        use a :class:`.BooleanCriterion` to combine multiple ``SearchCriterion`` objects.
+
+        .. versionchanged:: 2.0
+           Changed argument type
+        """
         return self._contains_records
 
     @contains_records.setter
@@ -574,16 +586,26 @@ class SearchCriterion:
         self._user_can_add_or_remove_items = value
 
     def _to_model(self) -> models.GsaRecordListSearchCriterion:
-        """Generate the DTO for use with the auto-generated client code."""
+        """
+        Generate the DTO for use with the auto-generated client code.
+
+        Generated DTO compatible with Granta MI 2025 R2 and later.
+        """
         logger.debug("Serializing SearchCriterion to API model")
+
         user_role = (
             models.GsaUserRole(self.user_role.value) if self.user_role is not None else Unset
         )
-        record_references = (
-            [RecordListItem._to_contains_search_item_model(item) for item in self.contains_records]
-            if self.contains_records is not None
-            else Unset
-        )
+
+        record_references: List[models.GsaListItemRecordReference] | None
+        if self.contains_records is not None:
+            record_references = [
+                RecordListItem._to_contains_search_item_model(item)
+                for item in self.contains_records
+            ]
+        else:
+            record_references = None
+
         model = models.GsaRecordListSearchCriterion(
             name_contains=self.name_contains,
             user_role=user_role,
@@ -595,6 +617,58 @@ class SearchCriterion:
             contains_records_in_integration_schemas=self.contains_records_in_integration_schemas,
             contains_records_in_tables=self.contains_records_in_tables,
             contains_records=record_references,
+            user_can_add_or_remove_items=self.user_can_add_or_remove_items,
+        )
+        logger.debug(model.to_str())
+        return model
+
+    def _to_2025r1_model(self) -> models2025r1.GsaRecordListSearchCriterion:
+        """
+        Generate the DTO for use with the auto-generated client code.
+
+        Generated DTO compatible with Granta MI 2025 R1 and earlier.
+        """
+        logger.debug("Serializing SearchCriterion to API model")
+
+        user_role = (
+            models2025r1.GsaUserRole(self.user_role.value) if self.user_role is not None else Unset
+        )
+
+        record_history_guids: List[str] | None
+        database_guids: List[str] | None
+        if self.contains_records_in_databases and self.contains_records:
+            raise ValueError(
+                "When interacting with Granta MI 2025 R1 and earlier, both 'contains_records_in_database' and "
+                "'contains_records' cannot be specified for the same criterion."
+            )
+        elif self.contains_records:
+            record_history_guids = [r.record_history_guid for r in self.contains_records]
+            _unique_database_guids = {r.database_guid for r in self.contains_records}
+            if len(_unique_database_guids) != 1:
+                raise ValueError(
+                    "When interacting with Granta MI 2025 R1 and earlier, all RecordListItem objects provided to the "
+                    "'contains_records' property must contain the same database GUID. To search for lists that contain "
+                    "records in multiple databases, use a BooleanCriterion to combine multiple SearchCriterion objects."
+                )
+            database_guids = list(_unique_database_guids)
+        elif self.contains_records_in_databases:
+            record_history_guids = None
+            database_guids = self.contains_records_in_databases
+        else:
+            record_history_guids = None
+            database_guids = None
+
+        model = models2025r1.GsaRecordListSearchCriterion(
+            name_contains=self.name_contains,
+            user_role=user_role,
+            is_published=self.is_published,
+            is_awaiting_approval=self.is_awaiting_approval,
+            is_internal_use=self.is_internal_use,
+            is_revision=self.is_revision,
+            contains_records_in_databases=database_guids,
+            contains_records_in_integration_schemas=self.contains_records_in_integration_schemas,
+            contains_records_in_tables=self.contains_records_in_tables,
+            contains_records=record_history_guids,
             user_can_add_or_remove_items=self.user_can_add_or_remove_items,
         )
         logger.debug(model.to_str())
@@ -679,7 +753,11 @@ class BooleanCriterion:
         self._match_all = value
 
     def _to_model(self) -> models.GsaListBooleanCriterion:
-        """Generate the DTO for use with the auto-generated client code."""
+        """
+        Generate the DTO for use with the auto-generated client code.
+
+        Generated DTO compatible with Granta MI 2025 R2 and later.
+        """
         logger.debug("Serializing BooleanCriterion to API model")
         model = models.GsaListBooleanCriterion(
             match_any=(
@@ -689,6 +767,28 @@ class BooleanCriterion:
             ),
             match_all=(
                 [criteria._to_model() for criteria in self.match_all]
+                if self.match_all is not None
+                else None
+            ),
+        )
+        logger.debug(model.to_str())
+        return model
+
+    def _to_2025r1_model(self) -> models2025r1.GsaListBooleanCriterion:
+        """
+        Generate the DTO for use with the auto-generated client code.
+
+        Generated DTO compatible with Granta MI 2025 R1 and earlier.
+        """
+        logger.debug("Serializing BooleanCriterion to API model")
+        model = models2025r1.GsaListBooleanCriterion(
+            match_any=(
+                [criteria._to_2025r1_model() for criteria in self.match_any]
+                if self.match_any is not None
+                else None
+            ),
+            match_all=(
+                [criteria._to_2025r1_model() for criteria in self.match_all]
                 if self.match_all is not None
                 else None
             ),
@@ -791,8 +891,18 @@ class AuditLogAction(str, Enum):
     LISTNAMECHANGED = models.GsaListAction.LISTNAMECHANGED.value
     LISTDESCRIPTIONCHANGED = models.GsaListAction.LISTDESCRIPTIONCHANGED.value
     LISTNOTESCHANGED = models.GsaListAction.LISTNOTESCHANGED.value
-    LISTSETTOAWAITINGAPPROVAL = models.GsaListAction.LISTSETTOAWAITINGAPPROVAL.value
-    LISTAWAITINGAPPROVALREMOVED = models.GsaListAction.LISTAWAITINGAPPROVALREMOVED.value
+    LISTSETTOAWAITINGAPPROVALFORPUBLISHING = (
+        models.GsaListAction.LISTSETTOAWAITINGAPPROVALFORPUBLISHING.value
+    )
+    LISTSETTOAWAITINGAPPROVALFORWITHDRAWAL = (
+        models.GsaListAction.LISTSETTOAWAITINGAPPROVALFORWITHDRAWAL.value
+    )
+    LISTAWAITINGAPPROVALFORPUBLISHINGREMOVED = (
+        models.GsaListAction.LISTAWAITINGAPPROVALFORPUBLISHINGREMOVED.value
+    )
+    LISTAWAITINGAPPROVALFORWITHDRAWALREMOVED = (
+        models.GsaListAction.LISTAWAITINGAPPROVALFORWITHDRAWALREMOVED.value
+    )
     LISTPUBLISHED = models.GsaListAction.LISTPUBLISHED.value
     LISTUNPUBLISHED = models.GsaListAction.LISTUNPUBLISHED.value
     LISTREVISIONCREATED = models.GsaListAction.LISTREVISIONCREATED.value

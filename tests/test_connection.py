@@ -26,8 +26,12 @@ import pytest
 import requests.exceptions
 import requests_mock
 
-from ansys.grantami.recordlists import Connection
-from ansys.grantami.recordlists._connection import AUTH_PATH, PROXY_PATH
+from ansys.grantami.recordlists import Connection, RecordListsApiClient
+from ansys.grantami.recordlists._connection import (
+    AUTH_PATH,
+    PROXY_PATH,
+    RecordLists2025R12024R2ApiClient,
+)
 
 
 @pytest.fixture
@@ -70,27 +74,44 @@ def test_500_on_test_connection_is_handled(sl_url, successful_auth, mocker):
         with pytest.raises(
             ConnectionError, match="Check that SSL certificates have been configured"
         ):
-            client = connection.connect()
+            connection.connect()
 
 
 def test_new_server_version(sl_url, successful_auth, mocker):
     mi_version_response = {
-        "binary_compatibility_version": "25.2.0.0",
+        "binaryCompatibilityVersion": "25.2.0.0",
         "version": "25.2.820.0",
-        "major_minor_version": "25.2",
+        "majorMinorVersion": "25.2",
     }
 
     with mocker:
         connection = Connection(sl_url).with_anonymous()
         mocker.get(requests_mock.ANY, status_code=200, json=mi_version_response)
-        connection.connect()
+        client = connection.connect()
+    assert isinstance(client, RecordListsApiClient)
+    assert not isinstance(client, RecordLists2025R12024R2ApiClient)
 
 
-def test_old_server_version_is_handled(sl_url, successful_auth, mocker):
+def test_old_supported_server_version(sl_url, successful_auth, mocker):
     mi_version_response = {
-        "binary_compatibility_version": "12.0.0.0",
+        "binaryCompatibilityVersion": "25.1.0.0",
+        "version": "25.1.820.0",
+        "majorMinorVersion": "25.1",
+    }
+
+    with mocker:
+        connection = Connection(sl_url).with_anonymous()
+        mocker.get(requests_mock.ANY, status_code=200, json=mi_version_response)
+        client = connection.connect()
+    assert isinstance(client, RecordListsApiClient)
+    assert isinstance(client, RecordLists2025R12024R2ApiClient)
+
+
+def test_old_unsupported_server_version_is_handled(sl_url, successful_auth, mocker):
+    mi_version_response = {
+        "binaryCompatibilityVersion": "12.0.0.0",
         "version": "12.1.2.3",
-        "major_minor_version": "12.0",
+        "majorMinorVersion": "12.1",
     }
 
     with mocker:
@@ -98,7 +119,7 @@ def test_old_server_version_is_handled(sl_url, successful_auth, mocker):
         mocker.get(requests_mock.ANY, status_code=200, json=mi_version_response)
         with pytest.raises(
             ConnectionError,
-            match=r"This package requires a more recent Granta MI version.*12\.1\.2\.3.*25\.2",
+            match=r"This package does not support the detected Granta MI version.*12\.1.*24\.2",
         ):
             connection.connect()
 
@@ -111,6 +132,6 @@ def test_server_version_error_is_handled(sl_url, successful_auth, mocker):
         mocker.get(version_path, status_code=404)
         with pytest.raises(
             ConnectionError,
-            match=r"Cannot check the Granta MI server version.*25\.2",
+            match=r"Cannot find the Server API definition in Granta MI Service Layer",
         ):
             connection.connect()

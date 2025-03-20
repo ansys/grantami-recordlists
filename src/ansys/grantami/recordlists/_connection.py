@@ -23,10 +23,10 @@
 from collections import defaultdict
 import concurrent.futures
 import functools
-from typing import Iterator, List, Optional, Tuple, Union
+from typing import Iterable, Iterator, List, Optional, Tuple, Union, cast
 
-from ansys.grantami.serverapi_openapi import api, models  # type: ignore[import]
-from ansys.openapi.common import (  # type: ignore[import]
+from ansys.grantami.serverapi_openapi.v2025r2 import api, models  # type: ignore[import-not-found]
+from ansys.openapi.common import (  # type: ignore[import-not-found]
     ApiClient,
     ApiClientFactory,
     ApiException,
@@ -34,7 +34,7 @@ from ansys.openapi.common import (  # type: ignore[import]
     Unset,
     generate_user_agent,
 )
-import requests  # type: ignore[import]
+import requests  # type: ignore[import-untyped]
 
 from ._logger import logger
 from ._models import (
@@ -48,38 +48,157 @@ from ._models import (
     _PagedResult,
 )
 
+from ansys.grantami.serverapi_openapi.v2025r1 import (  # type: ignore[import-not-found] # isort: skip
+    api as v2025r1api,
+    models as v2025r1models,
+)
+
+
 PROXY_PATH = "/proxy/v1.svc/mi"
 AUTH_PATH = "/Health/v2.svc"
 API_DEFINITION_PATH = "/swagger/v1/swagger.json"
 GRANTA_APPLICATION_NAME_HEADER = "PyGranta RecordLists"
 
-MINIMUM_GRANTA_MI_VERSION = (25, 2)
-
 _ArgNotProvided = "_ArgNotProvided"
 
 
-def _get_mi_server_version(client: ApiClient) -> Tuple[int, ...]:
-    """Get the Granta MI version as a tuple.
+class _ClientFactory:
+    def __init__(self, client_builder: "Connection"):
+        self._client_builder = client_builder
 
-    Makes direct use of the underlying serverapi-openapi package. The API methods
-    in this package may change over time, and so it is expected that this method
-    will grow to support multiple versions of the serverapi-openapi package.
+        self._client_map = {
+            # 2025 R2 bindings introduce new audit log and record-based searching
+            (25, 2): (RecordListsApiClient, None),
+            # No breaking changes between Server API 2025 R1 and 2024 R2. Use the same client for both.
+            (25, 1): (RecordLists2025R12024R2ApiClient, v2025r1models),
+            (24, 2): (RecordLists2025R12024R2ApiClient, v2025r1models),
+        }
 
-    Parameters
-    ----------
-    client : :class:`~.RecordListApiClient`
-        Client object.
+    def get_client(self) -> "RecordListsApiClient":
+        clients = self._create_clients()
+        server_version = self._get_server_version(clients)
 
-    Returns
-    -------
-    tuple of int
-        Granta MI version number.
-    """
-    schema_api = api.SchemaApi(client)
-    server_version_response = schema_api.get_version()
-    server_version_elements = server_version_response.version.split(".")
-    server_version = tuple([int(e) for e in server_version_elements])
-    return server_version
+        try:
+            return clients[server_version]
+        except KeyError:
+            # Forward compatibility
+            if server_version > self._highest_mi_version:
+                return clients[self._highest_mi_version]
+
+            raise ConnectionError(
+                f"This package does not support the detected Granta MI version. Detected Granta MI server "
+                f"version is {'.'.join([str(e) for e in server_version])}, but this package supports "
+                f"{self._all_mi_versions_formatted}. Use the pygranta package to install a version compatible "
+                "with your Granta MI server, for example pip install pygranta==2024.1"
+            )
+
+    def _create_clients(self) -> dict[tuple[int, int], "RecordListsApiClient"]:
+        """
+        Generate all clients for all supported versions of Granta MI.
+
+        Returns
+        -------
+        dict of int 2-tuple, RecordListsApiClient
+            A dictionary that maps the Granta MI version number for each client to the client object
+        """
+        clients = {}
+        for version, (client_class, models_override) in self._client_map.items():
+            client = client_class(
+                self._client_builder._session,
+                self._client_builder._base_service_layer_url,
+                self._client_builder._session_configuration,
+            )
+            client.setup_client(models_override if models_override else models)
+            clients[version] = client
+        return clients
+
+    def _get_server_version(
+        self, clients: dict[tuple[int, int], "RecordListsApiClient"]
+    ) -> tuple[int, int]:
+        """
+        Get the Granta MI server version.
+
+        Returns
+        -------
+        2-tuple of int
+            The Granta MI server major.minor version number.
+
+        Raises
+        ------
+        ConnectionError
+            If the version number could not be retrieved.
+        """
+        status_codes = set()
+        for client_version, client in clients.items():
+            try:
+                server_version = client._get_mi_server_major_minor_version()
+                if server_version:
+                    return server_version
+
+            except requests.exceptions.RequestException:
+                raise ConnectionError(
+                    "An unexpected error occurred when trying to connect Granta MI Server API. Check "
+                    "that SSL certificates have been configured for communications between Granta MI "
+                    "Server and client Granta MI applications."
+                )
+
+            except ApiException as e:
+                status_codes.add(e.status_code)
+
+        if status_codes == {404}:
+            # No client version could get the version.
+            raise ConnectionError(
+                "Cannot find the Server API definition in Granta MI Service Layer. Ensure a compatible version of "
+                "Granta MI is available try again. This package supports Granta MI versions "
+                f"{self._all_mi_versions_formatted}."
+            )
+        else:
+            # At least one client version found the resource, but the version number was still not returned.
+            raise ConnectionError(
+                "An unexpected error occurred when trying to connect Server API in Granta MI Service Layer. Check "
+                "the Service Layer logs for more information, and that a compatible version of Granta MI is available "
+                f"and try again. This package supports Granta MI versions {self._all_mi_versions_formatted}."
+            )
+
+    @property
+    def _all_mi_versions(self) -> Iterable[tuple[int, int]]:
+        """All Granta MI versions supported by this package.
+
+        Returns
+        -------
+        list of 2-tuple of int
+            List of major.minor version numbers.
+        """
+        return self._client_map.keys()
+
+    @property
+    def _all_mi_versions_formatted(self) -> str:
+        """All Granta MI versions supported by this package, formatted as a string.
+
+        Returns
+        -------
+        str
+            A formatted string of all versions supported by this package.
+        """
+        formatted_versions = [
+            ".".join(str(e) for e in version) for version in self._all_mi_versions
+        ]
+        return ",".join(formatted_versions)
+
+    @property
+    def _highest_mi_version(self) -> tuple[int, int]:
+        """The highest Granta MI version supported by this package.
+
+        Returns
+        -------
+        2-tuple of int
+            major.minor version number.
+        """
+        result = (0, 0)
+        for version in self._client_map.keys():
+            if version > result:
+                result = version
+        return result
 
 
 class RecordListsApiClient(ApiClient):  # type: ignore[misc]
@@ -109,10 +228,24 @@ class RecordListsApiClient(ApiClient):  # type: ignore[misc]
         self.list_item_api = api.ListItemApi(self)
         self.list_permissions_api = api.ListPermissionsApi(self)
         self.list_audit_log_api = api.ListAuditLogApi(self)
+        self.schema_api = api.SchemaApi(self)
 
     def __repr__(self) -> str:
         """Printable representation of the object."""
         return f"<{self.__class__.__name__} url: {self._service_layer_url}>"
+
+    def _get_mi_server_major_minor_version(self) -> Tuple[int, int]:
+        """Get the Granta MI major.minor version as a 2-tuple.
+
+        Returns
+        -------
+        tuple of int
+            Granta MI version number.
+        """
+        server_version_response = self.schema_api.get_version()
+        server_version = server_version_response.major_minor_version
+        parsed_version = tuple([int(e) for e in server_version.split(".")])
+        return cast(tuple[int, int], parsed_version)
 
     def get_all_lists(self) -> List[RecordList]:
         """
@@ -182,7 +315,6 @@ class RecordListsApiClient(ApiClient):  # type: ignore[misc]
         search_results = self.list_management_api.get_record_list_search_results(
             result_resource_identifier=search_info.search_result_identifier
         )
-        pass
         return [
             SearchResult._from_model(search_result, include_items)
             for search_result in search_results.search_results
@@ -699,6 +831,70 @@ class RecordListsApiClient(ApiClient):  # type: ignore[misc]
         return iter(AuditLogItem._from_model(item) for item in search_result)
 
 
+class RecordLists2025R12024R2ApiClient(RecordListsApiClient):
+    """
+    Communicates with Granta MI.
+
+    Compatibility version for Granta MI 2025 R1 and 2024 R2.
+
+    This class is instantiated by the
+    :class:`Connection` class and should not be instantiated
+    directly.
+    """
+
+    def __init__(
+        self,
+        session: requests.Session,
+        service_layer_url: str,
+        configuration: SessionConfiguration,
+    ):
+        super().__init__(session, service_layer_url, configuration)
+
+        self.list_management_api = v2025r1api.ListManagementApi(self)
+        self.list_item_api = v2025r1api.ListItemApi(self)
+        self.list_permissions_api = v2025r1api.ListPermissionsApi(self)
+        self.list_audit_log_api = None
+
+    def search_for_lists(
+        self, criterion: Union[BooleanCriterion, SearchCriterion], include_items: bool = False
+    ) -> List[SearchResult]:
+        """
+        Search for record lists matching the provided criteria.
+
+        Performs multiple HTTP requests against the Server API.
+
+        Parameters
+        ----------
+        criterion : :class:`.SearchCriterion` | :class:`.BooleanCriterion`
+            Criterion to use to filter lists.
+        include_items: bool
+            Whether the search results should include record list items.
+
+        Returns
+        -------
+        list of :class:`.SearchResult`
+            List of record lists matching the provided criterion.
+        """
+        logger.info(f"Searching for lists with connection {self}")
+        response_options = models.GsaResponseOptions(
+            include_record_list_items=include_items,
+        )
+        search_info = self.list_management_api.run_record_lists_search(
+            body=v2025r1models.GsaRecordListSearchRequest(
+                search_criterion=criterion._to_2025r1_model(),
+                response_options=response_options,
+            )
+        )
+        assert search_info is not None
+        search_results = self.list_management_api.get_record_list_search_results(
+            result_resource_identifier=search_info.search_result_identifier
+        )
+        return [
+            SearchResult._from_model(search_result, include_items)
+            for search_result in search_results.search_results
+        ]
+
+
 class _ItemResolver:
     _max_requests = 5
 
@@ -879,71 +1075,6 @@ class Connection(ApiClientFactory):  # type: ignore[misc]
             list API.
         """
         self._validate_builder()
-        client = RecordListsApiClient(
-            self._session,
-            self._base_service_layer_url,
-            self._session_configuration,
-        )
-        client.setup_client(models)
-        self._test_connection(client)
+        client_factory = _ClientFactory(self)
+        client = client_factory.get_client()
         return client
-
-    @staticmethod
-    def _test_connection(client: RecordListsApiClient) -> None:
-        """Check if the created client can be used to perform a request.
-
-        This method tests both that the API definition can be accessed and that the Granta MI
-        version is compatible with this package.
-
-        The first checks ensures that the Server API exists and is functional. The second check
-        ensures that the Granta MI server version is compatible with this version of the package.
-
-        A failure at any point raises a ConnectionError.
-
-        Parameters
-        ----------
-        client : :class:`~.RecordListsApiClient`
-            Client object to test.
-
-        Raises
-        ------
-        ConnectionError
-            Error raised if the connection test fails.
-        """
-        try:
-            client.call_api(resource_path=API_DEFINITION_PATH, method="GET")
-        except ApiException as e:
-            if e.status_code == 404:
-                raise ConnectionError(
-                    "Cannot find the Server API definition in Granta MI Service Layer. Ensure a "
-                    "compatible version of Granta MI is available try again."
-                ) from e
-            else:
-                raise ConnectionError(
-                    "An unexpected error occurred when trying to connect Server API in Granta MI "
-                    "Service Layer. Check the Service Layer logs for more information and try "
-                    "again."
-                ) from e
-        except requests.exceptions.RetryError as e:
-            raise ConnectionError(
-                "An unexpected error occurred when trying to connect Granta MI Server API. Check "
-                "that SSL certificates have been configured for communications between Granta MI "
-                "Server and client Granta MI applications."
-            ) from e
-
-        try:
-            server_version = _get_mi_server_version(client)
-        except ApiException as e:
-            raise ConnectionError(
-                "Cannot check the Granta MI server version. Ensure the Granta MI server version "
-                f"is at least {'.'.join([str(e) for e in MINIMUM_GRANTA_MI_VERSION])}."
-            ) from e
-
-        if server_version < MINIMUM_GRANTA_MI_VERSION:
-            raise ConnectionError(
-                f"This package requires a more recent Granta MI version. Detected Granta MI server "
-                f"version is {'.'.join([str(e) for e in server_version])}, but this package "
-                f"requires at least {'.'.join([str(e) for e in MINIMUM_GRANTA_MI_VERSION])}. "
-                "Use the pygranta package to install a version compatible with your Granta MI "
-                "server, for example pip install pygranta==2024.1"
-            )

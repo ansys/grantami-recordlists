@@ -31,14 +31,45 @@ from ansys.grantami.recordlists import (
     AuditLogAction,
     AuditLogSearchCriterion,
     BooleanCriterion,
+    Connection,
     RecordList,
     RecordListItem,
+    RecordListsApiClient,
     SearchCriterion,
+    SearchResult,
     UserOrGroup,
     UserRole,
 )
+from ansys.grantami.recordlists._connection import RecordLists2025R12024R2ApiClient
 
-pytestmark = pytest.mark.integration
+pytestmark = pytest.mark.integration(mi_versions=[(25, 2), (25, 1), (24, 2)])
+
+
+class TestConnection:
+    @pytest.mark.integration(mi_versions=[(25, 2)])
+    def test_latest_mi_version(self, sl_url, list_admin_username, list_admin_password):
+        connection = Connection(sl_url).with_credentials(list_admin_username, list_admin_password)
+        client = connection.connect()
+        assert isinstance(client, RecordListsApiClient)
+        assert not isinstance(client, RecordLists2025R12024R2ApiClient)
+
+    @pytest.mark.integration(mi_versions=[(25, 1), (24, 2)])
+    def test_older_supported_mi_version(self, sl_url, list_admin_username, list_admin_password):
+        connection = Connection(sl_url).with_credentials(list_admin_username, list_admin_password)
+        client = connection.connect()
+        assert isinstance(client, RecordListsApiClient)
+        assert isinstance(client, RecordLists2025R12024R2ApiClient)
+
+    @pytest.mark.integration(mi_versions=[(24, 1)])
+    def test_unsupported_mi_version(self, sl_url, list_admin_username, list_admin_password):
+        # We don't raise the expected version-specific error message because the Server API location has moved since
+        # 2024 R1 was released.
+        connection = Connection(sl_url).with_credentials(list_admin_username, list_admin_password)
+        with pytest.raises(
+            ConnectionError,
+            match=r"Cannot find the Server API definition in Granta MI Service Layer",
+        ):
+            connection.connect()
 
 
 def test_getting_all_lists(admin_client, new_list):
@@ -701,58 +732,172 @@ class TestLifeCyclePublishedAndAwaitingApproval(TestLifeCycle):
         assert e.value.status_code == 400
 
 
-class TestSearch:
+class _TestSearch:
     """Exercises some search criteria."""
 
-    _name_suffix_A = "_ListA"
-    _name_suffix_B = "_ListB"
-    _name_suffix_C = "_ListC"
+    _name_suffix_personal = "_ListA"
+    _name_suffix_published = "_ListB"
+    _name_suffix_published_training_items = "_ListC"
+    _name_suffix_rs_items = "_ListD"
+    _name_suffix_training_and_rs_items = "_ListE"
 
     @pytest.fixture(scope="class")
-    def list_a(self, admin_client, list_name):
+    def list_personal(self, admin_client, list_name):
         """A personal list with a known name."""
-        created_list = admin_client.create_list(list_name + self._name_suffix_A)
+        unique_list_name = f"{list_name}{self._name_suffix_personal}"
+        created_list = admin_client.create_list(unique_list_name)
+
         yield created_list
+
         admin_client.delete_list(created_list)
 
     @pytest.fixture(scope="class")
-    def list_b(self, admin_client, list_name):
+    def list_published(self, admin_client, list_name):
         """A published list with a known name."""
-        created_list = admin_client.create_list(list_name + self._name_suffix_B)
+        unique_list_name = f"{list_name}{self._name_suffix_published}"
+        created_list = admin_client.create_list(unique_list_name)
         admin_client.request_list_approval(created_list)
         admin_client.publish_list(created_list)
+
         yield created_list
+
         admin_client.delete_list(created_list)
 
     @pytest.fixture(scope="class")
-    def list_c(self, admin_client, list_name, list_b, resolvable_items):
-        """A revision of list B with a known name and items."""
-        created_list = admin_client.revise_list(list_b)
-        admin_client.update_list(created_list, name=list_name + self._name_suffix_C)
+    def list_mi_training_items(self, admin_client, list_name, list_published, resolvable_items):
+        """A revision of list B with a known name and items from MI Training."""
+        created_list = admin_client.revise_list(list_published)
+        unique_list_name = f"{list_name}{self._name_suffix_published_training_items}"
+        admin_client.update_list(created_list, name=unique_list_name)
         admin_client.add_items_to_list(created_list, resolvable_items)
+
         yield created_list
+
+        admin_client.delete_list(created_list)
+
+    @pytest.fixture(scope="class")
+    def list_rs_items(self, admin_client, list_name, list_published, resolvable_rs_items):
+        """A list with a known name and items from Restricted Substances."""
+        unique_list_name = f"{list_name}{self._name_suffix_rs_items}"
+        created_list = admin_client.create_list(unique_list_name)
+        admin_client.add_items_to_list(created_list, resolvable_rs_items)
+
+        yield created_list
+
+        admin_client.delete_list(created_list)
+
+    @pytest.fixture(scope="class")
+    def list_mi_training_and_rs_items(
+        self, admin_client, list_name, list_published, resolvable_items, resolvable_rs_items
+    ):
+        """A list with a known name and items from MI Training and Restricted Substances."""
+        unique_list_name = f"{list_name}{self._name_suffix_training_and_rs_items}"
+        created_list = admin_client.create_list(unique_list_name)
+        admin_client.add_items_to_list(created_list, resolvable_items)
+        admin_client.add_items_to_list(created_list, resolvable_rs_items)
+
+        yield created_list
+
         admin_client.delete_list(created_list)
 
     @pytest.fixture(scope="class", autouse=True)
-    def multiple_lists(self, list_a, list_b, list_c):
-        yield list_a, list_b, list_c
+    def multiple_lists(
+        self,
+        list_personal,
+        list_published,
+        list_mi_training_items,
+        list_rs_items,
+        list_mi_training_and_rs_items,
+    ):
+        """Forces all fixtures to execute at class instantiation."""
+        yield list_personal, list_published, list_mi_training_items, list_rs_items, list_mi_training_and_rs_items
 
+    def validate_list(
+        self,
+        search_results: list[SearchResult],
+        list_suffix: str,
+        items: list[RecordListItem] | None = None,
+    ):
+        result = next(r for r in search_results if r.record_list.name.endswith(list_suffix))
+        if items is not None:
+            assert len(result.items) == len(items)
+        else:
+            assert result.items is None
+
+
+class TestSearchResult(_TestSearch):
+    _properties_to_check = [
+        "record_history_guid",
+        "database_guid",
+        "table_guid",
+        "record_guid",
+        "record_version",
+    ]
+
+    def test_search_result_contains_correct_items_single_database(
+        self, admin_client, list_mi_training_items, resolvable_items
+    ):
+        results = admin_client.search_for_lists(
+            SearchCriterion(name_contains=self._name_suffix_published_training_items),
+            include_items=True,
+        )
+
+        assert len(results) == 1
+        result = results[0]
+
+        assert result.record_list.identifier == list_mi_training_items.identifier
+
+        results = {
+            tuple(getattr(item, prop) for prop in self._properties_to_check)
+            for item in result.items
+        }
+        expected = {
+            tuple(getattr(item, prop) for prop in self._properties_to_check)
+            for item in resolvable_items
+        }
+        assert results == expected
+
+    def test_search_result_contains_correct_items_multiple_databases(
+        self, admin_client, list_mi_training_and_rs_items, resolvable_items, resolvable_rs_items
+    ):
+        results = admin_client.search_for_lists(
+            SearchCriterion(name_contains=self._name_suffix_training_and_rs_items),
+            include_items=True,
+        )
+        assert len(results) == 1
+        result = results[0]
+        assert result.record_list.identifier == list_mi_training_and_rs_items.identifier
+
+        results = {
+            tuple(getattr(item, prop) for prop in self._properties_to_check)
+            for item in result.items
+        }
+        expected = {
+            tuple(getattr(item, prop) for prop in self._properties_to_check)
+            for item in resolvable_items + resolvable_rs_items
+        }
+        assert results == expected
+
+
+class TestSearchByName(_TestSearch):
     def test_search_list_name_match_all(self, admin_client, list_name):
         # All tests include name_contains=list_name to filter results to lists created in this test
         #  session.
         criteria = SearchCriterion(name_contains=list_name)
         results = admin_client.search_for_lists(criteria)
-        assert len(results) == 3
+        assert len(results) == 5
 
-    def test_search_list_name_match_one(self, admin_client, list_a):
-        criteria = SearchCriterion(name_contains=self._name_suffix_A)
+    def test_search_list_name_match_one(self, admin_client, list_personal):
+        criteria = SearchCriterion(name_contains=self._name_suffix_personal)
         results = admin_client.search_for_lists(criteria)
         assert len(results) == 1
-        assert results[0].record_list.identifier == list_a.identifier
+        assert results[0].record_list.identifier == list_personal.identifier
 
-    def test_search_not_published_or_awaiting(self, admin_client, list_a):
+
+class TestSearchByState(_TestSearch):
+    def test_search_not_published_or_awaiting(self, admin_client, list_personal):
         criteria = SearchCriterion(
-            name_contains=self._name_suffix_A,
+            name_contains=self._name_suffix_personal,
             is_published=False,
             is_awaiting_approval=False,
             is_revision=False,
@@ -760,51 +905,60 @@ class TestSearch:
         )
         results = admin_client.search_for_lists(criteria)
         assert len(results) == 1
-        assert results[0].record_list.identifier == list_a.identifier
+        assert results[0].record_list.identifier == list_personal.identifier
 
-    def test_search_published(self, admin_client, list_name, list_b):
+    def test_search_published(self, admin_client, list_name, list_published):
         criteria = SearchCriterion(name_contains=list_name, is_published=True)
         results = admin_client.search_for_lists(criteria)
         assert len(results) == 1
-        assert results[0].record_list.identifier == list_b.identifier
+        assert results[0].record_list.identifier == list_published.identifier
 
-    def test_search_revision(self, admin_client, list_name, list_c):
+    def test_search_revision(self, admin_client, list_name, list_mi_training_items):
         criteria = SearchCriterion(name_contains=list_name, is_revision=True)
         results = admin_client.search_for_lists(criteria)
         assert len(results) == 1
-        assert results[0].record_list.identifier == list_c.identifier
+        assert results[0].record_list.identifier == list_mi_training_items.identifier
 
-    @pytest.mark.parametrize("include_items", [True, False])
-    def test_search_by_database(
+
+@pytest.mark.parametrize("include_items", [True, False])
+class TestSearchByDatabase(_TestSearch):
+    def test_single_database_two_hits(
         self,
         include_items,
         admin_client,
         list_name,
         resolvable_items,
-        list_c,
+        resolvable_rs_items,
+        list_mi_training_items,
         training_database_guid,
     ):
         criteria = SearchCriterion(
             name_contains=list_name,
             contains_records_in_databases=[training_database_guid],
         )
-        results = admin_client.search_for_lists(criteria, include_items=include_items)
-        assert len(results) == 1
-        for result in results:
-            assert result.record_list.identifier == list_c.identifier
-            if include_items:
-                assert len(result.items) == len(resolvable_items)
-            else:
-                assert result.items is None
 
-    @pytest.mark.parametrize("include_items", [True, False])
-    def test_search_by_multiple_databases(
+        results = admin_client.search_for_lists(criteria, include_items=include_items)
+
+        expected_results = {
+            self._name_suffix_published_training_items: resolvable_items,
+            self._name_suffix_training_and_rs_items: resolvable_rs_items + resolvable_items,
+        }
+        assert len(results) == 2
+        for suffix, items in expected_results.items():
+            self.validate_list(
+                search_results=results,
+                list_suffix=suffix,
+                items=items if include_items else None,
+            )
+
+    def test_two_databases_two_hits(
         self,
         include_items,
         admin_client,
         list_name,
         resolvable_items,
-        list_c,
+        resolvable_rs_items,
+        list_mi_training_items,
         training_database_guid,
     ):
         # List of databases = Is in one OR the other
@@ -812,23 +966,64 @@ class TestSearch:
             name_contains=list_name,
             contains_records_in_databases=[training_database_guid, str(uuid.uuid4())],
         )
-        results = admin_client.search_for_lists(criteria, include_items=include_items)
-        assert len(results) == 1
-        for result in results:
-            assert result.record_list.identifier == list_c.identifier
-            if include_items:
-                assert len(result.items) == len(resolvable_items)
-            else:
-                assert result.items is None
 
-    @pytest.mark.parametrize("include_items", [True, False])
-    def test_search_by_table(
+        results = admin_client.search_for_lists(criteria, include_items=include_items)
+
+        expected_results = {
+            self._name_suffix_published_training_items: resolvable_items,
+            self._name_suffix_training_and_rs_items: resolvable_rs_items + resolvable_items,
+        }
+        assert len(results) == 2
+        for suffix, items in expected_results.items():
+            self.validate_list(
+                search_results=results,
+                list_suffix=suffix,
+                items=items if include_items else None,
+            )
+
+    def test_two_databases_three_hits(
         self,
         include_items,
         admin_client,
         list_name,
         resolvable_items,
-        list_c,
+        resolvable_rs_items,
+        list_mi_training_items,
+        training_database_guid,
+        rs_database_guid,
+    ):
+        # List of databases = Is in one OR the other
+        criteria = SearchCriterion(
+            name_contains=list_name,
+            contains_records_in_databases=[training_database_guid, rs_database_guid],
+        )
+
+        results = admin_client.search_for_lists(criteria, include_items=include_items)
+
+        expected_results = {
+            self._name_suffix_published_training_items: resolvable_items,
+            self._name_suffix_rs_items: resolvable_rs_items,
+            self._name_suffix_training_and_rs_items: resolvable_rs_items + resolvable_items,
+        }
+        assert len(results) == 3
+        for suffix, items in expected_results.items():
+            self.validate_list(
+                search_results=results,
+                list_suffix=suffix,
+                items=items if include_items else None,
+            )
+
+
+@pytest.mark.parametrize("include_items", [True, False])
+class TestSearchByTable(_TestSearch):
+    def test_single_table_two_hits(
+        self,
+        include_items,
+        admin_client,
+        list_name,
+        resolvable_items,
+        resolvable_rs_items,
+        list_mi_training_items,
         design_data_table_guid,
     ):
         criteria = SearchCriterion(
@@ -836,17 +1031,62 @@ class TestSearch:
             contains_records_in_tables=[design_data_table_guid],
         )
         results = admin_client.search_for_lists(criteria, include_items=include_items)
-        assert len(results) == 1
-        for result in results:
-            assert result.record_list.identifier == list_c.identifier
-            if include_items:
-                assert len(result.items) == len(resolvable_items)
-            else:
-                assert result.items is None
 
-    @pytest.mark.parametrize("include_items", [True, False])
-    def test_search_by_record(
-        self, include_items, admin_client, list_name, resolvable_items, list_c
+        expected_results = {
+            self._name_suffix_published_training_items: resolvable_items,
+            self._name_suffix_training_and_rs_items: resolvable_rs_items + resolvable_items,
+        }
+        assert len(results) == 2
+        for suffix, items in expected_results.items():
+            self.validate_list(
+                search_results=results,
+                list_suffix=suffix,
+                items=items if include_items else None,
+            )
+
+    def test_two_tables_two_hits(
+        self,
+        include_items,
+        admin_client,
+        list_name,
+        resolvable_items,
+        resolvable_rs_items,
+        list_mi_training_items,
+        design_data_table_guid,
+        tensile_statistical_data_table_guid,
+    ):
+        criteria = SearchCriterion(
+            name_contains=list_name,
+            contains_records_in_tables=[
+                design_data_table_guid,
+                tensile_statistical_data_table_guid,
+            ],
+        )
+        results = admin_client.search_for_lists(criteria, include_items=include_items)
+
+        expected_results = {
+            self._name_suffix_published_training_items: resolvable_items,
+            self._name_suffix_training_and_rs_items: resolvable_rs_items + resolvable_items,
+        }
+        assert len(results) == 2
+        for suffix, items in expected_results.items():
+            self.validate_list(
+                search_results=results,
+                list_suffix=suffix,
+                items=items if include_items else None,
+            )
+
+
+@pytest.mark.parametrize("include_items", [True, False])
+class TestSearchByRecord(_TestSearch):
+    def test_single_record_two_hits(
+        self,
+        include_items,
+        admin_client,
+        list_name,
+        resolvable_items,
+        resolvable_rs_items,
+        list_mi_training_items,
     ):
         record_reference = resolvable_items[0]
         criteria = SearchCriterion(
@@ -854,51 +1094,163 @@ class TestSearch:
             contains_records=[record_reference],
         )
         results = admin_client.search_for_lists(criteria, include_items=include_items)
-        assert len(results) == 1
-        assert results[0].record_list.identifier == list_c.identifier
-        if include_items:
-            assert len(results[0].items) == len(resolvable_items)
-        else:
-            assert results[0].items is None
+        assert len(results) == 2
+        expected_results = {
+            self._name_suffix_published_training_items: resolvable_items,
+            self._name_suffix_training_and_rs_items: resolvable_rs_items + resolvable_items,
+        }
+        assert len(results) == 2
+        for suffix, items in expected_results.items():
+            self.validate_list(
+                search_results=results,
+                list_suffix=suffix,
+                items=items if include_items else None,
+            )
 
-    def test_search_role_is_none(self, admin_client, list_name):
+    def test_two_records_same_database_two_hits(
+        self,
+        include_items,
+        admin_client,
+        list_name,
+        resolvable_items,
+        resolvable_rs_items,
+        list_mi_training_items,
+    ):
+        record_reference_1 = resolvable_items[0]
+        record_reference_2 = resolvable_items[1]
+
+        criteria = SearchCriterion(
+            name_contains=list_name,
+            contains_records=[record_reference_1, record_reference_2],
+        )
+        results = admin_client.search_for_lists(criteria, include_items=include_items)
+        assert len(results) == 2
+        expected_results = {
+            self._name_suffix_published_training_items: resolvable_items,
+            self._name_suffix_training_and_rs_items: resolvable_rs_items + resolvable_items,
+        }
+        assert len(results) == 2
+        for suffix, items in expected_results.items():
+            self.validate_list(
+                search_results=results,
+                list_suffix=suffix,
+                items=items if include_items else None,
+            )
+
+    @pytest.mark.integration(mi_versions=[(25, 2)])
+    def test_two_records_different_databases_three_hits(
+        self,
+        include_items,
+        admin_client,
+        list_name,
+        resolvable_items,
+        resolvable_rs_items,
+        list_mi_training_items,
+    ):
+        training_record_reference = resolvable_items[0]
+        rs_record_reference = resolvable_rs_items[0]
+        criteria = SearchCriterion(
+            name_contains=list_name,
+            contains_records=[training_record_reference, rs_record_reference],
+        )
+        results = admin_client.search_for_lists(criteria, include_items=include_items)
+
+        expected_results = {
+            self._name_suffix_published_training_items: resolvable_items,
+            self._name_suffix_rs_items: resolvable_rs_items,
+            self._name_suffix_training_and_rs_items: resolvable_rs_items + resolvable_items,
+        }
+        assert len(results) == 3
+        for suffix, items in expected_results.items():
+            self.validate_list(
+                search_results=results,
+                list_suffix=suffix,
+                items=items if include_items else None,
+            )
+
+    @pytest.mark.integration(mi_versions=[(25, 1), (24, 2)])
+    def test_two_records_different_databases_three_hits_2025_r1(
+        self,
+        include_items,
+        admin_client,
+        list_name,
+        resolvable_items,
+        resolvable_rs_items,
+        list_mi_training_items,
+    ):
+        training_record_reference = resolvable_items[0]
+        rs_record_reference = resolvable_rs_items[0]
+        criteria = BooleanCriterion(
+            match_any=[
+                SearchCriterion(
+                    name_contains=list_name,
+                    contains_records=[training_record_reference],
+                ),
+                SearchCriterion(
+                    name_contains=list_name,
+                    contains_records=[rs_record_reference],
+                ),
+            ]
+        )
+        results = admin_client.search_for_lists(criteria, include_items=include_items)
+
+        expected_results = {
+            self._name_suffix_published_training_items: resolvable_items,
+            self._name_suffix_rs_items: resolvable_rs_items,
+            self._name_suffix_training_and_rs_items: resolvable_rs_items + resolvable_items,
+        }
+        assert len(results) == 3
+        for suffix, items in expected_results.items():
+            self.validate_list(
+                search_results=results,
+                list_suffix=suffix,
+                items=items if include_items else None,
+            )
+
+
+class TestSearchByUserRole(_TestSearch):
+    def test_role_is_none(self, admin_client, list_name):
         criteria = SearchCriterion(user_role=UserRole.NONE)
         results = admin_client.search_for_lists(criteria)
         assert len(results) == 0
 
-    def test_search_role_is_owner(self, admin_client, list_name):
+    def test_role_is_owner(self, admin_client, list_name):
         criteria = SearchCriterion(name_contains=list_name, user_role=UserRole.OWNER)
         results = admin_client.search_for_lists(criteria)
-        assert len(results) == 3
+        assert len(results) == 5
 
-    def test_match_all(self, admin_client, list_name, new_list, list_a):
+
+class TestBooleanSearch(_TestSearch):
+    def test_match_all(self, admin_client, list_name, new_list, list_personal):
         # Uses fixture new_list to create a list with the root name only and assert that the
         # match_all criteria is excluding it as expected.
         criteria = BooleanCriterion(
             match_all=[
                 SearchCriterion(name_contains=list_name),
-                SearchCriterion(name_contains=self._name_suffix_A),
+                SearchCriterion(name_contains=self._name_suffix_personal),
             ]
         )
         results = admin_client.search_for_lists(criteria)
         assert len(results) == 1
-        assert results[0].record_list.identifier == list_a.identifier
+        assert results[0].record_list.identifier == list_personal.identifier
 
-    def test_nested_boolean_criteria(self, admin_client, list_name, new_list, list_a, list_b):
+    def test_nested_boolean_criteria(
+        self, admin_client, list_name, new_list, list_personal, list_published
+    ):
         criteria = BooleanCriterion(
             match_any=[
-                # Should match A only
+                # Should match personal only
                 BooleanCriterion(
                     match_all=[
                         SearchCriterion(name_contains=list_name),
-                        SearchCriterion(name_contains=self._name_suffix_A),
+                        SearchCriterion(name_contains=self._name_suffix_personal),
                     ]
                 ),
-                # Should match B only
+                # Should match published only
                 BooleanCriterion(
                     match_all=[
                         SearchCriterion(name_contains=list_name),
-                        SearchCriterion(name_contains=self._name_suffix_B),
+                        SearchCriterion(name_contains=self._name_suffix_published),
                         SearchCriterion(is_published=True),
                     ]
                 ),
@@ -907,48 +1259,29 @@ class TestSearch:
         results = admin_client.search_for_lists(criteria)
         assert len(results) == 2
         ids = {result.record_list.identifier for result in results}
-        assert list_a.identifier in ids
-        assert list_b.identifier in ids
+        assert list_personal.identifier in ids
+        assert list_published.identifier in ids
 
     def test_boolean_match_any_and_all(
         self,
         admin_client,
         list_name,
-        list_a,
-        list_b,
+        list_personal,
+        list_published,
     ):
         criteria = BooleanCriterion(
             match_any=[
-                SearchCriterion(name_contains=self._name_suffix_A),
-                SearchCriterion(name_contains=self._name_suffix_B),
+                SearchCriterion(name_contains=self._name_suffix_personal),
+                SearchCriterion(name_contains=self._name_suffix_published),
             ],
             match_all=[SearchCriterion(name_contains=list_name)],
         )
         results = admin_client.search_for_lists(criteria)
         ids = {result.record_list.identifier for result in results}
-        assert {list_a.identifier, list_b.identifier} == ids
-
-    def test_search_result_contains_correct_items(self, admin_client, list_c, resolvable_items):
-        results = admin_client.search_for_lists(
-            SearchCriterion(name_contains=self._name_suffix_C),
-            include_items=True,
-        )
-        assert len(results) == 1
-        result = results[0]
-        assert result.record_list.identifier == list_c.identifier
-        # Check the result does have the expected items
-        check_count = 0
-        for result_item in result.items:
-            for input_item in resolvable_items:
-                if result_item.record_history_guid == input_item.record_history_guid:
-                    assert result_item.database_guid == input_item.database_guid
-                    assert result_item.table_guid == input_item.table_guid
-                    assert result_item.record_guid == input_item.record_guid
-                    assert result_item.record_version == input_item.record_version
-                    check_count += 1
-        assert check_count == len(result.items) == len(resolvable_items)
+        assert {list_personal.identifier, list_published.identifier} == ids
 
 
+@pytest.mark.integration(mi_versions=[(25, 2)])
 class TestAuditLogging:
     _name_suffix_A = "_ListA"
     _name_suffix_B = "_ListB"
@@ -997,13 +1330,12 @@ class TestAuditLogging:
     def test_filter_log_entries_by_list_is_ordered(self, admin_client, list_a, list_b):
         criterion = AuditLogSearchCriterion(filter_record_lists=[list_b.identifier])
         results = list(admin_client.search_for_audit_log_entries(criterion))
-        assert len(results) == 4
+        assert len(results) == 3
         for event in results:
             assert event.list_identifier == list_b.identifier
         expected_actions = [
-            AuditLogAction.LISTAWAITINGAPPROVALREMOVED,
             AuditLogAction.LISTPUBLISHED,
-            AuditLogAction.LISTSETTOAWAITINGAPPROVAL,
+            AuditLogAction.LISTSETTOAWAITINGAPPROVALFORPUBLISHING,
             AuditLogAction.LISTCREATED,
         ]
         for event, action in zip(results, expected_actions):

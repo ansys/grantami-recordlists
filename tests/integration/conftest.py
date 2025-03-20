@@ -22,10 +22,15 @@
 
 import os
 from typing import List
+from unittest.mock import Mock
 import uuid
 
-from ansys.grantami.serverapi_openapi.api import SchemaDatabasesApi, SchemaTablesApi, SearchApi
-from ansys.grantami.serverapi_openapi.models import (
+from ansys.grantami.serverapi_openapi.v2025r2.api import (
+    SchemaDatabasesApi,
+    SchemaTablesApi,
+    SearchApi,
+)
+from ansys.grantami.serverapi_openapi.v2025r2.models import (
     GsaBooleanCriterion,
     GsaDiscreteTextValuesDatumCriterion,
     GsaRecordPropertyCriterion,
@@ -35,10 +40,17 @@ from ansys.grantami.serverapi_openapi.models import (
     GsaTextMatchBehavior,
     GsaVersionState,
 )
-from common import DB_KEY, TABLE_NAME, RecordCreator
+from common import (
+    DB_KEY,
+    DB_KEY_RS,
+    DEISGN_DATA_TABLE_NAME,
+    TENSILE_STATISTICAL_DATA_TABLE_NAME,
+    RecordCreator,
+)
 import pytest
 
 from ansys.grantami.recordlists import Connection, RecordList, RecordListItem, RecordListsApiClient
+from ansys.grantami.recordlists._connection import _ClientFactory
 
 
 @pytest.fixture(scope="session")
@@ -68,7 +80,7 @@ def list_password_no_permissions() -> str:
 
 @pytest.fixture(scope="session")
 def admin_client(
-    sl_url, list_admin_username, list_admin_password, list_name
+    sl_url, list_admin_username, list_admin_password, list_name, mi_version
 ) -> RecordListsApiClient:
     """
     Fixture providing a real ApiClient to run integration tests against an instance of Granta MI
@@ -76,7 +88,16 @@ def admin_client(
     On teardown, deletes all lists named using the fixture `list_name`.
     """
     connection = Connection(sl_url).with_credentials(list_admin_username, list_admin_password)
-    client = connection.connect()
+    try:
+        client = connection.connect()
+    except ConnectionError as e:
+        if mi_version not in _ClientFactory(Mock(spec=Connection))._client_map:
+            pytest.skip(
+                f"Client not available for Granta MI v{'.'.join(str(v) for v in mi_version)}"
+            )
+        else:
+            raise e
+
     yield client
 
     all_lists = client.get_all_lists()
@@ -87,7 +108,7 @@ def admin_client(
 
 @pytest.fixture(scope="session")
 def basic_client(
-    sl_url, list_username_no_permissions, list_password_no_permissions, list_name
+    sl_url, list_username_no_permissions, list_password_no_permissions, list_name, mi_version
 ) -> RecordListsApiClient:
     """
     Fixture providing a real ApiClient to run integration tests against an instance of Granta MI
@@ -98,7 +119,16 @@ def basic_client(
         list_username_no_permissions,
         list_password_no_permissions,
     )
-    client = connection.connect()
+    try:
+        client = connection.connect()
+    except ConnectionError as e:
+        if mi_version not in _ClientFactory(Mock(spec=Connection))._client_map:
+            pytest.skip(
+                f"Client not available for Granta MI v{'.'.join(str(v) for v in mi_version)}"
+            )
+        else:
+            raise e
+
     yield client
 
     all_lists = client.get_all_lists()
@@ -163,7 +193,20 @@ def training_database_guid(admin_client) -> str:
 def design_data_table_guid(admin_client) -> str:
     table_api = SchemaTablesApi(admin_client)
     table_response = table_api.get_tables(database_key=DB_KEY)
-    return next(table.guid for table in table_response.tables if table.name == TABLE_NAME)
+    return next(
+        table.guid for table in table_response.tables if table.name == DEISGN_DATA_TABLE_NAME
+    )
+
+
+@pytest.fixture(scope="session")
+def tensile_statistical_data_table_guid(admin_client) -> str:
+    table_api = SchemaTablesApi(admin_client)
+    table_response = table_api.get_tables(database_key=DB_KEY)
+    return next(
+        table.guid
+        for table in table_response.tables
+        if table.name == TENSILE_STATISTICAL_DATA_TABLE_NAME
+    )
 
 
 @pytest.fixture(scope="session")
@@ -211,6 +254,46 @@ def resolvable_items(admin_client, training_database_guid) -> List[RecordListIte
     ]
 
 
+@pytest.fixture(scope="session")
+def rs_database_guid(admin_client) -> str:
+    schema_api = SchemaDatabasesApi(admin_client)
+    dbs = schema_api.get_all_databases()
+    return next(db.guid for db in dbs.databases if db.key == DB_KEY_RS)
+
+
+@pytest.fixture(scope="session")
+def resolvable_rs_items(admin_client, rs_database_guid) -> List[RecordListItem]:
+    """Get all records in the MI_Restricted_Substances database and use them to create
+    a list of RecordListItems which can be added to a list.
+    """
+    search_api = SearchApi(admin_client)
+
+    is_any_record_type = GsaRecordPropertyCriterion(
+        _property=GsaSearchableRecordProperty.RECORDTYPE,
+        inner_criterion=GsaDiscreteTextValuesDatumCriterion(
+            any=["Record", "Generic", "Folder"],
+        ),
+    )
+    search_body = GsaSearchRequest(
+        criterion=GsaBooleanCriterion(
+            all=[is_any_record_type],
+        )
+    )
+    search_results = search_api.database_search(
+        database_key=DB_KEY_RS,
+        body=search_body,
+    )
+    return [
+        RecordListItem(
+            rs_database_guid,
+            result.table_guid,
+            result.record_history_guid,
+        )
+        for result in search_results.results
+        if result.database_key == DB_KEY_RS
+    ]
+
+
 @pytest.fixture
 def new_list_with_one_resolvable_item(admin_client, new_list, resolvable_items) -> RecordList:
     admin_client.add_items_to_list(new_list, [resolvable_items[0]])
@@ -238,7 +321,7 @@ def unreleased_item(admin_client) -> RecordListItem:
     |
     |-- Version 1 (unreleased) *
     """
-    record_creator = RecordCreator(admin_client, DB_KEY, TABLE_NAME, "UnreleasedRecord")
+    record_creator = RecordCreator(admin_client, DB_KEY, DEISGN_DATA_TABLE_NAME, "UnreleasedRecord")
     record_creator.get_or_create_version(GsaVersionState.UNRELEASED, 1)
     return RecordListItem(
         database_guid=record_creator.database_guid,
@@ -255,7 +338,7 @@ def released_item(admin_client) -> RecordListItem:
     |
     |-- Version 1 (released) *
     """
-    record_creator = RecordCreator(admin_client, DB_KEY, TABLE_NAME, "ReleasedRecord")
+    record_creator = RecordCreator(admin_client, DB_KEY, DEISGN_DATA_TABLE_NAME, "ReleasedRecord")
     record_creator.get_or_create_version(GsaVersionState.RELEASED, 1)
     return RecordListItem(
         database_guid=record_creator.database_guid,
@@ -273,7 +356,7 @@ def superseded_item(admin_client) -> RecordListItem:
     |-- Version 1 (superseded) *
     |-- Version 2 (released)
     """
-    record_creator = RecordCreator(admin_client, DB_KEY, TABLE_NAME, "SupersededRecord")
+    record_creator = RecordCreator(admin_client, DB_KEY, DEISGN_DATA_TABLE_NAME, "SupersededRecord")
     record_creator.get_or_create_version(GsaVersionState.SUPERSEDED, 1)
     return RecordListItem(
         database_guid=record_creator.database_guid,
@@ -291,7 +374,9 @@ def draft_superseded_item(admin_client) -> RecordListItem:
     |-- Version 1 (released) *
     |-- Version 2 (unreleased)
     """
-    record_creator = RecordCreator(admin_client, DB_KEY, TABLE_NAME, "DraftSupersededRecord")
+    record_creator = RecordCreator(
+        admin_client, DB_KEY, DEISGN_DATA_TABLE_NAME, "DraftSupersededRecord"
+    )
     record_creator.get_or_create_version(GsaVersionState.RELEASED, 1)
     return RecordListItem(
         database_guid=record_creator.database_guid,
@@ -309,7 +394,9 @@ def draft_superseding_item(admin_client) -> RecordListItem:
     |-- Version 1 (released)
     |-- Version 2 (unreleased) *
     """
-    record_creator = RecordCreator(admin_client, DB_KEY, TABLE_NAME, "DraftSupersededRecord")
+    record_creator = RecordCreator(
+        admin_client, DB_KEY, DEISGN_DATA_TABLE_NAME, "DraftSupersededRecord"
+    )
     record_creator.get_or_create_version(GsaVersionState.UNRELEASED, 2)
     return RecordListItem(
         database_guid=record_creator.database_guid,
@@ -662,3 +749,40 @@ def cleanup_basic(basic_client) -> List[RecordList]:
     yield to_delete
     for record_list in to_delete:
         basic_client.delete_list(record_list)
+
+
+@pytest.fixture(autouse=True)
+def process_integration_marks(request, mi_version):
+    """Processes the arguments provided to the integration mark.
+
+    If the mark is initialized with the kwarg ``mi_versions``, the value must be of type list[tuple[int, int]], where
+    the tuples contain compatible major and minor release versions of Granta MI. If the version is specified for a test
+    case and the Granta MI version being tested against is not in the provided list, the test case is skipped.
+
+    Also handles test-specific behavior, for example if a certain Granta MI version and test are incompatible and need
+    to be skipped or xfailed.
+    """
+
+    # Argument validation
+    if not request.node.get_closest_marker("integration"):
+        # No integration marker anywhere in the stack
+        return
+
+    if mi_version is None:
+        # An MI version number was not provided
+        return
+
+    # Process integration mark arguments
+    mark: pytest.Mark = request.node.get_closest_marker("integration")
+    if not mark.kwargs:
+        # Mark not initialized with any keyword arguments
+        return
+    allowed_versions = mark.kwargs.get("mi_versions")
+    if allowed_versions is None:
+        return
+    if not isinstance(allowed_versions, list):
+        raise TypeError("mi_versions argument type must be of type 'list'")
+    if mi_version not in allowed_versions:
+        formatted_version = ".".join(str(x) for x in mi_version)
+        skip_message = f'Test skipped for Granta MI release version "{formatted_version}"'
+        pytest.skip(skip_message)

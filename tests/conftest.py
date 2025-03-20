@@ -30,9 +30,9 @@ from ansys.grantami.recordlists import Connection, RecordListItem
 from inputs.examples import examples_as_strings
 
 MI_VERSION_RESPONSE = {
-    "binary_compatibility_version": "99.99.0.0",
+    "binaryCompatibilityVersion": "99.99.0.0",
     "version": "99.99.9.9",
-    "major_minor_version": "99.99",
+    "majorMinorVersion": "99.99",
 }
 
 
@@ -84,3 +84,17 @@ def many_unresolvable_items():
             )
         )
     return results
+
+
+def pytest_addoption(parser):
+    parser.addoption("--mi-version", action="store", default=None)
+
+
+@pytest.fixture(scope="session")
+def mi_version(request):
+    mi_version: str = request.config.getoption("--mi-version")
+    parsed_version = mi_version.split(".")
+    if len(parsed_version) != 2:
+        raise ValueError("--mi-version argument must be a MAJOR.MINOR version number")
+    version_number = tuple(int(e) for e in parsed_version)
+    return version_number

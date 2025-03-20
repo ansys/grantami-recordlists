@@ -25,13 +25,14 @@ from typing import Any
 from unittest.mock import Mock, call, patch
 import uuid
 
-from ansys.grantami.serverapi_openapi import GsaListItemRecordReference
-from ansys.grantami.serverapi_openapi.models import (
+from ansys.grantami.serverapi_openapi.v2025r1 import models as v2025r1models
+from ansys.grantami.serverapi_openapi.v2025r2.models import (
     GsaListAction,
     GsaListAuditLogItem,
     GsaListAuditLogSearchRequest,
     GsaListBooleanCriterion,
     GsaListItem,
+    GsaListItemRecordReference,
     GsaListsUserOrGroup,
     GsaRecordListHeader,
     GsaRecordListSearchCriterion,
@@ -314,7 +315,7 @@ class TestSearchCriterion:
             is criterion.contains_records_in_integration_schemas
         )
         assert dto.contains_records_in_tables is criterion.contains_records_in_tables
-        assert dto.contains_records is Unset
+        assert dto.contains_records is None
         assert dto.user_can_add_or_remove_items is criterion.user_can_add_or_remove_items
 
     def test_search_criterion_contains_records_dto_mapping(self):
@@ -342,7 +343,7 @@ class TestSearchCriterion:
         assert record_dto.record_version == record_item.record_version
 
     @pytest.mark.parametrize("prop_name", ["match_all", "match_any"])
-    def test_simple_boolean_criterion_dto_mapping(self, prop_name):
+    def test_simple_boolean_criterion_to_mapping(self, prop_name):
         crit_a_dto = Mock()
         crit_a = Mock(spec=SearchCriterion)
         crit_a.attach_mock(Mock(return_value=crit_a_dto), "_to_model")
@@ -439,6 +440,253 @@ class TestSearchCriterion:
 
     def test_search_criterion_repr(self):
         assert repr(SearchCriterion()) == "<SearchCriterion ...>"
+
+
+class TestSearchCriterion2025R1Variants:
+    def test_search_criterion_dto_mapping(self):
+        # Check one to one mapping between idiomatic class and DTO using ids of mock attributes
+        criterion = Mock(
+            spec=SearchCriterion,
+            user_role=UserRole.CURATOR,
+            contains_records=None,
+            contains_records_in_databases=None,
+        )
+
+        dto = SearchCriterion._to_2025r1_model(criterion)
+
+        assert isinstance(dto, v2025r1models.GsaRecordListSearchCriterion)
+        assert dto.name_contains is criterion.name_contains
+        assert dto.user_role == v2025r1models.GsaUserRole.CURATOR
+        assert dto.is_published is criterion.is_published
+        assert dto.is_awaiting_approval is criterion.is_awaiting_approval
+        assert dto.is_internal_use is criterion.is_internal_use
+        assert dto.is_revision is criterion.is_revision
+        assert dto.contains_records_in_databases is criterion.contains_records_in_databases
+        assert (
+            dto.contains_records_in_integration_schemas
+            is criterion.contains_records_in_integration_schemas
+        )
+        assert dto.contains_records_in_tables is criterion.contains_records_in_tables
+        assert dto.contains_records is None
+        assert dto.user_can_add_or_remove_items is criterion.user_can_add_or_remove_items
+
+    def test_search_criterion_contains_records_single_value_dto_mapping(self):
+        database_guid = str(uuid.uuid4())
+        record_history_guid = str(uuid.uuid4())
+
+        record_item = RecordListItem(
+            database_guid=database_guid,
+            table_guid=str(uuid.uuid4()),
+            record_history_guid=record_history_guid,
+            record_version=4,
+        )
+
+        # Check one to one mapping between idiomatic class and DTO using ids of mock attributes
+        criterion = Mock(
+            spec=SearchCriterion,
+            user_role=UserRole.CURATOR,
+            contains_records=[record_item],
+            contains_records_in_databases=None,
+        )
+
+        dto = SearchCriterion._to_2025r1_model(criterion)
+
+        assert isinstance(dto, v2025r1models.GsaRecordListSearchCriterion)
+        assert isinstance(dto.contains_records, list)
+        assert len(dto.contains_records) == 1
+
+        dto_record_history_guid = dto.contains_records[0]
+        assert isinstance(dto_record_history_guid, str)
+        assert dto_record_history_guid == record_history_guid
+
+        dto_database_guid = dto.contains_records_in_databases[0]
+        assert isinstance(dto_database_guid, str)
+        assert dto_database_guid == database_guid
+
+    def test_search_criterion_contains_records_in_databases_dto_mapping(self):
+        database_guid_1 = str(uuid.uuid4())
+        database_guid_2 = str(uuid.uuid4())
+
+        # Check one to one mapping between idiomatic class and DTO using ids of mock attributes
+        criterion = Mock(
+            spec=SearchCriterion,
+            user_role=UserRole.CURATOR,
+            contains_records=None,
+            contains_records_in_databases=[database_guid_1, database_guid_2],
+        )
+
+        dto = SearchCriterion._to_model(criterion)
+
+        assert isinstance(dto, GsaRecordListSearchCriterion)
+        assert dto.contains_records is None
+        assert isinstance(dto.contains_records_in_databases, list)
+        assert len(dto.contains_records_in_databases) == 2
+
+        database_guid_dto_1 = dto.contains_records_in_databases[0]
+        assert isinstance(database_guid_dto_1, str)
+        assert database_guid_dto_1 == database_guid_1
+
+        database_guid_dto_2 = dto.contains_records_in_databases[1]
+        assert isinstance(database_guid_dto_2, str)
+        assert database_guid_dto_2 == database_guid_2
+
+    def test_search_criterion_contains_records_multiple_values_dto_mapping(self):
+        database_guid = str(uuid.uuid4())
+        record_history_guid_1 = str(uuid.uuid4())
+        record_history_guid_2 = str(uuid.uuid4())
+
+        record_item_1 = RecordListItem(
+            database_guid=database_guid,
+            table_guid=str(uuid.uuid4()),
+            record_history_guid=record_history_guid_1,
+            record_version=4,
+        )
+
+        record_item_2 = RecordListItem(
+            database_guid=database_guid,
+            table_guid=str(uuid.uuid4()),
+            record_history_guid=record_history_guid_2,
+            record_version=4,
+        )
+
+        # Check one to one mapping between idiomatic class and DTO using ids of mock attributes
+        criterion = Mock(
+            spec=SearchCriterion,
+            user_role=UserRole.CURATOR,
+            contains_records=[record_item_1, record_item_2],
+            contains_records_in_databases=None,
+        )
+
+        dto = SearchCriterion._to_2025r1_model(criterion)
+
+        assert isinstance(dto, v2025r1models.GsaRecordListSearchCriterion)
+        assert isinstance(dto.contains_records, list)
+        assert len(dto.contains_records) == 2
+
+        dto_record_history_guid_1 = dto.contains_records[0]
+        assert isinstance(dto_record_history_guid_1, str)
+        assert dto_record_history_guid_1 == record_history_guid_1
+
+        dto_record_history_guid_2 = dto.contains_records[1]
+        assert isinstance(dto_record_history_guid_2, str)
+        assert dto_record_history_guid_2 == record_history_guid_2
+
+        assert len(dto.contains_records_in_databases) == 1
+        dto_database_guid = dto.contains_records_in_databases[0]
+        assert isinstance(dto_database_guid, str)
+        assert dto_database_guid == database_guid
+
+    def test_search_criterion_contains_records_and_contains_records_in_databases_raises_exception(
+        self,
+    ):
+        database_guid = str(uuid.uuid4())
+
+        record_item = RecordListItem(
+            database_guid=database_guid,
+            table_guid=str(uuid.uuid4()),
+            record_history_guid=str(uuid.uuid4()),
+            record_version=4,
+        )
+
+        criterion = Mock(
+            spec=SearchCriterion,
+            user_role=UserRole.CURATOR,
+            contains_records=[record_item],
+            contains_records_in_databases=database_guid,
+        )
+
+        with pytest.raises(
+            ValueError,
+            match="'contains_records_in_database' and 'contains_records' cannot be specified for the same criterion",
+        ):
+            SearchCriterion._to_2025r1_model(criterion)
+
+    def test_search_criterion_contains_records_different_databases_raises_exception(self):
+        database_guid_1 = str(uuid.uuid4())
+        database_guid_2 = str(uuid.uuid4())
+
+        record_item_1 = RecordListItem(
+            database_guid=database_guid_1,
+            table_guid=str(uuid.uuid4()),
+            record_history_guid=str(uuid.uuid4()),
+            record_version=4,
+        )
+
+        record_item_2 = RecordListItem(
+            database_guid=database_guid_2,
+            table_guid=str(uuid.uuid4()),
+            record_history_guid=str(uuid.uuid4()),
+            record_version=4,
+        )
+
+        criterion = Mock(
+            spec=SearchCriterion,
+            user_role=UserRole.CURATOR,
+            contains_records=[record_item_1, record_item_2],
+            contains_records_in_databases=None,
+        )
+
+        with pytest.raises(
+            ValueError,
+            match="objects provided to the 'contains_records' property must contain the same database GUID",
+        ):
+            SearchCriterion._to_2025r1_model(criterion)
+
+    @pytest.mark.parametrize("prop_name", ["match_all", "match_any"])
+    def test_simple_boolean_criterion_2025r1_dto_mapping(self, prop_name):
+        crit_a_dto = Mock()
+        crit_a = Mock(spec=SearchCriterion)
+        crit_a.attach_mock(Mock(return_value=crit_a_dto), "_to_2025r1_model")
+        crit_b_dto = Mock()
+        crit_b = Mock(spec=SearchCriterion)
+        crit_b.attach_mock(Mock(return_value=crit_b_dto), "_to_2025r1_model")
+
+        criterion = BooleanCriterion(**{prop_name: [crit_a, crit_b]})
+
+        dto = BooleanCriterion._to_2025r1_model(criterion)
+
+        assert getattr(dto, prop_name) == [crit_a_dto, crit_b_dto]
+
+    def test_nested_boolean_criterion_2025r1_dto_mapping(self):
+        database_guid = str(uuid.uuid4())
+        record_history_guid = str(uuid.uuid4())
+
+        record_item = RecordListItem(
+            database_guid=database_guid,
+            table_guid=str(uuid.uuid4()),
+            record_history_guid=record_history_guid,
+            record_version=4,
+        )
+
+        criterion = BooleanCriterion(
+            match_any=[
+                BooleanCriterion(
+                    match_all=[
+                        SearchCriterion(
+                            name_contains="A",
+                            user_role=UserRole.OWNER,
+                            contains_records=[record_item],
+                        )
+                    ],
+                ),
+            ]
+        )
+
+        criterion_dto = criterion._to_2025r1_model()
+
+        assert isinstance(criterion_dto, v2025r1models.GsaListBooleanCriterion)
+        assert criterion_dto.match_all is None
+        assert len(criterion_dto.match_any) == 1
+        nested_boolean_criterion = criterion_dto.match_any[0]
+        assert isinstance(nested_boolean_criterion, v2025r1models.GsaListBooleanCriterion)
+        assert nested_boolean_criterion.match_any is None
+        assert len(nested_boolean_criterion.match_all) == 1
+        leaf_criterion = nested_boolean_criterion.match_all[0]
+        assert isinstance(leaf_criterion, v2025r1models.GsaRecordListSearchCriterion)
+        assert leaf_criterion.name_contains == "A"
+        assert leaf_criterion.user_role == v2025r1models.GsaUserRole.OWNER
+        assert leaf_criterion.contains_records == [record_history_guid]
+        assert leaf_criterion.contains_records_in_databases == [database_guid]
 
 
 class TestSearchResult:
