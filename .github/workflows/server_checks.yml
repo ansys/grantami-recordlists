@@ -88,6 +88,8 @@ jobs:
             url: "TEST_SERVER_25R1_URL"
           - name: "AZURE_VM_NAME_24R2"
             url: "TEST_SERVER_24R2_URL"
+          - name: "AZURE_VM_NAME_24R1"
+            url: "TEST_SERVER_24R1_URL"
     steps:
       - name: "Checkout the repository"
         uses: actions/checkout@v4
