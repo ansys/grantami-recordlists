@@ -81,60 +81,71 @@ def list_password_no_permissions() -> str:
 @pytest.fixture(scope="session")
 def admin_client(
     sl_url, list_admin_username, list_admin_password, list_name, mi_version
-) -> RecordListsApiClient:
+) -> RecordListsApiClient | None:
     """
     Fixture providing a real ApiClient to run integration tests against an instance of Granta MI
     Server API.
     On teardown, deletes all lists named using the fixture `list_name`.
+
+    If client cannot be created because an unsupported Granta MI version is under test, instead yield
+    None and skip teardown. Tests that rely on a client being successfully generated should be
+    skipped via the 'mi_version' argument to the integration mark.
     """
     connection = Connection(sl_url).with_credentials(list_admin_username, list_admin_password)
+
+    skip_teardown = False
     try:
         client = connection.connect()
     except ConnectionError as e:
         if mi_version not in _ClientFactory(Mock(spec=Connection))._client_map:
-            pytest.skip(
-                f"Client not available for Granta MI v{'.'.join(str(v) for v in mi_version)}"
-            )
+            client = None
+            skip_teardown = True
         else:
             raise e
 
     yield client
 
-    all_lists = client.get_all_lists()
-    for record_list in all_lists:
-        if list_name in record_list.name:
-            client.delete_list(record_list)
+    if not skip_teardown:
+        all_lists = client.get_all_lists()
+        for record_list in all_lists:
+            if list_name in record_list.name:
+                client.delete_list(record_list)
 
 
 @pytest.fixture(scope="session")
 def basic_client(
     sl_url, list_username_no_permissions, list_password_no_permissions, list_name, mi_version
-) -> RecordListsApiClient:
+) -> RecordListsApiClient | None:
     """
     Fixture providing a real ApiClient to run integration tests against an instance of Granta MI
     Server API.
     On teardown, deletes all lists named using the fixture `list_name`.
+
+    If client cannot be created because an unsupported Granta MI version is under test, instead yield
+    None and skip teardown. Tests that rely on a client being successfully generated should be
+    skipped via the 'mi_version' argument to the integration mark.
     """
     connection = Connection(sl_url).with_credentials(
         list_username_no_permissions,
         list_password_no_permissions,
     )
+    skip_teardown = False
     try:
         client = connection.connect()
     except ConnectionError as e:
         if mi_version not in _ClientFactory(Mock(spec=Connection))._client_map:
-            pytest.skip(
-                f"Client not available for Granta MI v{'.'.join(str(v) for v in mi_version)}"
-            )
+            client = None
+            skip_teardown = True
         else:
             raise e
 
     yield client
 
-    all_lists = client.get_all_lists()
-    for record_list in all_lists:
-        if list_name in record_list.name:
-            client.delete_list(record_list)
+    if not skip_teardown:
+        all_lists = client.get_all_lists()
+        for record_list in all_lists:
+            if list_name in record_list.name:
+                client.delete_list(record_list)
 
 
 @pytest.fixture(scope="session")
