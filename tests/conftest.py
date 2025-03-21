@@ -93,6 +93,8 @@ def pytest_addoption(parser):
 @pytest.fixture(scope="session")
 def mi_version(request):
     mi_version: str = request.config.getoption("--mi-version")
+    if not mi_version:
+        return None
     parsed_version = mi_version.split(".")
     if len(parsed_version) != 2:
         raise ValueError("--mi-version argument must be a MAJOR.MINOR version number")
