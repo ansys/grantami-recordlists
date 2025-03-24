@@ -769,8 +769,11 @@ def process_integration_marks(request, mi_version):
         return
 
     if mi_version is None:
-        # An MI version number was not provided
-        return
+        # We didn't get an MI version. If integration tests were requested, an MI version must be provided. Raise
+        # an exception to fail all integration tests.
+        raise ValueError(
+            "No Granta MI Version provided to pytest. Specify Granta MI version with --mi-version MAJOR.MINOR."
+        )
 
     # Process integration mark arguments
     mark: pytest.Mark = request.node.get_closest_marker("integration")
