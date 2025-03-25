@@ -1,18 +1,53 @@
 version: 2
+registries:
+  python-pyansys-private-pypi:
+    type: python-index
+    url: https://pkgs.dev.azure.com/pyansys/_packaging/pyansys/pypi/simple/
+    username: dependabot@ansys.com
+    password: ${{ secrets.PYANSYS_PYPI_PRIVATE_PAT }}
+  python-pyansys-private-pypi-guid:
+    type: python-index
+    url: https://pkgs.dev.azure.com/pyansys/_packaging/705e121a-9631-49f5-8aaf-c7142856f923/simple/
+    username: dependabot@ansys.com
+    password: ${{ secrets.PYANSYS_PYPI_PRIVATE_PAT }}
 updates:
   - package-ecosystem: "pip"
+    insecure-external-code-execution: allow
     directory: "/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+    registries: "*"
     labels:
       - "maintenance"
       - "dependencies"
     versioning-strategy: increase-if-necessary
+    groups:
+      doc-deps:
+        patterns:
+        - "*sphinx*"
+        - "numpydoc"
+        - "jupytext"
+        - "ipykernel"
+        - "enum-tools"
+      dev-deps:
+        patterns:
+        - "pytest*"
+        - "mypy"
+        - "requests-mock"
+        - "pre-commit"
+      src-deps:
+        patterns:
+        - "ansys-openapi-common"
+        - "ansys-grantami-serverapi-openapi"
 
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
     labels:
       - "maintenance"
       - "dependencies"
+    groups:
+       actions:
+          patterns:
+            - "*"
