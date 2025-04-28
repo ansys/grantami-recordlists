@@ -252,7 +252,10 @@ class RecordCreator:
             compare_version_state(required_state, GsaVersionState.RELEASED)
             and required_version == 1
         ):
-            if self.latest_state == GsaVersionState.UNRELEASED.name and self.latest_version == 1:
+            if (
+                compare_version_state(self.latest_state, GsaVersionState.UNRELEASED)
+                and self.latest_version == 1
+            ):
                 self._release()
                 return self.latest_version_guid
 
