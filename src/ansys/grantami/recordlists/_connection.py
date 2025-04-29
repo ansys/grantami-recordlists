@@ -25,16 +25,19 @@ import concurrent.futures
 import functools
 from typing import Iterable, Iterator, List, Optional, Tuple, Union, cast
 
-from ansys.grantami.serverapi_openapi.v2025r2 import api, models  # type: ignore[import-not-found]
-from ansys.openapi.common import (  # type: ignore[import-not-found]
+from ansys.grantami.serverapi_openapi.v2025r1 import api as v2025r1api
+from ansys.grantami.serverapi_openapi.v2025r1 import models as v2025r1models
+from ansys.grantami.serverapi_openapi.v2025r2 import api, models
+from ansys.openapi.common import (
     ApiClient,
     ApiClientFactory,
     ApiException,
     SessionConfiguration,
     Unset,
+    Unset_Type,
     generate_user_agent,
 )
-import requests  # type: ignore[import-untyped]
+import requests
 
 from ._logger import logger
 from ._models import (
@@ -47,12 +50,6 @@ from ._models import (
     SearchResult,
     _PagedResult,
 )
-
-from ansys.grantami.serverapi_openapi.v2025r1 import (  # type: ignore[import-not-found] # isort: skip
-    api as v2025r1api,
-    models as v2025r1models,
-)
-
 
 PROXY_PATH = "/proxy/v1.svc/mi"
 AUTH_PATH = "/Health/v2.svc"
@@ -201,7 +198,7 @@ class _ClientFactory:
         return result
 
 
-class RecordListsApiClient(ApiClient):  # type: ignore[misc]
+class RecordListsApiClient(ApiClient):
     """
     Communicates with Granta MI.
 
@@ -244,6 +241,7 @@ class RecordListsApiClient(ApiClient):  # type: ignore[misc]
         """
         server_version_response = self.schema_api.get_version()
         server_version = server_version_response.major_minor_version
+        assert not isinstance(server_version, Unset_Type), "'server_version' must not be Unset"
         parsed_version = tuple([int(e) for e in server_version.split(".")])
         return cast(tuple[int, int], parsed_version)
 
@@ -260,6 +258,7 @@ class RecordListsApiClient(ApiClient):  # type: ignore[misc]
         """
         logger.info(f"Getting all lists available with connection {self}")
         record_lists = self.list_management_api.get_all_lists()
+        assert record_lists is not None, "'record_lists' must not be None"
         return [RecordList._from_model(record_list) for record_list in record_lists.lists]
 
     def get_list(self, identifier: str) -> RecordList:
@@ -279,6 +278,7 @@ class RecordListsApiClient(ApiClient):  # type: ignore[misc]
         """
         logger.info(f"Getting list with identifier {identifier} with connection {self}")
         record_list = self.list_management_api.get_list(list_identifier=identifier)
+        assert record_list is not None, "'record_list' must not be None"
         return RecordList._from_model(record_list)
 
     def search_for_lists(
@@ -312,9 +312,11 @@ class RecordListsApiClient(ApiClient):  # type: ignore[misc]
             )
         )
 
+        assert search_info is not None, "'search_info' must not be None"
         search_results = self.list_management_api.get_record_list_search_results(
             result_resource_identifier=search_info.search_result_identifier
         )
+        assert search_results is not None, "'search_results' must not be None"
         return [
             SearchResult._from_model(search_result, include_items)
             for search_result in search_results.search_results
@@ -338,6 +340,7 @@ class RecordListsApiClient(ApiClient):  # type: ignore[misc]
         """
         logger.info(f"Getting items in list {record_list} with connection {self}")
         items_response = self.list_item_api.get_list_items(list_identifier=record_list.identifier)
+        assert items_response is not None, "'items_response' must not be None"
         return [RecordListItem._from_model(item) for item in items_response.items]
 
     def get_resolvable_list_items(
@@ -425,6 +428,7 @@ class RecordListsApiClient(ApiClient):  # type: ignore[misc]
                 items=[item._to_create_list_item_model() for item in items]
             ),
         )
+        assert response_items is not None, "'response_items' must not be None"
         return [RecordListItem._from_model(item) for item in response_items.items]
 
     def remove_items_from_list(
@@ -455,6 +459,7 @@ class RecordListsApiClient(ApiClient):  # type: ignore[misc]
                 items=[item._to_delete_list_item_model() for item in items]
             ),
         )
+        assert response_items is not None, "'response_items' must not be None"
         return [RecordListItem._from_model(item) for item in response_items.items]
 
     def create_list(
@@ -487,14 +492,18 @@ class RecordListsApiClient(ApiClient):  # type: ignore[misc]
         """
         items_string = "no items" if items is None or len(items) == 0 else f"{len(items)} items"
         logger.info(f"Creating new list {name} with {items_string} with connection {self}")
+        record_list_items: models.GsaCreateRecordListItemsInfo | Unset_Type
         if items is not None:
-            items = models.GsaCreateRecordListItemsInfo(
+            record_list_items = models.GsaCreateRecordListItemsInfo(
                 items=[list_item._to_create_list_item_model() for list_item in items]
             )
+        else:
+            record_list_items = Unset
         body = models.GsaCreateRecordList(
-            name=name, description=description, notes=notes, items=items if items else Unset
+            name=name, description=description, notes=notes, items=record_list_items
         )
         created_list = self.list_management_api.create_list(body=body)
+        assert created_list is not None, "'created_list' must not be None"
         return RecordList._from_model(created_list)
 
     def delete_list(self, record_list: RecordList) -> None:
@@ -561,6 +570,7 @@ class RecordListsApiClient(ApiClient):  # type: ignore[misc]
         updated_resource = self.list_management_api.update_list(
             list_identifier=record_list.identifier, body=body
         )
+        assert updated_resource is not None, "'updated_resource' must not be None"
         return RecordList._from_model(updated_resource)
 
     def copy_list(self, record_list: RecordList) -> RecordList:
@@ -582,6 +592,7 @@ class RecordListsApiClient(ApiClient):  # type: ignore[misc]
         """
         logger.info(f"Copying list {record_list} with connection {self}")
         list_copy = self.list_management_api.copy_list(list_identifier=record_list.identifier)
+        assert list_copy is not None, "'list_copy' must not be None"
         return RecordList._from_model(list_copy)
 
     def revise_list(self, record_list: RecordList) -> RecordList:
@@ -607,6 +618,7 @@ class RecordListsApiClient(ApiClient):  # type: ignore[misc]
         list_revision = self.list_management_api.revise_list(
             list_identifier=record_list.identifier,
         )
+        assert list_revision is not None, "'list_revision' must not be None"
         return RecordList._from_model(list_revision)
 
     def request_list_approval(self, record_list: RecordList) -> RecordList:
@@ -630,6 +642,7 @@ class RecordListsApiClient(ApiClient):  # type: ignore[misc]
         updated_list = self.list_management_api.request_approval(
             list_identifier=record_list.identifier,
         )
+        assert updated_list is not None, "'updated_list' must not be None"
         return RecordList._from_model(updated_list)
 
     def publish_list(self, record_list: RecordList) -> RecordList:
@@ -656,6 +669,7 @@ class RecordListsApiClient(ApiClient):  # type: ignore[misc]
         updated_list = self.list_management_api.publish_list(
             list_identifier=record_list.identifier,
         )
+        assert updated_list is not None, "'updated_list' must not be None"
         return RecordList._from_model(updated_list)
 
     def unpublish_list(self, record_list: RecordList) -> RecordList:
@@ -681,6 +695,7 @@ class RecordListsApiClient(ApiClient):  # type: ignore[misc]
         updated_list = self.list_management_api.unpublish_list(
             list_identifier=record_list.identifier,
         )
+        assert updated_list is not None, "'updated_list' must not be None"
         return RecordList._from_model(updated_list)
 
     def cancel_list_approval_request(self, record_list: RecordList) -> RecordList:
@@ -705,6 +720,7 @@ class RecordListsApiClient(ApiClient):  # type: ignore[misc]
         updated_list = self.list_management_api.reset_awaiting_approval(
             list_identifier=record_list.identifier,
         )
+        assert updated_list is not None, "'updated_list' must not be None"
         return RecordList._from_model(updated_list)
 
     def subscribe_to_list(self, record_list: RecordList) -> None:
@@ -808,12 +824,14 @@ class RecordListsApiClient(ApiClient):  # type: ignore[misc]
                 criterion.paging_options = paging_options
 
                 response = client.list_audit_log_api.run_list_audit_log_search(body=criterion)
+                assert response is not None, "'response' must not be None"
                 page_id = response.search_result_identifier
                 logger.info(f"Received page with id {page_id}")
 
                 results = client.list_audit_log_api.get_list_audit_log_search_results(
                     result_resource_identifier=page_id,
                 )
+                assert results is not None, "'results' must not be None"
                 return [AuditLogItem._from_model(item) for item in results]
 
             partial_func = functools.partial(get_next_page, self, criterion._to_model())
@@ -822,12 +840,14 @@ class RecordListsApiClient(ApiClient):  # type: ignore[misc]
         logger.info("No paging options were specified, fetching all results...")
         gsa_criterion = criterion._to_model()
         response = self.list_audit_log_api.run_list_audit_log_search(body=gsa_criterion)
+        assert response is not None, "'response' must not be None"
         result_id = response.search_result_identifier
         logger.info(f"Received result with id {result_id}")
 
         search_result = self.list_audit_log_api.get_list_audit_log_search_results(
             result_resource_identifier=result_id
         )
+        assert search_result is not None, "'search_result' must not be None"
         return iter(AuditLogItem._from_model(item) for item in search_result)
 
 
@@ -850,10 +870,10 @@ class RecordLists2025R12024R2ApiClient(RecordListsApiClient):
     ):
         super().__init__(session, service_layer_url, configuration)
 
-        self.list_management_api = v2025r1api.ListManagementApi(self)
-        self.list_item_api = v2025r1api.ListItemApi(self)
-        self.list_permissions_api = v2025r1api.ListPermissionsApi(self)
-        self.list_audit_log_api = None
+        self.list_management_api = v2025r1api.ListManagementApi(self)  # type: ignore[assignment]
+        self.list_item_api = v2025r1api.ListItemApi(self)  # type: ignore[assignment]
+        self.list_permissions_api = v2025r1api.ListPermissionsApi(self)  # type: ignore[assignment]
+        self.list_audit_log_api = None  # type: ignore[assignment]
 
     def search_for_lists(
         self, criterion: Union[BooleanCriterion, SearchCriterion], include_items: bool = False
@@ -880,15 +900,18 @@ class RecordLists2025R12024R2ApiClient(RecordListsApiClient):
             include_record_list_items=include_items,
         )
         search_info = self.list_management_api.run_record_lists_search(
-            body=v2025r1models.GsaRecordListSearchRequest(
+            body=v2025r1models.GsaRecordListSearchRequest(  # type: ignore[arg-type]
                 search_criterion=criterion._to_2025r1_model(),
-                response_options=response_options,
+                response_options=cast(
+                    v2025r1models.gsa_response_options.GsaResponseOptions, response_options
+                ),
             )
         )
-        assert search_info is not None
+        assert search_info is not None, "'search_info' must not be None"
         search_results = self.list_management_api.get_record_list_search_results(
             result_resource_identifier=search_info.search_result_identifier
         )
+        assert search_results is not None, "'search_results' must not be None"
         return [
             SearchResult._from_model(search_result, include_items)
             for search_result in search_results.search_results
@@ -933,9 +956,11 @@ class _ItemResolver:
         return resolvable_items
 
     def _get_db_map(self) -> defaultdict[str, List[str]]:
-        dbs = self._db_schema_api.get_all_databases()
+        db_info = self._db_schema_api.get_all_databases()
         db_map: defaultdict[str, List[str]] = defaultdict(list)
-        for db in dbs.databases:
+        assert isinstance(db_info.databases, str), "'db_info.databases' must be of type 'list'"
+        for db in db_info.databases:
+            assert isinstance(db.guid, str), "'db.guid' must be of type 'str'"
             db_map[db.guid].append(db.key)
         return db_map
 
@@ -989,6 +1014,7 @@ class _ItemResolver:
                     mode="read" if self._read_mode else None,
                 )
                 if item.record_version is not None:
+                    assert history_info is not None, "'history_info' must not be 'None'"
                     for version in history_info.record_versions:
                         if item.record_version == version.version_number:
                             return True
@@ -1001,7 +1027,7 @@ class _ItemResolver:
             return True
 
 
-class Connection(ApiClientFactory):  # type: ignore[misc]
+class Connection(ApiClientFactory):
     """
     Connects to a Granta MI ServerAPI instance.
 

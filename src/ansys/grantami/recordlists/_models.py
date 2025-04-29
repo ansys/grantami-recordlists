@@ -25,14 +25,11 @@ from datetime import datetime
 from enum import Enum
 from typing import Callable, Iterator, List, Optional, Set, Type, TypeVar, Union
 
-from ansys.grantami.serverapi_openapi.v2025r2 import models  # type: ignore[import-not-found]
-from ansys.openapi.common import Unset  # type: ignore[import-not-found]
+from ansys.grantami.serverapi_openapi.v2025r1 import models as models2025r1
+from ansys.grantami.serverapi_openapi.v2025r2 import models
+from ansys.openapi.common import Unset, Unset_Type
 
 from ._logger import logger
-
-from ansys.grantami.serverapi_openapi.v2025r1 import (  # type: ignore[import-not-found] # isort: skip
-    models as models2025r1,
-)
 
 
 class RecordList:
@@ -184,6 +181,14 @@ class RecordList:
         """Instantiate from a model defined in the auto-generated client code."""
         logger.debug("Deserializing RecordList from API response")
         logger.debug(model.to_str())
+
+        assert not isinstance(
+            model.parent_record_list_identifier, Unset_Type
+        ), "'model.parent_record_list_identifier' must not be Unset"
+        assert not isinstance(
+            model.published_timestamp, Unset_Type
+        ), "'model.published_timestamp' must not be Unset"
+
         instance = cls(
             name=model.name,
             identifier=model.identifier,
@@ -978,7 +983,9 @@ class AuditLogSearchCriterion:
         logger.debug("Serializing AuditLogSearchCriterion to API model")
         model = models.GsaListAuditLogSearchRequest(
             list_actions_to_include=(
-                [item.value for item in self.filter_actions] if self.filter_actions else None
+                [models.GsaListAction[item.value] for item in self.filter_actions]
+                if self.filter_actions
+                else None
             ),
             list_identifiers=self.filter_record_lists,
         )
@@ -1059,7 +1066,14 @@ class AuditLogItem:
         logger.debug("Deserializing AuditLogItem from API response")
         logger.debug(model.to_str())
 
+        assert (
+            model.list_identifier
+        ), "GsaListAuditLogItem must have populated list_identifier attribute"
+        assert (
+            model.initiating_user
+        ), "GsaListAuditLogItem must have populated initiating_user attribute"
         assert model.timestamp, "GsaListAuditLogItem must have populated timestamp attribute"
+        assert model.action, "GsaListAuditLogItem must have populated action attribute"
 
         return cls(
             list_identifier=model.list_identifier,
