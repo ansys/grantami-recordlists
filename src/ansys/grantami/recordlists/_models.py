@@ -27,7 +27,7 @@ from typing import Callable, Iterator, List, Optional, Set, Type, TypeVar, Union
 
 from ansys.grantami.serverapi_openapi.v2025r1 import models as models2025r1
 from ansys.grantami.serverapi_openapi.v2025r2 import models
-from ansys.openapi.common import Unset, Unset_Type
+from ansys.openapi.common import Unset
 
 from ._logger import logger
 
@@ -181,14 +181,6 @@ class RecordList:
         """Instantiate from a model defined in the auto-generated client code."""
         logger.debug("Deserializing RecordList from API response")
         logger.debug(model.to_str())
-
-        assert not isinstance(
-            model.parent_record_list_identifier, Unset_Type
-        ), "'model.parent_record_list_identifier' must not be Unset"
-        assert not isinstance(
-            model.published_timestamp, Unset_Type
-        ), "'model.published_timestamp' must not be Unset"
-
         instance = cls(
             name=model.name,
             identifier=model.identifier,
@@ -202,11 +194,13 @@ class RecordList:
             internal_use=model.internal_use,
             last_modified_timestamp=model.last_modified_timestamp,
             last_modified_user=UserOrGroup._from_model(model.last_modified_user),
-            published_timestamp=model.published_timestamp,
+            published_timestamp=model.published_timestamp if model.published_timestamp else None,
             published_user=(
                 UserOrGroup._from_model(model.published_user) if model.published_user else None
             ),
-            parent_record_list_identifier=model.parent_record_list_identifier,
+            parent_record_list_identifier=(
+                model.parent_record_list_identifier if model.parent_record_list_identifier else None
+            ),
         )
         return instance
 
@@ -983,7 +977,7 @@ class AuditLogSearchCriterion:
         logger.debug("Serializing AuditLogSearchCriterion to API model")
         model = models.GsaListAuditLogSearchRequest(
             list_actions_to_include=(
-                [models.GsaListAction[item.value] for item in self.filter_actions]
+                [models.GsaListAction(item.value) for item in self.filter_actions]
                 if self.filter_actions
                 else None
             ),

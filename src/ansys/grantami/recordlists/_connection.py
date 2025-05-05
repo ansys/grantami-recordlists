@@ -958,7 +958,7 @@ class _ItemResolver:
     def _get_db_map(self) -> defaultdict[str, List[str]]:
         db_info = self._db_schema_api.get_all_databases()
         db_map: defaultdict[str, List[str]] = defaultdict(list)
-        assert isinstance(db_info.databases, str), "'db_info.databases' must be of type 'list'"
+        assert isinstance(db_info.databases, list), "'db_info.databases' must be of type 'list'"
         for db in db_info.databases:
             assert isinstance(db.guid, str), "'db.guid' must be of type 'str'"
             db_map[db.guid].append(db.key)
