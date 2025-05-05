@@ -905,6 +905,7 @@ class AuditLogAction(str, Enum):
     LISTPUBLISHED = models.GsaListAction.LISTPUBLISHED.value
     LISTUNPUBLISHED = models.GsaListAction.LISTUNPUBLISHED.value
     LISTREVISIONCREATED = models.GsaListAction.LISTREVISIONCREATED.value
+    LISTREVISIONDISCARDED = models.GsaListAction.LISTREVISIONDISCARDED.value
     USERSUBSCRIBED = models.GsaListAction.USERSUBSCRIBED.value
     USERUNSUBSCRIBED = models.GsaListAction.USERUNSUBSCRIBED.value
     LISTCURATORADDED = models.GsaListAction.LISTCURATORADDED.value

@@ -715,6 +715,12 @@ class TestSearchResult:
 
 
 class TestAuditLogSearchCriterion:
+    def test_all_enum_members(self):
+        values = {item.value for item in AuditLogAction}
+        swagger_values = {action.value for action in GsaListAction}
+
+        assert values == swagger_values
+
     def test_search_criterion_dto_mapping(self):
         list_guid_1 = str(uuid.uuid4())
         list_guid_2 = str(uuid.uuid4())
@@ -730,7 +736,7 @@ class TestAuditLogSearchCriterion:
         assert dto.paging_options == Unset
 
         for filter_action in criterion.filter_actions:
-            assert filter_action.value in dto.list_actions_to_include
+            assert filter_action.value in [action.value for action in dto.list_actions_to_include]
         assert dto.list_identifiers == [list_guid_1, list_guid_2]
 
     def test_search_criterion_dto_default_mapping(self):
