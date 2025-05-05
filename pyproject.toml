@@ -54,6 +54,8 @@ pytest = "^8.0.0"
 pytest-cov = "^6.0.0"
 requests-mock = "^1.10.0"
 pre-commit = "^4.0.1"
+mypy = "^1.8.0"
+types-requests = "^2.26"
 
 [[tool.poetry.source]]
 name = "private-pypi"
