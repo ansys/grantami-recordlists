@@ -67,7 +67,7 @@ jobs:
           documentation-html
           documentation-pdf
 
-  smoke-tests:
+  build-wheelhouse:
     name: "Build wheelhouse for latest Python versions"
     runs-on: ${{ matrix.os }}
     needs: code-style
@@ -85,7 +85,7 @@ jobs:
   tests:
     name: "Tests Python ${{ matrix.python-version }}, ${{ matrix.os }}"
     runs-on: ${{ matrix.os }}
-    needs: smoke-tests
+    needs: build-wheelhouse
     strategy:
       matrix:
        os: [ubuntu-latest, windows-latest]
