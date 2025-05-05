@@ -716,10 +716,10 @@ class TestSearchResult:
 
 class TestAuditLogSearchCriterion:
     def test_all_enum_members(self):
-        values = {item.value for item in AuditLogAction}
+        local_values = {action.value for action in AuditLogAction}
         swagger_values = {action.value for action in GsaListAction}
 
-        assert values == swagger_values
+        assert local_values == swagger_values
 
     def test_search_criterion_dto_mapping(self):
         list_guid_1 = str(uuid.uuid4())
