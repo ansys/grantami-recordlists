@@ -770,10 +770,10 @@ class RecordListsApiClient(ApiClient):  # type: ignore[misc]
         self, criterion: AuditLogSearchCriterion, page_size: Optional[int] = 100
     ) -> Iterator[AuditLogItem]:
         """
-        Fetch audit log entries, filtered by a search criterion.
+        Fetch all audit log entries for all lists that are visible to the current user, filtered by a search criterion.
 
-        If the ``criterion`` parameter does not specify a list identifier, then the results will be limited to the lists
-        that are visible to the current user.
+        If the search criterion does not specify a list identifier, then all actions relating to deleted lists are
+        excluded.
 
         Performs an HTTP request against the Granta MI Server API.
 
