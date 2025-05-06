@@ -762,7 +762,7 @@ class RecordListsApiClient(ApiClient):
 
     def get_all_audit_log_entries(self, page_size: Optional[int] = 100) -> Iterator[AuditLogItem]:
         """
-        Fetch all audit log entries that are visible to the current user.
+        Fetch all audit log entries for all lists that are visible to the current user.
 
         Performs an HTTP request against the Granta MI Server API.
 
@@ -786,7 +786,10 @@ class RecordListsApiClient(ApiClient):
         self, criterion: AuditLogSearchCriterion, page_size: Optional[int] = 100
     ) -> Iterator[AuditLogItem]:
         """
-        Fetch audit log entries, filtered by a search criterion.
+        Fetch all audit log entries for all lists that are visible to the current user, filtered by a search criterion.
+
+        If the search criterion does not specify a list identifier, then all actions relating to deleted lists are
+        excluded.
 
         Performs an HTTP request against the Granta MI Server API.
 
