@@ -23,10 +23,9 @@ from abc import ABC, abstractmethod
 from collections import defaultdict
 import concurrent.futures
 import functools
+import types
 from typing import Iterable, Iterator, List, Optional, Tuple, Union, cast
 
-from ansys.grantami.serverapi_openapi.v2024r2 import api as v2024r2api
-from ansys.grantami.serverapi_openapi.v2024r2 import models as v2024r2models
 from ansys.grantami.serverapi_openapi.v2025r1 import api as v2025r1api
 from ansys.grantami.serverapi_openapi.v2025r1 import models as v2025r1models
 from ansys.grantami.serverapi_openapi.v2025r2 import api as v2025r2api
@@ -67,10 +66,9 @@ class _ClientFactory:
         self._client_builder = client_builder
 
         self._client_map = {
-            # 2025 R2 bindings introduce new audit log and record-based searching
-            (25, 2): (_RecordListsApiClient2025R2, v2025r2models),
-            (25, 1): (_RecordListsApiClient2025R1, v2025r1models),
-            (24, 2): (_RecordListsApiClient2024R2, v2024r2models),
+            (25, 2): _RecordListsApiClient2025R2,
+            (25, 1): _RecordListsApiClient2025R1,
+            (24, 2): _RecordListsApiClient2024R2,
         }
 
     def get_client(self) -> "RecordListsApiClient":
@@ -101,13 +99,12 @@ class _ClientFactory:
             A dictionary that maps the Granta MI version number for each client to the client object
         """
         clients = {}
-        for version, (client_class, models_module) in self._client_map.items():
-            client = client_class(
+        for version, client_class in self._client_map.items():
+            client = client_class(  # type: ignore[abstract]
                 self._client_builder._session,
                 self._client_builder._base_service_layer_url,
                 self._client_builder._session_configuration,
             )
-            client.setup_client(models_module)
             clients[version] = client
         return clients
 
@@ -207,6 +204,9 @@ class RecordListsApiClient(ApiClient, ABC):
     This is an abstract class. Some methods in this class are not implemented by all Granta MI versions.
     """
 
+    _api: types.ModuleType
+    _models: types.ModuleType
+
     def __init__(
         self,
         session: requests.Session,
@@ -219,14 +219,15 @@ class RecordListsApiClient(ApiClient, ABC):
         logger.debug(f"Base Service Layer URL: {self._service_layer_url}")
         logger.debug(f"Service URL: {api_url}")
         super().__init__(session, api_url, configuration)
+        self.setup_client(self._models)
         self._instantiate_apis()
 
     def _instantiate_apis(self) -> None:
-        self.schema_api = v2025r2api.SchemaApi(self)
-        self.list_management_api = v2025r2api.ListManagementApi(self)
-        self.list_item_api = v2025r2api.ListItemApi(self)
-        self.list_permissions_api = v2025r2api.ListPermissionsApi(self)
-        self.list_audit_log_api = v2025r2api.ListAuditLogApi(self)
+        self.schema_api = self._api.SchemaApi(self)
+        self.list_management_api = self._api.ListManagementApi(self)
+        self.list_item_api = self._api.ListItemApi(self)
+        self.list_permissions_api = self._api.ListPermissionsApi(self)
+        self.list_audit_log_api = self._api.ListAuditLogApi(self)
 
     def __repr__(self) -> str:
         """Printable representation of the object."""
@@ -303,11 +304,11 @@ class RecordListsApiClient(ApiClient, ABC):
             List of record lists matching the provided criterion.
         """
         logger.info(f"Searching for lists with connection {self}")
-        response_options = v2025r2models.GsaResponseOptions(
+        response_options = self._models.GsaResponseOptions(
             include_record_list_items=include_items,
         )
         search_info = self.list_management_api.run_record_lists_search(
-            body=v2025r2models.GsaRecordListSearchRequest(
+            body=self._models.GsaRecordListSearchRequest(
                 search_criterion=criterion._to_model(),
                 response_options=response_options,
             )
@@ -425,7 +426,7 @@ class RecordListsApiClient(ApiClient, ABC):
         logger.info(f"Adding {len(items)} items to list {record_list} with connection {self}")
         response_items = self.list_item_api.add_items_to_list(
             list_identifier=record_list.identifier,
-            body=v2025r2models.GsaCreateRecordListItemsInfo(
+            body=self._models.GsaCreateRecordListItemsInfo(
                 items=[item._to_create_list_item_model() for item in items]
             ),
         )
@@ -456,7 +457,7 @@ class RecordListsApiClient(ApiClient, ABC):
         logger.info(f"Removing {len(items)} items from list {record_list} with connection {self}")
         response_items = self.list_item_api.remove_items_from_list(
             list_identifier=record_list.identifier,
-            body=v2025r2models.GsaDeleteRecordListItems(
+            body=self._models.GsaDeleteRecordListItems(
                 items=[item._to_delete_list_item_model() for item in items]
             ),
         )
@@ -495,12 +496,12 @@ class RecordListsApiClient(ApiClient, ABC):
         logger.info(f"Creating new list {name} with {items_string} with connection {self}")
         record_list_items: v2025r2models.GsaCreateRecordListItemsInfo | Unset_Type
         if items is not None:
-            record_list_items = v2025r2models.GsaCreateRecordListItemsInfo(
+            record_list_items = self._models.GsaCreateRecordListItemsInfo(
                 items=[list_item._to_create_list_item_model() for list_item in items]
             )
         else:
             record_list_items = Unset
-        body = v2025r2models.GsaCreateRecordList(
+        body = self._models.GsaCreateRecordList(
             name=name, description=description, notes=notes, items=record_list_items
         )
         created_list = self.list_management_api.create_list(body=body)
@@ -561,7 +562,7 @@ class RecordListsApiClient(ApiClient, ABC):
         if name is None:
             raise ValueError(f"If provided, argument 'name' cannot be None.")
 
-        body = v2025r2models.GsaUpdateRecordListProperties()
+        body = self._models.GsaUpdateRecordListProperties()
         if name != _ArgNotProvided:
             body.name = name
         if description != _ArgNotProvided:
@@ -820,6 +821,9 @@ class RecordListsApiClient(ApiClient, ABC):
 class _RecordListsApiClient2025R2(RecordListsApiClient):
     """2025 R2 implementation of the RecordListsApiClient interface."""
 
+    _api = v2025r2api
+    _models = v2025r2models
+
     def __init__(
         self,
         session: requests.Session,
@@ -849,7 +853,7 @@ class _RecordListsApiClient2025R2(RecordListsApiClient):
                 page_size: int,
                 start_index: int,
             ) -> List[AuditLogItem]:
-                paging_options = v2025r2models.GsaListsPagingOptions(
+                paging_options = self._models.GsaListsPagingOptions(
                     page_size=page_size, start_index=start_index
                 )
                 criterion.paging_options = paging_options
@@ -885,6 +889,9 @@ class _RecordListsApiClient2025R2(RecordListsApiClient):
 class _RecordListsApiClient2025R1(RecordListsApiClient):
     """2025 R1 implementation of the RecordListsApiClient interface."""
 
+    _api = v2025r1api
+    _models = v2025r1models
+
     def __init__(
         self,
         session: requests.Session,
@@ -895,11 +902,11 @@ class _RecordListsApiClient2025R1(RecordListsApiClient):
         super().__init__(session, service_layer_url, configuration)
 
     def _instantiate_apis(self) -> None:
-        self.schema_api = v2025r1api.SchemaApi(self)  # type: ignore[assignment]
-        self.list_management_api = v2025r1api.ListManagementApi(self)  # type: ignore[assignment]
-        self.list_item_api = v2025r1api.ListItemApi(self)  # type: ignore[assignment]
-        self.list_permissions_api = v2025r1api.ListPermissionsApi(self)  # type: ignore[assignment]
-        self.list_audit_log_api = None  # type: ignore[assignment]
+        self.schema_api = v2025r1api.SchemaApi(self)
+        self.list_management_api = v2025r1api.ListManagementApi(self)
+        self.list_item_api = v2025r1api.ListItemApi(self)
+        self.list_permissions_api = v2025r1api.ListPermissionsApi(self)
+        self.list_audit_log_api = None
 
     def search_for_lists(
         self, criterion: Union[BooleanCriterion, SearchCriterion], include_items: bool = False
@@ -910,7 +917,7 @@ class _RecordListsApiClient2025R1(RecordListsApiClient):
             include_record_list_items=include_items,
         )
         search_info = self.list_management_api.run_record_lists_search(
-            body=v2025r1models.GsaRecordListSearchRequest(  # type: ignore[arg-type]
+            body=v2025r1models.GsaRecordListSearchRequest(
                 search_criterion=criterion._to_2025r1_model(),
                 response_options=response_options,
             )
@@ -941,6 +948,9 @@ class _RecordListsApiClient2025R1(RecordListsApiClient):
 class _RecordListsApiClient2024R2(RecordListsApiClient):
     """2024 R2 implementation of the RecordListsApiClient interface."""
 
+    _api = v2025r1api
+    _models = v2025r1models
+
     def __init__(
         self,
         session: requests.Session,
@@ -951,11 +961,11 @@ class _RecordListsApiClient2024R2(RecordListsApiClient):
         super().__init__(session, service_layer_url, configuration)
 
     def _instantiate_apis(self) -> None:
-        self.schema_api = v2024r2api.SchemaApi(self)  # type: ignore[assignment]
-        self.list_management_api = v2024r2api.ListManagementApi(self)  # type: ignore[assignment]
-        self.list_item_api = v2024r2api.ListItemApi(self)  # type: ignore[assignment]
-        self.list_permissions_api = v2024r2api.ListPermissionsApi(self)  # type: ignore[assignment]
-        self.list_audit_log_api = None  # type: ignore[assignment]
+        self.schema_api = v2025r1api.SchemaApi(self)
+        self.list_management_api = v2025r1api.ListManagementApi(self)
+        self.list_item_api = v2025r1api.ListItemApi(self)
+        self.list_permissions_api = v2025r1api.ListPermissionsApi(self)
+        self.list_audit_log_api = None
 
     def search_for_lists(
         self, criterion: Union[BooleanCriterion, SearchCriterion], include_items: bool = False
@@ -966,7 +976,7 @@ class _RecordListsApiClient2024R2(RecordListsApiClient):
             include_record_list_items=include_items,
         )
         search_info = self.list_management_api.run_record_lists_search(
-            body=v2025r1models.GsaRecordListSearchRequest(  # type: ignore[arg-type]
+            body=v2025r1models.GsaRecordListSearchRequest(
                 search_criterion=criterion._to_2025r1_model(),
                 response_options=response_options,
             )
