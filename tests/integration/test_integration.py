@@ -40,28 +40,45 @@ from ansys.grantami.recordlists import (
     UserOrGroup,
     UserRole,
 )
-from ansys.grantami.recordlists._connection import RecordLists2025R12024R2ApiClient
+from ansys.grantami.recordlists._connection import (
+    _RecordListsApiClient2024R2,
+    _RecordListsApiClient2025R1,
+    _RecordListsApiClient2025R2,
+)
 
 pytestmark = pytest.mark.integration(mi_versions=[(25, 2), (25, 1), (24, 2)])
 
 
 class TestConnection:
     @pytest.mark.integration(mi_versions=[(25, 2)])
-    def test_latest_mi_version(self, sl_url, list_admin_username, list_admin_password):
+    def test_mi_25_2(self, sl_url, list_admin_username, list_admin_password):
         connection = Connection(sl_url).with_credentials(list_admin_username, list_admin_password)
         client = connection.connect()
         assert isinstance(client, RecordListsApiClient)
-        assert not isinstance(client, RecordLists2025R12024R2ApiClient)
+        assert isinstance(client, _RecordListsApiClient2025R2)
+        assert not isinstance(client, _RecordListsApiClient2025R1)
+        assert not isinstance(client, _RecordListsApiClient2024R2)
 
-    @pytest.mark.integration(mi_versions=[(25, 1), (24, 2)])
-    def test_older_supported_mi_version(self, sl_url, list_admin_username, list_admin_password):
+    @pytest.mark.integration(mi_versions=[(25, 1)])
+    def test_mi_25_1(self, sl_url, list_admin_username, list_admin_password):
         connection = Connection(sl_url).with_credentials(list_admin_username, list_admin_password)
         client = connection.connect()
         assert isinstance(client, RecordListsApiClient)
-        assert isinstance(client, RecordLists2025R12024R2ApiClient)
+        assert not isinstance(client, _RecordListsApiClient2025R2)
+        assert isinstance(client, _RecordListsApiClient2025R1)
+        assert not isinstance(client, _RecordListsApiClient2024R2)
+
+    @pytest.mark.integration(mi_versions=[(24, 2)])
+    def test_mi_24_2(self, sl_url, list_admin_username, list_admin_password):
+        connection = Connection(sl_url).with_credentials(list_admin_username, list_admin_password)
+        client = connection.connect()
+        assert isinstance(client, RecordListsApiClient)
+        assert not isinstance(client, _RecordListsApiClient2025R2)
+        assert not isinstance(client, _RecordListsApiClient2025R1)
+        assert isinstance(client, _RecordListsApiClient2024R2)
 
     @pytest.mark.integration(mi_versions=[(24, 1)])
-    def test_unsupported_mi_version(self, sl_url, list_admin_username, list_admin_password):
+    def test_mi_24_1_not_supported(self, sl_url, list_admin_username, list_admin_password):
         # We don't raise the expected version-specific error message because the Server API location has moved since
         # 2024 R1 was released.
         connection = Connection(sl_url).with_credentials(list_admin_username, list_admin_password)
