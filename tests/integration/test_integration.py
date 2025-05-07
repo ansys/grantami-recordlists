@@ -608,10 +608,7 @@ class TestLifeCycleNewList(TestLifeCycle):
             admin_client.unpublish_list(new_list)
         assert e.value.status_code == 400
 
-    def test_cannot_reset(self, admin_client, new_list, request, mi_version):
-        if mi_version == (25, 2):
-            marker = pytest.mark.xfail(reason="MI-21534", strict=True)
-            request.node.add_marker(marker)
+    def test_cannot_reset(self, admin_client, new_list):
         with pytest.raises(ApiException, match=self._not_awaiting_approval_error) as e:
             admin_client.cancel_list_approval_request(new_list)
         assert e.value.status_code == 400
@@ -672,10 +669,7 @@ class TestLifeCyclePublishedAndNotAwaitingApproval(TestLifeCycle):
             admin_client.unpublish_list(new_list)
         assert e.value.status_code == 400
 
-    def test_cannot_reset(self, admin_client, new_list, request, mi_version):
-        if mi_version == (25, 2):
-            marker = pytest.mark.xfail(reason="MI-21534", strict=True)
-            request.node.add_marker(marker)
+    def test_cannot_reset(self, admin_client, new_list):
         with pytest.raises(ApiException, match=self._not_awaiting_approval_error) as e:
             admin_client.cancel_list_approval_request(new_list)
         assert e.value.status_code == 400
