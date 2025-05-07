@@ -1304,7 +1304,6 @@ class TestBooleanSearch(_TestSearch):
         assert {list_personal.identifier, list_published.identifier} == ids
 
 
-@pytest.mark.integration(mi_versions=[(25, 2)])
 class TestAuditLogging:
     _name_suffix_A = "_ListA"
     _name_suffix_B = "_ListB"
@@ -1327,6 +1326,7 @@ class TestAuditLogging:
         unpublished_list = admin_client.unpublish_list(requested_list)
         admin_client.delete_list(unpublished_list)
 
+    @pytest.mark.integration(mi_versions=[(25, 2)])
     @pytest.mark.skip(reason="Current performance and network issues with getting all lists")
     def test_get_all_log_entries(self, admin_client, list_a, list_b):
         log_entries = admin_client.get_all_audit_log_entries(page_size=100)
@@ -1338,6 +1338,7 @@ class TestAuditLogging:
             assert isinstance(result.initiating_user, UserOrGroup)
             _ = uuid.UUID(result.initiating_user.identifier)
 
+    @pytest.mark.integration(mi_versions=[(25, 2)])
     @pytest.mark.parametrize("paged", (True, False))
     def test_filter_log_entries_by_list(self, admin_client, list_a, list_b, paged):
         criterion = AuditLogSearchCriterion(filter_record_lists=[list_a.identifier])
@@ -1350,6 +1351,7 @@ class TestAuditLogging:
         assert results[0].list_identifier == list_a.identifier
         assert results[0].action == AuditLogAction.LISTCREATED
 
+    @pytest.mark.integration(mi_versions=[(25, 2)])
     def test_filter_log_entries_by_list_is_ordered(self, admin_client, list_a, list_b):
         criterion = AuditLogSearchCriterion(filter_record_lists=[list_b.identifier])
         results = list(admin_client.search_for_audit_log_entries(criterion))
@@ -1363,3 +1365,20 @@ class TestAuditLogging:
         ]
         for event, action in zip(results, expected_actions):
             assert event.action == action
+
+    @pytest.mark.integration(mi_versions=[(25, 1), (24, 2)])
+    def test_search_for_audit_log_entries_not_implemented(self, admin_client):
+        criterion = AuditLogSearchCriterion()
+        with pytest.raises(
+            NotImplementedError,
+            match="This method is only supported by Granta MI 2025 R2 or later.",
+        ):
+            admin_client.search_for_audit_log_entries(criterion)
+
+    @pytest.mark.integration(mi_versions=[(25, 1), (24, 2)])
+    def test_test_get_all_log_entries_not_implemented(self, admin_client):
+        with pytest.raises(
+            NotImplementedError,
+            match="This method is only supported by Granta MI 2025 R2 or later.",
+        ):
+            admin_client.get_all_audit_log_entries()

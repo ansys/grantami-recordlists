@@ -201,7 +201,10 @@ class RecordListsApiClient(ApiClient, ABC):
     """
     Communicates with Granta MI.
 
-    This is an abstract class. Some methods in this class are not implemented by all Granta MI versions.
+    This is an abstract class. Each concrete subtype of this class corresponds to a specific Granta MI server version.
+
+    Methods are only implemented if the underlying functionality is supported by the Granta MI server version. If the
+    functionality is not available, a :class:`NotImplementedError` is raised.
     """
 
     _api: types.ModuleType
@@ -223,6 +226,11 @@ class RecordListsApiClient(ApiClient, ABC):
         self._instantiate_apis()
 
     def _instantiate_apis(self) -> None:
+        """Instantiate the APIs required by this class.
+
+        The versions of the API classes are not fixed, and depend on the api module defined in the ``_api`` class
+        variable. This method can be overridden if APIs do not exist for a certain Granta MI version.
+        """
         self.schema_api = self._api.SchemaApi(self)
         self.list_management_api = self._api.ListManagementApi(self)
         self.list_item_api = self._api.ListItemApi(self)
@@ -251,6 +259,8 @@ class RecordListsApiClient(ApiClient, ABC):
         """
         Get the details of all record lists available for the current user.
 
+        This method is available for all supported versions of Granta MI.
+
         Performs an HTTP request against the Granta MI Server API.
 
         Returns
@@ -266,6 +276,8 @@ class RecordListsApiClient(ApiClient, ABC):
     def get_list(self, identifier: str) -> RecordList:
         """
         Get the details of a record list.
+
+        This method is available for all supported versions of Granta MI.
 
         Performs an HTTP request against the Granta MI Server API.
 
@@ -288,6 +300,8 @@ class RecordListsApiClient(ApiClient, ABC):
     ) -> List[SearchResult]:
         """
         Search for record lists matching the provided criteria.
+
+        This method is available for all supported versions of Granta MI.
 
         Performs multiple HTTP requests against the Server API.
 
@@ -328,6 +342,8 @@ class RecordListsApiClient(ApiClient, ABC):
         """
         Get all items included in a record list.
 
+        This method is available for all supported versions of Granta MI.
+
         Performs an HTTP request against the Granta MI Server API.
 
         Parameters
@@ -350,6 +366,8 @@ class RecordListsApiClient(ApiClient, ABC):
     ) -> List[RecordListItem]:
         """
         Get all resolvable items included in a record list.
+
+        This method is available for all supported versions of Granta MI.
 
         If an item cannot be resolved, it will not be returned. Performs multiple HTTP requests
         against the Granta MI Server API.
@@ -407,6 +425,8 @@ class RecordListsApiClient(ApiClient, ABC):
         """
         Add items to a record list.
 
+        This method is available for all supported versions of Granta MI.
+
         Performs an HTTP request against the Granta MI Server API.
         Items are not validated against existing records on the server or existing items in the
         list.
@@ -438,6 +458,8 @@ class RecordListsApiClient(ApiClient, ABC):
     ) -> List[RecordListItem]:
         """
         Remove items from a record list.
+
+        This method is available for all supported versions of Granta MI.
 
         Performs an HTTP request against the Granta MI Server API.
         Attempting to remove items that are not in the list will not result in an error.
@@ -473,6 +495,8 @@ class RecordListsApiClient(ApiClient, ABC):
     ) -> RecordList:
         """
         Create a new record list with the provided arguments.
+
+        This method is available for all supported versions of Granta MI.
 
         Performs an HTTP request against the Granta MI Server API.
 
@@ -512,6 +536,8 @@ class RecordListsApiClient(ApiClient, ABC):
         """
         Delete a record list.
 
+        This method is available for all supported versions of Granta MI.
+
         Performs an HTTP request against the Granta MI Server API.
 
         Parameters
@@ -532,6 +558,8 @@ class RecordListsApiClient(ApiClient, ABC):
     ) -> RecordList:
         """
         Update a record list with the provided arguments.
+
+        This method is available for all supported versions of Granta MI.
 
         Performs an HTTP request against the Granta MI Server API.
 
@@ -579,6 +607,8 @@ class RecordListsApiClient(ApiClient, ABC):
         """
         Create a copy of a record list.
 
+        This method is available for all supported versions of Granta MI.
+
         Performs an HTTP request against the Granta MI Server API. The resulting list has a name
         prefixed by the original list name.
 
@@ -600,6 +630,8 @@ class RecordListsApiClient(ApiClient, ABC):
     def revise_list(self, record_list: RecordList) -> RecordList:
         """
         Revise a record list.
+
+        This method is available for all supported versions of Granta MI.
 
         Performs an HTTP request against the Granta MI Server API.
         Revising a list allows a user to create a personal copy of a published list and to modify
@@ -627,6 +659,8 @@ class RecordListsApiClient(ApiClient, ABC):
         """
         Request approval for a record list.
 
+        This method is available for all supported versions of Granta MI.
+
         Performs an HTTP request against the Granta MI Server API.
         Requesting approval updates the ``awaiting approval`` status of the record list to ``True``.
 
@@ -650,6 +684,8 @@ class RecordListsApiClient(ApiClient, ABC):
     def publish_list(self, record_list: RecordList) -> RecordList:
         """
         Publish a record list.
+
+        This method is available for all supported versions of Granta MI.
 
         Performs an HTTP request against the Granta MI Server API.
         The list must be awaiting approval and not published already. Publishing the list updates
@@ -678,6 +714,8 @@ class RecordListsApiClient(ApiClient, ABC):
         """
         Withdraw a record list.
 
+        This method is available for all supported versions of Granta MI.
+
         Performs an HTTP request against the Granta MI Server API.
         The list must be published and awaiting approval. Withdrawing the list updates
         the *published* status to False and resets the awaiting approval status.
@@ -704,6 +742,8 @@ class RecordListsApiClient(ApiClient, ABC):
         """
         Cancel a pending request for approval on a record list.
 
+        This method is available for all supported versions of Granta MI.
+
         Performs an HTTP request against the Granta MI Server API.
         The list must be awaiting approval. Cancelling the approval request resets the awaiting
         approval status to False.
@@ -729,6 +769,8 @@ class RecordListsApiClient(ApiClient, ABC):
         """
         Subscribe the current user to a record list.
 
+        This method is available for all supported versions of Granta MI.
+
         Performs an HTTP request against the Granta MI Server API.
         The list must be published.
 
@@ -746,6 +788,8 @@ class RecordListsApiClient(ApiClient, ABC):
     def unsubscribe_from_list(self, record_list: RecordList) -> None:
         """
         Unsubscribe the current user from a record list.
+
+        This method is available for all supported versions of Granta MI.
 
         Performs an HTTP request against the Granta MI Server API.
 
@@ -783,6 +827,11 @@ class RecordListsApiClient(ApiClient, ABC):
         -------
         Iterator of :class:`.AuditLogItem`
             Audit log entries.
+
+        Raises
+        ------
+        NotImplementedError
+            If this method is not supported by the Granta MI server.
         """
         pass
 
@@ -814,6 +863,11 @@ class RecordListsApiClient(ApiClient, ABC):
         -------
         Iterator of :class:`.AuditLogItem`
             Audit log entries.
+
+        Raises
+        ------
+        NotImplementedError
+            If this method is not supported by the Granta MI server.
         """
         pass
 
@@ -902,10 +956,14 @@ class _RecordListsApiClient2025R1(RecordListsApiClient):
         super().__init__(session, service_layer_url, configuration)
 
     def _instantiate_apis(self) -> None:
-        self.schema_api = v2025r1api.SchemaApi(self)
-        self.list_management_api = v2025r1api.ListManagementApi(self)
-        self.list_item_api = v2025r1api.ListItemApi(self)
-        self.list_permissions_api = v2025r1api.ListPermissionsApi(self)
+        """Override the base implementation of this module.
+
+        This is required because ``AuditLogApi`` is not available in the 2025 R1 definition.
+        """
+        self.schema_api = self._api.SchemaApi(self)
+        self.list_management_api = self._api.ListManagementApi(self)
+        self.list_item_api = self._api.ListItemApi(self)
+        self.list_permissions_api = self._api.ListPermissionsApi(self)
         self.list_audit_log_api = None
 
     def search_for_lists(
@@ -933,20 +991,20 @@ class _RecordListsApiClient2025R1(RecordListsApiClient):
         ]
 
     def get_all_audit_log_entries(self, page_size: Optional[int] = 100) -> Iterator[AuditLogItem]:
-        raise NotImplementedError(
-            "This method is only supported when using Granta MI 2025 R2 or later."
-        )
+        raise NotImplementedError("This method is only supported by Granta MI 2025 R2 or later.")
 
     def search_for_audit_log_entries(
         self, criterion: AuditLogSearchCriterion, page_size: Optional[int] = 100
     ) -> Iterator[AuditLogItem]:
-        raise NotImplementedError(
-            "This method is only supported when using Granta MI 2025 R2 or later."
-        )
+        raise NotImplementedError("This method is only supported by Granta MI 2025 R2 or later.")
 
 
 class _RecordListsApiClient2024R2(RecordListsApiClient):
-    """2024 R2 implementation of the RecordListsApiClient interface."""
+    """2024 R2 implementation of the RecordListsApiClient interface.
+
+    This module uses the 2025 R1 definition of Server API and model classes. The 2025 R1 Server API bindings are
+    identical to the 2024 R2 Server API bindings for RecordList-related APIs.
+    """
 
     _api = v2025r1api
     _models = v2025r1models
@@ -961,10 +1019,14 @@ class _RecordListsApiClient2024R2(RecordListsApiClient):
         super().__init__(session, service_layer_url, configuration)
 
     def _instantiate_apis(self) -> None:
-        self.schema_api = v2025r1api.SchemaApi(self)
-        self.list_management_api = v2025r1api.ListManagementApi(self)
-        self.list_item_api = v2025r1api.ListItemApi(self)
-        self.list_permissions_api = v2025r1api.ListPermissionsApi(self)
+        """Override the base implementation of this module.
+
+        This is required because ``AuditLogApi`` is not available in the 2024 R2 definition.
+        """
+        self.schema_api = self._api.SchemaApi(self)
+        self.list_management_api = self._api.ListManagementApi(self)
+        self.list_item_api = self._api.ListItemApi(self)
+        self.list_permissions_api = self._api.ListPermissionsApi(self)
         self.list_audit_log_api = None
 
     def search_for_lists(
@@ -992,16 +1054,12 @@ class _RecordListsApiClient2024R2(RecordListsApiClient):
         ]
 
     def get_all_audit_log_entries(self, page_size: Optional[int] = 100) -> Iterator[AuditLogItem]:
-        raise NotImplementedError(
-            "This method is only supported when using Granta MI 2025 R2 or later."
-        )
+        raise NotImplementedError("This method is only supported by Granta MI 2025 R2 or later.")
 
     def search_for_audit_log_entries(
         self, criterion: AuditLogSearchCriterion, page_size: Optional[int] = 100
     ) -> Iterator[AuditLogItem]:
-        raise NotImplementedError(
-            "This method is only supported when using Granta MI 2025 R2 or later."
-        )
+        raise NotImplementedError("This method is only supported by Granta MI 2025 R2 or later.")
 
 
 class _ItemResolver:
@@ -1135,8 +1193,7 @@ class Connection(ApiClientFactory):
     For advanced usage, including configuring session-specific properties and timeouts, see the
     :external+openapi-common:doc:`ansys-openapi-common API reference <api/index>`. Specifically, see
     the documentation for the :class:`~ansys.openapi.common.ApiClientFactory` base class and the
-    :class:`~ansys.openapi.common.SessionConfiguration` class
-
+    :class:`~ansys.openapi.common.SessionConfiguration` class.
 
     1. Create the connection builder object and specify the server to connect to.
     2. Specify the authentication method to use for the connection and provide credentials if
@@ -1183,8 +1240,9 @@ class Connection(ApiClientFactory):
         Returns
         -------
         :class:`.RecordListsApiClient`
-            Client object that can be used to connect to Granta MI and interact with the record
-            list API.
+            Client object that can be used to connect to Granta MI and interact with the record list API. The client
+            object is a subtype of :class:`.RecordListsApiClient`. The subtype returned depends on the Granta MI server
+            version.
         """
         self._validate_builder()
         client_factory = _ClientFactory(self)
