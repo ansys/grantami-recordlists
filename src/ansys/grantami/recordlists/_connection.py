@@ -833,7 +833,6 @@ class RecordListsApiClient(ApiClient, ABC):
         NotImplementedError
             If this method is not supported by the Granta MI server.
         """
-        pass
 
     @abstractmethod
     def search_for_audit_log_entries(
@@ -869,7 +868,6 @@ class RecordListsApiClient(ApiClient, ABC):
         NotImplementedError
             If this method is not supported by the Granta MI server.
         """
-        pass
 
 
 class _RecordListsApiClient2025R2(RecordListsApiClient):
