@@ -21,7 +21,7 @@
 # SOFTWARE.
 
 from types import SimpleNamespace
-from typing import Any, Type
+from typing import Any
 from unittest.mock import Mock
 import uuid
 
@@ -48,15 +48,17 @@ import pytest
 from ansys.grantami.recordlists import (
     RecordList,
     RecordListItem,
-    RecordListsApiClient,
     SearchResult,
 )
-from ansys.grantami.recordlists._connection import PROXY_PATH
+from ansys.grantami.recordlists._connection import (
+    PROXY_PATH,
+    _RecordListsApiClient2025R2,
+)
 
 
 @pytest.fixture
-def client():
-    client = RecordListsApiClient(
+def client(request):
+    client = _RecordListsApiClient2025R2(
         session=Mock(),
         service_layer_url="http://server_name/mi_servicelayer",
         configuration=Mock(),
@@ -76,19 +78,20 @@ def test_client_has_expected_api_url(client):
     assert client.api_url == "http://server_name/mi_servicelayer" + PROXY_PATH
 
 
-def test_client_repr(client):
-    assert repr(client) == "<RecordListsApiClient url: http://server_name/mi_servicelayer>"
+def test_client_25r2_repr(client):
+    assert repr(client) == "<_RecordListsApiClient2025R2 url: http://server_name/mi_servicelayer>"
 
 
 class TestClientMethod:
     _return_value: Any
-    _api: Type
+    _api_name: str
     _api_method: str
     _mock_uuid = str(uuid.uuid4())
 
     @pytest.fixture
     def api_method(self, monkeypatch):
         mocked_method = Mock(return_value=self._return_value)
+
         monkeypatch.setattr(self._api, self._api_method, mocked_method)
         return mocked_method
 

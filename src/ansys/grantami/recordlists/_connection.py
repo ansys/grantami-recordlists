@@ -19,15 +19,17 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-
+from abc import ABC, abstractmethod
 from collections import defaultdict
 import concurrent.futures
 import functools
+import types
 from typing import Iterable, Iterator, List, Optional, Tuple, Union, cast
 
 from ansys.grantami.serverapi_openapi.v2025r1 import api as v2025r1api
 from ansys.grantami.serverapi_openapi.v2025r1 import models as v2025r1models
-from ansys.grantami.serverapi_openapi.v2025r2 import api, models
+from ansys.grantami.serverapi_openapi.v2025r2 import api as v2025r2api
+from ansys.grantami.serverapi_openapi.v2025r2 import models as v2025r2models
 from ansys.openapi.common import (
     ApiClient,
     ApiClientFactory,
@@ -64,11 +66,9 @@ class _ClientFactory:
         self._client_builder = client_builder
 
         self._client_map = {
-            # 2025 R2 bindings introduce new audit log and record-based searching
-            (25, 2): (RecordListsApiClient, None),
-            # No breaking changes between Server API 2025 R1 and 2024 R2. Use the same client for both.
-            (25, 1): (RecordLists2025R12024R2ApiClient, v2025r1models),
-            (24, 2): (RecordLists2025R12024R2ApiClient, v2025r1models),
+            (25, 2): _RecordListsApiClient2025R2,
+            (25, 1): _RecordListsApiClient2025R1,
+            (24, 2): _RecordListsApiClient2024R2,
         }
 
     def get_client(self) -> "RecordListsApiClient":
@@ -99,13 +99,12 @@ class _ClientFactory:
             A dictionary that maps the Granta MI version number for each client to the client object
         """
         clients = {}
-        for version, (client_class, models_override) in self._client_map.items():
-            client = client_class(
+        for version, client_class in self._client_map.items():
+            client = client_class(  # type: ignore[abstract]
                 self._client_builder._session,
                 self._client_builder._base_service_layer_url,
                 self._client_builder._session_configuration,
             )
-            client.setup_client(models_override if models_override else models)
             clients[version] = client
         return clients
 
@@ -198,14 +197,18 @@ class _ClientFactory:
         return result
 
 
-class RecordListsApiClient(ApiClient):
+class RecordListsApiClient(ApiClient, ABC):
     """
     Communicates with Granta MI.
 
-    This class is instantiated by the
-    :class:`Connection` class and should not be instantiated
-    directly.
+    This is an abstract class. Each concrete subtype of this class corresponds to a specific Granta MI server version.
+
+    Methods are only implemented if the underlying functionality is supported by the Granta MI server version. If the
+    functionality is not available, a :class:`NotImplementedError` is raised.
     """
+
+    _api: types.ModuleType
+    _models: types.ModuleType
 
     def __init__(
         self,
@@ -216,16 +219,23 @@ class RecordListsApiClient(ApiClient):
         self._service_layer_url = service_layer_url
         api_url = service_layer_url + PROXY_PATH
 
-        logger.debug("Creating RecordListsApiClient")
         logger.debug(f"Base Service Layer URL: {self._service_layer_url}")
         logger.debug(f"Service URL: {api_url}")
-
         super().__init__(session, api_url, configuration)
-        self.list_management_api = api.ListManagementApi(self)
-        self.list_item_api = api.ListItemApi(self)
-        self.list_permissions_api = api.ListPermissionsApi(self)
-        self.list_audit_log_api = api.ListAuditLogApi(self)
-        self.schema_api = api.SchemaApi(self)
+        self.setup_client(self._models)
+        self._instantiate_apis()
+
+    def _instantiate_apis(self) -> None:
+        """Instantiate the APIs required by this class.
+
+        The versions of the API classes are not fixed, and depend on the api module defined in the ``_api`` class
+        variable. This method can be overridden if APIs do not exist for a certain Granta MI version.
+        """
+        self.schema_api = self._api.SchemaApi(self)
+        self.list_management_api = self._api.ListManagementApi(self)
+        self.list_item_api = self._api.ListItemApi(self)
+        self.list_permissions_api = self._api.ListPermissionsApi(self)
+        self.list_audit_log_api = self._api.ListAuditLogApi(self)
 
     def __repr__(self) -> str:
         """Printable representation of the object."""
@@ -249,6 +259,8 @@ class RecordListsApiClient(ApiClient):
         """
         Get the details of all record lists available for the current user.
 
+        This method is available for all supported versions of Granta MI.
+
         Performs an HTTP request against the Granta MI Server API.
 
         Returns
@@ -264,6 +276,8 @@ class RecordListsApiClient(ApiClient):
     def get_list(self, identifier: str) -> RecordList:
         """
         Get the details of a record list.
+
+        This method is available for all supported versions of Granta MI.
 
         Performs an HTTP request against the Granta MI Server API.
 
@@ -287,6 +301,8 @@ class RecordListsApiClient(ApiClient):
         """
         Search for record lists matching the provided criteria.
 
+        This method is available for all supported versions of Granta MI.
+
         Performs multiple HTTP requests against the Server API.
 
         Parameters
@@ -302,11 +318,11 @@ class RecordListsApiClient(ApiClient):
             List of record lists matching the provided criterion.
         """
         logger.info(f"Searching for lists with connection {self}")
-        response_options = models.GsaResponseOptions(
+        response_options = self._models.GsaResponseOptions(
             include_record_list_items=include_items,
         )
         search_info = self.list_management_api.run_record_lists_search(
-            body=models.GsaRecordListSearchRequest(
+            body=self._models.GsaRecordListSearchRequest(
                 search_criterion=criterion._to_model(),
                 response_options=response_options,
             )
@@ -325,6 +341,8 @@ class RecordListsApiClient(ApiClient):
     def get_list_items(self, record_list: RecordList) -> List[RecordListItem]:
         """
         Get all items included in a record list.
+
+        This method is available for all supported versions of Granta MI.
 
         Performs an HTTP request against the Granta MI Server API.
 
@@ -348,6 +366,8 @@ class RecordListsApiClient(ApiClient):
     ) -> List[RecordListItem]:
         """
         Get all resolvable items included in a record list.
+
+        This method is available for all supported versions of Granta MI.
 
         If an item cannot be resolved, it will not be returned. Performs multiple HTTP requests
         against the Granta MI Server API.
@@ -405,6 +425,8 @@ class RecordListsApiClient(ApiClient):
         """
         Add items to a record list.
 
+        This method is available for all supported versions of Granta MI.
+
         Performs an HTTP request against the Granta MI Server API.
         Items are not validated against existing records on the server or existing items in the
         list.
@@ -424,7 +446,7 @@ class RecordListsApiClient(ApiClient):
         logger.info(f"Adding {len(items)} items to list {record_list} with connection {self}")
         response_items = self.list_item_api.add_items_to_list(
             list_identifier=record_list.identifier,
-            body=models.GsaCreateRecordListItemsInfo(
+            body=self._models.GsaCreateRecordListItemsInfo(
                 items=[item._to_create_list_item_model() for item in items]
             ),
         )
@@ -436,6 +458,8 @@ class RecordListsApiClient(ApiClient):
     ) -> List[RecordListItem]:
         """
         Remove items from a record list.
+
+        This method is available for all supported versions of Granta MI.
 
         Performs an HTTP request against the Granta MI Server API.
         Attempting to remove items that are not in the list will not result in an error.
@@ -455,7 +479,7 @@ class RecordListsApiClient(ApiClient):
         logger.info(f"Removing {len(items)} items from list {record_list} with connection {self}")
         response_items = self.list_item_api.remove_items_from_list(
             list_identifier=record_list.identifier,
-            body=models.GsaDeleteRecordListItems(
+            body=self._models.GsaDeleteRecordListItems(
                 items=[item._to_delete_list_item_model() for item in items]
             ),
         )
@@ -471,6 +495,8 @@ class RecordListsApiClient(ApiClient):
     ) -> RecordList:
         """
         Create a new record list with the provided arguments.
+
+        This method is available for all supported versions of Granta MI.
 
         Performs an HTTP request against the Granta MI Server API.
 
@@ -492,14 +518,14 @@ class RecordListsApiClient(ApiClient):
         """
         items_string = "no items" if items is None or len(items) == 0 else f"{len(items)} items"
         logger.info(f"Creating new list {name} with {items_string} with connection {self}")
-        record_list_items: models.GsaCreateRecordListItemsInfo | Unset_Type
+        record_list_items: v2025r2models.GsaCreateRecordListItemsInfo | Unset_Type
         if items is not None:
-            record_list_items = models.GsaCreateRecordListItemsInfo(
+            record_list_items = self._models.GsaCreateRecordListItemsInfo(
                 items=[list_item._to_create_list_item_model() for list_item in items]
             )
         else:
             record_list_items = Unset
-        body = models.GsaCreateRecordList(
+        body = self._models.GsaCreateRecordList(
             name=name, description=description, notes=notes, items=record_list_items
         )
         created_list = self.list_management_api.create_list(body=body)
@@ -509,6 +535,8 @@ class RecordListsApiClient(ApiClient):
     def delete_list(self, record_list: RecordList) -> None:
         """
         Delete a record list.
+
+        This method is available for all supported versions of Granta MI.
 
         Performs an HTTP request against the Granta MI Server API.
 
@@ -530,6 +558,8 @@ class RecordListsApiClient(ApiClient):
     ) -> RecordList:
         """
         Update a record list with the provided arguments.
+
+        This method is available for all supported versions of Granta MI.
 
         Performs an HTTP request against the Granta MI Server API.
 
@@ -560,7 +590,7 @@ class RecordListsApiClient(ApiClient):
         if name is None:
             raise ValueError(f"If provided, argument 'name' cannot be None.")
 
-        body = models.GsaUpdateRecordListProperties()
+        body = self._models.GsaUpdateRecordListProperties()
         if name != _ArgNotProvided:
             body.name = name
         if description != _ArgNotProvided:
@@ -576,6 +606,8 @@ class RecordListsApiClient(ApiClient):
     def copy_list(self, record_list: RecordList) -> RecordList:
         """
         Create a copy of a record list.
+
+        This method is available for all supported versions of Granta MI.
 
         Performs an HTTP request against the Granta MI Server API. The resulting list has a name
         prefixed by the original list name.
@@ -598,6 +630,8 @@ class RecordListsApiClient(ApiClient):
     def revise_list(self, record_list: RecordList) -> RecordList:
         """
         Revise a record list.
+
+        This method is available for all supported versions of Granta MI.
 
         Performs an HTTP request against the Granta MI Server API.
         Revising a list allows a user to create a personal copy of a published list and to modify
@@ -625,6 +659,8 @@ class RecordListsApiClient(ApiClient):
         """
         Request approval for a record list.
 
+        This method is available for all supported versions of Granta MI.
+
         Performs an HTTP request against the Granta MI Server API.
         Requesting approval updates the ``awaiting approval`` status of the record list to ``True``.
 
@@ -648,6 +684,8 @@ class RecordListsApiClient(ApiClient):
     def publish_list(self, record_list: RecordList) -> RecordList:
         """
         Publish a record list.
+
+        This method is available for all supported versions of Granta MI.
 
         Performs an HTTP request against the Granta MI Server API.
         The list must be awaiting approval and not published already. Publishing the list updates
@@ -676,6 +714,8 @@ class RecordListsApiClient(ApiClient):
         """
         Withdraw a record list.
 
+        This method is available for all supported versions of Granta MI.
+
         Performs an HTTP request against the Granta MI Server API.
         The list must be published and awaiting approval. Withdrawing the list updates
         the *published* status to False and resets the awaiting approval status.
@@ -702,6 +742,8 @@ class RecordListsApiClient(ApiClient):
         """
         Cancel a pending request for approval on a record list.
 
+        This method is available for all supported versions of Granta MI.
+
         Performs an HTTP request against the Granta MI Server API.
         The list must be awaiting approval. Cancelling the approval request resets the awaiting
         approval status to False.
@@ -727,6 +769,8 @@ class RecordListsApiClient(ApiClient):
         """
         Subscribe the current user to a record list.
 
+        This method is available for all supported versions of Granta MI.
+
         Performs an HTTP request against the Granta MI Server API.
         The list must be published.
 
@@ -745,6 +789,8 @@ class RecordListsApiClient(ApiClient):
         """
         Unsubscribe the current user from a record list.
 
+        This method is available for all supported versions of Granta MI.
+
         Performs an HTTP request against the Granta MI Server API.
 
         Parameters
@@ -760,9 +806,12 @@ class RecordListsApiClient(ApiClient):
             list_identifier=record_list.identifier,
         )
 
+    @abstractmethod
     def get_all_audit_log_entries(self, page_size: Optional[int] = 100) -> Iterator[AuditLogItem]:
         """
         Fetch all audit log entries for all lists that are visible to the current user.
+
+        This method is only supported when using Granta MI 2025 R2 or later.
 
         Performs an HTTP request against the Granta MI Server API.
 
@@ -778,10 +827,14 @@ class RecordListsApiClient(ApiClient):
         -------
         Iterator of :class:`.AuditLogItem`
             Audit log entries.
-        """
-        criterion = AuditLogSearchCriterion()
-        return self.search_for_audit_log_entries(criterion=criterion, page_size=page_size)
 
+        Raises
+        ------
+        NotImplementedError
+            If this method is not supported by the Granta MI server.
+        """
+
+    @abstractmethod
     def search_for_audit_log_entries(
         self, criterion: AuditLogSearchCriterion, page_size: Optional[int] = 100
     ) -> Iterator[AuditLogItem]:
@@ -790,6 +843,8 @@ class RecordListsApiClient(ApiClient):
 
         If the search criterion does not specify a list identifier, then all actions relating to deleted lists are
         excluded.
+
+        This method is only supported when using Granta MI 2025 R2 or later.
 
         Performs an HTTP request against the Granta MI Server API.
 
@@ -807,7 +862,36 @@ class RecordListsApiClient(ApiClient):
         -------
         Iterator of :class:`.AuditLogItem`
             Audit log entries.
+
+        Raises
+        ------
+        NotImplementedError
+            If this method is not supported by the Granta MI server.
         """
+
+
+class _RecordListsApiClient2025R2(RecordListsApiClient):
+    """2025 R2 implementation of the RecordListsApiClient interface."""
+
+    _api = v2025r2api
+    _models = v2025r2models
+
+    def __init__(
+        self,
+        session: requests.Session,
+        service_layer_url: str,
+        configuration: SessionConfiguration,
+    ):
+        logger.debug("Creating RecordListsApiClient for Granta MI 2025 R2")
+        super().__init__(session, service_layer_url, configuration)
+
+    def get_all_audit_log_entries(self, page_size: Optional[int] = 100) -> Iterator[AuditLogItem]:
+        criterion = AuditLogSearchCriterion()
+        return self.search_for_audit_log_entries(criterion=criterion, page_size=page_size)
+
+    def search_for_audit_log_entries(
+        self, criterion: AuditLogSearchCriterion, page_size: Optional[int] = 100
+    ) -> Iterator[AuditLogItem]:
         logger.info("Fetching list audit log entries...")
 
         if page_size is not None:
@@ -817,11 +901,11 @@ class RecordListsApiClient(ApiClient):
 
             def get_next_page(
                 client: "RecordListsApiClient",
-                criterion: models.GsaListAuditLogSearchRequest,
+                criterion: v2025r2models.GsaListAuditLogSearchRequest,
                 page_size: int,
                 start_index: int,
             ) -> List[AuditLogItem]:
-                paging_options = models.GsaListsPagingOptions(
+                paging_options = self._models.GsaListsPagingOptions(
                     page_size=page_size, start_index=start_index
                 )
                 criterion.paging_options = paging_options
@@ -854,16 +938,11 @@ class RecordListsApiClient(ApiClient):
         return iter(AuditLogItem._from_model(item) for item in search_result)
 
 
-class RecordLists2025R12024R2ApiClient(RecordListsApiClient):
-    """
-    Communicates with Granta MI.
+class _RecordListsApiClient2025R1(RecordListsApiClient):
+    """2025 R1 implementation of the RecordListsApiClient interface."""
 
-    Compatibility version for Granta MI 2025 R1 and 2024 R2.
-
-    This class is instantiated by the
-    :class:`Connection` class and should not be instantiated
-    directly.
-    """
+    _api = v2025r1api
+    _models = v2025r1models
 
     def __init__(
         self,
@@ -871,43 +950,32 @@ class RecordLists2025R12024R2ApiClient(RecordListsApiClient):
         service_layer_url: str,
         configuration: SessionConfiguration,
     ):
+        logger.debug("Creating RecordListsApiClient for Granta MI 2025 R1")
         super().__init__(session, service_layer_url, configuration)
 
-        self.list_management_api = v2025r1api.ListManagementApi(self)  # type: ignore[assignment]
-        self.list_item_api = v2025r1api.ListItemApi(self)  # type: ignore[assignment]
-        self.list_permissions_api = v2025r1api.ListPermissionsApi(self)  # type: ignore[assignment]
-        self.list_audit_log_api = None  # type: ignore[assignment]
+    def _instantiate_apis(self) -> None:
+        """Override the base implementation of this module.
+
+        This is required because ``AuditLogApi`` is not available in the 2025 R1 definition.
+        """
+        self.schema_api = self._api.SchemaApi(self)
+        self.list_management_api = self._api.ListManagementApi(self)
+        self.list_item_api = self._api.ListItemApi(self)
+        self.list_permissions_api = self._api.ListPermissionsApi(self)
+        self.list_audit_log_api = None
 
     def search_for_lists(
         self, criterion: Union[BooleanCriterion, SearchCriterion], include_items: bool = False
     ) -> List[SearchResult]:
-        """
-        Search for record lists matching the provided criteria.
 
-        Performs multiple HTTP requests against the Server API.
-
-        Parameters
-        ----------
-        criterion : :class:`.SearchCriterion` | :class:`.BooleanCriterion`
-            Criterion to use to filter lists.
-        include_items: bool
-            Whether the search results should include record list items.
-
-        Returns
-        -------
-        list of :class:`.SearchResult`
-            List of record lists matching the provided criterion.
-        """
         logger.info(f"Searching for lists with connection {self}")
-        response_options = models.GsaResponseOptions(
+        response_options = v2025r1models.GsaResponseOptions(
             include_record_list_items=include_items,
         )
         search_info = self.list_management_api.run_record_lists_search(
-            body=v2025r1models.GsaRecordListSearchRequest(  # type: ignore[arg-type]
+            body=v2025r1models.GsaRecordListSearchRequest(
                 search_criterion=criterion._to_2025r1_model(),
-                response_options=cast(
-                    v2025r1models.gsa_response_options.GsaResponseOptions, response_options
-                ),
+                response_options=response_options,
             )
         )
         assert search_info is not None, "'search_info' must not be None"
@@ -920,14 +988,85 @@ class RecordLists2025R12024R2ApiClient(RecordListsApiClient):
             for search_result in search_results.search_results
         ]
 
+    def get_all_audit_log_entries(self, page_size: Optional[int] = 100) -> Iterator[AuditLogItem]:
+        raise NotImplementedError("This method is only supported by Granta MI 2025 R2 or later.")
+
+    def search_for_audit_log_entries(
+        self, criterion: AuditLogSearchCriterion, page_size: Optional[int] = 100
+    ) -> Iterator[AuditLogItem]:
+        raise NotImplementedError("This method is only supported by Granta MI 2025 R2 or later.")
+
+
+class _RecordListsApiClient2024R2(RecordListsApiClient):
+    """2024 R2 implementation of the RecordListsApiClient interface.
+
+    This module uses the 2025 R1 definition of Server API and model classes. The 2025 R1 Server API bindings are
+    identical to the 2024 R2 Server API bindings for RecordList-related APIs.
+    """
+
+    _api = v2025r1api
+    _models = v2025r1models
+
+    def __init__(
+        self,
+        session: requests.Session,
+        service_layer_url: str,
+        configuration: SessionConfiguration,
+    ):
+        logger.debug("Creating RecordListsApiClient for Granta MI 2024 R2")
+        super().__init__(session, service_layer_url, configuration)
+
+    def _instantiate_apis(self) -> None:
+        """Override the base implementation of this module.
+
+        This is required because ``AuditLogApi`` is not available in the 2024 R2 definition.
+        """
+        self.schema_api = self._api.SchemaApi(self)
+        self.list_management_api = self._api.ListManagementApi(self)
+        self.list_item_api = self._api.ListItemApi(self)
+        self.list_permissions_api = self._api.ListPermissionsApi(self)
+        self.list_audit_log_api = None
+
+    def search_for_lists(
+        self, criterion: Union[BooleanCriterion, SearchCriterion], include_items: bool = False
+    ) -> List[SearchResult]:
+
+        logger.info(f"Searching for lists with connection {self}")
+        response_options = v2025r1models.GsaResponseOptions(
+            include_record_list_items=include_items,
+        )
+        search_info = self.list_management_api.run_record_lists_search(
+            body=v2025r1models.GsaRecordListSearchRequest(
+                search_criterion=criterion._to_2025r1_model(),
+                response_options=response_options,
+            )
+        )
+        assert search_info is not None, "'search_info' must not be None"
+        search_results = self.list_management_api.get_record_list_search_results(
+            result_resource_identifier=search_info.search_result_identifier
+        )
+        assert search_results is not None, "'search_results' must not be None"
+        return [
+            SearchResult._from_model(search_result, include_items)
+            for search_result in search_results.search_results
+        ]
+
+    def get_all_audit_log_entries(self, page_size: Optional[int] = 100) -> Iterator[AuditLogItem]:
+        raise NotImplementedError("This method is only supported by Granta MI 2025 R2 or later.")
+
+    def search_for_audit_log_entries(
+        self, criterion: AuditLogSearchCriterion, page_size: Optional[int] = 100
+    ) -> Iterator[AuditLogItem]:
+        raise NotImplementedError("This method is only supported by Granta MI 2025 R2 or later.")
+
 
 class _ItemResolver:
     _max_requests = 5
 
     def __init__(self, client: ApiClient, read_mode: bool) -> None:
-        self._record_histories_api = api.RecordsRecordHistoriesApi(client)
-        self._record_versions_api = api.RecordsRecordVersionsApi(client)
-        self._db_schema_api = api.SchemaDatabasesApi(client)
+        self._record_histories_api = v2025r2api.RecordsRecordHistoriesApi(client)
+        self._record_versions_api = v2025r2api.RecordsRecordVersionsApi(client)
+        self._db_schema_api = v2025r2api.SchemaDatabasesApi(client)
         self._read_mode = read_mode
 
     def get_resolvable_items(self, all_items: List[RecordListItem]) -> List[RecordListItem]:
@@ -1052,8 +1191,7 @@ class Connection(ApiClientFactory):
     For advanced usage, including configuring session-specific properties and timeouts, see the
     :external+openapi-common:doc:`ansys-openapi-common API reference <api/index>`. Specifically, see
     the documentation for the :class:`~ansys.openapi.common.ApiClientFactory` base class and the
-    :class:`~ansys.openapi.common.SessionConfiguration` class
-
+    :class:`~ansys.openapi.common.SessionConfiguration` class.
 
     1. Create the connection builder object and specify the server to connect to.
     2. Specify the authentication method to use for the connection and provide credentials if
@@ -1100,8 +1238,9 @@ class Connection(ApiClientFactory):
         Returns
         -------
         :class:`.RecordListsApiClient`
-            Client object that can be used to connect to Granta MI and interact with the record
-            list API.
+            Client object that can be used to connect to Granta MI and interact with the record list API. The client
+            object is a subtype of :class:`.RecordListsApiClient`. The subtype returned depends on the Granta MI server
+            version.
         """
         self._validate_builder()
         client_factory = _ClientFactory(self)
