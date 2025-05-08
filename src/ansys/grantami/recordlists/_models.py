@@ -223,8 +223,8 @@ class RecordListItem:
     ----------
     database_guid : str
        GUID of the database.
-    table_guid : str
-       GUID of the table.
+    table_guid : str or None
+       GUID of the table. Must be provided if this object is added to a RecordList. Optional otherwise.
     record_history_guid : str
        Record History GUID.
     record_version : int, optional
@@ -236,12 +236,12 @@ class RecordListItem:
     def __init__(
         self,
         database_guid: str,
-        table_guid: str,
+        table_guid: str | None,
         record_history_guid: str,
         record_version: Optional[int] = None,
     ):
         self._database_guid: str = database_guid
-        self._table_guid: str = table_guid
+        self._table_guid: str | None = table_guid
         self._record_history_guid: str = record_history_guid
         self._record_version: Optional[int] = record_version
         self._record_guid: Optional[str] = None
@@ -252,7 +252,7 @@ class RecordListItem:
         return self._database_guid
 
     @property
-    def table_guid(self) -> str:
+    def table_guid(self) -> str | None:
         """Table GUID."""
         return self._table_guid
 
@@ -278,12 +278,19 @@ class RecordListItem:
         return self._record_guid
 
     def __eq__(self, other: object) -> bool:
-        """Evaluate equality by checking equality of GUIDs and record version."""
+        """Evaluate equality by checking equality of GUIDs and record version.
+
+        If either table_guid is None, table_guid is not included in the comparison.
+        """
         if not isinstance(other, RecordListItem):
             return False
         return (
             self.database_guid == other.database_guid
-            and self.table_guid == other.table_guid
+            and (
+                self.table_guid is None
+                or other.table_guid is None
+                or self.table_guid == other.table_guid
+            )
             and self.record_history_guid == other.record_history_guid
             and self.record_version == other.record_version
         )
@@ -306,6 +313,10 @@ class RecordListItem:
     def _to_create_list_item_model(self) -> models.GsaCreateListItem:
         """Generate the Create List Item DTO for use with the auto-generated client code."""
         logger.debug("Serializing RecordListItem to GsaCreateListItem API model")
+        if self.table_guid is None:
+            raise ValueError(
+                "table_guid must be provided for a RecordListItem which is added to a RecordList."
+            )
         model = models.GsaCreateListItem(
             database_guid=self.database_guid,
             table_guid=self.table_guid,

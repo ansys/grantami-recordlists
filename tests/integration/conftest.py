@@ -255,6 +255,18 @@ def resolvable_items(admin_client, training_database_guid) -> List[RecordListIte
 
 
 @pytest.fixture(scope="session")
+def resolvable_items_without_table_guids(resolvable_items) -> List[RecordListItem]:
+    return [
+        RecordListItem(
+            database_guid=item.database_guid,
+            table_guid=None,
+            record_history_guid=item.record_history_guid,
+        )
+        for item in resolvable_items
+    ]
+
+
+@pytest.fixture(scope="session")
 def rs_database_guid(admin_client) -> str:
     schema_api = SchemaDatabasesApi(admin_client)
     dbs = schema_api.get_all_databases()
