@@ -223,8 +223,10 @@ class RecordListItem:
     ----------
     database_guid : str
        GUID of the database.
-    table_guid : str
-       GUID of the table.
+    table_guid : str or None
+       Not required if this object is used as a request argument, since a database_guid,
+       record_history_guid, and optional record_version are sufficient to identify a Granta MI
+       record. Populated if this object represents part of an API response.
     record_history_guid : str
        Record History GUID.
     record_version : int, optional
@@ -236,12 +238,12 @@ class RecordListItem:
     def __init__(
         self,
         database_guid: str,
-        table_guid: str,
+        table_guid: str | None,
         record_history_guid: str,
         record_version: Optional[int] = None,
     ):
         self._database_guid: str = database_guid
-        self._table_guid: str = table_guid
+        self._table_guid: str | None = table_guid
         self._record_history_guid: str = record_history_guid
         self._record_version: Optional[int] = record_version
         self._record_guid: Optional[str] = None
@@ -252,7 +254,7 @@ class RecordListItem:
         return self._database_guid
 
     @property
-    def table_guid(self) -> str:
+    def table_guid(self) -> str | None:
         """Table GUID."""
         return self._table_guid
 
@@ -278,12 +280,19 @@ class RecordListItem:
         return self._record_guid
 
     def __eq__(self, other: object) -> bool:
-        """Evaluate equality by checking equality of GUIDs and record version."""
+        """Evaluate equality by checking equality of GUIDs and record version.
+
+        If either table_guid is None, table_guid is not included in the comparison.
+        """
         if not isinstance(other, RecordListItem):
             return False
         return (
             self.database_guid == other.database_guid
-            and self.table_guid == other.table_guid
+            and (
+                self.table_guid is None
+                or other.table_guid is None
+                or self.table_guid == other.table_guid
+            )
             and self.record_history_guid == other.record_history_guid
             and self.record_version == other.record_version
         )

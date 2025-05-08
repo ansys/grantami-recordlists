@@ -244,6 +244,7 @@ def resolvable_items(admin_client, training_database_guid) -> List[RecordListIte
         database_key=DB_KEY,
         body=search_body,
     )
+
     return [
         RecordListItem(
             training_database_guid,
@@ -251,6 +252,18 @@ def resolvable_items(admin_client, training_database_guid) -> List[RecordListIte
             result.record_history_guid,
         )
         for result in search_results.results
+    ]
+
+
+@pytest.fixture(scope="session")
+def resolvable_items_without_table_guids(resolvable_items) -> List[RecordListItem]:
+    return [
+        RecordListItem(
+            database_guid=item.database_guid,
+            table_guid=None,
+            record_history_guid=item.record_history_guid,
+        )
+        for item in resolvable_items
     ]
 
 
