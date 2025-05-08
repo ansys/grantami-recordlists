@@ -244,7 +244,6 @@ def resolvable_items(admin_client, training_database_guid) -> List[RecordListIte
         database_key=DB_KEY,
         body=search_body,
     )
-
     return [
         RecordListItem(
             training_database_guid,

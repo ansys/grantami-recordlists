@@ -104,11 +104,13 @@ class TestListItems:
         assert all(isinstance(item, RecordListItem) for item in record_list_items)
         assert len(record_list_items) == len(many_unresolvable_items)
 
-    @pytest.mark.parametrize("include_table_guid", [True, False])
-    def test_items_management(self, admin_client, new_list, unresolvable_item, include_table_guid):
+    @pytest.mark.parametrize("include_table_guid_for_deletion", [True, False])
+    def test_items_management(
+        self, admin_client, new_list, unresolvable_item, include_table_guid_for_deletion
+    ):
         another_item = RecordListItem(
             unresolvable_item.database_guid,
-            unresolvable_item.table_guid if include_table_guid else None,
+            unresolvable_item.table_guid,
             record_history_guid=str(uuid.uuid4()),
         )
         items = admin_client.add_items_to_list(new_list, items=[unresolvable_item])
@@ -120,6 +122,12 @@ class TestListItems:
         items = admin_client.remove_items_from_list(new_list, items=[unresolvable_item])
         assert items == [another_item]
 
+        if include_table_guid_for_deletion is False:
+            another_item = RecordListItem(
+                database_guid=another_item.database_guid,
+                table_guid=None,
+                record_history_guid=another_item.record_history_guid,
+            )
         items = admin_client.remove_items_from_list(new_list, items=[another_item])
         assert items == []
 

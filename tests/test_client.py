@@ -188,6 +188,11 @@ class TestAddItems(TestClientMethod):
         api_method.assert_called_once_with(list_identifier=mock_list.identifier, body=expected_body)
         assert response == [self._existing_item, new_item]
 
+    def test_add_item_without_table_guids_raises_value_error(self, client, api_method, mock_list):
+        new_item = RecordListItem("a", None, "c")
+        with pytest.raises(ValueError, match="table_guid must be provided"):
+            client.add_items_to_list(mock_list, [new_item])
+
 
 class TestRemoveItems(TestClientMethod):
     _api = ListItemApi

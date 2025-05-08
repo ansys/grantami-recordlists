@@ -224,9 +224,7 @@ class RecordListItem:
     database_guid : str
        GUID of the database.
     table_guid : str or None
-       Not required if this object is used as a request argument, since a database_guid,
-       record_history_guid, and optional record_version are sufficient to identify a Granta MI
-       record. Populated if this object represents part of an API response.
+       GUID of the table. Must be provided if this object is added to a RecordList. Optional otherwise.
     record_history_guid : str
        Record History GUID.
     record_version : int, optional
@@ -315,6 +313,10 @@ class RecordListItem:
     def _to_create_list_item_model(self) -> models.GsaCreateListItem:
         """Generate the Create List Item DTO for use with the auto-generated client code."""
         logger.debug("Serializing RecordListItem to GsaCreateListItem API model")
+        if self.table_guid is None:
+            raise ValueError(
+                "table_guid must be provided for a RecordListItem which is added to a RecordList."
+            )
         model = models.GsaCreateListItem(
             database_guid=self.database_guid,
             table_guid=self.table_guid,
