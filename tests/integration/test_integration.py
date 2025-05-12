@@ -121,7 +121,10 @@ class TestListItems:
         assert all(isinstance(item, RecordListItem) for item in record_list_items)
         assert len(record_list_items) == len(many_unresolvable_items)
 
-    def test_items_management(self, admin_client, new_list, unresolvable_item):
+    @pytest.mark.parametrize("include_table_guid_for_deletion", [True, False])
+    def test_items_management(
+        self, admin_client, new_list, unresolvable_item, include_table_guid_for_deletion
+    ):
         another_item = RecordListItem(
             unresolvable_item.database_guid,
             unresolvable_item.table_guid,
@@ -136,6 +139,12 @@ class TestListItems:
         items = admin_client.remove_items_from_list(new_list, items=[unresolvable_item])
         assert items == [another_item]
 
+        if include_table_guid_for_deletion is False:
+            another_item = RecordListItem(
+                database_guid=another_item.database_guid,
+                table_guid=None,
+                record_history_guid=another_item.record_history_guid,
+            )
         items = admin_client.remove_items_from_list(new_list, items=[another_item])
         assert items == []
 
@@ -1094,6 +1103,9 @@ class TestSearchByTable(_TestSearch):
             )
 
 
+@pytest.mark.parametrize(
+    "resolvable_item_fixture_name", ["resolvable_items", "resolvable_items_without_table_guids"]
+)
 @pytest.mark.parametrize("include_items", [True, False])
 class TestSearchByRecord(_TestSearch):
     def test_single_record_two_hits(
@@ -1101,10 +1113,12 @@ class TestSearchByRecord(_TestSearch):
         include_items,
         admin_client,
         list_name,
-        resolvable_items,
+        resolvable_item_fixture_name,
+        request,
         resolvable_rs_items,
         list_mi_training_items,
     ):
+        resolvable_items = request.getfixturevalue(resolvable_item_fixture_name)
         record_reference = resolvable_items[0]
         criteria = SearchCriterion(
             name_contains=list_name,
@@ -1129,10 +1143,12 @@ class TestSearchByRecord(_TestSearch):
         include_items,
         admin_client,
         list_name,
-        resolvable_items,
+        resolvable_item_fixture_name,
+        request,
         resolvable_rs_items,
         list_mi_training_items,
     ):
+        resolvable_items = request.getfixturevalue(resolvable_item_fixture_name)
         record_reference_1 = resolvable_items[0]
         record_reference_2 = resolvable_items[1]
 
@@ -1160,10 +1176,12 @@ class TestSearchByRecord(_TestSearch):
         include_items,
         admin_client,
         list_name,
-        resolvable_items,
+        resolvable_item_fixture_name,
+        request,
         resolvable_rs_items,
         list_mi_training_items,
     ):
+        resolvable_items = request.getfixturevalue(resolvable_item_fixture_name)
         training_record_reference = resolvable_items[0]
         rs_record_reference = resolvable_rs_items[0]
         criteria = SearchCriterion(
@@ -1191,10 +1209,12 @@ class TestSearchByRecord(_TestSearch):
         include_items,
         admin_client,
         list_name,
-        resolvable_items,
+        resolvable_item_fixture_name,
+        request,
         resolvable_rs_items,
         list_mi_training_items,
     ):
+        resolvable_items = request.getfixturevalue(resolvable_item_fixture_name)
         training_record_reference = resolvable_items[0]
         rs_record_reference = resolvable_rs_items[0]
         criteria = BooleanCriterion(

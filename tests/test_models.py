@@ -264,7 +264,7 @@ class TestItemEquality:
     RHG1 = str(uuid.uuid4())
     RV1 = 1
 
-    # Voluntary inconsistent naming scheme to highlight differences in test matrix
+    # Intentionally inconsistent naming scheme to highlight differences in test matrix
     db_guid_2 = str(uuid.uuid4())
     table_guid_2 = str(uuid.uuid4())
     record_hguid_2 = str(uuid.uuid4())

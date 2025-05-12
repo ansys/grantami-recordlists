@@ -1142,6 +1142,9 @@ class _ItemResolver:
         """
         try:
             if item.record_version is not None and item.record_guid is not None:
+                assert (
+                    item.table_guid
+                ), "RecordListItem.table_guid must be populated to check record version resolvability"
                 self._record_versions_api.get_record_version(
                     database_key=db_key,
                     table_guid=item.table_guid,
