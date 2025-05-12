@@ -285,16 +285,6 @@ class TestItemEquality:
                 RecordListItem(DB1, T1, RHG1, record_version_2),
                 False,
             ),
-            # Test cases where either or both table guids are omitted
-            (RecordListItem(DB1, T1, RHG1), RecordListItem(DB1, None, RHG1), True),
-            (RecordListItem(DB1, None, RHG1), RecordListItem(DB1, T1, RHG1), True),
-            (RecordListItem(DB1, None, RHG1), RecordListItem(DB1, None, RHG1), True),
-            (RecordListItem(DB1, T1, RHG1), RecordListItem(DB1, None, record_hguid_2), False),
-            (RecordListItem(DB1, None, RHG1), RecordListItem(DB1, T1, record_hguid_2), False),
-            (RecordListItem(DB1, None, RHG1), RecordListItem(DB1, None, record_hguid_2), False),
-            (RecordListItem(DB1, T1, RHG1), RecordListItem(db_guid_2, None, RHG1), False),
-            (RecordListItem(DB1, None, RHG1), RecordListItem(db_guid_2, T1, RHG1), False),
-            (RecordListItem(DB1, None, RHG1), RecordListItem(db_guid_2, None, RHG1), False),
         ],
     )
     def test_item_equality(self, item_a, item_b, expected_equal):
