@@ -278,11 +278,7 @@ class RecordListItem:
         return self._record_guid
 
     def __eq__(self, other: object) -> bool:
-        """Evaluate equality by checking equality of GUIDs and record version.
-
-        The table_guid is only included in the comparison if it is set on both objects. If the table_guid on either
-        object is None, table_guid is not included in the comparison.
-        """
+        """Evaluate equality by checking equality of GUIDs and record version."""
         if not isinstance(other, RecordListItem):
             return False
         return (
