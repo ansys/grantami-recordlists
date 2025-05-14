@@ -150,6 +150,15 @@ jobs:
     secrets:
       inherit
 
+  integration-checks-complete:
+    name: "Integration checks complete"
+    runs-on: ubuntu-latest
+    if: always() && ( startsWith( github.event.pull_request.head.ref, 'dependabot/') || needs.server-checks.result == 'success' )
+    needs: server-checks
+    steps:
+      - name: "Integration checks complete"
+        run: echo "Integration checks complete"
+
   doc-deploy-dev:
     name: "Deploy development documentation"
     runs-on: ubuntu-latest
