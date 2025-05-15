@@ -1,6 +1,6 @@
 # Changelog
 
-This project uses [towncrier](https://towncrier.readthedocs.io/) to generate changelogs. 
+This project uses [towncrier](https://towncrier.readthedocs.io/) to generate changelogs.
 
 The changes for the upcoming release can be found in
 <https://github.com/ansys/grantami-recordlists/tree/main/doc/changelog.d/>.
