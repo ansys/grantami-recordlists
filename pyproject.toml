@@ -107,12 +107,11 @@ namespace_packages = true
 [tool.towncrier]
 package = "ansys.grantami.recordlists"
 directory = "doc/changelog.d"
-filename = "CHANGELOG.md"
-start_string = "<!-- towncrier release notes start -->\n"
-underlines = ["", "", ""]
+filename = "doc/source/changelog.rst"
+start_string = ".. towncrier release notes start\n"
 template = "doc/changelog.d/changelog_template.jinja"
-title_format = "## [{version}](https://github.com/ansys/grantami-recordlists/releases/tag/v{version}) - {project_date}"
-issue_format = "[#{issue}](https://github.com/ansys/grantami-recordlists/pull/{issue})"
+title_format = "`{version} <https://github.com/ansys/grantami-recordlists/releases/tag/v{version}>`_ - {project_date}"
+issue_format = "`#{issue} <https://github.com/ansys/grantami-recordlists/pull/{issue}>`_"
 
 [[tool.towncrier.type]]
 directory = "added"
@@ -138,6 +137,7 @@ showcontent = true
 directory = "miscellaneous"
 name = "Miscellaneous"
 showcontent = true
+
 [[tool.towncrier.type]]
 directory = "documentation"
 name = "Documentation"

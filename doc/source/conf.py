@@ -16,6 +16,7 @@ project = "ansys-grantami-recordlists"
 project_copyright = f"(c) {datetime.now().year} ANSYS, Inc. All rights reserved"
 author = "ANSYS, Inc."
 release = version = __version__
+switcher_version = get_version_match(__version__)
 
 # Select desired logo, theme, and declare the html title
 html_logo = pyansys_logo_black
@@ -37,10 +38,18 @@ html_theme_options = {
     ],
     "switcher": {
         "json_url": f"https://{cname}/versions.json",
-        "version_match": get_version_match(__version__),
+        "version_match": switcher_version,
     },
     "check_switcher": False,
 }
+
+linkcheck_ignore = []
+# If we are on a release, we have to ignore the "release" URLs, since it is not
+# available until the release is published.
+if switcher_version != "dev":
+    linkcheck_ignore.append(
+        f"https://github.com/ansys/grantami-recordlists/releases/tag/v{__version__}"
+    )
 
 # Sphinx extensions
 extensions = [
