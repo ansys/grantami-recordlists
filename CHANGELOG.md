@@ -1,10 +1,12 @@
 # Changelog
 
-This project uses [towncrier](https://towncrier.readthedocs.io/) and the
-changes for the upcoming release can be found in
+This project uses [towncrier](https://towncrier.readthedocs.io/) to generate changelogs. 
+
+The changes for the upcoming release can be found in
 <https://github.com/ansys/grantami-recordlists/tree/main/doc/changelog.d/>.
 
-<!-- towncrier release notes start -->
+[Published release notes](https://recordlists.grantami.docs.pyansys.com/version/stable/changelog.html) can be found in the online documentation.
+
 
 ## [1.3.0](https://github.com/ansys/grantami-recordlists/releases/tag/v1.3.0) - 2024-12-13
 
