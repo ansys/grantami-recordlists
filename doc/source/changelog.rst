@@ -7,5 +7,7 @@ This document contains the release notes for the project. See release notes for 
 in `CHANGELOG.md <https://github.com/ansys/grantami-recordlists/blob/main/CHANGELOG.md>`_.
 
 .. vale off
+
 .. towncrier release notes start
+
 .. vale on
