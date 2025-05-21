@@ -55,3 +55,4 @@ Python interface to the Granta Lists API.
    api/index
    examples/index
    contributing
+   changelog
