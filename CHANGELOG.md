@@ -2,7 +2,7 @@
 
 This project uses [towncrier](https://towncrier.readthedocs.io/) to generate changelogs.
 
-Changes for releases after 1.0.0 can be found in
+Changes for releases after 1.3.0 can be found in
 <https://recordlists.grantami.docs.pyansys.com/version/stable/changelog.html>.
 
 Changes for the upcoming release can be found in
