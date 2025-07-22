@@ -21,7 +21,7 @@ The record list management capability is available to users in the following fro
 However, since these front-ends all share a common implementation in Granta MI, record lists can be
 created, accessed, and modified in any front-end with full interoperability. The documentation in
 this package is only concerned with this package. For more information about the other
-tools mentioned in the preceding list, consult the :MI_docs:`Granta MI Favorites <One_MI_Favorites/index.html>`
+tools mentioned in the preceding list, consult the :MI_docs:`Granta MI <Granta_MI/one_mi/favorites_1.html>`
 and :MI_docs:`Granta MI Materials Gateway <Materials_Gateway/index.html>`
 documentation.
 
@@ -49,4 +49,4 @@ Granta MI configuration
 
 Any use of Granta MI requires the user to have permission to access the Granta MI Server. Some
 record lists operations require additional permissions specific to record lists. For more
-information, see the :MI_docs:`Granta MI Favorites <One_MI_Favorites/index.html>` documentation.
+information, see the :MI_docs:`Granta MI <Granta_MI/one_mi/favorites_1.html>` documentation.
