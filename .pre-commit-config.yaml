@@ -25,7 +25,7 @@ repos:
     args: ["--ignore-words", "doc/styles/config/vocabularies/ANSYS/accept.txt", "--skip", "poetry.lock"]
 
 - repo: https://github.com/pre-commit/pre-commit-hooks
-  rev: v5.0.0
+  rev: v6.0.0
   hooks:
   - id: check-yaml
   - id: debug-statements
