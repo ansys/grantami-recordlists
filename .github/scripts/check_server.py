@@ -70,7 +70,7 @@ def check_status(url: str, auth_header: HTTPBasicAuth) -> bool:
 
 
 if __name__ == "__main__":
-    sl_url = os.getenv("TEST_SL_URL")
+    sl_url = os.getenv("TEST_SL_URL").strip("/")
     username = os.getenv("TEST_USER")
     password = os.getenv("TEST_PASS")
 
