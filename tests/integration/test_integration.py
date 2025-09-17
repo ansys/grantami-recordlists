@@ -46,7 +46,7 @@ from ansys.grantami.recordlists._connection import (
     _RecordListsApiClient2025R2,
 )
 
-pytestmark = pytest.mark.integration(mi_versions=[(25, 2), (25, 1), (24, 2)])
+pytestmark = pytest.mark.integration(mi_versions=[(26, 1), (25, 2), (25, 1), (24, 2)])
 
 
 class TestConnection:
@@ -1170,7 +1170,7 @@ class TestSearchByRecord(_TestSearch):
                 items=items if include_items else None,
             )
 
-    @pytest.mark.integration(mi_versions=[(25, 2)])
+    @pytest.mark.integration(mi_versions=[(26, 1), (25, 2)])
     def test_two_records_different_databases_three_hits(
         self,
         include_items,
@@ -1340,7 +1340,7 @@ class TestAuditLogging:
         unpublished_list = admin_client.unpublish_list(requested_list)
         admin_client.delete_list(unpublished_list)
 
-    @pytest.mark.integration(mi_versions=[(25, 2)])
+    @pytest.mark.integration(mi_versions=[(26, 1), (25, 2)])
     @pytest.mark.skip(reason="Current performance and network issues with getting all lists")
     def test_get_all_log_entries(self, admin_client, list_a, list_b):
         log_entries = admin_client.get_all_audit_log_entries(page_size=100)
@@ -1352,7 +1352,7 @@ class TestAuditLogging:
             assert isinstance(result.initiating_user, UserOrGroup)
             _ = uuid.UUID(result.initiating_user.identifier)
 
-    @pytest.mark.integration(mi_versions=[(25, 2)])
+    @pytest.mark.integration(mi_versions=[(26, 1), (25, 2)])
     @pytest.mark.parametrize("paged", (True, False))
     def test_filter_log_entries_by_list(self, admin_client, list_a, list_b, paged):
         criterion = AuditLogSearchCriterion(filter_record_lists=[list_a.identifier])
@@ -1365,7 +1365,7 @@ class TestAuditLogging:
         assert results[0].list_identifier == list_a.identifier
         assert results[0].action == AuditLogAction.LISTCREATED
 
-    @pytest.mark.integration(mi_versions=[(25, 2)])
+    @pytest.mark.integration(mi_versions=[(26, 1), (25, 2)])
     def test_filter_log_entries_by_list_is_ordered(self, admin_client, list_a, list_b):
         criterion = AuditLogSearchCriterion(filter_record_lists=[list_b.identifier])
         results = list(admin_client.search_for_audit_log_entries(criterion))

@@ -30,6 +30,7 @@ from ansys.grantami.serverapi_openapi.v2025r1 import api as v2025r1api
 from ansys.grantami.serverapi_openapi.v2025r1 import models as v2025r1models
 from ansys.grantami.serverapi_openapi.v2025r2 import api as v2025r2api
 from ansys.grantami.serverapi_openapi.v2025r2 import models as v2025r2models
+from ansys.grantami.serverapi_openapi.v2026r1 import api as v2026r1api
 from ansys.openapi.common import (
     ApiClient,
     ApiClientFactory,
@@ -66,6 +67,7 @@ class _ClientFactory:
         self._client_builder = client_builder
 
         self._client_map = {
+            (26, 1): _RecordListsApiClient2026R1,
             (25, 2): _RecordListsApiClient2025R2,
             (25, 1): _RecordListsApiClient2025R1,
             (24, 2): _RecordListsApiClient2024R2,
@@ -938,6 +940,19 @@ class _RecordListsApiClient2025R2(RecordListsApiClient):
         return iter(AuditLogItem._from_model(item) for item in search_result)
 
 
+class _RecordListsApiClient2026R1(_RecordListsApiClient2025R2):
+    """2026 R1 implementation of the RecordListsApiClient interface."""
+
+    def get_resolvable_list_items(
+        self, record_list: RecordList, read_mode: bool = False
+    ) -> List[RecordListItem]:
+
+        all_items = self.get_list_items(record_list)
+        logger.info("Testing if retrieved items are resolvable")
+        resolver = _ItemResolver2026R1(self, read_mode=read_mode)
+        return resolver.get_resolvable_items(all_items)
+
+
 class _RecordListsApiClient2025R1(RecordListsApiClient):
     """2025 R1 implementation of the RecordListsApiClient interface."""
 
@@ -1064,9 +1079,15 @@ class _ItemResolver:
     _max_requests = 5
 
     def __init__(self, client: ApiClient, read_mode: bool) -> None:
-        self._record_histories_api = v2025r2api.RecordsRecordHistoriesApi(client)
-        self._record_versions_api = v2025r2api.RecordsRecordVersionsApi(client)
-        self._db_schema_api = v2025r2api.SchemaDatabasesApi(client)
+        self._record_histories_api: (
+            v2025r2api.RecordsRecordHistoriesApi | v2026r1api.RecordsRecordHistoriesApi
+        ) = v2025r2api.RecordsRecordHistoriesApi(client)
+        self._record_versions_api: (
+            v2025r2api.RecordsRecordVersionsApi | v2026r1api.RecordsRecordVersionsApi
+        ) = v2025r2api.RecordsRecordVersionsApi(client)
+        self._db_schema_api: v2025r2api.SchemaDatabasesApi | v2026r1api.SchemaDatabasesApi = (
+            v2025r2api.SchemaDatabasesApi(client)
+        )
         self._read_mode = read_mode
 
     def get_resolvable_items(self, all_items: List[RecordListItem]) -> List[RecordListItem]:
@@ -1170,6 +1191,14 @@ class _ItemResolver:
             return False
         else:
             return True
+
+
+class _ItemResolver2026R1(_ItemResolver):
+    def __init__(self, client: ApiClient, read_mode: bool) -> None:
+        self._record_histories_api = v2026r1api.RecordsRecordHistoriesApi(client)
+        self._record_versions_api = v2026r1api.RecordsRecordVersionsApi(client)
+        self._db_schema_api = v2026r1api.SchemaDatabasesApi(client)
+        self._read_mode = read_mode
 
 
 class Connection(ApiClientFactory):
