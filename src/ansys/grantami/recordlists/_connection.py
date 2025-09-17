@@ -419,7 +419,7 @@ class RecordListsApiClient(ApiClient, ABC):
         """
         all_items = self.get_list_items(record_list)
         logger.info("Testing if retrieved items are resolvable")
-        resolver = _ItemResolver(self, read_mode=read_mode)
+        resolver = _ItemResolver(self, read_mode=read_mode, api_module=self._api)
         return resolver.get_resolvable_items(all_items)
 
     def add_items_to_list(
@@ -873,20 +873,8 @@ class RecordListsApiClient(ApiClient, ABC):
         """
 
 
-class _RecordListsApiClient2025R2(RecordListsApiClient):
-    """2025 R2 implementation of the RecordListsApiClient interface."""
-
-    _api = v2025r2api
-    _models = v2025r2models
-
-    def __init__(
-        self,
-        session: requests.Session,
-        service_layer_url: str,
-        configuration: SessionConfiguration,
-    ):
-        logger.debug("Creating RecordListsApiClient for Granta MI 2025 R2")
-        super().__init__(session, service_layer_url, configuration)
+class _RecordListsApiClientWithAuditLog(RecordListsApiClient, ABC):
+    """Abstract RecordListsApiClient interface with audit log support."""
 
     def get_all_audit_log_entries(self, page_size: Optional[int] = 100) -> Iterator[AuditLogItem]:
         criterion = AuditLogSearchCriterion()
@@ -941,20 +929,36 @@ class _RecordListsApiClient2025R2(RecordListsApiClient):
         return iter(AuditLogItem._from_model(item) for item in search_result)
 
 
-class _RecordListsApiClient2026R1(_RecordListsApiClient2025R2):
+class _RecordListsApiClient2025R2(_RecordListsApiClientWithAuditLog):
+    """2025 R2 implementation of the RecordListsApiClient interface."""
+
+    _api = v2025r2api
+    _models = v2025r2models
+
+    def __init__(
+        self,
+        session: requests.Session,
+        service_layer_url: str,
+        configuration: SessionConfiguration,
+    ):
+        logger.debug("Creating RecordListsApiClient for Granta MI 2025 R2")
+        super().__init__(session, service_layer_url, configuration)
+
+
+class _RecordListsApiClient2026R1(_RecordListsApiClientWithAuditLog):
     """2026 R1 implementation of the RecordListsApiClient interface."""
 
     _api = v2026r1api
     _models = v2026r1models
 
-    def get_resolvable_list_items(
-        self, record_list: RecordList, read_mode: bool = False
-    ) -> List[RecordListItem]:
-
-        all_items = self.get_list_items(record_list)
-        logger.info("Testing if retrieved items are resolvable")
-        resolver = _ItemResolver2026R1(self, read_mode=read_mode)
-        return resolver.get_resolvable_items(all_items)
+    def __init__(
+        self,
+        session: requests.Session,
+        service_layer_url: str,
+        configuration: SessionConfiguration,
+    ):
+        logger.debug("Creating RecordListsApiClient for Granta MI 2026 R1")
+        super().__init__(session, service_layer_url, configuration)
 
 
 class _RecordListsApiClient2025R1(RecordListsApiClient):
@@ -1082,16 +1086,10 @@ class _RecordListsApiClient2024R2(RecordListsApiClient):
 class _ItemResolver:
     _max_requests = 5
 
-    def __init__(self, client: ApiClient, read_mode: bool) -> None:
-        self._record_histories_api: (
-            v2025r2api.RecordsRecordHistoriesApi | v2026r1api.RecordsRecordHistoriesApi
-        ) = v2025r2api.RecordsRecordHistoriesApi(client)
-        self._record_versions_api: (
-            v2025r2api.RecordsRecordVersionsApi | v2026r1api.RecordsRecordVersionsApi
-        ) = v2025r2api.RecordsRecordVersionsApi(client)
-        self._db_schema_api: v2025r2api.SchemaDatabasesApi | v2026r1api.SchemaDatabasesApi = (
-            v2025r2api.SchemaDatabasesApi(client)
-        )
+    def __init__(self, client: ApiClient, read_mode: bool, api_module: types.ModuleType) -> None:
+        self._record_histories_api = api_module.RecordsRecordHistoriesApi(client)
+        self._record_versions_api = api_module.RecordsRecordVersionsApi(client)
+        self._db_schema_api = api_module.SchemaDatabasesApi(client)
         self._read_mode = read_mode
 
     def get_resolvable_items(self, all_items: List[RecordListItem]) -> List[RecordListItem]:
@@ -1195,14 +1193,6 @@ class _ItemResolver:
             return False
         else:
             return True
-
-
-class _ItemResolver2026R1(_ItemResolver):
-    def __init__(self, client: ApiClient, read_mode: bool) -> None:
-        self._record_histories_api = v2026r1api.RecordsRecordHistoriesApi(client)
-        self._record_versions_api = v2026r1api.RecordsRecordVersionsApi(client)
-        self._db_schema_api = v2026r1api.SchemaDatabasesApi(client)
-        self._read_mode = read_mode
 
 
 class Connection(ApiClientFactory):
