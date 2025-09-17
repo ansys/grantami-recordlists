@@ -85,6 +85,9 @@ markers = [
     be skipped if run against an incompatible Granta MI version. Deselect all integration tests with \
     'pytest -m \"not integration\"'. Specify MI version with '--mi-version MAJOR.MINOR'.""",
 ]
+filterwarnings = [
+	"error",
+]
 
 [tool.pydocstyle]
 convention = "numpy"
