@@ -31,6 +31,7 @@ from ansys.grantami.serverapi_openapi.v2025r1 import models as v2025r1models
 from ansys.grantami.serverapi_openapi.v2025r2 import api as v2025r2api
 from ansys.grantami.serverapi_openapi.v2025r2 import models as v2025r2models
 from ansys.grantami.serverapi_openapi.v2026r1 import api as v2026r1api
+from ansys.grantami.serverapi_openapi.v2026r1 import models as v2026r1models
 from ansys.openapi.common import (
     ApiClient,
     ApiClientFactory,
@@ -942,6 +943,9 @@ class _RecordListsApiClient2025R2(RecordListsApiClient):
 
 class _RecordListsApiClient2026R1(_RecordListsApiClient2025R2):
     """2026 R1 implementation of the RecordListsApiClient interface."""
+
+    _api = v2026r1api
+    _models = v2026r1models
 
     def get_resolvable_list_items(
         self, record_list: RecordList, read_mode: bool = False
