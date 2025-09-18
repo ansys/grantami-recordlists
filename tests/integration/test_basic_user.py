@@ -23,7 +23,7 @@
 from ansys.openapi.common import ApiException
 import pytest
 
-pytestmark = pytest.mark.integration(mi_versions=[(25, 2), (25, 1), (24, 2)])
+pytestmark = pytest.mark.integration(mi_versions=[(26, 1), (25, 2), (25, 1), (24, 2)])
 
 
 def test_create_list(basic_client, list_name):

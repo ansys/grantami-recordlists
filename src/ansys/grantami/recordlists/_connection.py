@@ -30,6 +30,8 @@ from ansys.grantami.serverapi_openapi.v2025r1 import api as v2025r1api
 from ansys.grantami.serverapi_openapi.v2025r1 import models as v2025r1models
 from ansys.grantami.serverapi_openapi.v2025r2 import api as v2025r2api
 from ansys.grantami.serverapi_openapi.v2025r2 import models as v2025r2models
+from ansys.grantami.serverapi_openapi.v2026r1 import api as v2026r1api
+from ansys.grantami.serverapi_openapi.v2026r1 import models as v2026r1models
 from ansys.openapi.common import (
     ApiClient,
     ApiClientFactory,
@@ -66,6 +68,7 @@ class _ClientFactory:
         self._client_builder = client_builder
 
         self._client_map = {
+            (26, 1): _RecordListsApiClient2026R1,
             (25, 2): _RecordListsApiClient2025R2,
             (25, 1): _RecordListsApiClient2025R1,
             (24, 2): _RecordListsApiClient2024R2,
@@ -416,7 +419,7 @@ class RecordListsApiClient(ApiClient, ABC):
         """
         all_items = self.get_list_items(record_list)
         logger.info("Testing if retrieved items are resolvable")
-        resolver = _ItemResolver(self, read_mode=read_mode)
+        resolver = _ItemResolver(self, read_mode=read_mode, api_module=self._api)
         return resolver.get_resolvable_items(all_items)
 
     def add_items_to_list(
@@ -870,20 +873,8 @@ class RecordListsApiClient(ApiClient, ABC):
         """
 
 
-class _RecordListsApiClient2025R2(RecordListsApiClient):
-    """2025 R2 implementation of the RecordListsApiClient interface."""
-
-    _api = v2025r2api
-    _models = v2025r2models
-
-    def __init__(
-        self,
-        session: requests.Session,
-        service_layer_url: str,
-        configuration: SessionConfiguration,
-    ):
-        logger.debug("Creating RecordListsApiClient for Granta MI 2025 R2")
-        super().__init__(session, service_layer_url, configuration)
+class _RecordListsApiClientWithAuditLog(RecordListsApiClient, ABC):
+    """Abstract RecordListsApiClient interface with audit log support."""
 
     def get_all_audit_log_entries(self, page_size: Optional[int] = 100) -> Iterator[AuditLogItem]:
         criterion = AuditLogSearchCriterion()
@@ -936,6 +927,38 @@ class _RecordListsApiClient2025R2(RecordListsApiClient):
         )
         assert search_result is not None, "'search_result' must not be None"
         return iter(AuditLogItem._from_model(item) for item in search_result)
+
+
+class _RecordListsApiClient2025R2(_RecordListsApiClientWithAuditLog):
+    """2025 R2 implementation of the RecordListsApiClient interface."""
+
+    _api = v2025r2api
+    _models = v2025r2models
+
+    def __init__(
+        self,
+        session: requests.Session,
+        service_layer_url: str,
+        configuration: SessionConfiguration,
+    ):
+        logger.debug("Creating RecordListsApiClient for Granta MI 2025 R2")
+        super().__init__(session, service_layer_url, configuration)
+
+
+class _RecordListsApiClient2026R1(_RecordListsApiClientWithAuditLog):
+    """2026 R1 implementation of the RecordListsApiClient interface."""
+
+    _api = v2026r1api
+    _models = v2026r1models
+
+    def __init__(
+        self,
+        session: requests.Session,
+        service_layer_url: str,
+        configuration: SessionConfiguration,
+    ):
+        logger.debug("Creating RecordListsApiClient for Granta MI 2026 R1")
+        super().__init__(session, service_layer_url, configuration)
 
 
 class _RecordListsApiClient2025R1(RecordListsApiClient):
@@ -1063,10 +1086,10 @@ class _RecordListsApiClient2024R2(RecordListsApiClient):
 class _ItemResolver:
     _max_requests = 5
 
-    def __init__(self, client: ApiClient, read_mode: bool) -> None:
-        self._record_histories_api = v2025r2api.RecordsRecordHistoriesApi(client)
-        self._record_versions_api = v2025r2api.RecordsRecordVersionsApi(client)
-        self._db_schema_api = v2025r2api.SchemaDatabasesApi(client)
+    def __init__(self, client: ApiClient, read_mode: bool, api_module: types.ModuleType) -> None:
+        self._record_histories_api = api_module.RecordsRecordHistoriesApi(client)
+        self._record_versions_api = api_module.RecordsRecordVersionsApi(client)
+        self._db_schema_api = api_module.SchemaDatabasesApi(client)
         self._read_mode = read_mode
 
     def get_resolvable_items(self, all_items: List[RecordListItem]) -> List[RecordListItem]:

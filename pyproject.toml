@@ -31,7 +31,7 @@ packages = [
 python = ">=3.10,<4.0"
 ansys-openapi-common = "^2.0.0"
 # Ensure PIP_INDEX_URL is not set in CI when building on release branches.
-ansys-grantami-serverapi-openapi = "~=5.0"
+ansys-grantami-serverapi-openapi = { version = "==5.1.0.dev786", source = "private-pypi" }
 requests = "^2.26"
 
 # Optional documentation dependencies
@@ -51,7 +51,7 @@ sphinx-design = "^0.6.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.0.0"
-pytest-cov = "^6.0.0"
+pytest-cov = "^7.0.0"
 requests-mock = "^1.10.0"
 pre-commit = "^4.0.1"
 mypy = "^1.8.0"
