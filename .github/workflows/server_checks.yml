@@ -75,6 +75,7 @@ concurrency:
 
 env:
   PIP_INDEX_URL: "https://${{ secrets.PYANSYS_PYPI_PRIVATE_PAT }}@pkgs.dev.azure.com/pyansys/_packaging/pyansys/pypi/simple/"
+  UV_INDEX_URL: "https://${{ secrets.PYANSYS_PYPI_PRIVATE_PAT }}@pkgs.dev.azure.com/pyansys/_packaging/pyansys/pypi/simple/"
   POETRY_HTTP_BASIC_PRIVATE_PYPI_USERNAME: "PAT"
   POETRY_HTTP_BASIC_PRIVATE_PYPI_PASSWORD: ${{ secrets.PYANSYS_PYPI_PRIVATE_PAT }}
 
@@ -138,7 +139,7 @@ jobs:
           - "windows-latest"
         server:
           - url: "TEST_SERVER_DEV_URL"
-            version: "25.2"
+            version: "26.1"
           - url: "TEST_SERVER_25R2_URL"
             version: "25.2"
           - url: "TEST_SERVER_25R1_URL"

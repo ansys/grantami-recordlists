@@ -42,7 +42,7 @@ def client():
 
 @pytest.fixture()
 def item_resolver(client):
-    resolver = _ItemResolver(client, False)
+    resolver = _ItemResolver(client, read_mode=False, api_module=Mock())
     yield resolver
 
 
