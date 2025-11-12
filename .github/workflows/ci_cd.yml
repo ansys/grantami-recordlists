@@ -43,6 +43,7 @@ jobs:
           python-package-name: ${{ env.LIBRARY_NAME }}
           dev-mode: ${{ github.ref != 'refs/heads/main' }}
           use-uv: false
+          bandit-configfile: pyproject.toml
 
   code-style:
     name: "Code style"

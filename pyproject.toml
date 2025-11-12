@@ -155,3 +155,6 @@ showcontent = true
 directory = "test"
 name = "Test"
 showcontent = true
+
+[tool.bandit]
+skips = ["B101"]
