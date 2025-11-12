@@ -16,6 +16,9 @@ on:
           - 'false'
         default: 'false'
 
+permissions:
+  contents: read
+
 env:
   MAIN_PYTHON_VERSION: '3.12'
   DOCUMENTATION_CNAME: 'recordlists.grantami.docs.pyansys.com'
@@ -169,7 +172,26 @@ jobs:
     with:
       skip-vm-management: ${{ vars.SKIP_VM_MANAGEMENT == 'true' }}
     secrets:
-      inherit
+      AZURE_APP_ID: ${{ secrets.AZURE_APP_ID }}
+      AZURE_SECRET: ${{ secrets.AZURE_SECRET }}
+      AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+      AZURE_RESOURCE_GROUP: ${{ secrets.AZURE_RESOURCE_GROUP }}
+      AZURE_VM_NAME_DEV: ${{ secrets.AZURE_VM_NAME_DEV }}
+      AZURE_VM_NAME_25R2: ${{ secrets.AZURE_VM_NAME_25R2 }}
+      AZURE_VM_NAME_25R1: ${{ secrets.AZURE_VM_NAME_25R1 }}
+      AZURE_VM_NAME_24R2: ${{ secrets.AZURE_VM_NAME_24R2 }}
+      AZURE_VM_NAME_24R1: ${{ secrets.AZURE_VM_NAME_24R1 }}
+      TEST_SERVER_DEV_URL: ${{ secrets.TEST_SERVER_DEV_URL }}
+      TEST_SERVER_25R2_URL: ${{ secrets.TEST_SERVER_25R2_URL }}
+      TEST_SERVER_25R1_URL: ${{ secrets.TEST_SERVER_25R1_URL }}
+      TEST_SERVER_24R2_URL: ${{ secrets.TEST_SERVER_24R2_URL }}
+      TEST_SERVER_24R1_URL: ${{ secrets.TEST_SERVER_24R1_URL }}
+      TEST_SERVER_ADMIN_USER: ${{ secrets.TEST_SERVER_ADMIN_USER }}
+      TEST_SERVER_ADMIN_PASS: ${{ secrets.TEST_SERVER_ADMIN_PASS }}
+      TEST_SERVER_USER: ${{ secrets.TEST_SERVER_USER }}
+      TEST_SERVER_PASS: ${{ secrets.TEST_SERVER_PASS }}
+      PYANSYS_PYPI_PRIVATE_PAT: ${{ secrets.PYANSYS_PYPI_PRIVATE_PAT }}
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
   integration-checks-complete:
     name: "Integration checks complete"
@@ -185,6 +207,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: [server-checks]
     if: github.event_name == 'push' && !contains(github.ref, 'refs/tags')
+    permissions:
+      contents: write
     steps:
       - uses: ansys/actions/doc-deploy-dev@21c9de9bee9692173780696d4a39964f20b9cfa3  # v10.1.5
         with:
@@ -256,6 +280,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: release
     if: github.event_name == 'push' && contains(github.ref, 'refs/tags')
+    permissions:
+      contents: write
     steps:
       - uses: ansys/actions/doc-deploy-stable@21c9de9bee9692173780696d4a39964f20b9cfa3  # v10.1.5
         with:
