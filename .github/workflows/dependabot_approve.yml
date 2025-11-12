@@ -1,6 +1,7 @@
 name: Dependabot auto-approve
 on: pull_request
 
+permissions: {}
 
 jobs:
   dependabot:
