@@ -73,6 +73,8 @@ concurrency:
   group: integration-server
   cancel-in-progress: false
 
+permissions: {}
+
 env:
   PIP_INDEX_URL: "https://${{ secrets.PYANSYS_PYPI_PRIVATE_PAT }}@pkgs.dev.azure.com/pyansys/_packaging/pyansys/pypi/simple/"
   UV_INDEX_URL: "https://${{ secrets.PYANSYS_PYPI_PRIVATE_PAT }}@pkgs.dev.azure.com/pyansys/_packaging/pyansys/pypi/simple/"
@@ -84,6 +86,8 @@ jobs:
   start-vm:
     name: "Start Azure VM"
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     strategy:
       matrix:
         server:
@@ -100,6 +104,8 @@ jobs:
     steps:
       - name: "Checkout the repository"
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8  # v5.0.0
+        with:
+          persist-credentials: false
 
       - name: "Start VM with Azure CLI"
         id: azure_cli
@@ -132,6 +138,8 @@ jobs:
     name: "Integration tests: ${{ matrix.os }}, v${{ matrix.server.version }}"
     runs-on: ${{ matrix.os }}
     needs: start-vm
+    permissions:
+      contents: read
     strategy:
       matrix:
         os:
@@ -154,6 +162,8 @@ jobs:
     steps:
       - name: "Checkout the repository"
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8  # v5.0.0
+        with:
+          persist-credentials: false
 
       - name: "Set up Python ${{ inputs.python-version }}"
         uses: actions/setup-python@e797f83bcb11b83ae66e0230d6156d7c80228e7c  # v6.0.0
