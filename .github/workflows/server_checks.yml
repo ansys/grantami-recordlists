@@ -73,6 +73,8 @@ concurrency:
   group: integration-server
   cancel-in-progress: false
 
+permissions: {}
+
 env:
   PIP_INDEX_URL: "https://${{ secrets.PYANSYS_PYPI_PRIVATE_PAT }}@pkgs.dev.azure.com/pyansys/_packaging/pyansys/pypi/simple/"
   UV_INDEX_URL: "https://${{ secrets.PYANSYS_PYPI_PRIVATE_PAT }}@pkgs.dev.azure.com/pyansys/_packaging/pyansys/pypi/simple/"
@@ -84,6 +86,8 @@ jobs:
   start-vm:
     name: "Start Azure VM"
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     strategy:
       matrix:
         server:
@@ -134,6 +138,8 @@ jobs:
     name: "Integration tests: ${{ matrix.os }}, v${{ matrix.server.version }}"
     runs-on: ${{ matrix.os }}
     needs: start-vm
+    permissions:
+      contents: read
     strategy:
       matrix:
         os:
