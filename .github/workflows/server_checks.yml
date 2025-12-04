@@ -182,6 +182,7 @@ jobs:
           pip install poetry 'tox<4' --disable-pip-version-check
 
       - name: "Test with tox (integration tests only)"
+        shell: bash
         run: tox -e tests -- -m "integration" --mi-version ${TEST_MI_VERSION}
         env:
           TEST_SL_URL: ${{ secrets[matrix.server.url] }}  # zizmor: ignore[overprovisioned-secrets,obfuscation] - No support in matrix for variable interpolation
