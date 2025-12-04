@@ -1,3 +1,4 @@
+name: "Server Checks and Integration Tests"
 on:
   workflow_call:
 
@@ -136,7 +137,7 @@ jobs:
           pip freeze
           python .github/scripts/check_server.py
         env:
-          TEST_SL_URL: ${{ secrets[matrix.server.url] }}
+          TEST_SL_URL: ${{ secrets[matrix.server.url] }}  # zizmor: ignore[overprovisioned-secrets,obfuscation] - No support in matrix for variable interpolation
           TEST_USER: ${{secrets.TEST_SERVER_ADMIN_USER}}
           TEST_PASS: ${{secrets.TEST_SERVER_ADMIN_PASS}}
 
@@ -183,7 +184,7 @@ jobs:
       - name: "Test with tox (integration tests only)"
         run: tox -e tests -- -m "integration" --mi-version ${{ matrix.server.version }}
         env:
-          TEST_SL_URL: ${{ secrets[matrix.server.url] }}
+          TEST_SL_URL: ${{ secrets[matrix.server.url] }}  # zizmor: ignore[overprovisioned-secrets,obfuscation] - No support in matrix for variable interpolation
           TEST_LIST_ADMIN_USER: ${{secrets.TEST_SERVER_ADMIN_USER}}
           TEST_LIST_ADMIN_PASS: ${{secrets.TEST_SERVER_ADMIN_PASS}}
           TEST_LIST_USER: ${{secrets.TEST_SERVER_USER}}
