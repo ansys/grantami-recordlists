@@ -612,10 +612,10 @@ def test_list_access(create_client_name, read_client_name, request, list_name, c
 
 
 class TestLifeCycle:
-    _not_awaiting_approval_error = "The list is not currently awaiting approval."
-    _already_awaiting_approval_error = "The list is already awaiting approval."
-    _not_published_error = "The list is not currently published"
-    _already_published_error = "The list is already published"
+    _not_awaiting_approval_error = r"The list is not currently awaiting approval\."
+    _already_awaiting_approval_error = r"The list is already awaiting approval\."
+    _not_published_error = r"The list is not currently published\."
+    _already_published_error = r"The list is already published\."
 
 
 class TestLifeCycleNewList(TestLifeCycle):
