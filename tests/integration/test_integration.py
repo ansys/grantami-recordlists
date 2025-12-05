@@ -614,6 +614,8 @@ def test_list_access(create_client_name, read_client_name, request, list_name, c
 class TestLifeCycle:
     _not_awaiting_approval_error = "The list is not currently awaiting approval."
     _already_awaiting_approval_error = "The list is already awaiting approval."
+    _not_published_error = "The list is not currently published"
+    _already_published_error = "The list is already published"
 
 
 class TestLifeCycleNewList(TestLifeCycle):
@@ -626,8 +628,15 @@ class TestLifeCycleNewList(TestLifeCycle):
             admin_client.publish_list(new_list)
         assert e.value.status_code == 400
 
-    def test_cannot_withdraw(self, admin_client, new_list):
+    @pytest.mark.integration(mi_versions=[(24, 1), (24, 2), (25, 1), (25, 2)])
+    def test_cannot_withdraw_legacy(self, admin_client, new_list):
         with pytest.raises(ApiException, match=self._not_awaiting_approval_error) as e:
+            admin_client.unpublish_list(new_list)
+        assert e.value.status_code == 400
+
+    @pytest.mark.integration(mi_versions=[(26, 1)])
+    def test_cannot_withdraw(self, admin_client, new_list):
+        with pytest.raises(ApiException, match=self._not_published_error) as e:
             admin_client.unpublish_list(new_list)
         assert e.value.status_code == 400
 
@@ -682,8 +691,15 @@ class TestLifeCyclePublishedAndNotAwaitingApproval(TestLifeCycle):
         admin_client.request_list_approval(new_list)
         admin_client.publish_list(new_list)
 
-    def test_cannot_publish(self, admin_client, new_list):
+    @pytest.mark.integration(mi_versions=[(24, 1), (24, 2), (25, 1), (25, 2)])
+    def test_cannot_publish_legacy(self, admin_client, new_list):
         with pytest.raises(ApiException, match=self._not_awaiting_approval_error) as e:
+            admin_client.publish_list(new_list)
+        assert e.value.status_code == 400
+
+    @pytest.mark.integration(mi_versions=[(26, 1)])
+    def test_cannot_publish(self, admin_client, new_list):
+        with pytest.raises(ApiException, match=self._already_published_error) as e:
             admin_client.publish_list(new_list)
         assert e.value.status_code == 400
 
