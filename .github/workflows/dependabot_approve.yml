@@ -1,23 +1,19 @@
 name: Dependabot auto-approve
 on: pull_request
-
-permissions: {}
-
+permissions:
+  {}
 jobs:
   dependabot:
-    name: "Auto-approve Dependabot PRs"
-    runs-on: ubuntu-latest
+    name: Auto-approve Dependabot PRs
     permissions:
-      pull-requests: write  # to allow the Action to approve PRs
+      pull-requests: write
+    runs-on: ubuntu-latest
     # Checking the author will prevent your Action run failing on non-Dependabot PRs
-    # Checking the repository will prevent your Action run happening on forked repos
-    if: ${{ (github.event.pull_request.user.login == 'dependabot[bot]' || github.event.pull_request.user.login == 'pre-commit-ci[bot]') && github.repository == 'ansys/grantami-recordlists' }}
+    if: ${{ github.event.pull_request.user.login == 'dependabot[bot]' || github.event.pull_request.user.login == 'pre-commit-ci[bot]' }}
     steps:
-      - name: Dependabot metadata
-        id: metadata
-        uses: dependabot/fetch-metadata@08eff52bf64351f401fb50d4972fa95b9f2c2d1b  # v2.4.0
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8  # v6.0.1
         with:
-          github-token: "${{ secrets.GITHUB_TOKEN }}"
+          persist-credentials: false
       - name: Approve a PR if not already approved
         run: |
           gh pr checkout "$PR_URL" # sets the upstream metadata for `gh pr status`
