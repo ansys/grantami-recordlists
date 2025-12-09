@@ -32,7 +32,7 @@ packages = [
 python = ">=3.10,<4.0"
 ansys-openapi-common = "^2.0.0"
 # Ensure PIP_INDEX_URL is not set in CI when building on release branches.
-ansys-grantami-serverapi-openapi = { version = "==5.1.0.dev884", source = "private-pypi" }
+ansys-grantami-serverapi-openapi = { version = "==5.1.0rc0", source = "private-pypi" }
 requests = "^2.26"
 
 # Optional documentation dependencies
