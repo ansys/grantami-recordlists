@@ -72,7 +72,7 @@ on:
 
 concurrency:
   group: integration-server
-  cancel-in-progress: false
+  cancel-in-progress: false  # zizmor: ignore[concurrency-limits] # Allowed in versions above 1.16.2
 
 permissions: {}
 

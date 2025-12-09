@@ -30,8 +30,7 @@ jobs:
     name: Set labels
     needs: [label-syncer]
     permissions:
-      contents: read
-      pull-requests: write
+      pull-requests: write   # to allow the Action to add labels to PRs
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request'
     steps:
@@ -62,8 +61,8 @@ jobs:
       name: "Create changelog fragment"
       needs: [labeler]
       permissions:
-        contents: write
-        pull-requests: write
+        contents: write  # to allow the Action to push to the PR branch
+        pull-requests: write  # to allow the Action to update the target PR
       runs-on: ubuntu-latest
       if: ${{ !startsWith( github.event.pull_request.head.ref, 'dependabot/') && !(startsWith(github.event.pull_request.head.ref, 'pre-commit-ci-update-config')) }}
       steps:
