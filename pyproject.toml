@@ -2,17 +2,19 @@
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
-[tool.poetry]
+[project]
 # Check https://python-poetry.org/docs/pyproject/ for all available sections
 name = "ansys-grantami-recordlists"
 version = "2.1.0.dev0"
 description = "A python wrapper for the Granta MI RecordLists API"
 license = "MIT"
-authors = ["ANSYS, Inc. <pyansys.core@ansys.com>"]
-maintainers = ["ANSYS, Inc. <pyansys.core@ansys.com>"]
+authors = [
+    {name = "ANSYS, Inc.", email = "pyansys.core@ansys.com"}
+]
+maintainers = [
+    {name = "ANSYS, Inc.", email = "pyansys.core@ansys.com"}
+]
 readme = "README.rst"
-repository = "https://github.com/ansys/grantami-recordlists"
-documentation = "https://recordlists.grantami.docs.pyansys.com"
 classifiers = [
     "Development Status :: 4 - Beta",
     "Programming Language :: Python :: 3",
@@ -24,16 +26,26 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
 ]
+requires-python = ">=3.10,<4.0"
+dependencies = [
+    "ansys-openapi-common>=2.0.0,<3.0.0",
+    # Ensure PIP_INDEX_URL is not set in CI when building on release branches and source is public PyPI
+    "ansys-grantami-serverapi-openapi==5.1.0rc0",
+    "requests>=2.26,<3.0.0",
+]
+
+[tool.poetry.dependencies]
+ansys-grantami-serverapi-openapi = { source = "private-pypi" }
+
+[tool.poetry]
 packages = [
     { include = "ansys", from = "src" },
 ]
 
-[tool.poetry.dependencies]
-python = ">=3.10,<4.0"
-ansys-openapi-common = "^2.0.0"
-# Ensure PIP_INDEX_URL is not set in CI when building on release branches.
-ansys-grantami-serverapi-openapi = { version = "==5.1.0rc0", source = "private-pypi" }
-requests = "^2.26"
+[project.urls]
+repository = "https://github.com/ansys/grantami-recordlists"
+documentation = "https://recordlists.grantami.docs.pyansys.com"
+
 
 # Optional documentation dependencies
 [tool.poetry.group.doc]
