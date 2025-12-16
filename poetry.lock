@@ -3761,4 +3761,4 @@ examples = ["jupyterlab"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<4.0"
-content-hash = "fa2af1f29d0761b8211e4e97e197c39883d1685b5d4e79bd349fcad95d9bce4f"
+content-hash = "b8b4bd2be44006c3381890ad93ed12c04bb021f69488ee956ec8226674b5c059"
