@@ -5,6 +5,19 @@ Examples
 
 The following examples demonstrate key aspects of PyGranta RecordLists.
 
+To run these examples, install dependencies with this command:
+
+.. code::
+
+   pip install ansys-grantami-recordlists[examples]
+
+And launch ``jupyterlab`` with this command:
+
+.. code::
+
+   jupyter lab
+
+
 .. jinja:: examples
 
     {% if build_examples %}
