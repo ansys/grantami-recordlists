@@ -46,6 +46,10 @@ packages = [
 repository = "https://github.com/ansys/grantami-recordlists"
 documentation = "https://recordlists.grantami.docs.pyansys.com"
 
+[project.optional-dependencies]
+examples = [
+    "jupyterlab>=4.0.0",
+]
 
 # Optional documentation dependencies
 [tool.poetry.group.doc]
