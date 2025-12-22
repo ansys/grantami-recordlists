@@ -5,7 +5,7 @@ build-backend = "poetry.core.masonry.api"
 [project]
 # Check https://python-poetry.org/docs/pyproject/ for all available sections
 name = "ansys-grantami-recordlists"
-version = "2.1.0.dev0"
+version = "2.1.0rc0"
 description = "A python wrapper for the Granta MI RecordLists API"
 license = "MIT"
 authors = [
@@ -29,13 +29,9 @@ classifiers = [
 requires-python = ">=3.10,<4.0"
 dependencies = [
     "ansys-openapi-common>=2.0.0,<3.0.0",
-    # Ensure PIP_INDEX_URL is not set in CI when building on release branches and source is public PyPI
     "ansys-grantami-serverapi-openapi>=5.1.0,<6.0",
     "requests>=2.26,<3.0.0",
 ]
-
-[tool.poetry.dependencies]
-ansys-grantami-serverapi-openapi = { source = "private-pypi" }
 
 [tool.poetry]
 packages = [
@@ -73,11 +69,6 @@ requests-mock = "^1.10.0"
 pre-commit = "^4.0.1"
 mypy = "^1.8.0"
 types-requests = "^2.26"
-
-[[tool.poetry.source]]
-name = "private-pypi"
-url = "https://pkgs.dev.azure.com/pyansys/_packaging/pyansys/pypi/simple/"
-priority = "explicit"
 
 [tool.black]
 line-length = 100
