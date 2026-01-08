@@ -1,0 +1,27 @@
+[
+  {
+    "name": "dev",
+    "version": "dev",
+    "url": "https://recordlists.grantami.docs.pyansys.com/version/dev/"
+  },
+  {
+    "name": "2.1.0rc0",
+    "version": "2.1.0rc0",
+    "url": "https://recordlists.grantami.docs.pyansys.com/version/2.1.0rc0/"
+  },
+  {
+    "name": "2.0 (stable)",
+    "version": "2.0",
+    "url": "https://recordlists.grantami.docs.pyansys.com/version/stable/"
+  },
+  {
+    "name": "1.3",
+    "version": "1.3",
+    "url": "https://recordlists.grantami.docs.pyansys.com/version/1.3/"
+  },
+  {
+    "name": "Older version",
+    "version": "N/A",
+    "url": "https://recordlists.grantami.docs.pyansys.com/version/"
+  }
+]
