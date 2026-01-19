@@ -1,6 +1,3 @@
-ci:
-  skip: [mypy-code]
-
 repos:
 
 - repo: https://github.com/psf/black-pre-commit-mirror
@@ -22,7 +19,7 @@ repos:
   rev: v2.4.1
   hooks:
   - id: codespell
-    args: ["--ignore-words", "doc/styles/config/vocabularies/ANSYS/accept.txt", "--skip", "poetry.lock"]
+    args: ["--ignore-words", "doc/styles/config/vocabularies/ANSYS/accept.txt", "--skip", "uv.lock"]
 
 - repo: https://github.com/pre-commit/pre-commit-hooks
   rev: v6.0.0
@@ -36,16 +33,6 @@ repos:
   hooks:
   - id: pydocstyle
     additional_dependencies: [tomli]
-    files: "^(src/)"
-
-- repo: local
-  hooks:
-  - id: mypy-code
-    name: "mypy: checks on code"
-    entry: "python -m mypy"
-    language: system
-    types: [python]
-    require_serial: true
     files: "^(src/)"
 
 - repo: https://github.com/ansys/pre-commit-hooks

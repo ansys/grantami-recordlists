@@ -1,3 +1,9 @@
+#!/usr/bin/env -S uv run --script
+#
+# /// script
+# dependencies = ["requests"]
+# ///
+
 from functools import wraps
 import json
 import logging

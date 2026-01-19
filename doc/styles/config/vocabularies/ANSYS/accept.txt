@@ -7,3 +7,5 @@ jupytext
 (?i)ansys
 THIRDPARTY
 autologon
+uv
+pytest

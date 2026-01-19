@@ -1,6 +1,9 @@
 [build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/ansys"]
 
 [project]
 # Check https://python-poetry.org/docs/pyproject/ for all available sections
@@ -26,58 +29,47 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
 ]
-requires-python = ">=3.10,<4.0"
+requires-python = ">=3.10"
 dependencies = [
     "ansys-openapi-common>=2.0.0,<3.0.0",
-    # Ensure PIP_INDEX_URL is not set in CI when building on release branches and source is public PyPI
     "ansys-grantami-serverapi-openapi>=5.1.0,<6.0",
     "requests>=2.26,<3.0.0",
 ]
 
-[tool.poetry.dependencies]
-ansys-grantami-serverapi-openapi = { source = "private-pypi" }
-
-[tool.poetry]
-packages = [
-    { include = "ansys", from = "src" },
-]
+[[tool.uv.index]]
+name = "private-pypi"
+url = "https://pkgs.dev.azure.com/pyansys/_packaging/pyansys/pypi/simple/"
+explicit = true
 
 [project.urls]
 repository = "https://github.com/ansys/grantami-recordlists"
 documentation = "https://recordlists.grantami.docs.pyansys.com"
 
-[project.optional-dependencies]
+[dependency-groups]
+dev = [
+    "pytest>=9.0.0",
+    "pytest-cov>=7.0.0",
+    "requests-mock>=1.10.0",
+    "pre-commit>=4.0.1",
+    "mypy>=1.8.0,<1.9",
+    "types-requests>=2.26",
+]
+
+doc = [
+    "sphinx>=8.1.3,<8.2.0",
+    "numpydoc>=1.4.0",
+    "ansys-sphinx-theme>=1.6.0",
+    "sphinx-copybutton>=0.5.0",
+    "jupytext>=1.14.4",
+    "nbsphinx>=0.9.0",
+    "ipykernel>=7.0.0",
+    "sphinx-jinja>=2.0.2",
+    "sphinx-design>=0.6.0",
+]
+
 examples = [
     "jupyterlab>=4.0.0",
 ]
-
-# Optional documentation dependencies
-[tool.poetry.group.doc]
-optional = true
-
-[tool.poetry.group.doc.dependencies]
-Sphinx = "^8.1.3"
-numpydoc = "^1.4.0"
-ansys-sphinx-theme = "^1.0.3"
-sphinx-copybutton = "^0.5.0"
-jupytext = "^1.14.4"
-nbsphinx = "^0.9.0"
-ipykernel = "^7.0.1" # required by nbsphinx to run notebooks.
-sphinx-jinja = "^2.0.2"
-sphinx-design = "^0.6.0"
-
-[tool.poetry.group.dev.dependencies]
-pytest = "^9.0.0"
-pytest-cov = "^7.0.0"
-requests-mock = "^1.10.0"
-pre-commit = "^4.0.1"
-mypy = "^1.8.0"
-types-requests = "^2.26"
-
-[[tool.poetry.source]]
-name = "private-pypi"
-url = "https://pkgs.dev.azure.com/pyansys/_packaging/pyansys/pypi/simple/"
-priority = "explicit"
 
 [tool.black]
 line-length = 100
@@ -102,6 +94,7 @@ markers = [
     be skipped if run against an incompatible Granta MI version. Deselect all integration tests with \
     'pytest -m \"not integration\"'. Specify MI version with '--mi-version MAJOR.MINOR'.""",
 ]
+addopts = ["--cov=ansys.grantami.recordlists", "--cov-report=term", "--cov-report=xml:.cov/xml", "--cov-report=html:.cov/html"]
 filterwarnings = [
 	"error",
 ]
