@@ -21,6 +21,7 @@
 # SOFTWARE.
 
 """Models."""
+
 from datetime import datetime
 from enum import Enum
 from typing import Callable, Iterator, List, Optional, Set, Type, TypeVar, Union
