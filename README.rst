@@ -87,13 +87,13 @@ use this code:
     pip install git+https://github.com/ansys/grantami-recordlists.git
 
 
-To install a local *development* version with Git and Poetry, use this code:
+To install a local *development* version with Git and uv, use this code:
 
 .. code::
 
     git clone https://github.com/ansys/grantami-recordlists
     cd grantami-recordlists
-    poetry install
+    uv sync
 
 
 The preceding code installs the package and allows you to modify it locally,
