@@ -79,8 +79,8 @@ permissions: {}
 env:
   PIP_INDEX_URL: "https://${{ secrets.PYANSYS_PYPI_PRIVATE_PAT }}@pkgs.dev.azure.com/pyansys/_packaging/pyansys/pypi/simple/"
   UV_INDEX_URL: "https://${{ secrets.PYANSYS_PYPI_PRIVATE_PAT }}@pkgs.dev.azure.com/pyansys/_packaging/pyansys/pypi/simple/"
-  POETRY_HTTP_BASIC_PRIVATE_PYPI_USERNAME: "PAT"
-  POETRY_HTTP_BASIC_PRIVATE_PYPI_PASSWORD: ${{ secrets.PYANSYS_PYPI_PRIVATE_PAT }}
+  UV_INDEX_PRIVATE_PYPI_USERNAME: "PAT"
+  UV_INDEX_PRIVATE_PYPI_PASSWORD: ${{ secrets.PYANSYS_PYPI_PRIVATE_PAT }}
 
 jobs:
 
@@ -124,18 +124,14 @@ jobs:
             az login --service-principal -u ${APP_ID} -p ${SECRET} --tenant ${TENANT_ID}
             az vm start -g ${RESOURCE_GROUP} -n ${SERVER_NAME}
 
-      - name: "Set up Python ${{ inputs.python-version }}"
-        uses: actions/setup-python@83679a892e2d95755f2dac6acb0bfd1e9ac5d548  # v6.1.0
+      - name: Install uv
+        uses: astral-sh/setup-uv@681c641aba71e4a1c380be3ab5e12ad51f415867  # v7.1.6
         with:
           python-version: ${{ inputs.python-version }}
 
       - name: "Check if server is ready"
         run: |
-          python -m venv ./venv
-          source ./venv/bin/activate
-          pip install requests --disable-pip-version-check
-          pip freeze
-          python .github/scripts/check_server.py
+          uv run ./.github/scripts/check_server.py
         env:
           TEST_SL_URL: ${{ secrets[matrix.server.url] }}  # zizmor: ignore[overprovisioned-secrets,obfuscation] - No support in matrix for variable interpolation
           TEST_USER: ${{secrets.TEST_SERVER_ADMIN_USER}}
@@ -172,18 +168,14 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: "Set up Python ${{ inputs.python-version }}"
-        uses: actions/setup-python@83679a892e2d95755f2dac6acb0bfd1e9ac5d548  # v6.1.0
+      - name: Install uv
+        uses: astral-sh/setup-uv@681c641aba71e4a1c380be3ab5e12ad51f415867  # v7.1.6
         with:
           python-version: ${{ inputs.python-version }}
 
-      - name: "Install Python dependencies"
-        run: |
-          pip install poetry 'tox<4' --disable-pip-version-check
-
-      - name: "Test with tox (integration tests only)"
+      - name: "Test with pytest (integration tests only)"
         shell: bash
-        run: tox -e tests -- -m "integration" --mi-version ${TEST_MI_VERSION}
+        run: uv run pytest ./tests -m "integration" --mi-version ${TEST_MI_VERSION}
         env:
           TEST_SL_URL: ${{ secrets[matrix.server.url] }}  # zizmor: ignore[overprovisioned-secrets,obfuscation] - No support in matrix for variable interpolation
           TEST_LIST_ADMIN_USER: ${{secrets.TEST_SERVER_ADMIN_USER}}

@@ -15,8 +15,8 @@ The following contribution information is specific to PyGranta RecordLists.
 Developer environment setup
 ===========================
 
-PyGranta RecordLists uses `Poetry`_ for packaging and dependency management. Installation
-information is available in the Poetry documentation.
+PyGranta RecordLists uses `uv`_ for packaging and dependency management. Installation
+information is available in the `uv` documentation.
 
 Installing PyGranta RecordLists in developer mode allows you to modify and enhance
 the source.
@@ -33,7 +33,7 @@ build the documentation, and build the package.
 
     git clone https://github.com/ansys/grantami-recordlists
     cd grantami-recordlists
-    poetry install --with doc
+    uv sync --with doc
 
 Additional tools
 -----------------
@@ -50,25 +50,21 @@ encouraged to install this tool with this command:
 
     python -m pip install pre-commit && pre-commit install
 
-.. _ref_tox:
+.. _ref_tests:
 
-Tox
-~~~
-Tests can be run using `tox`_. The project defines the tox environments in the ``tox.ini``
-file. The following tox environments are provided:
+Running tests
+~~~~~~~~~~~~~
+Tests can be run using pytest which is installed as part of the development dependencies. To run the all the tests,
+use the following command:
 
-.. vale off
+.. code:: bash
 
-- ``tox -e style``: Checks for coding style quality.
-- ``tox -e tests``: Runs all tests and checks code coverage. (For requirements, see :ref:`ref_serveraccess`.)
-- ``tox -e doc``: Checks the documentation-building process.
-
-.. vale on
+    uv run pytest ./tests
 
 Optionally, add the ``-- -m "not integration"`` suffix to the commands above to skip integration
 tests. For example, this command only runs tests that do not require a Granta MI instance::
 
-     tox -e tests -- -m "not integration"
+    uv run pytest ./tests -- -m "not integration"
 
 .. _ref_serveraccess:
 
@@ -79,7 +75,7 @@ As indicated in :ref:`ref_software_requirements`, running integration tests and 
 requires access to a valid Granta MI instance.
 
 External contributors might not have an instance of Granta MI at their disposal. Prior to creating a
-pull request with the desired changes, they should make sure that unit tests pass (:ref:`ref_tox`),
+pull request with the desired changes, they should make sure that unit tests pass (:ref:`ref_tests`),
 static code validation and styling pass (:ref:`pre-commit <ref_precommit>`), and that the
 documentation can be generated successfully without the examples
 (:ref:`Documenting <ref_documenting>`).
@@ -153,9 +149,8 @@ If you have general questions about the PyAnsys ecosystem, email `pyansys.core@a
 If your question is specific to PyGranta RecordLists, ask your question in an issue as described in
 the previous paragraph.
 
-.. _Poetry: https://python-poetry.org/
+.. _uv: https://docs.astral.sh/uv/
 .. _pre-commit: https://pre-commit.com/
-.. _tox: https://tox.wiki/
 .. _Sphinx: https://www.sphinx-doc.org/en/master/
 .. _jupytext: https://jupytext.readthedocs.io/en/latest/
 .. _nb-convert: https://nbconvert.readthedocs.io/en/latest/
