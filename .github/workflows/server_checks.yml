@@ -104,7 +104,7 @@ jobs:
             url: "TEST_SERVER_24R1_URL"
     steps:
       - name: "Checkout the repository"
-        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8  # v6.0.1
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
         with:
           persist-credentials: false
 
@@ -125,7 +125,7 @@ jobs:
             az vm start -g ${RESOURCE_GROUP} -n ${SERVER_NAME}
 
       - name: Install uv
-        uses: astral-sh/setup-uv@681c641aba71e4a1c380be3ab5e12ad51f415867  # v7.1.6
+        uses: astral-sh/setup-uv@61cb8a9741eeb8a550a1b8544337180c0fc8476b  # v7.2.0
         with:
           python-version: ${{ inputs.python-version }}
 
@@ -164,12 +164,12 @@ jobs:
       cancel-in-progress: false
     steps:
       - name: "Checkout the repository"
-        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8  # v6.0.1
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
         with:
           persist-credentials: false
 
       - name: Install uv
-        uses: astral-sh/setup-uv@681c641aba71e4a1c380be3ab5e12ad51f415867  # v7.1.6
+        uses: astral-sh/setup-uv@61cb8a9741eeb8a550a1b8544337180c0fc8476b  # v7.2.0
         with:
           python-version: ${{ inputs.python-version }}
 
