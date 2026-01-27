@@ -243,7 +243,8 @@ class RecordListItem:
         record_version: Optional[int] = None,
     ):
         _validate_uuid(database_guid, "Invalid 'database_guid'")
-        _validate_uuid(table_guid, "Invalid 'table_guid'")
+        if table_guid is not None:
+            _validate_uuid(table_guid, "Invalid 'table_guid'")
         _validate_uuid(record_history_guid, "Invalid 'record_history_guid'")
 
         self._database_guid: str = database_guid
@@ -1190,7 +1191,7 @@ class _PagedResult(Iterator[T]):
         return next(self._current_page)
 
 
-def _validate_uuid(value: str, error_message: str):
+def _validate_uuid(value: str, error_message: str) -> None:
     if not isinstance(value, str):
         raise TypeError(f"{error_message}. Value '{value}' is not a valid UUID string.")
     try:
