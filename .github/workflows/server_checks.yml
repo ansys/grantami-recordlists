@@ -183,7 +183,7 @@ jobs:
 
       - name: "Test with pytest (integration tests only)"
         shell: bash
-        run: uv run pytest ./tests -m "integration" --mi-version ${TEST_MI_VERSION}
+        run: uv run --frozen pytest ./tests -m "integration" --mi-version ${TEST_MI_VERSION}
         env:
           TEST_SL_URL: ${{ secrets[matrix.server.url] }}  # zizmor: ignore[overprovisioned-secrets,obfuscation] - No support in matrix for variable interpolation
           TEST_LIST_ADMIN_USER: ${{secrets.TEST_SERVER_ADMIN_USER}}
