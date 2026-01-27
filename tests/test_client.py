@@ -106,6 +106,14 @@ class TestReadList(TestClientMethod):
         client.get_list(identifier)
         api_method.assert_called_once_with(list_identifier=identifier)
 
+    def test_read_list_with_incorrect_identifier_raises_value_error(self, client, api_method):
+        with pytest.raises(
+            ValueError,
+            match=r"Invalid list identifier\. Value 'invalid-uuid' is not a valid UUID string\.",
+        ):
+            client.get_list("invalid-uuid")
+        api_method.assert_not_called()
+
 
 class TestReadAllLists(TestClientMethod):
     _return_value = SimpleNamespace(lists=[])

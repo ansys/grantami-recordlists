@@ -25,6 +25,7 @@
 from datetime import datetime
 from enum import Enum
 from typing import Callable, Iterator, List, Optional, Set, Type, TypeVar, Union
+from uuid import UUID
 
 from ansys.grantami.serverapi_openapi.v2025r1 import models as models2025r1
 from ansys.grantami.serverapi_openapi.v2025r2 import models
@@ -223,11 +224,11 @@ class RecordListItem:
     Parameters
     ----------
     database_guid : str
-       GUID of the database.
+       GUID of the database, as valid UUID string.
     table_guid : str or None
-       GUID of the table. Must be provided if this object is added to a RecordList. Optional otherwise.
+       GUID of the table, as valid UUID string. Must be provided if this object is added to a RecordList. Optional otherwise.
     record_history_guid : str
-       Record History GUID.
+       Record History GUID, as valid UUID string.
     record_version : int, optional
        Record version number - for records in version-controlled tables. If provided, the requested
        version of the record is added to the list. If not provided, the list tracks the latest
@@ -241,6 +242,10 @@ class RecordListItem:
         record_history_guid: str,
         record_version: Optional[int] = None,
     ):
+        _validate_uuid(database_guid, "Invalid 'database_guid'")
+        _validate_uuid(table_guid, "Invalid 'table_guid'")
+        _validate_uuid(record_history_guid, "Invalid 'record_history_guid'")
+
         self._database_guid: str = database_guid
         self._table_guid: str | None = table_guid
         self._record_history_guid: str = record_history_guid
@@ -458,6 +463,18 @@ class SearchCriterion:
         self._contains_records: Optional[List["RecordListItem"]] = contains_records
         self._user_can_add_or_remove_items: Optional[bool] = user_can_add_or_remove_items
 
+        if contains_records_in_databases is not None:
+            for db_guid in contains_records_in_databases:
+                _validate_uuid(db_guid, "Invalid GUID in 'contains_records_in_databases'")
+        if contains_records_in_integration_schemas is not None:
+            for schema_guid in contains_records_in_integration_schemas:
+                _validate_uuid(
+                    schema_guid, "Invalid GUID in 'contains_records_in_integration_schemas'"
+                )
+        if contains_records_in_tables is not None:
+            for table_guid in contains_records_in_tables:
+                _validate_uuid(table_guid, "Invalid GUID in 'contains_records_in_tables'")
+
     @property
     def name_contains(self) -> Optional[str]:
         """Limits results to lists whose name contains the provided string."""
@@ -538,29 +555,52 @@ class SearchCriterion:
 
     @property
     def contains_records_in_databases(self) -> Optional[List[str]]:
-        """Limits results to lists containing records in databases specified by GUIDs."""
+        """
+        Limits results to lists containing records in databases specified by GUIDs.
+
+        GUIDS must be provided as valid UUID strings.
+        """
         return self._contains_records_in_databases
 
     @contains_records_in_databases.setter
     def contains_records_in_databases(self, value: Optional[List[str]]) -> None:
+        if value is not None:
+            for db_guid in value:
+                _validate_uuid(db_guid, "Invalid GUID in 'contains_records_in_databases'")
         self._contains_records_in_databases = value
 
     @property
     def contains_records_in_integration_schemas(self) -> Optional[List[str]]:
-        """Limits results to lists containing records in integration schemas specified by GUIDs."""
+        """
+        Limits results to lists containing records in integration schemas specified by GUIDs.
+
+        GUIDS must be provided as valid UUID strings.
+        """
         return self._contains_records_in_integration_schemas
 
     @contains_records_in_integration_schemas.setter
     def contains_records_in_integration_schemas(self, value: Optional[List[str]]) -> None:
+        if value is not None:
+            for schema_guid in value:
+                _validate_uuid(
+                    schema_guid, "Invalid GUID in 'contains_records_in_integration_schemas'"
+                )
         self._contains_records_in_integration_schemas = value
 
     @property
     def contains_records_in_tables(self) -> Optional[List[str]]:
-        """Limits results to lists containing records in tables specified by GUIDs."""
+        """
+        Limits results to lists containing records in tables specified by GUIDs.
+
+        GUIDS must be provided as valid UUID strings.
+        """
         return self._contains_records_in_tables
 
     @contains_records_in_tables.setter
     def contains_records_in_tables(self, value: Optional[List[str]]) -> None:
+        if value is not None:
+            for table_guid in value:
+                _validate_uuid(table_guid, "Invalid GUID in 'contains_records_in_tables'")
         self._contains_records_in_tables = value
 
     @property
@@ -950,16 +990,24 @@ class AuditLogSearchCriterion:
         self._filter_record_lists = filter_record_lists
         self._filter_actions = filter_actions
 
+        if filter_record_lists is not None:
+            for list_id in filter_record_lists:
+                _validate_uuid(list_id, "Invalid list identifier in 'filter_record_lists'")
+
     @property
     def filter_record_lists(self) -> Optional[List[str]]:
         """Filter audit log entries for only the specified record list identifiers.
 
-        If None then log entries for all record lists will be included.
+        If None then log entries for all record lists will be included. Record list identifiers
+        must be provided as valid UUID strings.
         """
         return self._filter_record_lists
 
     @filter_record_lists.setter
     def filter_record_lists(self, filter_record_lists: Optional[List[str]]) -> None:
+        if filter_record_lists is not None:
+            for list_id in filter_record_lists:
+                _validate_uuid(list_id, "Invalid list identifier in 'filter_record_lists'")
         self._filter_record_lists = filter_record_lists
 
     @property
@@ -1140,3 +1188,12 @@ class _PagedResult(Iterator[T]):
             self._current_page = iter(next_page)
 
         return next(self._current_page)
+
+
+def _validate_uuid(value: str, error_message: str):
+    if not isinstance(value, str):
+        raise TypeError(f"{error_message}. Value '{value}' is not a valid UUID string.")
+    try:
+        UUID(value)
+    except ValueError as exc:
+        raise ValueError(f"{error_message}. Value '{value}' is not a valid UUID string.")
