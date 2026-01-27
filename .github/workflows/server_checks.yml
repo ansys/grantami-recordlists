@@ -156,7 +156,7 @@ jobs:
           - "windows-latest"
         server:
           - url: "TEST_SERVER_DEV_URL"
-          - version: "26.1"
+            version: "26.1"
           - url: "TEST_SERVER_26R1_URL"
             version: "26.1"
           - url: "TEST_SERVER_25R2_URL"
