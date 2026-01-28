@@ -182,13 +182,16 @@ class TestAddItems(TestClientMethod):
         assert response == [self._existing_item]
 
     def test_add_items(self, client, api_method, mock_list):
-        new_item = RecordListItem("a", "b", "c")
+        db_guid = str(uuid.uuid4())
+        table_guid = str(uuid.uuid4())
+        record_history_guid = str(uuid.uuid4())
+        new_item = RecordListItem(db_guid, table_guid, record_history_guid)
         expected_body = GsaCreateRecordListItemsInfo(
             items=[
                 GsaCreateListItem(
-                    database_guid="a",
-                    table_guid="b",
-                    record_history_guid="c",
+                    database_guid=db_guid,
+                    table_guid=table_guid,
+                    record_history_guid=record_history_guid,
                     record_version=None,
                 )
             ]
@@ -200,7 +203,9 @@ class TestAddItems(TestClientMethod):
         assert response == [self._existing_item, new_item]
 
     def test_add_item_without_table_guids_raises_value_error(self, client, api_method, mock_list):
-        new_item = RecordListItem("a", None, "c")
+        db_guid = str(uuid.uuid4())
+        record_history_guid = str(uuid.uuid4())
+        new_item = RecordListItem(db_guid, None, record_history_guid)
         with pytest.raises(ValueError, match="table_guid must be provided"):
             client.add_items_to_list(mock_list, [new_item])
 
