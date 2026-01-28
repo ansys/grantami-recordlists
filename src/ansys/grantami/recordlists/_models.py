@@ -242,14 +242,18 @@ class RecordListItem:
         record_history_guid: str,
         record_version: Optional[int] = None,
     ):
-        _validate_uuid(database_guid, "Invalid 'database_guid'")
+        sanitized_db_guid = _sanitize_uuid(database_guid, "Invalid 'database_guid'")
         if table_guid is not None:
-            _validate_uuid(table_guid, "Invalid 'table_guid'")
-        _validate_uuid(record_history_guid, "Invalid 'record_history_guid'")
+            sanitized_table_guid = _sanitize_uuid(table_guid, "Invalid 'table_guid'")
+        else:
+            sanitized_table_guid = None
+        sanitized_record__history_guid = _sanitize_uuid(
+            record_history_guid, "Invalid 'record_history_guid'"
+        )
 
-        self._database_guid: str = database_guid
-        self._table_guid: str | None = table_guid
-        self._record_history_guid: str = record_history_guid
+        self._database_guid: str = sanitized_db_guid
+        self._table_guid: str | None = sanitized_table_guid
+        self._record_history_guid: str = sanitized_record__history_guid
         self._record_version: Optional[int] = record_version
         self._record_guid: Optional[str] = None
 
@@ -450,31 +454,44 @@ class SearchCriterion:
         contains_records: Optional[List["RecordListItem"]] = None,
         user_can_add_or_remove_items: Optional[bool] = None,
     ):
+        sanitized_contains_records_in_databases: list[str] | None = None
+        if contains_records_in_databases is not None:
+            sanitized_contains_records_in_databases = [
+                _sanitize_uuid(db_guid, "Invalid GUID in 'contains_records_in_databases'")
+                for db_guid in contains_records_in_databases
+            ]
+
+        sanitized_contains_records_in_integration_schemas: list[str] | None = None
+        if contains_records_in_integration_schemas is not None:
+            sanitized_contains_records_in_integration_schemas = [
+                _sanitize_uuid(
+                    schema_guid, "Invalid GUID in 'contains_records_in_integration_schemas'"
+                )
+                for schema_guid in contains_records_in_integration_schemas
+            ]
+
+        sanitized_contains_records_in_tables: list[str] | None = None
+        if contains_records_in_tables is not None:
+            sanitized_contains_records_in_tables = [
+                _sanitize_uuid(table_guid, "Invalid GUID in 'contains_records_in_tables'")
+                for table_guid in contains_records_in_tables
+            ]
+
         self._name_contains: Optional[str] = name_contains
         self._user_role: Optional[UserRole] = user_role
         self._is_published: Optional[bool] = is_published
         self._is_awaiting_approval: Optional[bool] = is_awaiting_approval
         self._is_internal_use: Optional[bool] = is_internal_use
         self._is_revision: Optional[bool] = is_revision
-        self._contains_records_in_databases: Optional[List[str]] = contains_records_in_databases
-        self._contains_records_in_integration_schemas: Optional[List[str]] = (
-            contains_records_in_integration_schemas
+        self._contains_records_in_databases: Optional[List[str]] = (
+            sanitized_contains_records_in_databases
         )
-        self._contains_records_in_tables: Optional[List[str]] = contains_records_in_tables
+        self._contains_records_in_integration_schemas: Optional[List[str]] = (
+            sanitized_contains_records_in_integration_schemas
+        )
+        self._contains_records_in_tables: Optional[List[str]] = sanitized_contains_records_in_tables
         self._contains_records: Optional[List["RecordListItem"]] = contains_records
         self._user_can_add_or_remove_items: Optional[bool] = user_can_add_or_remove_items
-
-        if contains_records_in_databases is not None:
-            for db_guid in contains_records_in_databases:
-                _validate_uuid(db_guid, "Invalid GUID in 'contains_records_in_databases'")
-        if contains_records_in_integration_schemas is not None:
-            for schema_guid in contains_records_in_integration_schemas:
-                _validate_uuid(
-                    schema_guid, "Invalid GUID in 'contains_records_in_integration_schemas'"
-                )
-        if contains_records_in_tables is not None:
-            for table_guid in contains_records_in_tables:
-                _validate_uuid(table_guid, "Invalid GUID in 'contains_records_in_tables'")
 
     @property
     def name_contains(self) -> Optional[str]:
@@ -565,10 +582,13 @@ class SearchCriterion:
 
     @contains_records_in_databases.setter
     def contains_records_in_databases(self, value: Optional[List[str]]) -> None:
+        sanitized_value: list[str] | None = None
         if value is not None:
-            for db_guid in value:
-                _validate_uuid(db_guid, "Invalid GUID in 'contains_records_in_databases'")
-        self._contains_records_in_databases = value
+            sanitized_value = [
+                _sanitize_uuid(db_guid, "Invalid GUID in 'contains_records_in_databases'")
+                for db_guid in value
+            ]
+        self._contains_records_in_databases = sanitized_value
 
     @property
     def contains_records_in_integration_schemas(self) -> Optional[List[str]]:
@@ -581,12 +601,15 @@ class SearchCriterion:
 
     @contains_records_in_integration_schemas.setter
     def contains_records_in_integration_schemas(self, value: Optional[List[str]]) -> None:
+        sanitized_value: list[str] | None = None
         if value is not None:
-            for schema_guid in value:
-                _validate_uuid(
+            sanitized_value = [
+                _sanitize_uuid(
                     schema_guid, "Invalid GUID in 'contains_records_in_integration_schemas'"
                 )
-        self._contains_records_in_integration_schemas = value
+                for schema_guid in value
+            ]
+        self._contains_records_in_integration_schemas = sanitized_value
 
     @property
     def contains_records_in_tables(self) -> Optional[List[str]]:
@@ -599,10 +622,13 @@ class SearchCriterion:
 
     @contains_records_in_tables.setter
     def contains_records_in_tables(self, value: Optional[List[str]]) -> None:
+        sanitized_value: list[str] | None = None
         if value is not None:
-            for table_guid in value:
-                _validate_uuid(table_guid, "Invalid GUID in 'contains_records_in_tables'")
-        self._contains_records_in_tables = value
+            sanitized_value = [
+                _sanitize_uuid(table_guid, "Invalid GUID in 'contains_records_in_tables'")
+                for table_guid in value
+            ]
+        self._contains_records_in_tables = sanitized_value
 
     @property
     def contains_records(self) -> Optional[List["RecordListItem"]]:
@@ -988,12 +1014,14 @@ class AuditLogSearchCriterion:
         filter_record_lists: Optional[List[str]] = None,
         filter_actions: Optional[Set[AuditLogAction]] = None,
     ):
-        self._filter_record_lists = filter_record_lists
-        self._filter_actions = filter_actions
-
+        sanitized_filter_record_lists: list[str] | None = None
         if filter_record_lists is not None:
-            for list_id in filter_record_lists:
-                _validate_uuid(list_id, "Invalid list identifier in 'filter_record_lists'")
+            sanitized_filter_record_lists = [
+                _sanitize_uuid(list_id, "Invalid list identifier in 'filter_record_lists'")
+                for list_id in filter_record_lists
+            ]
+        self._filter_record_lists = sanitized_filter_record_lists
+        self._filter_actions = filter_actions
 
     @property
     def filter_record_lists(self) -> Optional[List[str]]:
@@ -1006,10 +1034,13 @@ class AuditLogSearchCriterion:
 
     @filter_record_lists.setter
     def filter_record_lists(self, filter_record_lists: Optional[List[str]]) -> None:
+        sanitized_filter_record_lists: list[str] | None = None
         if filter_record_lists is not None:
-            for list_id in filter_record_lists:
-                _validate_uuid(list_id, "Invalid list identifier in 'filter_record_lists'")
-        self._filter_record_lists = filter_record_lists
+            sanitized_filter_record_lists = [
+                _sanitize_uuid(list_id, "Invalid list identifier in 'filter_record_lists'")
+                for list_id in filter_record_lists
+            ]
+        self._filter_record_lists = sanitized_filter_record_lists
 
     @property
     def filter_actions(self) -> Optional[Set[AuditLogAction]]:
@@ -1191,10 +1222,11 @@ class _PagedResult(Iterator[T]):
         return next(self._current_page)
 
 
-def _validate_uuid(value: str, error_message: str) -> None:
+def _sanitize_uuid(value: str, error_message: str) -> str:
     if not isinstance(value, str):
         raise TypeError(f"{error_message}. Value '{value}' is not a valid UUID string.")
     try:
-        UUID(value)
-    except ValueError as exc:
+        as_uuid = UUID(value)
+    except ValueError:
         raise ValueError(f"{error_message}. Value '{value}' is not a valid UUID string.")
+    return str(as_uuid)

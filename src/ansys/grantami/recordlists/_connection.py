@@ -53,7 +53,7 @@ from ._models import (
     SearchCriterion,
     SearchResult,
     _PagedResult,
-    _validate_uuid,
+    _sanitize_uuid,
 )
 
 PROXY_PATH = "/proxy/v1.svc/mi"
@@ -295,8 +295,8 @@ class RecordListsApiClient(ApiClient, ABC):
         :class:`.RecordList`
         """
         logger.info(f"Getting list with identifier {identifier} with connection {self}")
-        _validate_uuid(identifier, "Invalid list identifier")
-        record_list = self.list_management_api.get_list(list_identifier=identifier)
+        sanitized_identifier = _sanitize_uuid(identifier, "Invalid list identifier")
+        record_list = self.list_management_api.get_list(list_identifier=sanitized_identifier)
         assert record_list is not None, "'record_list' must not be None"
         return RecordList._from_model(record_list)
 
