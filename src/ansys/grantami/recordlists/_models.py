@@ -559,7 +559,7 @@ class SearchCriterion:
         """
         Limits results to lists containing records in databases specified by GUIDs.
 
-        GUIDS must be provided as valid UUID strings.
+        GUIDs must be provided as valid UUID strings.
         """
         return self._contains_records_in_databases
 
@@ -575,7 +575,7 @@ class SearchCriterion:
         """
         Limits results to lists containing records in integration schemas specified by GUIDs.
 
-        GUIDS must be provided as valid UUID strings.
+        GUIDs must be provided as valid UUID strings.
         """
         return self._contains_records_in_integration_schemas
 
@@ -593,7 +593,7 @@ class SearchCriterion:
         """
         Limits results to lists containing records in tables specified by GUIDs.
 
-        GUIDS must be provided as valid UUID strings.
+        GUIDs must be provided as valid UUID strings.
         """
         return self._contains_records_in_tables
 
