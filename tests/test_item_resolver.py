@@ -78,28 +78,33 @@ def test_map_lists_dbs_with_identical_guids(item_resolver, monkeypatch, client):
     assert db_map[duplicate_guid] == ["DB_KEY_1", "DB_KEY_2"]
 
 
+DB_GUID = str(uuid4())
+TABLE_GUID_1 = str(uuid4())
+TABLE_GUID_2 = str(uuid4())
+
+
 @pytest.fixture
 def item_1():
     yield RecordListItem(
-        "DB_GUID",
-        "TABLE_GUID_1",
-        "HISTORY_GUID_1",
+        DB_GUID,
+        TABLE_GUID_1,
+        str(uuid4()),
     )
 
 
 @pytest.fixture
 def item_2():
     yield RecordListItem(
-        "DB_GUID",
-        "TABLE_GUID_2",
-        "HISTORY_GUID_2",
+        DB_GUID,
+        TABLE_GUID_2,
+        str(uuid4()),
     )
 
 
 def test_items_are_resolved_in_all_dbs_with_matched_guid(
     item_resolver, monkeypatch, item_1, item_2
 ):
-    monkeypatch.setattr(item_resolver, "_get_db_map", lambda: {"DB_GUID": ["DB_KEY_1", "DB_KEY_2"]})
+    monkeypatch.setattr(item_resolver, "_get_db_map", lambda: {DB_GUID: ["DB_KEY_1", "DB_KEY_2"]})
     mock_resolve_item_in_db = Mock(return_value=False)
     monkeypatch.setattr(item_resolver, "_is_item_resolvable_in_db", mock_resolve_item_in_db)
 
@@ -115,7 +120,7 @@ def test_items_are_resolved_in_all_dbs_with_matched_guid(
 
 
 def test_resolver_exits_early_if_item_is_matched(item_resolver, item_1, monkeypatch):
-    monkeypatch.setattr(item_resolver, "_get_db_map", lambda: {"DB_GUID": ["DB_KEY_1", "DB_KEY_2"]})
+    monkeypatch.setattr(item_resolver, "_get_db_map", lambda: {DB_GUID: ["DB_KEY_1", "DB_KEY_2"]})
     mock_resolve_item_in_db = Mock(return_value=True)
     monkeypatch.setattr(item_resolver, "_is_item_resolvable_in_db", mock_resolve_item_in_db)
 
