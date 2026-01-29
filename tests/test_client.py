@@ -106,6 +106,14 @@ class TestReadList(TestClientMethod):
         client.get_list(identifier)
         api_method.assert_called_once_with(list_identifier=identifier)
 
+    def test_read_list_with_incorrect_identifier_raises_value_error(self, client, api_method):
+        with pytest.raises(
+            ValueError,
+            match=r"Invalid list identifier\. Value 'invalid-uuid' is not a valid UUID string\.",
+        ):
+            client.get_list("invalid-uuid")
+        api_method.assert_not_called()
+
 
 class TestReadAllLists(TestClientMethod):
     _return_value = SimpleNamespace(lists=[])
@@ -174,13 +182,16 @@ class TestAddItems(TestClientMethod):
         assert response == [self._existing_item]
 
     def test_add_items(self, client, api_method, mock_list):
-        new_item = RecordListItem("a", "b", "c")
+        db_guid = str(uuid.uuid4())
+        table_guid = str(uuid.uuid4())
+        record_history_guid = str(uuid.uuid4())
+        new_item = RecordListItem(db_guid, table_guid, record_history_guid)
         expected_body = GsaCreateRecordListItemsInfo(
             items=[
                 GsaCreateListItem(
-                    database_guid="a",
-                    table_guid="b",
-                    record_history_guid="c",
+                    database_guid=db_guid,
+                    table_guid=table_guid,
+                    record_history_guid=record_history_guid,
                     record_version=None,
                 )
             ]
@@ -192,7 +203,9 @@ class TestAddItems(TestClientMethod):
         assert response == [self._existing_item, new_item]
 
     def test_add_item_without_table_guids_raises_value_error(self, client, api_method, mock_list):
-        new_item = RecordListItem("a", None, "c")
+        db_guid = str(uuid.uuid4())
+        record_history_guid = str(uuid.uuid4())
+        new_item = RecordListItem(db_guid, None, record_history_guid)
         with pytest.raises(ValueError, match="table_guid must be provided"):
             client.add_items_to_list(mock_list, [new_item])
 
