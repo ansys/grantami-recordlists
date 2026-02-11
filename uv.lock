@@ -1153,7 +1153,7 @@ wheels = [
 
 [[package]]
 name = "jupyterlab"
-version = "4.5.2"
+version = "4.5.4"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "async-lru" },
@@ -1171,9 +1171,9 @@ dependencies = [
     { name = "tornado" },
     { name = "traitlets" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/93/dc/2c8c4ff1aee27ac999ba04c373c5d0d7c6c181b391640d7b916b884d5985/jupyterlab-4.5.2.tar.gz", hash = "sha256:c80a6b9f6dace96a566d590c65ee2785f61e7cd4aac5b4d453dcc7d0d5e069b7", size = 23990371, upload-time = "2026-01-12T12:27:08.493Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/7c/6b/21af7c0512bdf67e0c54c121779a1f2a97a164a7657e13fced79db8fa5a0/jupyterlab-4.5.4.tar.gz", hash = "sha256:c215f48d8e4582bd2920ad61cc6a40d8ebfef7e5a517ae56b8a9413c9789fdfb", size = 23943597, upload-time = "2026-02-11T00:26:55.308Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/a4/78/7e455920f104ef2aa94a4c0d2b40e5b44334ee7057eae1aa1fb97b9631ad/jupyterlab-4.5.2-py3-none-any.whl", hash = "sha256:76466ebcfdb7a9bb7e2fbd6459c0e2c032ccf75be673634a84bee4b3e6b13ab6", size = 12385807, upload-time = "2026-01-12T12:27:03.923Z" },
+    { url = "https://files.pythonhosted.org/packages/f5/9f/a70972ece62ead2d81acc6223188f6d18a92f665ccce17796a0cdea4fcf5/jupyterlab-4.5.4-py3-none-any.whl", hash = "sha256:cc233f70539728534669fb0015331f2a3a87656207b3bb2d07916e9289192f12", size = 12391867, upload-time = "2026-02-11T00:26:51.23Z" },
 ]
 
 [[package]]
