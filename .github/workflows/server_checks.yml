@@ -167,7 +167,7 @@ jobs:
             version: "24.2"
           - url: "TEST_SERVER_24R1_URL"
             version: "24.1"
-      fail-fast: false
+      fail-fast: false  # Required to ensure all servers are allowed to complete their tests and clean up after
     concurrency:
       group: ${{ matrix.server.url }}
       cancel-in-progress: false
