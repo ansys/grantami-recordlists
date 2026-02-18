@@ -1,0 +1,1489 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Models &#8212; PyGranta RecordLists</title>
+  
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/ansys-sphinx-theme.css?v=a23b20f3" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/ansys-sphinx-theme.css?v=a23b20f3" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.23/css/jquery.dataTables.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://www.nerdfonts.com/assets/css/webfont.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+
+  <!-- Include desired assets -->
+  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+  
+
+  
+    <link href="../_static/css/breadcrumbs.css" rel="stylesheet" />
+  
+    <script src="../_static/documentation_options.js?v=bc775645"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="https://cdn.datatables.net/1.10.23/js/jquery.dataTables.min.js"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'api/models';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://recordlists.grantami.docs.pyansys.com/versions.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'dev';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            false;
+        </script>
+    <link rel="icon" href="../_static/ansys-favicon.png"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Examples" href="../examples/index.html" />
+    <link rel="prev" title="Granta MI connection" href="connection.html" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="2.1.0.dev0" />
+  <link rel="canonical" href="https://recordlists.grantami.docs.pyansys.com/version/stable/api/models.html" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/pyansys_logo_transparent_black.png" class="logo__image only-light" alt="PyGranta RecordLists - Home"/>
+    <img src="../_static/pyansys_logo_transparent_white.png" class="logo__image only-dark pst-js-only" alt="PyGranta RecordLists - Home"/>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../index.html" title="PyGranta RecordLists home">Home</a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../getting_started/index.html">
+    Getting started
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../user_guide/index.html">
+    User guide
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    API reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../examples/index.html">
+    Examples
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../contributing.html">
+    Contribute
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../changelog.html">
+    Release notes
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav>
+</div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+      
+        <div class="navbar-item">
+<div class="search-bar pst-js-only" id="search-bar">
+  <form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <input type="search" class="form-control" name="q" placeholder="Search the docs ..."
+      aria-label="Search the docs ..." autocomplete="off" autocorrect="off"
+      autocapitalize="off" spellcheck="false" />
+    <span class="search-button__kbd-shortcut">
+      <kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd>
+    </span>
+  </form>
+  
+  <div id="static-search-results" class="static-search-results" style="display:none;" tabindex="0"></div>
+  
+</div></div>
+      
+        <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/ansys/grantami-recordlists" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+  
+    
+<!--
+  Announcement Version Loader
+  Dynamically loads the announcement.html content into the announcement_msg div.
+-->
+<div id="announcement_msg" aria-live="polite"></div>
+<script>
+  // Fetch and inject the announcement HTML content
+  fetch("announcement.html")
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`HTTP error: ${response.status} Announcement.html file not found, Please ignore this, if you are in dev/stable documentation`);
+      }
+      return response.text();
+    })
+    .then((text) => {
+      var msgDiv = document.getElementById("announcement_msg");
+      if (msgDiv) {
+        msgDiv.innerHTML = text;
+      }
+    })
+    .catch((error) => {
+      // Log only unexpected fetch errors
+      if (!(error.message && error.message.startsWith("HTTP error: 404"))) {
+        console.error(`Fetch problem: ${error.message} Announcement.html could not be loaded.`);
+      }
+    });
+</script>
+  
+
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../index.html" title="PyGranta RecordLists home">Home</a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../getting_started/index.html">
+    Getting started
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../user_guide/index.html">
+    User guide
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    API reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../examples/index.html">
+    Examples
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../contributing.html">
+    Contribute
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../changelog.html">
+    Release notes
+  </a>
+</li>
+
+  </ul>
+</nav>
+</div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+<div class="search-bar pst-js-only" id="search-bar">
+  <form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <input type="search" class="form-control" name="q" placeholder="Search the docs ..."
+      aria-label="Search the docs ..." autocomplete="off" autocorrect="off"
+      autocapitalize="off" spellcheck="false" />
+    <span class="search-button__kbd-shortcut">
+      <kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd>
+    </span>
+  </form>
+  
+  <div id="static-search-results" class="static-search-results" style="display:none;" tabindex="0"></div>
+  
+</div></div>
+        
+          <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-3"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-3"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-3"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-3">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/ansys/grantami-recordlists" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="connection.html">Granta MI connection</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Models</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+<nav aria-label="Breadcrumb">
+  <ul class="bd-breadcrumbs">
+         
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="https://docs.pyansys.com/" class="nav-link">PyAnsys</a>
+    </li>
+       
+    <li class="breadcrumb-item">
+      <a href="https://grantami.docs.pyansys.com/" class="nav-link">PyGranta</a>
+    </li>
+     
+    <li class="breadcrumb-item">
+      <a
+        href="../index.html"
+        class="nav-link"
+        aria-label="Home"
+      >
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+     
+    <li class="breadcrumb-item">
+      <a href="index.html" class="nav-link">API reference</a>
+    </li>
+      
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Models</span></li>
+    
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="models">
+<span id="ref-grantami-recordlists-models"></span><h1>Models<a class="headerlink" href="#models" title="Link to this heading">#</a></h1>
+<section id="record-list">
+<h2>Record list<a class="headerlink" href="#record-list" title="Link to this heading">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.RecordList">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">RecordList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">identifier</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">created_timestamp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">created_user</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">published</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_revision</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">awaiting_approval</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">internal_use</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">notes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">last_modified_timestamp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">last_modified_user</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">published_timestamp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">published_user</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parent_record_list_identifier</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ansys.grantami.recordlists.RecordList" title="Link to this definition">#</a></dt>
+<dd><p>Describes a RecordList as obtained from the API.</p>
+<p>Read-only - do not directly instantiate or modify instances of this class.</p>
+<dl class="field-list simple">
+</dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.RecordList.name">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></em><a class="headerlink" href="#ansys.grantami.recordlists.RecordList.name" title="Link to this definition">#</a></dt>
+<dd><p>Name of the Record List. Read-only.</p>
+<p>Can be updated via
+<a class="reference internal" href="connection.html#ansys.grantami.recordlists.RecordListsApiClient.update_list" title="ansys.grantami.recordlists.RecordListsApiClient.update_list"><code class="xref py py-meth docutils literal notranslate"><span class="pre">update_list()</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.RecordList.description">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">description</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></em><a class="headerlink" href="#ansys.grantami.recordlists.RecordList.description" title="Link to this definition">#</a></dt>
+<dd><p>Description of the Record List. Read-only.</p>
+<p>Can be updated via
+<a class="reference internal" href="connection.html#ansys.grantami.recordlists.RecordListsApiClient.update_list" title="ansys.grantami.recordlists.RecordListsApiClient.update_list"><code class="xref py py-meth docutils literal notranslate"><span class="pre">update_list()</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.RecordList.notes">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">notes</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></em><a class="headerlink" href="#ansys.grantami.recordlists.RecordList.notes" title="Link to this definition">#</a></dt>
+<dd><p>Notes about the Record List. Read-only.</p>
+<p>Can be updated via
+<a class="reference internal" href="connection.html#ansys.grantami.recordlists.RecordListsApiClient.update_list" title="ansys.grantami.recordlists.RecordListsApiClient.update_list"><code class="xref py py-meth docutils literal notranslate"><span class="pre">update_list()</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.RecordList.identifier">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">identifier</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></em><a class="headerlink" href="#ansys.grantami.recordlists.RecordList.identifier" title="Link to this definition">#</a></dt>
+<dd><p>Identifier of the Record List. Read-only.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.RecordList.created_timestamp">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">created_timestamp</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.14)"><span class="pre">datetime</span></a></em><a class="headerlink" href="#ansys.grantami.recordlists.RecordList.created_timestamp" title="Link to this definition">#</a></dt>
+<dd><p>Datetime at which the Record List was created. Read-only.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.RecordList.created_user">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">created_user</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#ansys.grantami.recordlists.UserOrGroup" title="ansys.grantami.recordlists._models.UserOrGroup"><span class="pre">UserOrGroup</span></a></em><a class="headerlink" href="#ansys.grantami.recordlists.RecordList.created_user" title="Link to this definition">#</a></dt>
+<dd><p>User who created the Record List. Read-only.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.RecordList.last_modified_timestamp">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">last_modified_timestamp</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.14)"><span class="pre">datetime</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></em><a class="headerlink" href="#ansys.grantami.recordlists.RecordList.last_modified_timestamp" title="Link to this definition">#</a></dt>
+<dd><p>Datetime at which the Record List was last modified. Read-only.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.RecordList.last_modified_user">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">last_modified_user</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#ansys.grantami.recordlists.UserOrGroup" title="ansys.grantami.recordlists._models.UserOrGroup"><span class="pre">UserOrGroup</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></em><a class="headerlink" href="#ansys.grantami.recordlists.RecordList.last_modified_user" title="Link to this definition">#</a></dt>
+<dd><p>User who last modified the Record List. Read-only.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.RecordList.published_timestamp">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">published_timestamp</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.14)"><span class="pre">datetime</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></em><a class="headerlink" href="#ansys.grantami.recordlists.RecordList.published_timestamp" title="Link to this definition">#</a></dt>
+<dd><p>Datetime at which the Record List was published. Read-only.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.RecordList.published_user">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">published_user</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#ansys.grantami.recordlists.UserOrGroup" title="ansys.grantami.recordlists._models.UserOrGroup"><span class="pre">UserOrGroup</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></em><a class="headerlink" href="#ansys.grantami.recordlists.RecordList.published_user" title="Link to this definition">#</a></dt>
+<dd><p>User who published/withdrew the Record List. Read-only.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.RecordList.published">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">published</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></em><a class="headerlink" href="#ansys.grantami.recordlists.RecordList.published" title="Link to this definition">#</a></dt>
+<dd><p>Whether the Record List has been published or not. Read-only.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.RecordList.is_revision">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_revision</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></em><a class="headerlink" href="#ansys.grantami.recordlists.RecordList.is_revision" title="Link to this definition">#</a></dt>
+<dd><p>Whether the Record List is a revision. Read-only.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.RecordList.awaiting_approval">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">awaiting_approval</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></em><a class="headerlink" href="#ansys.grantami.recordlists.RecordList.awaiting_approval" title="Link to this definition">#</a></dt>
+<dd><p>Whether the Record List is awaiting approval to be published or withdrawn. Read-only.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.RecordList.internal_use">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">internal_use</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></em><a class="headerlink" href="#ansys.grantami.recordlists.RecordList.internal_use" title="Link to this definition">#</a></dt>
+<dd><p>Whether the Record List is for internal use only. Read-only.</p>
+<p>Lists flagged as for internal use are periodically deleted from the system.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.RecordList.parent_record_list_identifier">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">parent_record_list_identifier</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></em><a class="headerlink" href="#ansys.grantami.recordlists.RecordList.parent_record_list_identifier" title="Link to this definition">#</a></dt>
+<dd><p>Identifier of the parent record list. Read-only.</p>
+<p>Is populated if the record list is a revision of another record list.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="record-list-item">
+<h2>Record list item<a class="headerlink" href="#record-list-item" title="Link to this heading">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.RecordListItem">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">RecordListItem</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">database_guid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">table_guid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">record_history_guid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">record_version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ansys.grantami.recordlists.RecordListItem" title="Link to this definition">#</a></dt>
+<dd><p>Describes a <a class="reference internal" href="#ansys.grantami.recordlists.RecordList" title="ansys.grantami.recordlists.RecordList"><code class="xref py py-class docutils literal notranslate"><span class="pre">RecordList</span></code></a> item, generally a reference to a record in a Granta MI database.</p>
+<p>If this item was returned by the <a class="reference internal" href="connection.html#ansys.grantami.recordlists.RecordListsApiClient.get_resolvable_list_items" title="ansys.grantami.recordlists.RecordListsApiClient.get_resolvable_list_items"><code class="xref py py-meth docutils literal notranslate"><span class="pre">RecordListsApiClient.get_resolvable_list_items()</span></code></a> method,
+then it guaranteed to be resolvable by the current user at the time it was generated. If this
+item was returned by the <a class="reference internal" href="connection.html#ansys.grantami.recordlists.RecordListsApiClient.get_list_items" title="ansys.grantami.recordlists.RecordListsApiClient.get_list_items"><code class="xref py py-meth docutils literal notranslate"><span class="pre">RecordListsApiClient.get_list_items()</span></code></a> then it is not guaranteed
+to be resolvable and care should be taken to ensure that the reference to the record is valid
+before using it.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>database_guid</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a></span></dt><dd><p>GUID of the database, as valid UUID string.</p>
+</dd>
+<dt><strong>table_guid</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">None</span></code></a></span></dt><dd><p>GUID of the table, as valid UUID string. Must be provided if this object is added to a RecordList. Optional otherwise.</p>
+</dd>
+<dt><strong>record_history_guid</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a></span></dt><dd><p>Record History GUID, as valid UUID string.</p>
+</dd>
+<dt><strong>record_version</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a>, optional</span></dt><dd><p>Record version number - for records in version-controlled tables. If provided, the requested
+version of the record is added to the list. If not provided, the list tracks the latest
+available version of the record.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.RecordListItem.database_guid">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">database_guid</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></em><a class="headerlink" href="#ansys.grantami.recordlists.RecordListItem.database_guid" title="Link to this definition">#</a></dt>
+<dd><p>Database GUID.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.RecordListItem.table_guid">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">table_guid</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></em><a class="headerlink" href="#ansys.grantami.recordlists.RecordListItem.table_guid" title="Link to this definition">#</a></dt>
+<dd><p>Table GUID.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.RecordListItem.record_history_guid">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">record_history_guid</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></em><a class="headerlink" href="#ansys.grantami.recordlists.RecordListItem.record_history_guid" title="Link to this definition">#</a></dt>
+<dd><p>Record History GUID.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.RecordListItem.record_version">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">record_version</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></em><a class="headerlink" href="#ansys.grantami.recordlists.RecordListItem.record_version" title="Link to this definition">#</a></dt>
+<dd><p>Record version number.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.RecordListItem.record_guid">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">record_guid</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></em><a class="headerlink" href="#ansys.grantami.recordlists.RecordListItem.record_guid" title="Link to this definition">#</a></dt>
+<dd><p>Record GUID.</p>
+<p>Only populated if the <a class="reference internal" href="#ansys.grantami.recordlists.RecordListItem" title="ansys.grantami.recordlists.RecordListItem"><code class="xref py py-class docutils literal notranslate"><span class="pre">RecordListItem</span></code></a> has both been obtained via an API request and
+represents a specific version of a record. See the note on the <code class="docutils literal notranslate"><span class="pre">record_version</span></code> parameter
+for this class for more details.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="user-and-user-groups">
+<h2>User and user groups<a class="headerlink" href="#user-and-user-groups" title="Link to this heading">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.UserOrGroup">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">UserOrGroup</span></span><a class="headerlink" href="#ansys.grantami.recordlists.UserOrGroup" title="Link to this definition">#</a></dt>
+<dd><p>Description of a Granta MI User or Group.</p>
+<p>Read-only - do not directly instantiate or modify instances of this class.</p>
+<dl class="field-list simple">
+</dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.UserOrGroup.identifier">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">identifier</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></em><a class="headerlink" href="#ansys.grantami.recordlists.UserOrGroup.identifier" title="Link to this definition">#</a></dt>
+<dd><p>Read-only identifier of the user or group.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.UserOrGroup.display_name">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">display_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></em><a class="headerlink" href="#ansys.grantami.recordlists.UserOrGroup.display_name" title="Link to this definition">#</a></dt>
+<dd><p>Read-only display name of the user or group.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.UserOrGroup.name">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></em><a class="headerlink" href="#ansys.grantami.recordlists.UserOrGroup.name" title="Link to this definition">#</a></dt>
+<dd><p>Read-only name of the user or group.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="search-criteria">
+<h2>Search criteria<a class="headerlink" href="#search-criteria" title="Link to this heading">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.SearchCriterion">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">SearchCriterion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name_contains</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_role</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_published</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_awaiting_approval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_internal_use</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_revision</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">contains_records_in_databases</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">contains_records_in_integration_schemas</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">contains_records_in_tables</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">contains_records</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_can_add_or_remove_items</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ansys.grantami.recordlists.SearchCriterion" title="Link to this definition">#</a></dt>
+<dd><p>Search criterion to use in a <a class="reference internal" href="connection.html#ansys.grantami.recordlists.RecordListsApiClient.search_for_lists" title="ansys.grantami.recordlists.RecordListsApiClient.search_for_lists"><code class="xref py py-meth docutils literal notranslate"><span class="pre">search_for_lists()</span></code></a> operation.</p>
+<p>The properties in this class represent an <em>AND</em> search - only lists that match all the
+non-null properties will be returned.</p>
+<p class="rubric">Examples</p>
+<p>To filter record lists based on their name and status:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">criterion</span> <span class="o">=</span> <span class="n">SearchCriterion</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">name_contains</span><span class="o">=</span><span class="s2">&quot;Approved materials&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">is_published</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="gp">... </span><span class="p">)</span>
+</pre></div>
+</div>
+<p>To filter record lists based on whether they include items from specific databases:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">criterion</span> <span class="o">=</span> <span class="n">SearchCriterion</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">contains_records_in_databases</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;9f6182ee-1f49-4ba9-9bd7-d4c0a392e94e&quot;</span><span class="p">],</span>
+<span class="gp">... </span><span class="p">)</span>
+</pre></div>
+</div>
+<p>To filter record lists based on whether they include items from specific tables:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">criterion</span> <span class="o">=</span> <span class="n">SearchCriterion</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">contains_records_in_tables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;9f6182ee-1f49-4ba9-9bd7-d4c0a392e94e&quot;</span><span class="p">],</span>
+<span class="gp">... </span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+</dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.SearchCriterion.name_contains">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">name_contains</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></em><a class="headerlink" href="#ansys.grantami.recordlists.SearchCriterion.name_contains" title="Link to this definition">#</a></dt>
+<dd><p>Limits results to lists whose name contains the provided string.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.SearchCriterion.user_role">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">user_role</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#ansys.grantami.recordlists.UserRole" title="ansys.grantami.recordlists._models.UserRole"><span class="pre">UserRole</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></em><a class="headerlink" href="#ansys.grantami.recordlists.SearchCriterion.user_role" title="Link to this definition">#</a></dt>
+<dd><p>Limits results to lists on which the user has the specified role.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.SearchCriterion.is_published">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_published</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></em><a class="headerlink" href="#ansys.grantami.recordlists.SearchCriterion.is_published" title="Link to this definition">#</a></dt>
+<dd><p>Limits results to lists with a specific publication status.</p>
+<p>Set to <code class="docutils literal notranslate"><span class="pre">True</span></code> to include only record lists that are published.
+Set to <code class="docutils literal notranslate"><span class="pre">False</span></code> to include only record lists that are not published.
+Default value <code class="docutils literal notranslate"><span class="pre">None</span></code> will include both.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.SearchCriterion.is_awaiting_approval">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_awaiting_approval</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></em><a class="headerlink" href="#ansys.grantami.recordlists.SearchCriterion.is_awaiting_approval" title="Link to this definition">#</a></dt>
+<dd><p>Limits results to lists with a specific approval status.</p>
+<p>Set to <code class="docutils literal notranslate"><span class="pre">True</span></code> to include only record lists that are awaiting approval.
+Set to <code class="docutils literal notranslate"><span class="pre">False</span></code> to include only record lists that are not awaiting approval.
+Default value <code class="docutils literal notranslate"><span class="pre">None</span></code> will include both.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.SearchCriterion.is_internal_use">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_internal_use</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></em><a class="headerlink" href="#ansys.grantami.recordlists.SearchCriterion.is_internal_use" title="Link to this definition">#</a></dt>
+<dd><p>Limits results to lists which are internal.</p>
+<p>Set to <code class="docutils literal notranslate"><span class="pre">True</span></code> to include only internal record lists.
+Set to <code class="docutils literal notranslate"><span class="pre">False</span></code> to include only non-internal record lists.
+Default value <code class="docutils literal notranslate"><span class="pre">None</span></code> will include both.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.SearchCriterion.is_revision">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_revision</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></em><a class="headerlink" href="#ansys.grantami.recordlists.SearchCriterion.is_revision" title="Link to this definition">#</a></dt>
+<dd><p>Limits results to lists which are revisions.</p>
+<p>Set to <code class="docutils literal notranslate"><span class="pre">True</span></code> to include only record lists that are revisions of another list.
+Set to <code class="docutils literal notranslate"><span class="pre">False</span></code> to include only record lists that are not revisions.
+Default value <code class="docutils literal notranslate"><span class="pre">None</span></code> will include both.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.SearchCriterion.contains_records_in_databases">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">contains_records_in_databases</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.14)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></em><a class="headerlink" href="#ansys.grantami.recordlists.SearchCriterion.contains_records_in_databases" title="Link to this definition">#</a></dt>
+<dd><p>Limits results to lists containing records in databases specified by GUIDs.</p>
+<p>GUIDs must be provided as valid UUID strings.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.SearchCriterion.contains_records_in_integration_schemas">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">contains_records_in_integration_schemas</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.14)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></em><a class="headerlink" href="#ansys.grantami.recordlists.SearchCriterion.contains_records_in_integration_schemas" title="Link to this definition">#</a></dt>
+<dd><p>Limits results to lists containing records in integration schemas specified by GUIDs.</p>
+<p>GUIDs must be provided as valid UUID strings.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.SearchCriterion.contains_records_in_tables">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">contains_records_in_tables</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.14)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></em><a class="headerlink" href="#ansys.grantami.recordlists.SearchCriterion.contains_records_in_tables" title="Link to this definition">#</a></dt>
+<dd><p>Limits results to lists containing records in tables specified by GUIDs.</p>
+<p>GUIDs must be provided as valid UUID strings.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.SearchCriterion.contains_records">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">contains_records</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.14)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#ansys.grantami.recordlists.RecordListItem" title="ansys.grantami.recordlists._models.RecordListItem"><span class="pre">RecordListItem</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></em><a class="headerlink" href="#ansys.grantami.recordlists.SearchCriterion.contains_records" title="Link to this definition">#</a></dt>
+<dd><p>Limits results to lists containing specific records.</p>
+<p>When interacting with Granta MI 2025 R1 and earlier, all <a class="reference internal" href="#ansys.grantami.recordlists.RecordListItem" title="ansys.grantami.recordlists.RecordListItem"><code class="xref py py-class docutils literal notranslate"><span class="pre">RecordListItem</span></code></a> objects provided to this
+property must contain the same database GUID. To search for lists that contain records in multiple databases,
+use a <a class="reference internal" href="#ansys.grantami.recordlists.BooleanCriterion" title="ansys.grantami.recordlists.BooleanCriterion"><code class="xref py py-class docutils literal notranslate"><span class="pre">BooleanCriterion</span></code></a> to combine multiple <code class="docutils literal notranslate"><span class="pre">SearchCriterion</span></code> objects.</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Changed in version 2.0: </span>Changed argument type</p>
+</div>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.SearchCriterion.user_can_add_or_remove_items">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">user_can_add_or_remove_items</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></em><a class="headerlink" href="#ansys.grantami.recordlists.SearchCriterion.user_can_add_or_remove_items" title="Link to this definition">#</a></dt>
+<dd><p>Limits results to lists where the current user can add or remove items.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.BooleanCriterion">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">BooleanCriterion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">match_any</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">match_all</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ansys.grantami.recordlists.BooleanCriterion" title="Link to this definition">#</a></dt>
+<dd><p>Search criterion to use in a search operation <a class="reference internal" href="connection.html#ansys.grantami.recordlists.RecordListsApiClient.search_for_lists" title="ansys.grantami.recordlists.RecordListsApiClient.search_for_lists"><code class="xref py py-meth docutils literal notranslate"><span class="pre">search_for_lists()</span></code></a>.</p>
+<p>Use this class to combine multiple <a class="reference internal" href="#ansys.grantami.recordlists.SearchCriterion" title="ansys.grantami.recordlists.SearchCriterion"><code class="xref py py-class docutils literal notranslate"><span class="pre">SearchCriterion</span></code></a> or
+<a class="reference internal" href="#ansys.grantami.recordlists.BooleanCriterion" title="ansys.grantami.recordlists.BooleanCriterion"><code class="xref py py-class docutils literal notranslate"><span class="pre">BooleanCriterion</span></code></a> objects together as either <em>AND</em> or <em>OR</em> searches. When both <a class="reference internal" href="#ansys.grantami.recordlists.BooleanCriterion.match_any" title="ansys.grantami.recordlists.BooleanCriterion.match_any"><code class="xref py py-attr docutils literal notranslate"><span class="pre">match_any</span></code></a>
+and <a class="reference internal" href="#ansys.grantami.recordlists.BooleanCriterion.match_all" title="ansys.grantami.recordlists.BooleanCriterion.match_all"><code class="xref py py-attr docutils literal notranslate"><span class="pre">match_all</span></code></a> are used together, results match all criterion from <code class="docutils literal notranslate"><span class="pre">match_all</span></code> <em>AND</em> at least one
+criterion from <code class="docutils literal notranslate"><span class="pre">match_any</span></code>.</p>
+<p class="rubric">Examples</p>
+<p>Search record lists and obtain the union of multiple criteria (<em>OR</em>):</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">criterion</span> <span class="o">=</span> <span class="n">BooleanCriterion</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">match_any</span><span class="o">=</span><span class="p">[</span>
+<span class="gp">... </span>        <span class="n">SearchCriterion</span><span class="p">(</span><span class="n">name_contains</span><span class="o">=</span><span class="s2">&quot;Approved materials&quot;</span><span class="p">),</span>
+<span class="gp">... </span>        <span class="n">SearchCriterion</span><span class="p">(</span><span class="n">is_published</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+<span class="gp">... </span>    <span class="p">]</span>
+<span class="gp">... </span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Search record lists and obtain the intersection of multiple criteria (<em>AND</em>):</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">criterion</span> <span class="o">=</span> <span class="n">BooleanCriterion</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">match_all</span><span class="o">=</span><span class="p">[</span>
+<span class="gp">... </span>        <span class="n">SearchCriterion</span><span class="p">(</span><span class="n">name_contains</span><span class="o">=</span><span class="s2">&quot;Approved materials&quot;</span><span class="p">),</span>
+<span class="gp">... </span>        <span class="n">SearchCriterion</span><span class="p">(</span><span class="n">is_published</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+<span class="gp">... </span>    <span class="p">]</span>
+<span class="gp">... </span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+</dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.BooleanCriterion.match_any">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">match_any</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.14)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#ansys.grantami.recordlists.BooleanCriterion" title="ansys.grantami.recordlists._models.BooleanCriterion"><span class="pre">BooleanCriterion</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#ansys.grantami.recordlists.SearchCriterion" title="ansys.grantami.recordlists._models.SearchCriterion"><span class="pre">SearchCriterion</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></em><a class="headerlink" href="#ansys.grantami.recordlists.BooleanCriterion.match_any" title="Link to this definition">#</a></dt>
+<dd><p>Limits results to lists which satisfy one or more provided criteria.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">list</span></code></a> of <a class="reference internal" href="#ansys.grantami.recordlists.BooleanCriterion" title="ansys.grantami.recordlists.BooleanCriterion"><code class="xref py py-class docutils literal notranslate"><span class="pre">BooleanCriterion</span></code></a> | <a class="reference internal" href="#ansys.grantami.recordlists.SearchCriterion" title="ansys.grantami.recordlists.SearchCriterion"><code class="xref py py-class docutils literal notranslate"><span class="pre">SearchCriterion</span></code></a>, or <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">None</span></code></a></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.BooleanCriterion.match_all">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">match_all</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.14)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#ansys.grantami.recordlists.BooleanCriterion" title="ansys.grantami.recordlists._models.BooleanCriterion"><span class="pre">BooleanCriterion</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#ansys.grantami.recordlists.SearchCriterion" title="ansys.grantami.recordlists._models.SearchCriterion"><span class="pre">SearchCriterion</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></em><a class="headerlink" href="#ansys.grantami.recordlists.BooleanCriterion.match_all" title="Link to this definition">#</a></dt>
+<dd><p>Limits results to lists which satisfy all provided criteria.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">list</span></code></a> of <a class="reference internal" href="#ansys.grantami.recordlists.BooleanCriterion" title="ansys.grantami.recordlists.BooleanCriterion"><code class="xref py py-class docutils literal notranslate"><span class="pre">BooleanCriterion</span></code></a> | <a class="reference internal" href="#ansys.grantami.recordlists.SearchCriterion" title="ansys.grantami.recordlists.SearchCriterion"><code class="xref py py-class docutils literal notranslate"><span class="pre">SearchCriterion</span></code></a>, or <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="docutils literal notranslate"><span class="pre">None</span></code></a></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.UserRole">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">UserRole</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">module</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qualname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">boundary</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ansys.grantami.recordlists.UserRole" title="Link to this definition">#</a></dt>
+<dd><p>Roles a user can have on a record list.</p>
+<p>Can be used in <a class="reference internal" href="#ansys.grantami.recordlists.SearchCriterion.user_role" title="ansys.grantami.recordlists.SearchCriterion.user_role"><code class="xref py py-attr docutils literal notranslate"><span class="pre">SearchCriterion.user_role</span></code></a>.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.UserRole.NONE">
+<span class="sig-name descname"><span class="pre">NONE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'None'</span></em><a class="headerlink" href="#ansys.grantami.recordlists.UserRole.NONE" title="Link to this definition">#</a></dt>
+<dd><p><a class="reference internal" href="#ansys.grantami.recordlists.UserRole" title="ansys.grantami.recordlists.UserRole"><code class="xref py py-class docutils literal notranslate"><span class="pre">UserRole</span></code></a> is currently only supported in searches. Searching for lists with user
+role = <a class="reference internal" href="#ansys.grantami.recordlists.UserRole.NONE" title="ansys.grantami.recordlists.UserRole.NONE"><code class="xref py py-attr docutils literal notranslate"><span class="pre">NONE</span></code></a> as criteria would exclude all lists from the results.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.UserRole.OWNER">
+<span class="sig-name descname"><span class="pre">OWNER</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Owner'</span></em><a class="headerlink" href="#ansys.grantami.recordlists.UserRole.OWNER" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.UserRole.SUBSCRIBER">
+<span class="sig-name descname"><span class="pre">SUBSCRIBER</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Subscriber'</span></em><a class="headerlink" href="#ansys.grantami.recordlists.UserRole.SUBSCRIBER" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.UserRole.CURATOR">
+<span class="sig-name descname"><span class="pre">CURATOR</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Curator'</span></em><a class="headerlink" href="#ansys.grantami.recordlists.UserRole.CURATOR" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.UserRole.ADMINISTRATOR">
+<span class="sig-name descname"><span class="pre">ADMINISTRATOR</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Administrator'</span></em><a class="headerlink" href="#ansys.grantami.recordlists.UserRole.ADMINISTRATOR" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.UserRole.PUBLISHER">
+<span class="sig-name descname"><span class="pre">PUBLISHER</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Publisher'</span></em><a class="headerlink" href="#ansys.grantami.recordlists.UserRole.PUBLISHER" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="search-results">
+<h2>Search results<a class="headerlink" href="#search-results" title="Link to this heading">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.SearchResult">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">SearchResult</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">record_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">items</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ansys.grantami.recordlists.SearchResult" title="Link to this definition">#</a></dt>
+<dd><p>Describes the result of a search.</p>
+<p>Read-only - do not directly instantiate or modify instances of this class.</p>
+<dl class="field-list simple">
+</dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.SearchResult.record_list">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">record_list</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#ansys.grantami.recordlists.RecordList" title="ansys.grantami.recordlists._models.RecordList"><span class="pre">RecordList</span></a></em><a class="headerlink" href="#ansys.grantami.recordlists.SearchResult.record_list" title="Link to this definition">#</a></dt>
+<dd><p>Details of the record list associated with the search result.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.SearchResult.items">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">items</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.14)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#ansys.grantami.recordlists.RecordListItem" title="ansys.grantami.recordlists._models.RecordListItem"><span class="pre">RecordListItem</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></em><a class="headerlink" href="#ansys.grantami.recordlists.SearchResult.items" title="Link to this definition">#</a></dt>
+<dd><p>Items of the record list associated with the search result.</p>
+<p>Will be <code class="docutils literal notranslate"><span class="pre">None</span></code> unless <code class="docutils literal notranslate"><span class="pre">include_items</span></code> has been specified in
+<a class="reference internal" href="connection.html#ansys.grantami.recordlists.RecordListsApiClient.search_for_lists" title="ansys.grantami.recordlists.RecordListsApiClient.search_for_lists"><code class="xref py py-meth docutils literal notranslate"><span class="pre">search_for_lists()</span></code></a></p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="audit-log-entries">
+<h2>Audit log entries<a class="headerlink" href="#audit-log-entries" title="Link to this heading">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.AuditLogSearchCriterion">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">AuditLogSearchCriterion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filter_record_lists</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_actions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ansys.grantami.recordlists.AuditLogSearchCriterion" title="Link to this definition">#</a></dt>
+<dd><p>Search criterion to use in a search operation <a class="reference internal" href="connection.html#ansys.grantami.recordlists.RecordListsApiClient.search_for_lists" title="ansys.grantami.recordlists.RecordListsApiClient.search_for_lists"><code class="xref py py-meth docutils literal notranslate"><span class="pre">search_for_lists()</span></code></a>.</p>
+<p class="rubric">Examples</p>
+<p>Search audit log entries for a given record list.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">criterion</span> <span class="o">=</span> <span class="n">AuditLogSearchCriterion</span><span class="p">(</span>
+<span class="gp">... </span>   <span class="n">filter_record_lists</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="gp">... </span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Search audit log entries for all record lists published or made not internal.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">criterion</span> <span class="o">=</span> <span class="n">AuditLogSearchCriterion</span><span class="p">(</span>
+<span class="gp">... </span>   <span class="n">filter_actions</span> <span class="o">=</span> <span class="p">{</span><span class="n">AuditLogAction</span><span class="o">.</span><span class="n">LISTPUBLISHED</span><span class="p">,</span> <span class="n">AuditLogAction</span><span class="o">.</span><span class="n">LISTMADENOTINTERNAL</span><span class="p">}</span>
+<span class="gp">... </span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+</dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.AuditLogSearchCriterion.filter_record_lists">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">filter_record_lists</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.14)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></em><a class="headerlink" href="#ansys.grantami.recordlists.AuditLogSearchCriterion.filter_record_lists" title="Link to this definition">#</a></dt>
+<dd><p>Filter audit log entries for only the specified record list identifiers.</p>
+<p>If None then log entries for all record lists will be included. Record list identifiers
+must be provided as valid UUID strings.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.AuditLogSearchCriterion.filter_actions">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">filter_actions</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Set" title="(in Python v3.14)"><span class="pre">Set</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#ansys.grantami.recordlists.AuditLogAction" title="ansys.grantami.recordlists._models.AuditLogAction"><span class="pre">AuditLogAction</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></em><a class="headerlink" href="#ansys.grantami.recordlists.AuditLogSearchCriterion.filter_actions" title="Link to this definition">#</a></dt>
+<dd><p>Filter audit log entries for only the specified actions.</p>
+<p>If None then log entries for all actions will be included.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.AuditLogItem">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">AuditLogItem</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">list_identifier</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initiating_user</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_or_group_affected</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">list_item_affected</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">action</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestamp</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ansys.grantami.recordlists.AuditLogItem" title="Link to this definition">#</a></dt>
+<dd><p>A log entry representing a single action affecting a record list.</p>
+<p>Read-only - do not directly instantiate or modify instances of this class.</p>
+<dl class="field-list simple">
+</dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.AuditLogItem.list_identifier">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">list_identifier</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></em><a class="headerlink" href="#ansys.grantami.recordlists.AuditLogItem.list_identifier" title="Link to this definition">#</a></dt>
+<dd><p>Identifier of the record list affected by the action that triggered this audit log entry.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.AuditLogItem.initiating_user">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">initiating_user</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#ansys.grantami.recordlists.UserOrGroup" title="ansys.grantami.recordlists._models.UserOrGroup"><span class="pre">UserOrGroup</span></a></em><a class="headerlink" href="#ansys.grantami.recordlists.AuditLogItem.initiating_user" title="Link to this definition">#</a></dt>
+<dd><p>User or Group that initiated the action that triggered this audit log entry.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.AuditLogItem.user_or_group_affected">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">user_or_group_affected</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#ansys.grantami.recordlists.UserOrGroup" title="ansys.grantami.recordlists._models.UserOrGroup"><span class="pre">UserOrGroup</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></em><a class="headerlink" href="#ansys.grantami.recordlists.AuditLogItem.user_or_group_affected" title="Link to this definition">#</a></dt>
+<dd><p>User or group affected by the action that triggered this audit log entry, if applicable.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.AuditLogItem.list_item_affected">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">list_item_affected</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#ansys.grantami.recordlists.RecordListItem" title="ansys.grantami.recordlists._models.RecordListItem"><span class="pre">RecordListItem</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></em><a class="headerlink" href="#ansys.grantami.recordlists.AuditLogItem.list_item_affected" title="Link to this definition">#</a></dt>
+<dd><p>Record list item affected by the action that triggered this audit log entry, if applicable.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.AuditLogItem.action">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">action</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#ansys.grantami.recordlists.AuditLogAction" title="ansys.grantami.recordlists._models.AuditLogAction"><span class="pre">AuditLogAction</span></a></em><a class="headerlink" href="#ansys.grantami.recordlists.AuditLogItem.action" title="Link to this definition">#</a></dt>
+<dd><p>Type of action that triggered this audit log entry.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.AuditLogItem.timestamp">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">timestamp</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.14)"><span class="pre">datetime</span></a></em><a class="headerlink" href="#ansys.grantami.recordlists.AuditLogItem.timestamp" title="Link to this definition">#</a></dt>
+<dd><p>Timestamp of the event that triggered this audit log entry.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.AuditLogAction">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">AuditLogAction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">module</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qualname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">boundary</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ansys.grantami.recordlists.AuditLogAction" title="Link to this definition">#</a></dt>
+<dd><p>Action logged involving a specific record list.</p>
+<p>Can be used in <a class="reference internal" href="#ansys.grantami.recordlists.AuditLogSearchCriterion.filter_actions" title="ansys.grantami.recordlists.AuditLogSearchCriterion.filter_actions"><code class="xref py py-attr docutils literal notranslate"><span class="pre">AuditLogSearchCriterion.filter_actions</span></code></a>.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.AuditLogAction.LISTCREATED">
+<span class="sig-name descname"><span class="pre">LISTCREATED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'ListCreated'</span></em><a class="headerlink" href="#ansys.grantami.recordlists.AuditLogAction.LISTCREATED" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.AuditLogAction.LISTDELETED">
+<span class="sig-name descname"><span class="pre">LISTDELETED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'ListDeleted'</span></em><a class="headerlink" href="#ansys.grantami.recordlists.AuditLogAction.LISTDELETED" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.AuditLogAction.ITEMADDED">
+<span class="sig-name descname"><span class="pre">ITEMADDED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'ItemAdded'</span></em><a class="headerlink" href="#ansys.grantami.recordlists.AuditLogAction.ITEMADDED" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.AuditLogAction.ITEMREMOVED">
+<span class="sig-name descname"><span class="pre">ITEMREMOVED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'ItemRemoved'</span></em><a class="headerlink" href="#ansys.grantami.recordlists.AuditLogAction.ITEMREMOVED" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.AuditLogAction.LISTNAMECHANGED">
+<span class="sig-name descname"><span class="pre">LISTNAMECHANGED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'ListNameChanged'</span></em><a class="headerlink" href="#ansys.grantami.recordlists.AuditLogAction.LISTNAMECHANGED" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.AuditLogAction.LISTDESCRIPTIONCHANGED">
+<span class="sig-name descname"><span class="pre">LISTDESCRIPTIONCHANGED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'ListDescriptionChanged'</span></em><a class="headerlink" href="#ansys.grantami.recordlists.AuditLogAction.LISTDESCRIPTIONCHANGED" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.AuditLogAction.LISTNOTESCHANGED">
+<span class="sig-name descname"><span class="pre">LISTNOTESCHANGED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'ListNotesChanged'</span></em><a class="headerlink" href="#ansys.grantami.recordlists.AuditLogAction.LISTNOTESCHANGED" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.AuditLogAction.LISTSETTOAWAITINGAPPROVALFORPUBLISHING">
+<span class="sig-name descname"><span class="pre">LISTSETTOAWAITINGAPPROVALFORPUBLISHING</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'ListSetToAwaitingApprovalForPublishing'</span></em><a class="headerlink" href="#ansys.grantami.recordlists.AuditLogAction.LISTSETTOAWAITINGAPPROVALFORPUBLISHING" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.AuditLogAction.LISTSETTOAWAITINGAPPROVALFORWITHDRAWAL">
+<span class="sig-name descname"><span class="pre">LISTSETTOAWAITINGAPPROVALFORWITHDRAWAL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'ListSetToAwaitingApprovalForWithdrawal'</span></em><a class="headerlink" href="#ansys.grantami.recordlists.AuditLogAction.LISTSETTOAWAITINGAPPROVALFORWITHDRAWAL" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.AuditLogAction.LISTAWAITINGAPPROVALFORPUBLISHINGREMOVED">
+<span class="sig-name descname"><span class="pre">LISTAWAITINGAPPROVALFORPUBLISHINGREMOVED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'ListAwaitingApprovalForPublishingRemoved'</span></em><a class="headerlink" href="#ansys.grantami.recordlists.AuditLogAction.LISTAWAITINGAPPROVALFORPUBLISHINGREMOVED" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.AuditLogAction.LISTAWAITINGAPPROVALFORWITHDRAWALREMOVED">
+<span class="sig-name descname"><span class="pre">LISTAWAITINGAPPROVALFORWITHDRAWALREMOVED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'ListAwaitingApprovalForWithdrawalRemoved'</span></em><a class="headerlink" href="#ansys.grantami.recordlists.AuditLogAction.LISTAWAITINGAPPROVALFORWITHDRAWALREMOVED" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.AuditLogAction.LISTPUBLISHED">
+<span class="sig-name descname"><span class="pre">LISTPUBLISHED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'ListPublished'</span></em><a class="headerlink" href="#ansys.grantami.recordlists.AuditLogAction.LISTPUBLISHED" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.AuditLogAction.LISTUNPUBLISHED">
+<span class="sig-name descname"><span class="pre">LISTUNPUBLISHED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'ListUnpublished'</span></em><a class="headerlink" href="#ansys.grantami.recordlists.AuditLogAction.LISTUNPUBLISHED" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.AuditLogAction.LISTREVISIONCREATED">
+<span class="sig-name descname"><span class="pre">LISTREVISIONCREATED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'ListRevisionCreated'</span></em><a class="headerlink" href="#ansys.grantami.recordlists.AuditLogAction.LISTREVISIONCREATED" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.AuditLogAction.LISTREVISIONDISCARDED">
+<span class="sig-name descname"><span class="pre">LISTREVISIONDISCARDED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'ListRevisionDiscarded'</span></em><a class="headerlink" href="#ansys.grantami.recordlists.AuditLogAction.LISTREVISIONDISCARDED" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.AuditLogAction.USERSUBSCRIBED">
+<span class="sig-name descname"><span class="pre">USERSUBSCRIBED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'UserSubscribed'</span></em><a class="headerlink" href="#ansys.grantami.recordlists.AuditLogAction.USERSUBSCRIBED" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.AuditLogAction.USERUNSUBSCRIBED">
+<span class="sig-name descname"><span class="pre">USERUNSUBSCRIBED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'UserUnsubscribed'</span></em><a class="headerlink" href="#ansys.grantami.recordlists.AuditLogAction.USERUNSUBSCRIBED" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.AuditLogAction.LISTCURATORADDED">
+<span class="sig-name descname"><span class="pre">LISTCURATORADDED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'ListCuratorAdded'</span></em><a class="headerlink" href="#ansys.grantami.recordlists.AuditLogAction.LISTCURATORADDED" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.AuditLogAction.LISTCURATORREMOVED">
+<span class="sig-name descname"><span class="pre">LISTCURATORREMOVED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'ListCuratorRemoved'</span></em><a class="headerlink" href="#ansys.grantami.recordlists.AuditLogAction.LISTCURATORREMOVED" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.AuditLogAction.LISTADMINADDED">
+<span class="sig-name descname"><span class="pre">LISTADMINADDED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'ListAdminAdded'</span></em><a class="headerlink" href="#ansys.grantami.recordlists.AuditLogAction.LISTADMINADDED" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.AuditLogAction.LISTADMINREMOVED">
+<span class="sig-name descname"><span class="pre">LISTADMINREMOVED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'ListAdminRemoved'</span></em><a class="headerlink" href="#ansys.grantami.recordlists.AuditLogAction.LISTADMINREMOVED" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.AuditLogAction.LISTPUBLISHERADDED">
+<span class="sig-name descname"><span class="pre">LISTPUBLISHERADDED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'ListPublisherAdded'</span></em><a class="headerlink" href="#ansys.grantami.recordlists.AuditLogAction.LISTPUBLISHERADDED" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.AuditLogAction.LISTPUBLISHERREMOVED">
+<span class="sig-name descname"><span class="pre">LISTPUBLISHERREMOVED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'ListPublisherRemoved'</span></em><a class="headerlink" href="#ansys.grantami.recordlists.AuditLogAction.LISTPUBLISHERREMOVED" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.AuditLogAction.LISTMADEINTERNAL">
+<span class="sig-name descname"><span class="pre">LISTMADEINTERNAL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'ListMadeInternal'</span></em><a class="headerlink" href="#ansys.grantami.recordlists.AuditLogAction.LISTMADEINTERNAL" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ansys.grantami.recordlists.AuditLogAction.LISTMADENOTINTERNAL">
+<span class="sig-name descname"><span class="pre">LISTMADENOTINTERNAL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'ListMadeNotInternal'</span></em><a class="headerlink" href="#ansys.grantami.recordlists.AuditLogAction.LISTMADENOTINTERNAL" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#record-list">Record list</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.RecordList"><code class="docutils literal notranslate"><span class="pre">RecordList</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.RecordList.name"><code class="docutils literal notranslate"><span class="pre">RecordList.name</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.RecordList.description"><code class="docutils literal notranslate"><span class="pre">RecordList.description</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.RecordList.notes"><code class="docutils literal notranslate"><span class="pre">RecordList.notes</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.RecordList.identifier"><code class="docutils literal notranslate"><span class="pre">RecordList.identifier</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.RecordList.created_timestamp"><code class="docutils literal notranslate"><span class="pre">RecordList.created_timestamp</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.RecordList.created_user"><code class="docutils literal notranslate"><span class="pre">RecordList.created_user</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.RecordList.last_modified_timestamp"><code class="docutils literal notranslate"><span class="pre">RecordList.last_modified_timestamp</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.RecordList.last_modified_user"><code class="docutils literal notranslate"><span class="pre">RecordList.last_modified_user</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.RecordList.published_timestamp"><code class="docutils literal notranslate"><span class="pre">RecordList.published_timestamp</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.RecordList.published_user"><code class="docutils literal notranslate"><span class="pre">RecordList.published_user</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.RecordList.published"><code class="docutils literal notranslate"><span class="pre">RecordList.published</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.RecordList.is_revision"><code class="docutils literal notranslate"><span class="pre">RecordList.is_revision</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.RecordList.awaiting_approval"><code class="docutils literal notranslate"><span class="pre">RecordList.awaiting_approval</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.RecordList.internal_use"><code class="docutils literal notranslate"><span class="pre">RecordList.internal_use</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.RecordList.parent_record_list_identifier"><code class="docutils literal notranslate"><span class="pre">RecordList.parent_record_list_identifier</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#record-list-item">Record list item</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.RecordListItem"><code class="docutils literal notranslate"><span class="pre">RecordListItem</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.RecordListItem.database_guid"><code class="docutils literal notranslate"><span class="pre">RecordListItem.database_guid</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.RecordListItem.table_guid"><code class="docutils literal notranslate"><span class="pre">RecordListItem.table_guid</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.RecordListItem.record_history_guid"><code class="docutils literal notranslate"><span class="pre">RecordListItem.record_history_guid</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.RecordListItem.record_version"><code class="docutils literal notranslate"><span class="pre">RecordListItem.record_version</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.RecordListItem.record_guid"><code class="docutils literal notranslate"><span class="pre">RecordListItem.record_guid</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#user-and-user-groups">User and user groups</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.UserOrGroup"><code class="docutils literal notranslate"><span class="pre">UserOrGroup</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.UserOrGroup.identifier"><code class="docutils literal notranslate"><span class="pre">UserOrGroup.identifier</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.UserOrGroup.display_name"><code class="docutils literal notranslate"><span class="pre">UserOrGroup.display_name</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.UserOrGroup.name"><code class="docutils literal notranslate"><span class="pre">UserOrGroup.name</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#search-criteria">Search criteria</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.SearchCriterion"><code class="docutils literal notranslate"><span class="pre">SearchCriterion</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.SearchCriterion.name_contains"><code class="docutils literal notranslate"><span class="pre">SearchCriterion.name_contains</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.SearchCriterion.user_role"><code class="docutils literal notranslate"><span class="pre">SearchCriterion.user_role</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.SearchCriterion.is_published"><code class="docutils literal notranslate"><span class="pre">SearchCriterion.is_published</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.SearchCriterion.is_awaiting_approval"><code class="docutils literal notranslate"><span class="pre">SearchCriterion.is_awaiting_approval</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.SearchCriterion.is_internal_use"><code class="docutils literal notranslate"><span class="pre">SearchCriterion.is_internal_use</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.SearchCriterion.is_revision"><code class="docutils literal notranslate"><span class="pre">SearchCriterion.is_revision</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.SearchCriterion.contains_records_in_databases"><code class="docutils literal notranslate"><span class="pre">SearchCriterion.contains_records_in_databases</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.SearchCriterion.contains_records_in_integration_schemas"><code class="docutils literal notranslate"><span class="pre">SearchCriterion.contains_records_in_integration_schemas</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.SearchCriterion.contains_records_in_tables"><code class="docutils literal notranslate"><span class="pre">SearchCriterion.contains_records_in_tables</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.SearchCriterion.contains_records"><code class="docutils literal notranslate"><span class="pre">SearchCriterion.contains_records</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.SearchCriterion.user_can_add_or_remove_items"><code class="docutils literal notranslate"><span class="pre">SearchCriterion.user_can_add_or_remove_items</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.BooleanCriterion"><code class="docutils literal notranslate"><span class="pre">BooleanCriterion</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.BooleanCriterion.match_any"><code class="docutils literal notranslate"><span class="pre">BooleanCriterion.match_any</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.BooleanCriterion.match_all"><code class="docutils literal notranslate"><span class="pre">BooleanCriterion.match_all</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.UserRole"><code class="docutils literal notranslate"><span class="pre">UserRole</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.UserRole.NONE"><code class="docutils literal notranslate"><span class="pre">UserRole.NONE</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.UserRole.OWNER"><code class="docutils literal notranslate"><span class="pre">UserRole.OWNER</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.UserRole.SUBSCRIBER"><code class="docutils literal notranslate"><span class="pre">UserRole.SUBSCRIBER</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.UserRole.CURATOR"><code class="docutils literal notranslate"><span class="pre">UserRole.CURATOR</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.UserRole.ADMINISTRATOR"><code class="docutils literal notranslate"><span class="pre">UserRole.ADMINISTRATOR</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.UserRole.PUBLISHER"><code class="docutils literal notranslate"><span class="pre">UserRole.PUBLISHER</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#search-results">Search results</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.SearchResult"><code class="docutils literal notranslate"><span class="pre">SearchResult</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.SearchResult.record_list"><code class="docutils literal notranslate"><span class="pre">SearchResult.record_list</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.SearchResult.items"><code class="docutils literal notranslate"><span class="pre">SearchResult.items</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#audit-log-entries">Audit log entries</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.AuditLogSearchCriterion"><code class="docutils literal notranslate"><span class="pre">AuditLogSearchCriterion</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.AuditLogSearchCriterion.filter_record_lists"><code class="docutils literal notranslate"><span class="pre">AuditLogSearchCriterion.filter_record_lists</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.AuditLogSearchCriterion.filter_actions"><code class="docutils literal notranslate"><span class="pre">AuditLogSearchCriterion.filter_actions</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.AuditLogItem"><code class="docutils literal notranslate"><span class="pre">AuditLogItem</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.AuditLogItem.list_identifier"><code class="docutils literal notranslate"><span class="pre">AuditLogItem.list_identifier</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.AuditLogItem.initiating_user"><code class="docutils literal notranslate"><span class="pre">AuditLogItem.initiating_user</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.AuditLogItem.user_or_group_affected"><code class="docutils literal notranslate"><span class="pre">AuditLogItem.user_or_group_affected</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.AuditLogItem.list_item_affected"><code class="docutils literal notranslate"><span class="pre">AuditLogItem.list_item_affected</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.AuditLogItem.action"><code class="docutils literal notranslate"><span class="pre">AuditLogItem.action</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.AuditLogItem.timestamp"><code class="docutils literal notranslate"><span class="pre">AuditLogItem.timestamp</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.AuditLogAction"><code class="docutils literal notranslate"><span class="pre">AuditLogAction</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.AuditLogAction.LISTCREATED"><code class="docutils literal notranslate"><span class="pre">AuditLogAction.LISTCREATED</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.AuditLogAction.LISTDELETED"><code class="docutils literal notranslate"><span class="pre">AuditLogAction.LISTDELETED</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.AuditLogAction.ITEMADDED"><code class="docutils literal notranslate"><span class="pre">AuditLogAction.ITEMADDED</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.AuditLogAction.ITEMREMOVED"><code class="docutils literal notranslate"><span class="pre">AuditLogAction.ITEMREMOVED</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.AuditLogAction.LISTNAMECHANGED"><code class="docutils literal notranslate"><span class="pre">AuditLogAction.LISTNAMECHANGED</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.AuditLogAction.LISTDESCRIPTIONCHANGED"><code class="docutils literal notranslate"><span class="pre">AuditLogAction.LISTDESCRIPTIONCHANGED</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.AuditLogAction.LISTNOTESCHANGED"><code class="docutils literal notranslate"><span class="pre">AuditLogAction.LISTNOTESCHANGED</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.AuditLogAction.LISTSETTOAWAITINGAPPROVALFORPUBLISHING"><code class="docutils literal notranslate"><span class="pre">AuditLogAction.LISTSETTOAWAITINGAPPROVALFORPUBLISHING</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.AuditLogAction.LISTSETTOAWAITINGAPPROVALFORWITHDRAWAL"><code class="docutils literal notranslate"><span class="pre">AuditLogAction.LISTSETTOAWAITINGAPPROVALFORWITHDRAWAL</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.AuditLogAction.LISTAWAITINGAPPROVALFORPUBLISHINGREMOVED"><code class="docutils literal notranslate"><span class="pre">AuditLogAction.LISTAWAITINGAPPROVALFORPUBLISHINGREMOVED</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.AuditLogAction.LISTAWAITINGAPPROVALFORWITHDRAWALREMOVED"><code class="docutils literal notranslate"><span class="pre">AuditLogAction.LISTAWAITINGAPPROVALFORWITHDRAWALREMOVED</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.AuditLogAction.LISTPUBLISHED"><code class="docutils literal notranslate"><span class="pre">AuditLogAction.LISTPUBLISHED</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.AuditLogAction.LISTUNPUBLISHED"><code class="docutils literal notranslate"><span class="pre">AuditLogAction.LISTUNPUBLISHED</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.AuditLogAction.LISTREVISIONCREATED"><code class="docutils literal notranslate"><span class="pre">AuditLogAction.LISTREVISIONCREATED</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.AuditLogAction.LISTREVISIONDISCARDED"><code class="docutils literal notranslate"><span class="pre">AuditLogAction.LISTREVISIONDISCARDED</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.AuditLogAction.USERSUBSCRIBED"><code class="docutils literal notranslate"><span class="pre">AuditLogAction.USERSUBSCRIBED</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.AuditLogAction.USERUNSUBSCRIBED"><code class="docutils literal notranslate"><span class="pre">AuditLogAction.USERUNSUBSCRIBED</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.AuditLogAction.LISTCURATORADDED"><code class="docutils literal notranslate"><span class="pre">AuditLogAction.LISTCURATORADDED</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.AuditLogAction.LISTCURATORREMOVED"><code class="docutils literal notranslate"><span class="pre">AuditLogAction.LISTCURATORREMOVED</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.AuditLogAction.LISTADMINADDED"><code class="docutils literal notranslate"><span class="pre">AuditLogAction.LISTADMINADDED</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.AuditLogAction.LISTADMINREMOVED"><code class="docutils literal notranslate"><span class="pre">AuditLogAction.LISTADMINREMOVED</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.AuditLogAction.LISTPUBLISHERADDED"><code class="docutils literal notranslate"><span class="pre">AuditLogAction.LISTPUBLISHERADDED</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.AuditLogAction.LISTPUBLISHERREMOVED"><code class="docutils literal notranslate"><span class="pre">AuditLogAction.LISTPUBLISHERREMOVED</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.AuditLogAction.LISTMADEINTERNAL"><code class="docutils literal notranslate"><span class="pre">AuditLogAction.LISTMADEINTERNAL</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ansys.grantami.recordlists.AuditLogAction.LISTMADENOTINTERNAL"><code class="docutils literal notranslate"><span class="pre">AuditLogAction.LISTMADENOTINTERNAL</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+  <div role="note" aria-label="source link">
+    <ul class="this-page-menu">
+      <li><a href="../_sources/api/models.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+
+  <!-- Include desired assets -->
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.7/require.min.js"></script>
+
+<script>
+// Passing the search options to the search.js file
+const SEARCH_OPTIONS = JSON.parse('{"keys": ["title", "text", "objectID"], "limit": 10, "threshold": 0.2}');
+const SEARCH_FILE = "../_static/search.json";
+const ADVANCE_SEARCH_PATH = "../search.html";
+const EXTRA_SOURCES = JSON.parse('""');
+</script>
+
+
+<script src="../_static/js/search.js"></script>
+
+  
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright (c) 2026 ANSYS, Inc. All rights reserved.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<!--
+  Theme Version Footer
+  Displays the Sphinx theme version and the last updated date.
+  Accessibility and semantic improvements included.
+-->
+<footer class="theme-version" aria-label="Theme version and last update">
+  <span>
+    
+      Built with the
+      <a href="https://sphinxdocs.ansys.com/version/stable/index.html" target="_blank" rel="noopener noreferrer">
+        Ansys Sphinx Theme
+      </a>
+      1.7.0.
+    
+  </span>
+  <br />
+  <span>Last updated on <time id="ast_build_date"></time></span>
+</footer>
+<script>
+  // Set the last updated date in a readable format
+  (function() {
+    var options = { day: "numeric", month: "long", year: "numeric" };
+    var ast_lastModifiedDate = new Date(document.lastModified);
+    var ast_build_date = ast_lastModifiedDate.toLocaleDateString("en-US", options);
+    var dateElem = document.getElementById("ast_build_date");
+    if (dateElem) {
+      dateElem.textContent = ast_build_date;
+    }
+  })();
+</script></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>
