@@ -1,0 +1,354 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "id": "1b4ce63f",
+   "metadata": {},
+   "source": [
+    "# Getting started\n",
+    "This example shows how to connect to Granta MI and perform basic operations on record lists."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "c572f8b4",
+   "metadata": {},
+   "source": [
+    "## Connect to Granta MI"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "39346a33",
+   "metadata": {},
+   "source": [
+    "First, use the ``ansys.grantami.recordlists.Connection`` class to connect to the Granta MI\n",
+    "server. The ``Connection`` class uses a fluent interface to build the connection, which is\n",
+    "always invoked in the following sequence:\n",
+    "\n",
+    "1. Specify your Granta MI Service Layer URL as a parameter to the ``Connection`` class.\n",
+    "2. Specify the authentication method using a ``Connection.with_...()`` method.\n",
+    "3. Use the ``Connection.connect()`` method to finalize the connection.\n",
+    "\n",
+    "This returns a client object, called ``client`` in these examples."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "c7787431",
+   "metadata": {
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "from ansys.grantami.recordlists import Connection, RecordListItem\n",
+    "\n",
+    "connection = Connection(\"http://my_grantami_server/mi_servicelayer\").with_autologon()\n",
+    "client = connection.connect()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "b95bd11f",
+   "metadata": {},
+   "source": [
+    "## Create a new record list\n",
+    "API operations expect a ``RecordList`` instance as input. For the purpose of this example, create\n",
+    "a new record list, using the ``create_list`` method. It returns a ``RecordList`` instance."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "4679a7b3",
+   "metadata": {
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "example_list = client.create_list(\n",
+    "    name=\"Example list\",\n",
+    "    description=f\"Created by example 00_Basic_usage\",\n",
+    ")\n",
+    "example_list"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "8c0b19a8",
+   "metadata": {},
+   "source": [
+    "## Get the details of an existing record list\n",
+    "The ``get_list`` method allows obtaining a ``RecordList`` instance from an existing record list\n",
+    "unique identifier. This can be useful when the identifier is already known, for example if it has\n",
+    "been obtained from the Favorites application or if it is hard-coded in the script configuration."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "e8c9ceb3",
+   "metadata": {
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "list_details = client.get_list(example_list.identifier)\n",
+    "list_details"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "836b93fa",
+   "metadata": {
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "print(f\"Name: {list_details.name}\")\n",
+    "print(f\"Identifier: {list_details.identifier}\")\n",
+    "print(f\"Notes: {list_details.notes}\")\n",
+    "print(f\"Description: {list_details.description}\")\n",
+    "print(f\"Created timestamp: {list_details.created_timestamp}\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "d629cd21",
+   "metadata": {},
+   "source": [
+    "## Get all record lists"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "c337a6f8",
+   "metadata": {
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "all_lists = client.get_all_lists()\n",
+    "all_lists"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "e05b6940",
+   "metadata": {},
+   "source": [
+    "## Copy a record list"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "8efe3ec4",
+   "metadata": {
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "list_copy = client.copy_list(example_list)\n",
+    "list_copy"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "f1d72a95",
+   "metadata": {},
+   "source": [
+    "## Update a record list"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "13d2eec4",
+   "metadata": {
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "updated_list_copy = client.update_list(\n",
+    "    list_copy,\n",
+    "    name=\"Copied - Example List\",\n",
+    "    description=None,\n",
+    "    notes=\"Copy of the example list\",\n",
+    ")\n",
+    "print(f\"Name: {updated_list_copy.name}\")\n",
+    "print(f\"Identifier: {updated_list_copy.identifier}\")\n",
+    "print(f\"Notes: {updated_list_copy.notes}\")\n",
+    "print(f\"Description: {updated_list_copy.description}\")\n",
+    "print(f\"Created timestamp: {updated_list_copy.created_timestamp}\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "25bb4460",
+   "metadata": {},
+   "source": [
+    "## Delete a record list"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "0b35ef68",
+   "metadata": {
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "client.delete_list(updated_list_copy)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "cf4a972f",
+   "metadata": {},
+   "source": [
+    "## Read the items in a record list\n",
+    "The list was created at the beginning of this example, so the list is currently empty."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "ee6daeee",
+   "metadata": {
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "items = client.get_list_items(example_list)\n",
+    "items"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "7685802f",
+   "metadata": {},
+   "source": [
+    "## Add items to a record list\n",
+    "Add items to a list using ``add_items_to_list``.\n",
+    "Items are described using the database GUID, table GUID, and record history GUID."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "1b2c77c7",
+   "metadata": {
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "client.add_items_to_list(\n",
+    "    example_list,\n",
+    "    items=[\n",
+    "        RecordListItem(\n",
+    "            database_guid=\"e595fe23-b450-4d18-8c08-4a0f378ef095\",\n",
+    "            table_guid=\"81dff531-0254-4fbe-9621-174b10aaee3d\",\n",
+    "            record_history_guid=\"3bc2b82f-0199-4f3b-a7af-8d520250b180\",\n",
+    "        ),\n",
+    "    ],\n",
+    ")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "6b179b92",
+   "metadata": {},
+   "source": [
+    "Then retrieve the items and confirm that the record list now includes the added items."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "02249fa1",
+   "metadata": {
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "list_items = client.get_list_items(example_list)\n",
+    "list_items"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "9b7183b5",
+   "metadata": {},
+   "source": [
+    "## Remove items from a record list\n",
+    "Remove items from a record list using ``remove_items_from_list``."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "031249bf",
+   "metadata": {
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "client.remove_items_from_list(\n",
+    "    example_list,\n",
+    "    items=list_items,\n",
+    ")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "e0b2c303",
+   "metadata": {},
+   "source": [
+    "Then retrieve the items again and confirm that the record list is empty."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "af1f3db0",
+   "metadata": {
+    "lines_to_next_cell": 2,
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "items = client.get_list_items(example_list)\n",
+    "items"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "19d49149",
+   "metadata": {
+    "nbsphinx": "hidden"
+   },
+   "outputs": [],
+   "source": [
+    "client.delete_list(example_list)"
+   ]
+  }
+ ],
+ "metadata": {
+  "jupytext": {
+   "formats": "ipynb,py:light"
+  },
+  "kernelspec": {
+   "display_name": "Python 3 (ipykernel)",
+   "language": "python",
+   "name": "python3"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}

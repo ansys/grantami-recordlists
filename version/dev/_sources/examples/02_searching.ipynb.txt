@@ -1,0 +1,287 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "id": "c2a22adb",
+   "metadata": {},
+   "source": [
+    "# Searching\n",
+    "This notebook demonstrates how to search for record lists using ``SearchCriterion`` and\n",
+    "``BooleanCriterion``."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "2504bcdf",
+   "metadata": {},
+   "source": [
+    ".. note:: Running this notebook requires permissions to request publication of, to publish, and to\n",
+    "revise a record list. Contact your Granta MI administrator for more information."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "e81f7af0",
+   "metadata": {},
+   "source": [
+    "## Connect to Granta MI and create a record list"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "3a0a3edb",
+   "metadata": {},
+   "source": [
+    "Import the ``Connection`` class and create the connection. See the\n",
+    "[Getting started](00_basic_usage.ipynb) example for more details."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "93cddefb",
+   "metadata": {
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "from ansys.grantami.recordlists import (\n",
+    "    BooleanCriterion,\n",
+    "    Connection,\n",
+    "    RecordListItem,\n",
+    "    SearchCriterion,\n",
+    "    UserRole,\n",
+    ")\n",
+    "\n",
+    "connection = Connection(\"http://my_grantami_server/mi_servicelayer\").with_autologon()\n",
+    "client = connection.connect()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "b287a477",
+   "metadata": {},
+   "source": [
+    "Create some record lists for use in this example:\n",
+    "\n",
+    "* ``identifier_a``: Published, empty\n",
+    "* ``identifier_b``: Published, populated\n",
+    "* ``identifier_c``: Revision of ``identifier_b``\n",
+    "* ``identifier_d``: Unpublished\n",
+    "\n",
+    "See the\n",
+    "[Publishing, revising, and withdrawing record lists](01_publishing_revising_withdrawing.ipynb)\n",
+    "example for more details."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "ad345c8e",
+   "metadata": {
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "list_a = client.create_list(name=\"Approved materials - Metals\")\n",
+    "list_a = client.request_list_approval(list_a)\n",
+    "list_a = client.publish_list(list_a)\n",
+    "\n",
+    "list_b = client.create_list(name=\"Approved materials - Ceramics\")\n",
+    "list_b_item = RecordListItem(\n",
+    "    \"9716c5a3-da85-4126-a922-3fbb854656d8\",\n",
+    "    \"d352fd12-c342-41c1-9da7-dac0dac1c6d9\",\n",
+    "    \"c61e8f3a-d7e1-4b7f-8232-b2495eae6c15\",\n",
+    ")\n",
+    "client.add_items_to_list(\n",
+    "    list_b,\n",
+    "    items=[list_b_item],\n",
+    ")\n",
+    "list_b = client.request_list_approval(list_b)\n",
+    "list_b = client.publish_list(list_b)\n",
+    "\n",
+    "list_c = client.revise_list(list_b)\n",
+    "list_d = client.create_list(name=\"My personal list\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "22f46bfb",
+   "metadata": {},
+   "source": [
+    "## Search for a record list by name"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "f10361f9",
+   "metadata": {},
+   "source": [
+    "Use the `name_contains` keyword argument for the ``SearchCriterion`` constructor to specify\n",
+    "a search criterion based on the record list name."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "bf3e2f9a",
+   "metadata": {
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "results = client.search_for_lists(SearchCriterion(name_contains=\"Approved materials - Ceramics\"))\n",
+    "results"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "5d9434c9",
+   "metadata": {},
+   "source": [
+    "## Search for 'personal' record lists\n",
+    "A 'personal' record list is a list that the current user has created for their own use. It is\n",
+    "owned by the current user, is not published, is not awaiting approval, and is not a revision of\n",
+    "another list. Lists are generally in this state if they are created in the Favorites or Explore\n",
+    "apps and are not submitted for publication."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "38136744",
+   "metadata": {},
+   "source": [
+    "To search for a list of this type, use the ``SearchCriterion`` below. Set\n",
+    "``is_internal_use=False`` to exclude transient record lists created by Granta MI for\n",
+    "internal use only, which would otherwise be returned by this search."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "d707571e",
+   "metadata": {
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "criterion = SearchCriterion(\n",
+    "    is_published=False,\n",
+    "    is_revision=False,\n",
+    "    is_awaiting_approval=False,\n",
+    "    is_internal_use=False,\n",
+    "    user_role=UserRole.OWNER,\n",
+    ")\n",
+    "results = client.search_for_lists(criterion)\n",
+    "results"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "81d548f2",
+   "metadata": {},
+   "source": [
+    "## Search for a record list by contents\n",
+    "Search for record lists that contain a specific record with the ``contains_records`` keyword.\n",
+    "Specifying ``include_items=True`` when calling ``search_for_lists`` will populate ``items`` on\n",
+    "the results."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "5afcf167",
+   "metadata": {
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "criterion = SearchCriterion(contains_records=[list_b_item])\n",
+    "results = client.search_for_lists(criterion, include_items=True)\n",
+    "results"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "58812d01",
+   "metadata": {
+    "lines_to_next_cell": 2,
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "results[0].items"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "3a7ff9de",
+   "metadata": {},
+   "source": [
+    "## Search using a complex criterion\n",
+    "Build complex queries with ``BooleanCriterion``. For example, search for published record lists\n",
+    "following the naming convention \"Approved materials - {Material family}\", but specifically only\n",
+    "metals and ceramics."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "08b74b6a",
+   "metadata": {
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "criterion = BooleanCriterion(\n",
+    "    match_all=[\n",
+    "        SearchCriterion(\n",
+    "            name_contains=\"Approved materials\",\n",
+    "            is_published=True,\n",
+    "        ),\n",
+    "        BooleanCriterion(\n",
+    "            match_any=[\n",
+    "                SearchCriterion(\n",
+    "                    name_contains=\"Metals\",\n",
+    "                ),\n",
+    "                SearchCriterion(\n",
+    "                    name_contains=\"Ceramics\",\n",
+    "                ),\n",
+    "            ]\n",
+    "        ),\n",
+    "    ]\n",
+    ")\n",
+    "results = client.search_for_lists(criterion)\n",
+    "results"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "868be96f",
+   "metadata": {
+    "nbsphinx": "hidden"
+   },
+   "outputs": [],
+   "source": [
+    "client.delete_list(list_a)\n",
+    "client.delete_list(list_b)\n",
+    "client.delete_list(list_c)\n",
+    "client.delete_list(list_d)"
+   ]
+  }
+ ],
+ "metadata": {
+  "jupytext": {
+   "formats": "ipynb,py:light"
+  },
+  "kernelspec": {
+   "display_name": "Python 3 (ipykernel)",
+   "language": "python",
+   "name": "python3"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}
