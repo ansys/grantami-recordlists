@@ -133,8 +133,7 @@ def basic_client(
 
     all_lists = client.get_all_lists()
     for record_list in all_lists:
-        if list_name in record_list.name:
-            client.delete_list(record_list)
+        client.delete_list(record_list)
 
 
 @pytest.fixture(scope="session")
