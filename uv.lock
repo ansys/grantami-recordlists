@@ -30,7 +30,7 @@ wheels = [
 
 [[package]]
 name = "ansys-grantami-recordlists"
-version = "2.1.0.dev0"
+version = "2.2.0.dev0"
 source = { editable = "." }
 dependencies = [
     { name = "ansys-grantami-serverapi-openapi" },
