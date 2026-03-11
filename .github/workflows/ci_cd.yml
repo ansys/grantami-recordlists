@@ -52,7 +52,7 @@ jobs:
     name: "Check actions security"
     runs-on: ubuntu-latest
     steps:
-      - uses: ansys/actions/check-actions-security@3931ac9351b13ae11b1203c2ef6b51e5c75502ea # v10.2.5
+      - uses: ansys/actions/check-actions-security@1f4f0896a8e49d3aec2f02ced215b04a32c85f28 # v10.2.7
         with:
           generate-summary: true
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -144,7 +144,7 @@ jobs:
         run: uv run --frozen pytest ./tests -m "not integration"
 
       - name: "Upload coverage artifacts"
-        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f  # v6.0.0
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f  # v7.0.0
         if: ${{ matrix.python-version == env.MAIN_PYTHON_VERSION && matrix.os == 'ubuntu-latest' && !startsWith( github.event.pull_request.head.ref, 'dependabot/') }}
         with:
           name: coverage-html-unittests
