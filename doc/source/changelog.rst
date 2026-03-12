@@ -11,6 +11,32 @@ See `CHANGELOG.md <https://github.com/ansys/grantami-recordlists/blob/main/CHANG
 
 .. towncrier release notes start
 
+`2.1.1 <https://github.com/ansys/grantami-recordlists/releases/tag/v2.1.1>`_ - March 12, 2026
+=============================================================================================
+
+.. tab-set::
+
+
+  .. tab-item:: Miscellaneous
+
+    .. list-table::
+        :header-rows: 0
+        :widths: auto
+
+        * - Prepare 2.1.1 release
+          - `#585 <https://github.com/ansys/grantami-recordlists/pull/585>`_
+
+
+  .. tab-item:: Documentation
+
+    .. list-table::
+        :header-rows: 0
+        :widths: auto
+
+        * - Update documentation to refer to 2026 R1 help
+          - `#582 <https://github.com/ansys/grantami-recordlists/pull/582>`_
+
+
 `2.1.0 <https://github.com/ansys/grantami-recordlists/releases/tag/v2.1.0>`_ - March 05, 2026
 =============================================================================================
 
