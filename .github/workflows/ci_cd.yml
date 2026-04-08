@@ -39,7 +39,7 @@ jobs:
     name: "Check library vulnerabilities"
     runs-on: ubuntu-latest
     steps:
-      - uses: ansys/actions/check-vulnerabilities@1f4f0896a8e49d3aec2f02ced215b04a32c85f28  # v10.2.7
+      - uses: ansys/actions/check-vulnerabilities@7d55ff0b9f67c77dae50a286d711ee1ae27b0a25  # v10.2.12
         with:
           python-version: ${{ env.MAIN_PYTHON_VERSION }}
           token: ${{ secrets.PYANSYS_CI_BOT_TOKEN }}
@@ -52,7 +52,7 @@ jobs:
     name: "Check actions security"
     runs-on: ubuntu-latest
     steps:
-      - uses: ansys/actions/check-actions-security@1f4f0896a8e49d3aec2f02ced215b04a32c85f28 # v10.2.7
+      - uses: ansys/actions/check-actions-security@7d55ff0b9f67c77dae50a286d711ee1ae27b0a25 # v10.2.12
         with:
           generate-summary: true
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -63,7 +63,7 @@ jobs:
     name: "Code style"
     runs-on: ubuntu-latest
     steps:
-      - uses: ansys/actions/code-style@1f4f0896a8e49d3aec2f02ced215b04a32c85f28  # v10.2.7
+      - uses: ansys/actions/code-style@7d55ff0b9f67c77dae50a286d711ee1ae27b0a25  # v10.2.12
         with:
           python-version: ${{ env.MAIN_PYTHON_VERSION }}
           skip-install: false
@@ -76,7 +76,7 @@ jobs:
     name: "Documentation style"
     runs-on: ubuntu-latest
     steps:
-      - uses: ansys/actions/doc-style@1f4f0896a8e49d3aec2f02ced215b04a32c85f28  # v10.2.7
+      - uses: ansys/actions/doc-style@7d55ff0b9f67c77dae50a286d711ee1ae27b0a25  # v10.2.12
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -85,7 +85,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: "Run Ansys documentation building action"
-      uses: ansys/actions/doc-build@1f4f0896a8e49d3aec2f02ced215b04a32c85f28  # v10.2.7
+      uses: ansys/actions/doc-build@7d55ff0b9f67c77dae50a286d711ee1ae27b0a25  # v10.2.12
       with:
         check-links: false
         dependencies: "pandoc"
@@ -113,7 +113,7 @@ jobs:
            os: [ubuntu-latest, windows-latest]
            python-version: ['3.10', '3.11', '3.12', '3.13', '3.14']
     steps:
-      - uses: ansys/actions/build-wheelhouse@1f4f0896a8e49d3aec2f02ced215b04a32c85f28  # v10.2.7
+      - uses: ansys/actions/build-wheelhouse@7d55ff0b9f67c77dae50a286d711ee1ae27b0a25  # v10.2.12
         with:
           library-name: ${{ env.LIBRARY_NAME }}
           operating-system: ${{ matrix.os }}
@@ -136,7 +136,7 @@ jobs:
           persist-credentials: false
 
       - name: Install uv
-        uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78  # zizmor: ignore[cache-poisoning] - This job does not produce artifacts used by release
+        uses: astral-sh/setup-uv@cec208311dfd045dd5311c1add060b2062131d57  # zizmor: ignore[cache-poisoning] - This job does not produce artifacts used by release
         with:
           python-version: ${{ matrix.python-version }}
 
@@ -152,7 +152,7 @@ jobs:
           retention-days: 7
 
       - name: "Upload coverage to Codecov"
-        uses: codecov/codecov-action@671740ac38dd9b0130fbe1cec585b89eea48d3de  # v5.5.2
+        uses: codecov/codecov-action@57e3a136b779b570ffcdbf80b3bdc90e7fab3de2  # v6.0.0
         if: ${{ matrix.python-version == env.MAIN_PYTHON_VERSION && matrix.os == 'ubuntu-latest' && !startsWith( github.event.pull_request.head.ref, 'dependabot/') }}
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
@@ -169,7 +169,7 @@ jobs:
       id-token: write  # Required for Sigstore
       attestations: write  # Required to generate attestation
     steps:
-      - uses: ansys/actions/build-library@1f4f0896a8e49d3aec2f02ced215b04a32c85f28  # v10.2.7
+      - uses: ansys/actions/build-library@7d55ff0b9f67c77dae50a286d711ee1ae27b0a25  # v10.2.12
         with:
           library-name: ${{ env.LIBRARY_NAME }}
           python-version: ${{ env.MAIN_PYTHON_VERSION }}
@@ -223,7 +223,7 @@ jobs:
     permissions:
       contents: write  # to allow the Action to push to the gh-pages branch
     steps:
-      - uses: ansys/actions/doc-deploy-dev@1f4f0896a8e49d3aec2f02ced215b04a32c85f28  # v10.2.7
+      - uses: ansys/actions/doc-deploy-dev@7d55ff0b9f67c77dae50a286d711ee1ae27b0a25  # v10.2.12
         with:
           cname: ${{ env.DOCUMENTATION_CNAME }}
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -238,7 +238,7 @@ jobs:
     if: (github.event_name == 'workflow_dispatch') && (github.ref == 'refs/heads/main') && (inputs.publish-to-private-pypi == 'true')
     steps:
       - name: "Release to private PyPI"
-        uses: ansys/actions/release-pypi-private@1f4f0896a8e49d3aec2f02ced215b04a32c85f28  # v10.2.7
+        uses: ansys/actions/release-pypi-private@7d55ff0b9f67c77dae50a286d711ee1ae27b0a25  # v10.2.12
         with:
           library-name: ${{ env.LIBRARY_NAME }}
           twine-username: "__token__"
@@ -252,7 +252,7 @@ jobs:
       contents: write  # to allow the Action to push to the repo
       pull-requests: write   # to allow the Action to create a PR if needed
     steps:
-      - uses: ansys/actions/doc-deploy-changelog@1f4f0896a8e49d3aec2f02ced215b04a32c85f28  # v10.2.7
+      - uses: ansys/actions/doc-deploy-changelog@7d55ff0b9f67c77dae50a286d711ee1ae27b0a25  # v10.2.12
         with:
           token: ${{ secrets.PYANSYS_CI_BOT_TOKEN }}
           bot-user: ${{ secrets.PYANSYS_CI_BOT_USERNAME }}
@@ -275,14 +275,14 @@ jobs:
           path: ${{ env.LIBRARY_NAME }}-artifacts
 
       - name: "Upload artifacts to PyPI using trusted publisher"
-        uses: pypa/gh-action-pypi-publish@ed0c53931b1dc9bd32cbe73a98c7f6766f8a527e  # v1.13.0
+        uses: pypa/gh-action-pypi-publish@cef221092ed1bacb1cc03d23a2d87d1d172e277b  # v1.14.0
         with:
           repository-url: "https://upload.pypi.org/legacy/"
           print-hash: true
           packages-dir: ${{ env.LIBRARY_NAME }}-artifacts
           skip-existing: false
 
-      - uses: ansys/actions/release-github@1f4f0896a8e49d3aec2f02ced215b04a32c85f28  # v10.2.7
+      - uses: ansys/actions/release-github@7d55ff0b9f67c77dae50a286d711ee1ae27b0a25  # v10.2.12
         name: "Release to GitHub"
         with:
           library-name: ${{ env.LIBRARY_NAME }}
@@ -296,7 +296,7 @@ jobs:
     permissions:
       contents: write  # To allow the Action to push to the gh-pages branch
     steps:
-      - uses: ansys/actions/doc-deploy-stable@1f4f0896a8e49d3aec2f02ced215b04a32c85f28  # v10.2.7
+      - uses: ansys/actions/doc-deploy-stable@7d55ff0b9f67c77dae50a286d711ee1ae27b0a25  # v10.2.12
         with:
           cname: ${{ env.DOCUMENTATION_CNAME }}
           token: ${{ secrets.GITHUB_TOKEN }}
