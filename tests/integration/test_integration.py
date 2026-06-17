@@ -798,9 +798,10 @@ class _TestSearch:
     _name_suffix_training_and_rs_items = "_ListE"
 
     @pytest.fixture(scope="class")
-    def list_personal(self, admin_client, list_name):
+    @classmethod
+    def list_personal(cls, admin_client, list_name):
         """A personal list with a known name."""
-        unique_list_name = f"{list_name}{self._name_suffix_personal}"
+        unique_list_name = f"{list_name}{cls._name_suffix_personal}"
         created_list = admin_client.create_list(unique_list_name)
 
         yield created_list
@@ -808,9 +809,10 @@ class _TestSearch:
         admin_client.delete_list(created_list)
 
     @pytest.fixture(scope="class")
-    def list_published(self, admin_client, list_name):
+    @classmethod
+    def list_published(cls, admin_client, list_name):
         """A published list with a known name."""
-        unique_list_name = f"{list_name}{self._name_suffix_published}"
+        unique_list_name = f"{list_name}{cls._name_suffix_published}"
         created_list = admin_client.create_list(unique_list_name)
         admin_client.request_list_approval(created_list)
         admin_client.publish_list(created_list)
@@ -820,10 +822,11 @@ class _TestSearch:
         admin_client.delete_list(created_list)
 
     @pytest.fixture(scope="class")
-    def list_mi_training_items(self, admin_client, list_name, list_published, resolvable_items):
+    @classmethod
+    def list_mi_training_items(cls, admin_client, list_name, list_published, resolvable_items):
         """A revision of list B with a known name and items from MI Training."""
         created_list = admin_client.revise_list(list_published)
-        unique_list_name = f"{list_name}{self._name_suffix_published_training_items}"
+        unique_list_name = f"{list_name}{cls._name_suffix_published_training_items}"
         admin_client.update_list(created_list, name=unique_list_name)
         admin_client.add_items_to_list(created_list, resolvable_items)
 
@@ -832,9 +835,10 @@ class _TestSearch:
         admin_client.delete_list(created_list)
 
     @pytest.fixture(scope="class")
-    def list_rs_items(self, admin_client, list_name, list_published, resolvable_rs_items):
+    @classmethod
+    def list_rs_items(cls, admin_client, list_name, list_published, resolvable_rs_items):
         """A list with a known name and items from Restricted Substances."""
-        unique_list_name = f"{list_name}{self._name_suffix_rs_items}"
+        unique_list_name = f"{list_name}{cls._name_suffix_rs_items}"
         created_list = admin_client.create_list(unique_list_name)
         admin_client.add_items_to_list(created_list, resolvable_rs_items)
 
@@ -843,11 +847,12 @@ class _TestSearch:
         admin_client.delete_list(created_list)
 
     @pytest.fixture(scope="class")
+    @classmethod
     def list_mi_training_and_rs_items(
-        self, admin_client, list_name, list_published, resolvable_items, resolvable_rs_items
+        cls, admin_client, list_name, list_published, resolvable_items, resolvable_rs_items
     ):
         """A list with a known name and items from MI Training and Restricted Substances."""
-        unique_list_name = f"{list_name}{self._name_suffix_training_and_rs_items}"
+        unique_list_name = f"{list_name}{cls._name_suffix_training_and_rs_items}"
         created_list = admin_client.create_list(unique_list_name)
         admin_client.add_items_to_list(created_list, resolvable_items)
         admin_client.add_items_to_list(created_list, resolvable_rs_items)
@@ -857,8 +862,9 @@ class _TestSearch:
         admin_client.delete_list(created_list)
 
     @pytest.fixture(scope="class", autouse=True)
+    @classmethod
     def multiple_lists(
-        self,
+        cls,
         list_personal,
         list_published,
         list_mi_training_items,
@@ -1353,16 +1359,18 @@ class TestAuditLogging:
     _name_suffix_B = "_ListB"
 
     @pytest.fixture(scope="class")
-    def list_a(self, admin_client, list_name):
+    @classmethod
+    def list_a(cls, admin_client, list_name):
         """A personal list with a known name."""
-        created_list = admin_client.create_list(list_name + self._name_suffix_A)
+        created_list = admin_client.create_list(list_name + cls._name_suffix_A)
         yield created_list
         admin_client.delete_list(created_list)
 
     @pytest.fixture(scope="class")
-    def list_b(self, admin_client, list_name):
+    @classmethod
+    def list_b(cls, admin_client, list_name):
         """A published list with a known name."""
-        created_list = admin_client.create_list(list_name + self._name_suffix_B)
+        created_list = admin_client.create_list(list_name + cls._name_suffix_B)
         requested_list = admin_client.request_list_approval(created_list)
         published_list = admin_client.publish_list(requested_list)
         yield published_list
