@@ -102,6 +102,9 @@ filterwarnings = [
 [tool.pydocstyle]
 convention = "numpy"
 
+[tool.codespell]
+ignore-words-list = ["Synopsys"]
+
 [tool.mypy]
 strict = true
 warn_return_any = true
