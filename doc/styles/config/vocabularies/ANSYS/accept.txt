@@ -9,3 +9,4 @@ THIRDPARTY
 autologon
 uv
 pytest
+synopsys
