@@ -33,6 +33,8 @@ from ansys.grantami.recordlists._connection import (
     _RecordListsApiClient2024R2,
     _RecordListsApiClient2025R1,
     _RecordListsApiClient2025R2,
+    _RecordListsApiClient2026R1,
+    _RecordListsApiClient2027R1,
 )
 
 
@@ -92,6 +94,43 @@ def test_new_server_version(sl_url, successful_auth, mocker):
         client = connection.connect()
     assert isinstance(client, RecordListsApiClient)
     assert isinstance(client, _RecordListsApiClient2025R2)
+    assert not isinstance(client, _RecordListsApiClient2025R1)
+    assert not isinstance(client, _RecordListsApiClient2024R2)
+
+
+def test_supported_server_version_26_1(sl_url, successful_auth, mocker):
+    mi_version_response = {
+        "binaryCompatibilityVersion": "26.1.0.0",
+        "version": "26.1.820.0",
+        "majorMinorVersion": "26.1",
+    }
+
+    with mocker:
+        connection = Connection(sl_url).with_anonymous()
+        mocker.get(requests_mock.ANY, status_code=200, json=mi_version_response)
+        client = connection.connect()
+    assert isinstance(client, RecordListsApiClient)
+    assert isinstance(client, _RecordListsApiClient2026R1)
+    assert not isinstance(client, _RecordListsApiClient2025R2)
+    assert not isinstance(client, _RecordListsApiClient2025R1)
+    assert not isinstance(client, _RecordListsApiClient2024R2)
+
+
+def test_supported_server_version_27_1(sl_url, successful_auth, mocker):
+    mi_version_response = {
+        "binaryCompatibilityVersion": "27.1.0.0",
+        "version": "27.1.820.0",
+        "majorMinorVersion": "27.1",
+    }
+
+    with mocker:
+        connection = Connection(sl_url).with_anonymous()
+        mocker.get(requests_mock.ANY, status_code=200, json=mi_version_response)
+        client = connection.connect()
+    assert isinstance(client, RecordListsApiClient)
+    assert isinstance(client, _RecordListsApiClient2027R1)
+    assert not isinstance(client, _RecordListsApiClient2026R1)
+    assert not isinstance(client, _RecordListsApiClient2025R2)
     assert not isinstance(client, _RecordListsApiClient2025R1)
     assert not isinstance(client, _RecordListsApiClient2024R2)
 
