@@ -70,6 +70,7 @@ class _ClientFactory:
         self._client_builder = client_builder
 
         self._client_map = {
+            (27, 1): _RecordListsApiClient2027R1,
             (26, 1): _RecordListsApiClient2026R1,
             (25, 2): _RecordListsApiClient2025R2,
             (25, 1): _RecordListsApiClient2025R1,
@@ -961,6 +962,22 @@ class _RecordListsApiClient2026R1(_RecordListsApiClientWithAuditLog):
         configuration: SessionConfiguration,
     ):
         logger.debug("Creating RecordListsApiClient for Granta MI 2026 R1")
+        super().__init__(session, service_layer_url, configuration)
+
+
+class _RecordListsApiClient2027R1(_RecordListsApiClientWithAuditLog):
+    """2027 R1 implementation of the RecordListsApiClient interface."""
+
+    _api = v2026r1api
+    _models = v2026r1models
+
+    def __init__(
+        self,
+        session: requests.Session,
+        service_layer_url: str,
+        configuration: SessionConfiguration,
+    ):
+        logger.debug("Creating RecordListsApiClient for Granta MI 2027 R1")
         super().__init__(session, service_layer_url, configuration)
 
 

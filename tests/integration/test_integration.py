@@ -45,17 +45,30 @@ from ansys.grantami.recordlists._connection import (
     _RecordListsApiClient2025R1,
     _RecordListsApiClient2025R2,
     _RecordListsApiClient2026R1,
+    _RecordListsApiClient2027R1,
 )
 
-pytestmark = pytest.mark.integration(mi_versions=[(26, 1), (25, 2), (25, 1), (24, 2)])
+pytestmark = pytest.mark.integration(mi_versions=[(27, 1), (26, 1), (25, 2), (25, 1), (24, 2)])
 
 
 class TestConnection:
+    @pytest.mark.integration(mi_versions=[(27, 1)])
+    def test_mi_27_1(self, sl_url, list_admin_username, list_admin_password):
+        connection = Connection(sl_url).with_credentials(list_admin_username, list_admin_password)
+        client = connection.connect()
+        assert isinstance(client, RecordListsApiClient)
+        assert isinstance(client, _RecordListsApiClient2027R1)
+        assert not isinstance(client, _RecordListsApiClient2026R1)
+        assert not isinstance(client, _RecordListsApiClient2025R2)
+        assert not isinstance(client, _RecordListsApiClient2025R1)
+        assert not isinstance(client, _RecordListsApiClient2024R2)
+
     @pytest.mark.integration(mi_versions=[(26, 1)])
     def test_mi_26_1(self, sl_url, list_admin_username, list_admin_password):
         connection = Connection(sl_url).with_credentials(list_admin_username, list_admin_password)
         client = connection.connect()
         assert isinstance(client, RecordListsApiClient)
+        assert not isinstance(client, _RecordListsApiClient2027R1)
         assert isinstance(client, _RecordListsApiClient2026R1)
         assert not isinstance(client, _RecordListsApiClient2025R2)
         assert not isinstance(client, _RecordListsApiClient2025R1)
@@ -66,6 +79,7 @@ class TestConnection:
         connection = Connection(sl_url).with_credentials(list_admin_username, list_admin_password)
         client = connection.connect()
         assert isinstance(client, RecordListsApiClient)
+        assert not isinstance(client, _RecordListsApiClient2027R1)
         assert not isinstance(client, _RecordListsApiClient2026R1)
         assert isinstance(client, _RecordListsApiClient2025R2)
         assert not isinstance(client, _RecordListsApiClient2025R1)
@@ -76,6 +90,7 @@ class TestConnection:
         connection = Connection(sl_url).with_credentials(list_admin_username, list_admin_password)
         client = connection.connect()
         assert isinstance(client, RecordListsApiClient)
+        assert not isinstance(client, _RecordListsApiClient2027R1)
         assert not isinstance(client, _RecordListsApiClient2026R1)
         assert not isinstance(client, _RecordListsApiClient2025R2)
         assert isinstance(client, _RecordListsApiClient2025R1)
@@ -86,6 +101,7 @@ class TestConnection:
         connection = Connection(sl_url).with_credentials(list_admin_username, list_admin_password)
         client = connection.connect()
         assert isinstance(client, RecordListsApiClient)
+        assert not isinstance(client, _RecordListsApiClient2027R1)
         assert not isinstance(client, _RecordListsApiClient2026R1)
         assert not isinstance(client, _RecordListsApiClient2025R2)
         assert not isinstance(client, _RecordListsApiClient2025R1)
