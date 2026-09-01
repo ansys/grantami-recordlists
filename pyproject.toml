@@ -52,7 +52,6 @@ dev = [
     "requests-mock>=1.10.0",
     "pre-commit>=4.0.1",
     "mypy>=1.19.0,<3",
-    "types-requests>=2.26",
 ]
 
 doc = [
