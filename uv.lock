@@ -63,7 +63,7 @@ examples = [
 
 [package.metadata]
 requires-dist = [
-    { name = "ansys-grantami-serverapi-openapi", specifier = ">=5.1.0,<6.0" },
+    { name = "ansys-grantami-serverapi-openapi", specifier = "==6.0.0.dev1349", index = "https://pkgs.dev.azure.com/pyansys/_packaging/pyansys/pypi/simple/" },
     { name = "ansys-openapi-common", specifier = ">=2.0.0,<3.0.0" },
     { name = "requests", specifier = ">=2.26,<3.0.0" },
 ]
@@ -91,16 +91,16 @@ examples = [{ name = "jupyterlab", specifier = ">=4.0.0" }]
 
 [[package]]
 name = "ansys-grantami-serverapi-openapi"
-version = "5.1.0"
-source = { registry = "https://pypi.org/simple" }
+version = "6.0.0.dev1349"
+source = { registry = "https://pkgs.dev.azure.com/pyansys/_packaging/pyansys/pypi/simple/" }
 dependencies = [
     { name = "ansys-openapi-common" },
     { name = "python-dateutil" },
     { name = "requests" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/80/c4/89aa623b46056f9bae8b3e96cccb127ad34cffafd57ecfb18b6b5b8d61b2/ansys_grantami_serverapi_openapi-5.1.0.tar.gz", hash = "sha256:699c9859714b23f4db14090f20d4d274462131672b55602cbef87113eb23ad66", size = 2132692, upload-time = "2025-12-16T14:43:59.874Z" }
+sdist = { url = "https://pkgs.dev.azure.com/pyansys/_packaging/705e121a-9631-49f5-8aaf-c7142856f923/pypi/download/ansys-grantami-serverapi-openapi/6.dev1349/ansys_grantami_serverapi_openapi-6.0.0.dev1349.tar.gz", hash = "sha256:ea7546d7b31dbe86af2f9e22b1bbbccafd26e317cd03b95fac5305937f5fb857" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/d9/40/f1dbb9cd6f21199bc73af566cd211a820ed4d433a342d7f4c343bcba6497/ansys_grantami_serverapi_openapi-5.1.0-py3-none-any.whl", hash = "sha256:930ef5678e2ccc37f54801a4d57aa910df92842894632362e3f6472b79832859", size = 10496013, upload-time = "2025-12-16T14:43:57.72Z" },
+    { url = "https://pkgs.dev.azure.com/pyansys/_packaging/705e121a-9631-49f5-8aaf-c7142856f923/pypi/download/ansys-grantami-serverapi-openapi/6.dev1349/ansys_grantami_serverapi_openapi-6.0.0.dev1349-py3-none-any.whl", hash = "sha256:2a553e63add0d279a35613504d8b9afea99577f41c668221e66ea0fc26857352" },
 ]
 
 [[package]]
