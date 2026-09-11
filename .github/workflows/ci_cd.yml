@@ -243,6 +243,7 @@ jobs:
           library-name: ${{ env.LIBRARY_NAME }}
           twine-username: "__token__"
           twine-token: ${{ secrets.PYANSYS_PYPI_PRIVATE_PAT }}
+          verify-tag-version: false
 
   update-changelog:
     name: "Update CHANGELOG for new tag"
