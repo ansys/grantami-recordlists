@@ -33,6 +33,8 @@ from ansys.grantami.serverapi_openapi.v2025r2 import api as v2025r2api
 from ansys.grantami.serverapi_openapi.v2025r2 import models as v2025r2models
 from ansys.grantami.serverapi_openapi.v2026r1 import api as v2026r1api
 from ansys.grantami.serverapi_openapi.v2026r1 import models as v2026r1models
+from ansys.grantami.serverapi_openapi.v2027r1 import api as v2027r1api
+from ansys.grantami.serverapi_openapi.v2027r1 import models as v2027r1models
 from ansys.openapi.common import (
     ApiClient,
     ApiClientFactory,
@@ -968,8 +970,8 @@ class _RecordListsApiClient2026R1(_RecordListsApiClientWithAuditLog):
 class _RecordListsApiClient2027R1(_RecordListsApiClientWithAuditLog):
     """2027 R1 implementation of the RecordListsApiClient interface."""
 
-    _api = v2026r1api
-    _models = v2026r1models
+    _api = v2027r1api
+    _models = v2027r1models
 
     def __init__(
         self,
