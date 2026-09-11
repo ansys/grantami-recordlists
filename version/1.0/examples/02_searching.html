@@ -1,0 +1,748 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Searching &#8212; PyGranta RecordLists</title>
+    
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=e353d410970836974a52" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/ansys_sphinx_theme.css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.23/css/jquery.dataTables.min.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
+
+    
+        <link href="../_static/css/breadcrumbs.css" rel="stylesheet">
+    
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/clipboard.min.js"></script>
+    <script src="../_static/copybutton.js"></script>
+    <script src="../_static/js/table.js"></script>
+    <script src="https://cdn.datatables.net/1.10.23/js/jquery.dataTables.min.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'examples/02_searching';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://recordlists.grantami.docs.pyansys.com/versions.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '1.0';
+        </script>
+    <link rel="icon" href="../_static/ansys-favicon.png"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Contributing" href="../contributing.html" />
+    <link rel="prev" title="Publishing, revising, and withdrawing record lists" href="01_publishing_revising_withdrawing.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <link rel="canonical" href="https://recordlists.grantami.docs.pyansys.com/version/stable/examples/02_searching.html" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container"><!-- Debugging: html_theme_options =  -->
+
+  <!-- If there is no MiliSearch enabled, use the PyData search -->
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+</div>
+  </div>
+  
+    
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  <div class="navbar-header-items__start">
+    
+      <div class="navbar-item">
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/pyansys-logo-black-cropped.png" class="logo__image only-light" alt="Logo image"/>
+    <script>document.write(`<img src="../_static/pyansys-logo-black-cropped.png" class="logo__image only-dark" alt="Logo image"/>`);</script>
+  
+  
+</a></div>
+    
+  </div>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item"><nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../getting_started/index.html">
+                        Getting started
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../api/index.html">
+                        API reference
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="index.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../contributing.html">
+                        Contributing
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+  </button>
+`);
+</script>
+        </div>
+      
+      
+        <div class="navbar-item">
+<script>
+document.write(`
+  <div class="version-switcher__container dropdown">
+    <button type="button" class="version-switcher__button btn btn-sm navbar-btn dropdown-toggle" data-bs-toggle="dropdown">
+      1.0  <!-- this text may get changed later by javascript -->
+      <span class="caret"></span>
+    </button>
+    <div class="version-switcher__menu dropdown-menu list-group-flush py-0">
+    <!-- dropdown will be populated by javascript on page load -->
+    </div>
+  </div>
+`);
+</script></div>
+      
+        <div class="navbar-item">
+<script>
+document.write(`
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  </button>
+`);
+</script></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/ansys/grantami-recordlists" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-square-github"></i></span>
+            <label class="sr-only">GitHub</label></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+  </button>
+`);
+</script>
+    </div>
+  
+
+  
+    <label class="sidebar-toggle secondary-toggle" for="__secondary">
+      <span class="fa-solid fa-outdent"></span>
+    </label>
+  
+</div>
+
+    </nav>
+  
+
+    
+    <div id="announcement_msg"></div>
+<script>
+  fetch("announcement.html")
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`HTTP error: ${response.status}`);
+      }
+      return response.text();
+    })
+    .then(text => document.getElementById("announcement_msg").innerHTML = text)
+    .catch((error) => console.error(`Fetch problem: ${error.message}`));
+</script>
+    
+
+    
+    <div class="container-xl">
+    <div class="row">
+        <div class="col-12 col-md-3" id="breadcrumbs-spacer"></div>
+        <div class="col-12 col-md-11 col-xl-9" id="breadcrumbs">
+          
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+    
+        <li class="nav-item nav-item-additional-breadcrumb"><a href="https://docs.pyansys.com/">PyAnsys</a> » </li>
+    
+        <li class="nav-item nav-item-additional-breadcrumb"><a href="https://grantami.docs.pyansys.com/">PyGranta</a> » </li>
+    
+    
+        <li class="nav-item nav-item-0"><a href="../index.html">PyGranta RecordLists</a> » </li>
+    
+
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Examples</a> » </li>
+        <li class="nav-item nav-item-this"><a href="">Searching</a></li> 
+      </ul>
+    </div>
+        </div>
+  </div>
+</div>
+    
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item"><nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../getting_started/index.html">
+                        Getting started
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../api/index.html">
+                        API reference
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="index.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../contributing.html">
+                        Contributing
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+<script>
+document.write(`
+  <div class="version-switcher__container dropdown">
+    <button type="button" class="version-switcher__button btn btn-sm navbar-btn dropdown-toggle" data-bs-toggle="dropdown">
+      1.0  <!-- this text may get changed later by javascript -->
+      <span class="caret"></span>
+    </button>
+    <div class="version-switcher__menu dropdown-menu list-group-flush py-0">
+    <!-- dropdown will be populated by javascript on page load -->
+    </div>
+  </div>
+`);
+</script></div>
+        
+          <div class="navbar-item">
+<script>
+document.write(`
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  </button>
+`);
+</script></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/ansys/grantami-recordlists" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-square-github"></i></span>
+            <label class="sr-only">GitHub</label></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item"><nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="00_basic_usage.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="01_publishing_revising_withdrawing.html">Publishing, revising, and withdrawing record lists</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Searching</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article"></div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <p>Download this example as a <a class="reference download internal" download="" href="../_downloads/43b3c0e88c3cc5bf0badb5986296d86f/02_searching.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Jupyter</span> <span class="pre">notebook</span></code></a> or a
+<a class="reference download internal" download="" href="../_downloads/54c90de1c60d6131ab9b64f57d0a7c0c/02_searching.py"><code class="xref download docutils literal notranslate"><span class="pre">Python</span> <span class="pre">script</span></code></a>.</p>
+<hr class="docutils" />
+<section id="Searching">
+<h1>Searching<a class="headerlink" href="#Searching" title="Permalink to this heading">#</a></h1>
+<p>This notebook demonstrates how to search for record lists using <code class="docutils literal notranslate"><span class="pre">SearchCriterion</span></code> and <code class="docutils literal notranslate"><span class="pre">BooleanCriterion</span></code>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Running this notebook requires permissions to request publication of, to publish, and to revise a record list. Contact your Granta MI administrator for more information.</p>
+</div>
+<section id="Connect-to-Granta-MI-and-create-a-record-list">
+<h2>Connect to Granta MI and create a record list<a class="headerlink" href="#Connect-to-Granta-MI-and-create-a-record-list" title="Permalink to this heading">#</a></h2>
+<p>Import the <code class="docutils literal notranslate"><span class="pre">Connection</span></code> class and create the connection. See the <a class="reference internal" href="00_basic_usage.html"><span class="doc">Getting started</span></a> example for more details.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ansys.grantami.recordlists</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">BooleanCriterion</span><span class="p">,</span>
+    <span class="n">Connection</span><span class="p">,</span>
+    <span class="n">RecordListItem</span><span class="p">,</span>
+    <span class="n">SearchCriterion</span><span class="p">,</span>
+    <span class="n">UserRole</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">connection</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="s2">&quot;http://my_grantami_server/mi_servicelayer&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">with_autologon</span><span class="p">()</span>
+<span class="n">client</span> <span class="o">=</span> <span class="n">connection</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<p>Create some record lists for use in this example:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">identifier_a</span></code>: Published, empty</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">identifier_b</span></code>: Published, populated</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">identifier_c</span></code>: Revision of <code class="docutils literal notranslate"><span class="pre">identifier_b</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">identifier_d</span></code>: Unpublished</p></li>
+</ul>
+<p>See the <a class="reference internal" href="01_publishing_revising_withdrawing.html"><span class="doc">Publishing, revising, and withdrawing record lists</span></a> example for more details.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">list_a</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">create_list</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Approved materials - Metals&quot;</span><span class="p">)</span>
+<span class="n">list_a</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">request_list_approval</span><span class="p">(</span><span class="n">list_a</span><span class="p">)</span>
+<span class="n">list_a</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">publish_list</span><span class="p">(</span><span class="n">list_a</span><span class="p">)</span>
+
+<span class="n">list_b</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">create_list</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Approved materials - Ceramics&quot;</span><span class="p">)</span>
+<span class="n">client</span><span class="o">.</span><span class="n">add_items_to_list</span><span class="p">(</span>
+    <span class="n">list_b</span><span class="p">,</span>
+    <span class="n">items</span><span class="o">=</span><span class="p">[</span>
+        <span class="n">RecordListItem</span><span class="p">(</span>
+            <span class="s2">&quot;9716c5a3-da85-4126-a922-3fbb854656d8&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;d352fd12-c342-41c1-9da7-dac0dac1c6d9&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;c61e8f3a-d7e1-4b7f-8232-b2495eae6c15&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="p">],</span>
+<span class="p">)</span>
+<span class="n">list_b</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">request_list_approval</span><span class="p">(</span><span class="n">list_b</span><span class="p">)</span>
+<span class="n">list_b</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">publish_list</span><span class="p">(</span><span class="n">list_b</span><span class="p">)</span>
+
+<span class="n">list_c</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">revise_list</span><span class="p">(</span><span class="n">list_b</span><span class="p">)</span>
+<span class="n">list_d</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">create_list</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;My personal list&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Search-for-a-record-list-by-name">
+<h2>Search for a record list by name<a class="headerlink" href="#Search-for-a-record-list-by-name" title="Permalink to this heading">#</a></h2>
+<p>Use the <code class="docutils literal notranslate"><span class="pre">name_contains</span></code> keyword argument for the <code class="docutils literal notranslate"><span class="pre">SearchCriterion</span></code> constructor to specify a search criterion based on the record list name.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">results</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">search_for_lists</span><span class="p">(</span><span class="n">SearchCriterion</span><span class="p">(</span><span class="n">name_contains</span><span class="o">=</span><span class="s2">&quot;Approved materials - Ceramics&quot;</span><span class="p">))</span>
+<span class="n">results</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[&lt;SearchResult name: Approved materials - Ceramics&gt;,
+ &lt;SearchResult name: Approved materials - Ceramics&gt;]
+</pre></div></div>
+</div>
+</section>
+<section id="Search-for-'personal'-record-lists">
+<h2>Search for ‘personal’ record lists<a class="headerlink" href="#Search-for-'personal'-record-lists" title="Permalink to this heading">#</a></h2>
+<p>A ‘personal’ record list is a list that the current user has created for their own use. It is owned by the current user, is not published, is not awaiting approval, and is not a revision of another list. Lists are generally in this state if they are created in the Favorites or Explore apps and are not submitted for publication.</p>
+<p>To search for a list of this type, use the <code class="docutils literal notranslate"><span class="pre">SearchCriterion</span></code> below. Set <code class="docutils literal notranslate"><span class="pre">is_internal_use=False</span></code> to exclude transient record lists created by Granta MI for internal use only, which would otherwise be returned by this search.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">criterion</span> <span class="o">=</span> <span class="n">SearchCriterion</span><span class="p">(</span>
+    <span class="n">is_published</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">is_revision</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">is_awaiting_approval</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">is_internal_use</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">user_role</span><span class="o">=</span><span class="n">UserRole</span><span class="o">.</span><span class="n">OWNER</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">results</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">search_for_lists</span><span class="p">(</span><span class="n">criterion</span><span class="p">)</span>
+<span class="n">results</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[&lt;SearchResult name: My personal list&gt;]
+</pre></div></div>
+</div>
+</section>
+<section id="Search-for-a-record-list-by-contents">
+<h2>Search for a record list by contents<a class="headerlink" href="#Search-for-a-record-list-by-contents" title="Permalink to this heading">#</a></h2>
+<p>Search for record lists that contain a specific record with the <code class="docutils literal notranslate"><span class="pre">contains_records</span></code> keyword. Specifying <code class="docutils literal notranslate"><span class="pre">include_items=True</span></code> when calling <code class="docutils literal notranslate"><span class="pre">search_for_lists</span></code> will populate <code class="docutils literal notranslate"><span class="pre">items</span></code> on the results.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">criterion</span> <span class="o">=</span> <span class="n">SearchCriterion</span><span class="p">(</span><span class="n">contains_records</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;c61e8f3a-d7e1-4b7f-8232-b2495eae6c15&quot;</span><span class="p">])</span>
+<span class="n">results</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">search_for_lists</span><span class="p">(</span><span class="n">criterion</span><span class="p">,</span> <span class="n">include_items</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">results</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[&lt;SearchResult name: Approved materials - Ceramics&gt;,
+ &lt;SearchResult name: Approved materials - Ceramics&gt;]
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">items</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[&lt;RecordListItem(database_guid=&#39;9716c5a3-da85-4126-a922-3fbb854656d8&#39;, record_history_guid=&#39;c61e8f3a-d7e1-4b7f-8232-b2495eae6c15&#39;)&gt;]
+</pre></div></div>
+</div>
+</section>
+<section id="Search-using-a-complex-criterion">
+<h2>Search using a complex criterion<a class="headerlink" href="#Search-using-a-complex-criterion" title="Permalink to this heading">#</a></h2>
+<p>Build complex queries with <code class="docutils literal notranslate"><span class="pre">BooleanCriterion</span></code>. For example, search for published record lists following the naming convention “Approved materials - {Material family}”, but specifically only metals and ceramics.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">criterion</span> <span class="o">=</span> <span class="n">BooleanCriterion</span><span class="p">(</span>
+    <span class="n">match_all</span><span class="o">=</span><span class="p">[</span>
+        <span class="n">SearchCriterion</span><span class="p">(</span>
+            <span class="n">name_contains</span><span class="o">=</span><span class="s2">&quot;Approved materials&quot;</span><span class="p">,</span>
+            <span class="n">is_published</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">),</span>
+        <span class="n">BooleanCriterion</span><span class="p">(</span>
+            <span class="n">match_any</span><span class="o">=</span><span class="p">[</span>
+                <span class="n">SearchCriterion</span><span class="p">(</span>
+                    <span class="n">name_contains</span><span class="o">=</span><span class="s2">&quot;Metals&quot;</span><span class="p">,</span>
+                <span class="p">),</span>
+                <span class="n">SearchCriterion</span><span class="p">(</span>
+                    <span class="n">name_contains</span><span class="o">=</span><span class="s2">&quot;Ceramics&quot;</span><span class="p">,</span>
+                <span class="p">),</span>
+            <span class="p">]</span>
+        <span class="p">),</span>
+    <span class="p">]</span>
+<span class="p">)</span>
+<span class="n">results</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">search_for_lists</span><span class="p">(</span><span class="n">criterion</span><span class="p">)</span>
+<span class="n">results</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[&lt;SearchResult name: Approved materials - Ceramics&gt;,
+ &lt;SearchResult name: Approved materials - Metals&gt;]
+</pre></div></div>
+</div>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Connect-to-Granta-MI-and-create-a-record-list">Connect to Granta MI and create a record list</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Search-for-a-record-list-by-name">Search for a record list by name</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Search-for-'personal'-record-lists">Search for ‘personal’ record lists</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Search-for-a-record-list-by-contents">Search for a record list by contents</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Search-using-a-complex-criterion">Search using a complex criterion</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+  <div class="tocsection sourcelink">
+    <a href="../_sources/examples/02_searching.ipynb.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=e353d410970836974a52"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+  <p class="copyright">
+    
+      © Copyright (c) 2023 ANSYS, Inc. All rights reserved.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.0.1.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item"><p class="theme-version">
+    Built with the <a href="https://sphinxdocs.ansys.com/version/stable/index.html">Ansys Sphinx Theme</a> 0.9.9.
+    <br>Last updated on <span id="date"></span></br>
+</p>
+<script>
+  var options = { day: 'numeric', month: 'long', year: 'numeric' };
+  var lastModifiedDate = new Date(document.lastModified);
+  var date = lastModifiedDate.toLocaleDateString('en-US', options);
+  document.getElementById("date").innerHTML = date;
+</script></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>
