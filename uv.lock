@@ -63,7 +63,7 @@ examples = [
 
 [package.metadata]
 requires-dist = [
-    { name = "ansys-grantami-serverapi-openapi", specifier = "==6.0.0.dev1349", index = "https://pkgs.dev.azure.com/pyansys/_packaging/pyansys/pypi/simple/" },
+    { name = "ansys-grantami-serverapi-openapi", specifier = "==6.0.0rc0" },
     { name = "ansys-openapi-common", specifier = ">=2.0.0,<3.0.0" },
     { name = "requests", specifier = ">=2.26,<3.0.0" },
 ]
@@ -91,16 +91,16 @@ examples = [{ name = "jupyterlab", specifier = ">=4.0.0" }]
 
 [[package]]
 name = "ansys-grantami-serverapi-openapi"
-version = "6.0.0.dev1349"
-source = { registry = "https://pkgs.dev.azure.com/pyansys/_packaging/pyansys/pypi/simple/" }
+version = "6.0.0rc0"
+source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "ansys-openapi-common" },
     { name = "python-dateutil" },
     { name = "requests" },
 ]
-sdist = { url = "https://pkgs.dev.azure.com/pyansys/_packaging/705e121a-9631-49f5-8aaf-c7142856f923/pypi/download/ansys-grantami-serverapi-openapi/6.dev1349/ansys_grantami_serverapi_openapi-6.0.0.dev1349.tar.gz", hash = "sha256:ea7546d7b31dbe86af2f9e22b1bbbccafd26e317cd03b95fac5305937f5fb857" }
+sdist = { url = "https://files.pythonhosted.org/packages/eb/ee/c34d73d936f394b33cf8d0f6b00198ec67af68184482e94e6601e784c48a/ansys_grantami_serverapi_openapi-6.0.0rc0.tar.gz", hash = "sha256:941fcc721a9ffddade4723196c2dfe62ed8f48b07f2f0c244c9c4bd32522b77f", size = 2442307, upload-time = "2026-09-17T09:13:07.335Z" }
 wheels = [
-    { url = "https://pkgs.dev.azure.com/pyansys/_packaging/705e121a-9631-49f5-8aaf-c7142856f923/pypi/download/ansys-grantami-serverapi-openapi/6.dev1349/ansys_grantami_serverapi_openapi-6.0.0.dev1349-py3-none-any.whl", hash = "sha256:2a553e63add0d279a35613504d8b9afea99577f41c668221e66ea0fc26857352" },
+    { url = "https://files.pythonhosted.org/packages/24/0c/9d94902120f46cd103e586b9bfee67b98725ad38c0082ec92c68eb7e8d5b/ansys_grantami_serverapi_openapi-6.0.0rc0-py3-none-any.whl", hash = "sha256:096732d9443f8e58191351ba1413555e1e7cf3d7a4016dde7c37db0dbdaf7c86", size = 10707848, upload-time = "2026-09-17T09:13:04.948Z" },
 ]
 
 [[package]]
