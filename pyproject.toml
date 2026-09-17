@@ -30,12 +30,9 @@ classifiers = [
 requires-python = ">=3.12"
 dependencies = [
     "ansys-openapi-common>=2.0.0,<3.0.0",
-    "ansys-grantami-serverapi-openapi==6.0.0.dev1349",
+    "ansys-grantami-serverapi-openapi==6.0.0rc0",
     "requests>=2.26,<3.0.0",
 ]
-
-[tool.uv.sources]
-ansys-grantami-serverapi-openapi = { index = "private-pypi"}
 
 [[tool.uv.index]]
 name = "private-pypi"
