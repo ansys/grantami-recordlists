@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- managed-by: ansys/actions/_doc-gen-sitemap -->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://recordlists.grantami.docs.pyansys.com/</loc>
+    <lastmod>2026-09-19T22:55:29+00:00</lastmod>
+  </url>
+  <url>
+    <loc>https://recordlists.grantami.docs.pyansys.com/version/stable/user_guide/index.html</loc>
+  </url>
+  <url>
+    <loc>https://recordlists.grantami.docs.pyansys.com/version/stable/changelog.html</loc>
+  </url>
+  <url>
+    <loc>https://recordlists.grantami.docs.pyansys.com/version/stable/getting_started/index.html</loc>
+  </url>
+  <url>
+    <loc>https://recordlists.grantami.docs.pyansys.com/version/stable/examples/01_publishing_revising_withdrawing.html</loc>
+  </url>
+  <url>
+    <loc>https://recordlists.grantami.docs.pyansys.com/version/stable/examples/index.html</loc>
+  </url>
+  <url>
+    <loc>https://recordlists.grantami.docs.pyansys.com/version/stable/examples/02_searching.html</loc>
+  </url>
+  <url>
+    <loc>https://recordlists.grantami.docs.pyansys.com/version/stable/examples/00_basic_usage.html</loc>
+  </url>
+  <url>
+    <loc>https://recordlists.grantami.docs.pyansys.com/version/stable/index.html</loc>
+  </url>
+  <url>
+    <loc>https://recordlists.grantami.docs.pyansys.com/version/stable/api/models.html</loc>
+  </url>
+  <url>
+    <loc>https://recordlists.grantami.docs.pyansys.com/version/stable/api/connection.html</loc>
+  </url>
+  <url>
+    <loc>https://recordlists.grantami.docs.pyansys.com/version/stable/api/index.html</loc>
+  </url>
+  <url>
+    <loc>https://recordlists.grantami.docs.pyansys.com/version/stable/contributing.html</loc>
+  </url>
+</urlset>
