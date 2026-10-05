@@ -178,7 +178,7 @@ jobs:
   server-checks:
     name: "Server checks"
     needs: [tests]
-    if: ${{ !startsWith( github.event.pull_request.head.ref, 'dependabot/') }}
+    if: ${{ !startsWith( github.event.pull_request.head.ref, 'dependabot/') && vars.SKIP_INTEGRATION_TESTS != 'true' }}
     uses: ./.github/workflows/server_checks.yml
     with:
       skip-vm-management: ${{ vars.SKIP_VM_MANAGEMENT == 'true' }}
@@ -209,7 +209,7 @@ jobs:
   integration-checks-complete:
     name: "Integration checks complete"
     runs-on: ubuntu-latest
-    if: always() && ( startsWith( github.event.pull_request.head.ref, 'dependabot/') || needs.server-checks.result == 'success' )
+    if: always() && ( startsWith( github.event.pull_request.head.ref, 'dependabot/') || vars.SKIP_INTEGRATION_TESTS == 'true' || needs.server-checks.result == 'success' )
     needs: server-checks
     steps:
       - name: "Integration checks complete"
