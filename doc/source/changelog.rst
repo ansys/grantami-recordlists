@@ -11,6 +11,90 @@ See `CHANGELOG.md <https://github.com/ansys/grantami-recordlists/blob/main/CHANG
 
 .. towncrier release notes start
 
+`2.2.0rc0 <https://github.com/ansys/grantami-recordlists/releases/tag/v2.2.0rc0>`_ - October 07, 2026
+=====================================================================================================
+
+.. tab-set::
+
+
+  .. tab-item:: Fixed
+
+    .. list-table::
+        :header-rows: 0
+        :widths: auto
+
+        * - Convert class-scoped fixtures to class methods
+          - `#643 <https://github.com/ansys/grantami-recordlists/pull/643>`_
+
+
+  .. tab-item:: Documentation
+
+    .. list-table::
+        :header-rows: 0
+        :widths: auto
+
+        * - Chore: update CHANGELOG for v2.1.0
+          - `#579 <https://github.com/ansys/grantami-recordlists/pull/579>`_
+
+        * - Chore: update CHANGELOG for v2.1.1
+          - `#587 <https://github.com/ansys/grantami-recordlists/pull/587>`_
+
+
+  .. tab-item:: Maintenance
+
+    .. list-table::
+        :header-rows: 0
+        :widths: auto
+
+        * - Add 2026 R1 test VM
+          - `#551 <https://github.com/ansys/grantami-recordlists/pull/551>`_
+
+        * - Update ansys/actions to v10.2.7
+          - `#573 <https://github.com/ansys/grantami-recordlists/pull/573>`_
+
+        * - Bump version number on main to 2.2.0.dev0
+          - `#580 <https://github.com/ansys/grantami-recordlists/pull/580>`_
+
+        * - Chore: Update missing or outdated files
+          - `#645 <https://github.com/ansys/grantami-recordlists/pull/645>`_, `#668 <https://github.com/ansys/grantami-recordlists/pull/668>`_
+
+        * - Add 2027 R1 client implementation and tests
+          - `#667 <https://github.com/ansys/grantami-recordlists/pull/667>`_
+
+        * - Update ansys actions to 10.3.6
+          - `#669 <https://github.com/ansys/grantami-recordlists/pull/669>`_
+
+        * - Remove types-requests dependency
+          - `#679 <https://github.com/ansys/grantami-recordlists/pull/679>`_
+
+        * - Drop support for python 3.10 and 3.11
+          - `#683 <https://github.com/ansys/grantami-recordlists/pull/683>`_
+
+        * - Update to ServerAPI 27R1 dev bindings
+          - `#686 <https://github.com/ansys/grantami-recordlists/pull/686>`_
+
+        * - Disable version verification on internal dev build publication
+          - `#687 <https://github.com/ansys/grantami-recordlists/pull/687>`_
+
+        * - Bump serverapi-openapi to 6.0.0rc0
+          - `#690 <https://github.com/ansys/grantami-recordlists/pull/690>`_
+
+        * - Update authors/maintainers to Synopsys, Inc. and ANSYS, Inc.
+          - `#692 <https://github.com/ansys/grantami-recordlists/pull/692>`_
+
+        * - Conditionally skip integration tests via actions variable
+          - `#697 <https://github.com/ansys/grantami-recordlists/pull/697>`_
+
+        * - Run post-build actions if integration checks are skipped
+          - `#701 <https://github.com/ansys/grantami-recordlists/pull/701>`_
+
+        * - Bump serverapi-openapi to 6.0
+          - `#703 <https://github.com/ansys/grantami-recordlists/pull/703>`_
+
+        * - Prepare release 2.2.0rc0
+          - `#706 <https://github.com/ansys/grantami-recordlists/pull/706>`_
+
+
 `2.1.1 <https://github.com/ansys/grantami-recordlists/releases/tag/v2.1.1>`_ - March 12, 2026
 =============================================================================================
 
