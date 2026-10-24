@@ -1113,12 +1113,12 @@ class AuditLogItem:
         logger.debug("Deserializing AuditLogItem from API response")
         logger.debug(model.to_str())
 
-        assert (
-            model.list_identifier
-        ), "GsaListAuditLogItem must have populated list_identifier attribute"
-        assert (
-            model.initiating_user
-        ), "GsaListAuditLogItem must have populated initiating_user attribute"
+        assert model.list_identifier, (
+            "GsaListAuditLogItem must have populated list_identifier attribute"
+        )
+        assert model.initiating_user, (
+            "GsaListAuditLogItem must have populated initiating_user attribute"
+        )
         assert model.timestamp, "GsaListAuditLogItem must have populated timestamp attribute"
         assert model.action, "GsaListAuditLogItem must have populated action attribute"
 

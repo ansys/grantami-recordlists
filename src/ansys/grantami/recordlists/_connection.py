@@ -592,12 +592,12 @@ class RecordListsApiClient(ApiClient, ABC):
         logger.info(f"Updating list {record_list} with connection {self}")
         if name == _ArgNotProvided and description == _ArgNotProvided and notes == _ArgNotProvided:
             raise ValueError(
-                f"Update must include at least one property to update. "
-                f"Supported properties are 'name', 'description', and 'notes'."
+                "Update must include at least one property to update. "
+                "Supported properties are 'name', 'description', and 'notes'."
             )
 
         if name is None:
-            raise ValueError(f"If provided, argument 'name' cannot be None.")
+            raise ValueError("If provided, argument 'name' cannot be None.")
 
         body = self._models.GsaUpdateRecordListProperties()
         if name != _ArgNotProvided:
@@ -1187,9 +1187,9 @@ class _ItemResolver:
         """
         try:
             if item.record_version is not None and item.record_guid is not None:
-                assert (
-                    item.table_guid
-                ), "RecordListItem.table_guid must be populated to check record version resolvability"
+                assert item.table_guid, (
+                    "RecordListItem.table_guid must be populated to check record version resolvability"
+                )
                 self._record_versions_api.get_record_version(
                     database_key=db_key,
                     table_guid=item.table_guid,

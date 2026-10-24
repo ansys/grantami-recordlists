@@ -123,8 +123,8 @@ def test_getting_all_lists(admin_client, new_list):
     # Using new_list fixture to ensure there is at least one list when this test is run
     all_lists = admin_client.get_all_lists()
     assert isinstance(all_lists, list)
-    assert all(isinstance(l, RecordList) for l in all_lists)
-    my_list = next(rl for rl in all_lists if rl.identifier == new_list.identifier)
+    assert all(isinstance(rl, RecordList) for rl in all_lists)
+    next(rl for rl in all_lists if rl.identifier == new_list.identifier)
 
 
 class TestListItems:
@@ -567,7 +567,7 @@ def test_delete_list(admin_client, new_list, list_name):
     admin_client.delete_list(new_list)
 
     with pytest.raises(ApiException) as exc:
-        my_list = admin_client.get_list(new_list.identifier)
+        admin_client.get_list(new_list.identifier)
     assert exc.value.status_code == 404
 
 
@@ -747,11 +747,11 @@ class TestRevisionLifeCycle(TestLifeCyclePublishedAndNotAwaitingApproval):
         updated_note = "Notes added to list revision"
         _ = admin_client.update_list(list_details, notes=updated_note)
 
-        updated_list = admin_client.request_list_approval(list_details)
-        returned_list = admin_client.publish_list(list_details)
+        admin_client.request_list_approval(list_details)
+        admin_client.publish_list(list_details)
 
         with pytest.raises(ApiException) as e:
-            revision_list_details = admin_client.get_list(list_details.identifier)
+            admin_client.get_list(list_details.identifier)
         assert e.value.status_code == 404
 
         original_list_details = admin_client.get_list(new_list.identifier)
@@ -888,7 +888,13 @@ class _TestSearch:
         list_mi_training_and_rs_items,
     ):
         """Forces all fixtures to execute at class instantiation."""
-        yield list_personal, list_published, list_mi_training_items, list_rs_items, list_mi_training_and_rs_items
+        yield (
+            list_personal,
+            list_published,
+            list_mi_training_items,
+            list_rs_items,
+            list_mi_training_and_rs_items,
+        )
 
     def validate_list(
         self,

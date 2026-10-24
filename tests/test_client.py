@@ -481,7 +481,7 @@ class TestSearch:
         mock_from_model = Mock()
         monkeypatch.setattr(SearchResult, "_from_model", mock_from_model)
 
-        results = client.search_for_lists(criterion, include_items=include_items)
+        client.search_for_lists(criterion, include_items=include_items)
 
         to_model_method.assert_called_once()
         expected_body = models.GsaRecordListSearchRequest(
