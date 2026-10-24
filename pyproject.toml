@@ -80,6 +80,7 @@ select = [
     "W",    # pycodestyle warnings
     "F",    # pyflakes
     "I",    # isort
+    "D",    # pydocstyle
     "C90",  # mccabe complexity
 ]
 ignore = [
@@ -89,12 +90,19 @@ ignore = [
 [tool.ruff.lint.isort]
 force-sort-within-sections = true
 
+[tool.ruff.lint.pydocstyle]
+convention = "numpy"
+
 [tool.ruff.lint.mccabe]
 max-complexity = 10
 
 [tool.ruff.lint.per-file-ignores]
 "__init__.py" = ["F401", "F403"]
-"tests/**" = ["C901"]  # complexity was not enforced before ruff
+"tests/**" = ["C901", "D"]  # complexity was not enforced before ruff
+"examples/**" = ["D"]
+"doc/**" = ["D"]
+".github/**" = ["D"]
+".ipython/**" = ["D"]
 [tool.coverage.run]
 source = ["ansys.grantami"]
 
