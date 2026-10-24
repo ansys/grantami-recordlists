@@ -28,12 +28,6 @@ repos:
   - id: debug-statements
   - id: check-merge-conflict
   - id: trailing-whitespace
-- repo: https://github.com/pycqa/pydocstyle
-  rev: 6.3.0
-  hooks:
-  - id: pydocstyle
-    additional_dependencies: [tomli]
-    files: "^(src/)"
 
 - repo: https://github.com/ansys/pre-commit-hooks
   rev: v0.8.0

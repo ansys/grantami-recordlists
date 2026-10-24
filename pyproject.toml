@@ -96,9 +96,6 @@ filterwarnings = [
 	"error",
 ]
 
-[tool.pydocstyle]
-convention = "numpy"
-
 [tool.codespell]
 ignore-words-list = ["Synopsys"]
 
