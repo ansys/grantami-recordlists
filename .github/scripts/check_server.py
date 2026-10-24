@@ -28,7 +28,7 @@ def block_until_server_is_ok(func):
         while True:
             logger.info(f"Check {check_count}")
             if func(*args, **kwargs):
-                logger.info(f"Server ready!")
+                logger.info("Server ready!")
                 break
             if check_count == MAX_ATTEMPTS:
                 logger.info(f"Failed after {MAX_ATTEMPTS} attempts. Quitting...")
@@ -69,9 +69,9 @@ def check_status(url: str, auth_header: HTTPBasicAuth) -> bool:
     content = json.loads(response.content)
     for check in content["HealthChecks"]:
         if check["Name"] == "Database Check" and check["Status"] == "Ok":
-            logger.info(f"All databases loaded.")
+            logger.info("All databases loaded.")
             return True
-    logger.info(f"All databases not loaded.")
+    logger.info("All databases not loaded.")
     return False
 
 
@@ -80,6 +80,6 @@ if __name__ == "__main__":
     username = os.getenv("TEST_USER")
     password = os.getenv("TEST_PASS")
 
-    logger.info(f"Checking if Granta MI server is ready for requests")
+    logger.info("Checking if Granta MI server is ready for requests")
     auth = HTTPBasicAuth(username, password)
     check_status(sl_url, auth)
