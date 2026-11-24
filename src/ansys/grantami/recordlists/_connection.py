@@ -1271,9 +1271,7 @@ class Connection(ApiClientFactory):
         if session_configuration is None:
             session_configuration = SessionConfiguration()
         # Headers must be set before calling super().__init__, which copies them to the underlying requests session.
-        session_configuration.headers["X-Granta-ApplicationName"] = (
-            GRANTA_APPLICATION_NAME_HEADER
-        )
+        session_configuration.headers["X-Granta-ApplicationName"] = GRANTA_APPLICATION_NAME_HEADER
         session_configuration.headers["User-Agent"] = generate_user_agent(
             "ansys-grantami-recordlists", __version__
         )
