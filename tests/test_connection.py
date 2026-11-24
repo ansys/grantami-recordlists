@@ -29,6 +29,7 @@ import requests_mock
 from ansys.grantami.recordlists import Connection, RecordListsApiClient
 from ansys.grantami.recordlists._connection import (
     AUTH_PATH,
+    GRANTA_APPLICATION_NAME_HEADER,
     PROXY_PATH,
     _RecordListsApiClient2024R2,
     _RecordListsApiClient2025R1,
@@ -48,6 +49,12 @@ def successful_auth(mocker, sl_url):
     with mocker:
         mocker.get(sl_url)
         mocker.get(sl_url + AUTH_PATH)
+
+
+def test_session_headers(sl_url):
+    headers = Connection(sl_url)._session.headers
+    assert headers["X-Granta-ApplicationName"] == GRANTA_APPLICATION_NAME_HEADER
+    assert headers["User-Agent"].startswith("ansys-grantami-recordlists/")
 
 
 def test_missing_api_definition_raises_informative_error(sl_url, successful_auth, mocker):
