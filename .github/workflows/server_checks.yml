@@ -43,8 +43,6 @@ on:
         required: true
       AZURE_VM_NAME_24R2:
         required: true
-      AZURE_VM_NAME_24R1:
-        required: true
 
       # Test server URLs
       TEST_SERVER_DEV_URL:
@@ -58,8 +56,6 @@ on:
       TEST_SERVER_25R1_URL:
         required: true
       TEST_SERVER_24R2_URL:
-        required: true
-      TEST_SERVER_24R1_URL:
         required: true
 
       # Test server credentials
@@ -112,8 +108,6 @@ jobs:
             url: "TEST_SERVER_25R1_URL"
           - name: "AZURE_VM_NAME_24R2"
             url: "TEST_SERVER_24R2_URL"
-          - name: "AZURE_VM_NAME_24R1"
-            url: "TEST_SERVER_24R1_URL"
     steps:
       - name: "Checkout the repository"
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
@@ -173,8 +167,6 @@ jobs:
             version: "25.1"
           - url: "TEST_SERVER_24R2_URL"
             version: "24.2"
-          - url: "TEST_SERVER_24R1_URL"
-            version: "24.1"
       fail-fast: false  # Required to ensure all servers are allowed to complete their tests and clean up after
     concurrency:
       group: ${{ matrix.server.url }}
@@ -250,7 +242,6 @@ jobs:
           - "AZURE_VM_NAME_25R2"
           - "AZURE_VM_NAME_25R1"
           - "AZURE_VM_NAME_24R2"
-          - "AZURE_VM_NAME_24R1"
     steps:
       - uses: azure/CLI@9eb25b8360668fb0ecbafa808d40e2197b2f5f52  #v3.0.0
         env:
